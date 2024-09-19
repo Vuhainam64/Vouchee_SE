@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Dynamic.Core;
+using System.Text;
+using System.Threading.Tasks;
+using Vouchee.Data.Models.Entities;
+using Vouchee.Data.Repositories.IRepos;
+
+namespace Vouchee.Data.Repositories.Repos
+{
+    public class VoucherRepository : BaseRepository<Voucher>, IVoucherRepository
+    {
+    }
+}
