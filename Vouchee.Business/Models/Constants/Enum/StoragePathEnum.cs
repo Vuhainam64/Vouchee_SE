@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Business.Models.Constants.Enum
 {
-    public enum OrderStatusEnum
+    public enum StoragePathEnum
     {
-        SUSPICIOUS,
-        PENDING,
-        DONE
+        User,
+        Voucher
     }
 }

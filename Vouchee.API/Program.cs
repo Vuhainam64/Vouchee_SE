@@ -10,8 +10,9 @@ IConfiguration configuration = builder.Configuration;
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddDependencyInjection();
-builder.Services.AddAutoMapper(typeof(AutoMapperResolver).Assembly);
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 builder.Services.AddSwaggerServices(configuration);
+builder.Services.AddFirebaseAuthentication(configuration);
 
 var app = builder.Build();
 IWebHostEnvironment env = app.Environment;

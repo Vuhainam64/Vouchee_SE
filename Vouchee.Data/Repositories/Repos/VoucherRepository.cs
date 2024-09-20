@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
+using Vouchee.Data.Helpers.Base;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Repositories.IRepos;
 

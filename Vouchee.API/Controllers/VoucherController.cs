@@ -8,7 +8,7 @@ using Vouchee.Business.Services;
 namespace Vouchee.API.Controllers
 {
     [ApiController]
-    [Route("api/v1.0/vouchers")]
+    [Route("api/voucher")]
     [EnableCors]
     public class VoucherController : ControllerBase
     {
@@ -21,7 +21,7 @@ namespace Vouchee.API.Controllers
 
         //CREATE
         [HttpPost]
-        public async Task<IActionResult> CreateVoucher([FromBody] CreateVoucherDTO voucherDTO)
+        public async Task<IActionResult> CreateVoucher([FromForm] CreateVoucherDTO voucherDTO)
         {
             var result = await _voucherService.CreateVoucherAsync(voucherDTO);
             return CreatedAtAction(nameof(GetVoucherById), new { result }, result);
@@ -31,9 +31,9 @@ namespace Vouchee.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllVouchers([FromQuery] PagingRequest pagingRequest,
                                                             [FromQuery] VoucherFiler voucherFiler,
-                                                            [FromQuery] VoucherOrderEnum voucherOrderEnum)
+                                                            [FromQuery] SortVoucherEnum sortVoucherEnum)
         {
-            var result = await _voucherService.GetVouchersAsync(pagingRequest, voucherFiler, voucherOrderEnum);
+            var result = await _voucherService.GetVouchersAsync(pagingRequest, voucherFiler, sortVoucherEnum);
             return Ok(result);
         }
 
@@ -52,6 +52,15 @@ namespace Vouchee.API.Controllers
         public async Task<IActionResult> UpdateVoucher(Guid id, [FromBody] UpdateVoucherDTO voucherDTO)
         {
             var result = await _voucherService.UpdateVoucherAsync(id, voucherDTO);
+            return Ok(result);
+        }
+
+        // DELETE
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<IActionResult> DeleteVoucher(Guid id)
+        {
+            var result = await _voucherService.DeleteVoucherAsync(id);
             return Ok(result);
         }
     }

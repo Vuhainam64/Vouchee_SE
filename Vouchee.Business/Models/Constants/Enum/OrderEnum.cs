@@ -6,9 +6,15 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Business.Models.Constants.Enum
 {
+    public enum OrderEnum
+    {
+        SUSPICIOUS,
+        PENDING,
+        DONE
+    }
+
     public enum SortOrderEnum
     {
-        Ascending,
-        Descending,
+
     }
 }

@@ -7,27 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Vouchee.Data.Models.Entities;
+using Microsoft.AspNetCore.Http;
 
 namespace Vouchee.Business.Models.DTOs
 {
     public class VoucherDTO
     {
-
-    }
-
-    public class CreateVoucherDTO : VoucherDTO
-    {
-
-    }
-
-    public class UpdateVoucherDTO : VoucherDTO
-    {
-
-    }
-
-    public class GetVoucherDTO : VoucherDTO
-    {
-        public Guid? id { get; set; }
         public string? name { get; set; }
         public string? description { get; set; }
         public decimal? price { get; set; }
@@ -35,6 +20,23 @@ namespace Vouchee.Business.Models.DTOs
         public DateTime? endDate { get; set; }
         public string? policy { get; set; }
         public int? quantity { get; set; }
+    }
+
+    public class CreateVoucherDTO : VoucherDTO
+    {
+        public IFormFile? image { get; set; }
+    }
+
+    public class UpdateVoucherDTO : VoucherDTO
+    {
+        public IFormFile? image { get; set; }
+    }
+
+    public class GetVoucherDTO : VoucherDTO
+    {
+        public Guid? id { get; set; }
+
+        public string? image { get; set; }
 
         public string? status { get; set; }
         public DateTime? createDate { get; set; }

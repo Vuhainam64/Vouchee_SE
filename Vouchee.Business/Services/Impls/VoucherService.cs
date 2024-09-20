@@ -18,20 +18,25 @@ using Vouchee.Business.Models.Constants.Enum;
 using Vouchee.Business.Models.Constants.String;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Models.Helpers;
+using Vouchee.Business.Services.Extensions.Filebase;
 using Vouchee.Data.Helpers;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Repositories.IRepos;
+using static Grpc.Core.Metadata;
 
 namespace Vouchee.Business.Services.Impls
 {
     public class VoucherService : IVoucherService
     {
+        private readonly IFileUploadService _fileUploadService;
         private readonly IVoucherRepository _voucherRepository;
         private readonly IMapper _mapper;
 
-        public VoucherService(IVoucherRepository voucherRepository,
+        public VoucherService(IFileUploadService fileUploadService,
+                                IVoucherRepository voucherRepository,
                                 IMapper mapper)
         {
+            _fileUploadService = fileUploadService;
             _voucherRepository = voucherRepository;
             _mapper = mapper;
         }
@@ -41,7 +46,16 @@ namespace Vouchee.Business.Services.Impls
             try
             {
                 Voucher voucher = _mapper.Map<Voucher>(createVoucherDTO);
+
                 var voucherId = await _voucherRepository.AddAsync(voucher);
+
+                if (createVoucherDTO.image != null)
+                {
+                    voucher.Image = await _fileUploadService.UploadImageToFirebaseVoucher(createVoucherDTO.image, voucherId.ToString());
+
+                    await _voucherRepository.UpdateAsync(voucher);
+                }
+
                 return voucherId;
             }
             catch (Exception ex)
@@ -56,7 +70,7 @@ namespace Vouchee.Business.Services.Impls
             try
             {
                 bool result = false;
-                Voucher voucher = await _voucherRepository.GetByIdAsync(id);
+                var voucher = await _voucherRepository.GetByIdAsync(id);
                 if (voucher != null)
                 {
                     result = await _voucherRepository.DeleteAsync(voucher);
@@ -98,9 +112,8 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<DynamicResponseModel<GetVoucherDTO>> GetVouchersAsync(PagingRequest pagingRequest,
                                                                                     VoucherFiler voucherFiler,
-                                                                                    VoucherOrderEnum voucherOrderEnum)
+                                                                                    SortVoucherEnum sortVoucherEnum)
         {
-            int total;
             (int, IQueryable<GetVoucherDTO>) result;
             try
             {
@@ -108,13 +121,6 @@ namespace Vouchee.Business.Services.Impls
                             .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
                             .DynamicFilter(_mapper.Map<GetVoucherDTO>(voucherFiler))
                             .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LimitPaging, PageConstant.DefaultPaging);
-
-                total = result.Item2.Count();
-
-                if (total == 0)
-                {
-                    throw new NotFoundException("Không tìm thấy voucher");
-                }
             }
             catch (Exception ex)
             {
@@ -127,7 +133,7 @@ namespace Vouchee.Business.Services.Impls
                 {
                     Page = pagingRequest.page,
                     Size = pagingRequest.pageSize,
-                    Total = total
+                    Total = result.Item1
                 },
                 Results = result.Item2.ToList()
             };

@@ -4,9 +4,9 @@ using Vouchee.Data.Models.Entities;
 
 namespace Vouchee.API.AppStarts
 {
-    public class AutoMapperResolver : Profile
+    public class MappingProfile : Profile
     {
-        public AutoMapperResolver()
+        public MappingProfile()
         {
             CreateMap<Voucher, VoucherDTO>().ReverseMap();
             CreateMap<Voucher, CreateVoucherDTO>().ReverseMap();

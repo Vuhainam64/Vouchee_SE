@@ -53,6 +53,7 @@ namespace Vouchee.Data.Models.Entities
         public DateTime EndDate { get; set; }
         public string? Policy { get; set; }
         public int Quantity { get; set; }
+        public string? Image { get; set; }
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]

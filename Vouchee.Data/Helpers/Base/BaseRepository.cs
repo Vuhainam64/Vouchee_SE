@@ -1,15 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
-using Vouchee.Data.Helpers;
-using Vouchee.Data.Repositories.IRepos;
 
-namespace Vouchee.Data.Repositories.Repos
+namespace Vouchee.Data.Helpers.Base
 {
     public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : class
     {

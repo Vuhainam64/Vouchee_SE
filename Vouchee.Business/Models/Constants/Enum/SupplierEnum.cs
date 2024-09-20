@@ -6,15 +6,11 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Business.Models.Constants.Enum
 {
-    public enum VoucherStatusEnum
+    public enum SupplierEnum
     {
-        INACTIVE,
-        ACTIVE,
-        SUSPICIOUS,
-        BANNED
     }
 
-    public enum SortVoucherEnum
+    public enum SortSupplierEnum
     {
 
     }

@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Business.Models.Constants.Enum
 {
-    public enum UserStatusEnum
+    public enum ObjectEnum
     {
         INACTIVE,
-        ACTIVE,
-        SUSPICIOUS,
-        BANNED
+        ACTIVE
     }
 }

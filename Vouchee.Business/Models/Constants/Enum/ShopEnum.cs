@@ -6,9 +6,14 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Business.Models.Constants.Enum
 {
-    public enum ObjectStatusEnum
+    public enum ShopEnum
     {
-        INACTIVE,
+        INACTIVE, 
         ACTIVE
+    }
+
+    public enum SortShopEnum
+    {
+
     }
 }
