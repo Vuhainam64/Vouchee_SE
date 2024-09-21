@@ -1,14 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Query;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using Vouchee.Business.Models.Constants.Enum;
+﻿using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
-using Vouchee.Business.Models.Helpers;
-using Vouchee.Data.Models.Entities;
+using Vouchee.Data.Models.Constants.Enum.Sort;
+using Vouchee.Data.Models.Filters;
 
 namespace Vouchee.Business.Services
 {

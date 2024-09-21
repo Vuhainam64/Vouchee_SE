@@ -10,5 +10,6 @@ namespace Vouchee.Data.Repositories.IRepos
 {
     public interface IUserRepository : IBaseRepository<User>
     {
+        public Task<User> GetUserByEmail(string email);
     }
 }

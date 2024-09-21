@@ -1,20 +1,16 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
-using Vouchee.Business.Models.Constants.Enum;
-using Vouchee.Business.Models.Constants.String;
+using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
-using Vouchee.Business.Models.Helpers;
 using Vouchee.Data.Helpers;
+using Vouchee.Data.Models.Constants.Enum.Sort;
+using Vouchee.Data.Models.Constants.Enum.Status;
+using Vouchee.Data.Models.Constants.Number;
 using Vouchee.Data.Models.Entities;
+using Vouchee.Data.Models.Filters;
 using Vouchee.Data.Repositories.IRepos;
-using Vouchee.Data.Repositories.Repos;
 
 namespace Vouchee.Business.Services.Impls
 {
@@ -113,7 +109,7 @@ namespace Vouchee.Business.Services.Impls
             }
             return new DynamicResponseModel<GetOrderDTO>()
             {
-                Metadata = new PagingMetadata()
+                PagingMetaData = new PagingMetaData()
                 {
                     Page = pagingRequest.page,
                     Size = pagingRequest.pageSize,

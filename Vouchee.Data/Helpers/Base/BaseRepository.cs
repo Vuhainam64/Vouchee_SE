@@ -20,10 +20,6 @@ namespace Vouchee.Data.Helpers.Base
 
         public Task<bool> DeleteAsync(TEntity entity) => _dao.DeleteAsync(entity);
 
-        public Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> filter,
-            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null) =>
-            _dao.GetFirstOrDefaultAsync(filter, includeProperties);
-
         public Task<TEntity?> GetByIdAsync(object id, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null) =>
             _dao.GetByIdAsync(id, includeProperties);
 

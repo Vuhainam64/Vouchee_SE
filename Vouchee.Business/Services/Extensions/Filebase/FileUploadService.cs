@@ -1,15 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Firebase.Auth;
 using Firebase.Storage;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Vouchee.Business.Models.Helpers;
 using Microsoft.Extensions.Options;
-using Vouchee.Business.Models.Constants.Enum;
 using Vouchee.Data.Helpers;
+using Vouchee.Business.Models;
+using Vouchee.Data.Models.Constants.Enum.Other;
 
 namespace Vouchee.Business.Services.Extensions.Filebase
 {
@@ -39,16 +34,15 @@ namespace Vouchee.Business.Services.Extensions.Filebase
                 var token = await auth.SignInWithCustomTokenAsync(storageToken);
 
                 var task = new FirebaseStorage(_firebaseSettings.Bucket,
-                                                new FirebaseStorageOptions
-                                                {
-                                                    AuthTokenAsyncFactory = () => Task.FromResult(token.FirebaseToken),
-                                                    ThrowOnCancel = true,
-                                                }
-                                            ).Child("Vouchers")
-                                            .Child(StoragePathEnum.Voucher.ToString())
-                                            .Child(file.FileName)
-                                            .PutAsync(file.OpenReadStream()
-                                            );
+                                                    new FirebaseStorageOptions
+                                                    {
+                                                        AuthTokenAsyncFactory = () => Task.FromResult(token.FirebaseToken),
+                                                        ThrowOnCancel = true,
+                                                    }
+                                                ).Child("Vouchers")
+                                                    .Child(StoragePathEnum.Voucher.ToString())
+                                                    .Child(file.FileName)
+                                                    .PutAsync(file.OpenReadStream());
 
                 var downloadUrl = await task;
 

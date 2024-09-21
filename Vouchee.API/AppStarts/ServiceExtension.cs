@@ -1,7 +1,6 @@
 ﻿using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.OpenApi.Models;
-using Vouchee.Business.Models.Helpers;
 using Vouchee.Business.Services.Extensions.Filebase;
 using Vouchee.Business.Services.Impls;
 using Vouchee.Business.Services;
@@ -9,6 +8,7 @@ using Vouchee.Data.Helpers.Base;
 using Vouchee.Data.Helpers;
 using Vouchee.Data.Repositories.IRepos;
 using Vouchee.Data.Repositories.Repos;
+using Vouchee.Business.Models;
 
 namespace Vouchee.API.AppStarts
 {

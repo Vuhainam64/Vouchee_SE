@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Vouchee.Business.Models.Constants.Enum;
+using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
-using Vouchee.Business.Models.Helpers;
 using Vouchee.Business.Services;
+using Vouchee.Data.Models.Constants.Enum.Sort;
+using Vouchee.Data.Models.Filters;
 
 namespace Vouchee.API.Controllers
 {

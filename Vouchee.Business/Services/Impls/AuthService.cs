@@ -1,33 +1,46 @@
 ﻿using AutoMapper;
+using FirebaseAdmin.Auth;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Vouchee.Business.Models.DTOs;
-using Vouchee.Business.Models.Helpers;
+using Vouchee.Business.Exceptions;
+using Vouchee.Business.Models;
+using Vouchee.Data.Models.Constants.Dictionary;
+using Vouchee.Data.Models.Constants.Enum.Other;
+using Vouchee.Data.Models.Entities;
+using Vouchee.Data.Repositories.IRepos;
 
 namespace Vouchee.Business.Services.Impls
 {
     public class AuthService : IAuthService
     {
         private readonly AppSettings _appSettings;
-        private readonly IUserService _userService;
+        private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
 
         public AuthService(IOptions<AppSettings> appSettings, 
-                            IUserService userService, 
+                            IUserRepository userRepository, 
                             IMapper mapper)
         {
             _appSettings = appSettings.Value;
-            _userService = userService;
+            _userRepository = userRepository;
             _mapper = mapper;
         }
 
-        public Task<AuthResponse> GetTokenAdmin(string firebaseToken)
+        public async Task<AuthResponse> GetTokenAdmin(string firebaseToken)
         {
-            throw new NotImplementedException();
+            FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
+            string uid = decryptedToken.Uid;
+
+            UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
+            string email = userRecord.Email;
+            string imageUrl = userRecord.PhotoUrl.ToString();
+
+            User userObject = await _userRepository.GetUserByEmail(email);
+            AuthResponse authResponse = new();
+
+            if (userRecord == null)
+                throw new NotFoundException("User not found");
+
+            return null;
         }
 
         public Task<AuthResponse> GetTokenBuyer(string firebaseToken)
