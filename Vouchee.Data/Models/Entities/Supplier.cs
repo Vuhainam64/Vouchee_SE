@@ -18,7 +18,7 @@ namespace Vouchee.Data.Models.Entities
         }
 
         [InverseProperty(nameof(Voucher.Supplier))]
-        public virtual ICollection<Voucher> Vouchers { get; set; }
+        public virtual ICollection<Voucher>? Vouchers { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
@@ -26,6 +26,8 @@ namespace Vouchee.Data.Models.Entities
 
         public string? Name { get; set; }
         public string? Contact { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? PercentShow { get; set; }
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]

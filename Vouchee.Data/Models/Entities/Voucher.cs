@@ -34,6 +34,11 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty("Vouchers")]
         public virtual Supplier? Supplier { get; set; }
 
+        public Guid? CreateBy { get; set; }
+        [ForeignKey(nameof(CreateBy))]
+        [InverseProperty("Vouchers")]
+        public virtual User? Seller { get; set; }
+
         public Guid? VoucherTypeId { get; set; }
         [ForeignKey(nameof(VoucherTypeId))]
         [InverseProperty("Vouchers")]
@@ -54,11 +59,12 @@ namespace Vouchee.Data.Models.Entities
         public string? Policy { get; set; }
         public int Quantity { get; set; }
         public string? Image { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? PercentShow { get; set; }
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
-        public Guid? CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }

@@ -45,7 +45,18 @@ namespace Vouchee.Data.Helpers
             modelBuilder.Entity<VoucherCode>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<VoucherType>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
 
+            modelBuilder.Seed();
 
+            base.OnModelCreating(modelBuilder);
+        }
+
+        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        {
+            configurationBuilder.Properties<DateOnly>()
+                                .HaveConversion<DateOnlyConverter>()
+                                .HaveColumnType("date");
+
+            base.ConfigureConventions(configurationBuilder);
         }
     }
 }

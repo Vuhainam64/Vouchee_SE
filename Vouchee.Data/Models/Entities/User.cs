@@ -17,10 +17,13 @@ namespace Vouchee.Data.Models.Entities
         public User()
         {
             Orders = new HashSet<Order>();
+            Vouchers = new HashSet<Voucher>();
         }
 
         [InverseProperty(nameof(Order.User))]
         public virtual ICollection<Order> Orders { get; set; }
+        [InverseProperty(nameof(Voucher.Seller))]
+        public virtual ICollection<Voucher> Vouchers { get; set; }
 
         public Guid? RoleId { get; set; }
         [ForeignKey(nameof(RoleId))]
@@ -41,9 +44,13 @@ namespace Vouchee.Data.Models.Entities
         public string? City { get; set; }
         public string? District { get; set; }
         public string? Address { get; set; }
+        public string? Image { get; set; }
         public string? BankName { get; set; }
         public string? BankAccount { get; set; }
         public string? SecretKey { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? PercentShow { get; set; }
+        public int ResponsibilityScore { get; set; }
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]

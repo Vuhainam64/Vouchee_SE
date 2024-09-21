@@ -28,7 +28,8 @@ namespace Vouchee.Data.Models.Entities
         public string? Description { get; set; }
         [Column(TypeName = "decimal")]
         public decimal? PercentShow { get; set; }
-        public int ResponsibilityScore { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal Lat { get; set; }
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]

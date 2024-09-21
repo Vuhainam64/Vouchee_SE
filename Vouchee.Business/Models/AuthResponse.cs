@@ -8,6 +8,15 @@ namespace Vouchee.Business.Models
 {
     public class AuthResponse
     {
-
+        public Guid id { get; set; }
+        public Guid? sellerId { get; set; }
+        public Guid? buyerId { get; set; }
+        public Guid? roleId { get; set; }
+        public string? roleName { get; set; }
+        public string? uid { get; set; }
+        public string? fullName { get; set; }
+        public string? email { get; set; }
+        public string? image { get; set; }
+        public string? token { get; set; }
     }
 }

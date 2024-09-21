@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Constants.Enum.Status
 {
-    public class VoucherCodeStatusEnum
+    public enum VoucherCodeStatusEnum
     {
-
+        ACTIVE,
+        INACTIVE,
+        SOLD
     }
 }

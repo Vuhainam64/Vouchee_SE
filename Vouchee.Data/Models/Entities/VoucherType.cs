@@ -24,6 +24,8 @@ namespace Vouchee.Data.Models.Entities
         public Guid Id { get; set; }
 
         public string? Name { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? PercentShow { get; set; }
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]
