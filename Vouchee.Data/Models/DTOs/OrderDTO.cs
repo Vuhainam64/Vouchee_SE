@@ -7,10 +7,10 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? userId { get; set; }
 
         public string? paymentType { get; set; }
-        public decimal discountValue { get; set; }
-        public decimal totalPrice { get; set; }
-        public decimal discountPrice { get; set; }
-        public decimal finalPrice => totalPrice - discountPrice;
+        public decimal? discountValue { get; set; }
+        public decimal? totalPrice { get; set; }
+        public decimal? discountPrice { get; set; }
+        public decimal? finalPrice => totalPrice - discountPrice;
     }
 
     public class CreateOrderDTO : OrderDTO
@@ -33,15 +33,14 @@ namespace Vouchee.Business.Models.DTOs
             orderDetails = new HashSet<GetOrderDetailDTO>();
         }
 
-        public Guid id { get; set; }
-
-        public virtual ICollection<GetOrderDetailDTO> orderDetails { get; set; }
-
+        public Guid? id { get; set; }
 
         public string? status { get; set; }
         public DateTime? createDate { get; }
-        public Guid? createBy { get; }
-        public DateTime? updateDate { get; }
-        public Guid? updateBy { get; }
+        public Guid? createBy { get; set; }
+        public DateTime? updateDate { get; set; }
+        public Guid? updateBy { get; set; }
+
+        public virtual ICollection<GetOrderDetailDTO>? orderDetails { get; set; }
     }
 }

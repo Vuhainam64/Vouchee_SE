@@ -25,9 +25,40 @@ namespace Vouchee.API.AppStarts
             // FILE UPLOAD
             services.AddScoped<IFileUploadService, FileUploadService>();
 
+            // AUTH
+            services.AddScoped<IAuthService, AuthService>();
+
             // VOUCHER
-            services.AddScoped<IVoucherRepository, VoucherRepository>();
             services.AddScoped<IVoucherService, VoucherService>();
+            services.AddScoped<IVoucherRepository, VoucherRepository>();
+
+            // ORDER
+            services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
+
+            // ROLE
+            services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
+
+            // SHOP
+            services.AddScoped<IShopService, ShopService>();
+            services.AddScoped<IShopRepository, ShopRepository>();
+
+            // SUPPLIER
+            services.AddScoped<ISupplierService, SupplierService>();
+            services.AddScoped<ISupplierRepository, SupplierRepository>();
+
+            // USER
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IUserRepository, UserRepository>();
+
+            // VOUCHER
+            services.AddScoped<IVoucherService, VoucherService>();
+            services.AddScoped<IVoucherRepository, VoucherRepository>();
+
+            // VOUCHER TYPE
+            services.AddScoped<IVoucherTypeService, VoucherTypeService>();
+            services.AddScoped<IVoucherTypeRepository, VoucherTypeRepository>();
         }
 
         public static void AddSwaggerServices(this IServiceCollection services, IConfiguration configuration)

@@ -16,8 +16,8 @@ namespace Vouchee.Business.Models.DTOs
 {
     public class VoucherDTO
     {
-        public Guid? SupplierId { get; set; }
-        public Guid? VoucherTypeId { get; set; }
+        public Guid? supplierId { get; set; }
+        public Guid? voucherTypeId { get; set; }
 
         public string? name { get; set; }
         public string? description { get; set; }
@@ -54,16 +54,16 @@ namespace Vouchee.Business.Models.DTOs
             shops = new HashSet<GetShopDTO>();
         }
 
-        public virtual ICollection<GetVoucherCodeDTO> voucherCodes { get; set; }
-        public virtual ICollection<GetOrderDetailDTO> orderDetails { get; set; }
-        public virtual ICollection<GetShopDTO> shops { get; set; }
+        public Guid? id { get; set; }
 
-        public Guid? id { get; }
-
-        public string? status { get; }
-        public DateTime? createDate { get; }
+        public string? status { get; set; }
+        public DateTime? createDate { get; set; }
         public Guid? createBy { get; set; }
         public DateTime? updateDate { get; set; }
         public Guid? updateBy { get; set; }
+
+        public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
+        public virtual ICollection<GetOrderDetailDTO>? orderDetails { get; set; }
+        public virtual ICollection<GetShopDTO>? shops { get; set; }
     }
 }

@@ -37,14 +37,14 @@ namespace Vouchee.Business.Models.DTOs
             voucherCodes = new HashSet<GetVoucherCodeDTO>();
         }
 
-        public Guid id { get; }
+        public Guid? id { get; set; }
 
-        public virtual ICollection<GetVoucherCodeDTO> voucherCodes { get; set; }
+        public string? status { get; set; }
+        public DateTime? createDate { get; set; }
+        public Guid? createBy { get; set; }
+        public DateTime? updateDate { get; set; }
+        public Guid? updateBy { get; set; }
 
-        public string? status { get; }
-        public DateTime? createDate { get; }
-        public Guid? createBy { get; }
-        public DateTime? updateDate { get; }
-        public Guid? updateBy { get;  }
+        public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
     }
 }

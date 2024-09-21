@@ -4,11 +4,11 @@ namespace Vouchee.Business.Models.DTOs
 {
     public class VoucherCodeDTO
     {
-        public Guid? VoucherId { get; set; }
-        public Guid? OrderDetailId { get; set; }
+        public Guid? voucherId { get; set; }
+        public Guid? orderDetailId { get; set; }
 
-        public string? Code { get; set; }
-        public string? Image { get; set; }
+        public string? code { get; set; }
+        public string? image { get; set; }
     }
 
     public class CreateVoucherCodeDTO : VoucherCodeDTO
@@ -26,12 +26,12 @@ namespace Vouchee.Business.Models.DTOs
 
     public class GetVoucherCodeDTO : VoucherCodeDTO
     {
-        public Guid id { get; }
+        public Guid? id { get; set; }
 
-        public string? status { get; }
-        public DateTime? createDate { get; }
-        public Guid? createBy { get; }
-        public DateTime? updateDate { get; }
-        public Guid? updateBy { get; }
+        public string? status { get; set; }
+        public DateTime? createDate { get; set; }
+        public Guid? createBy { get; set; }
+        public DateTime? updateDate { get; set; }
+        public Guid? updateBy { get; set; }
     }
 }

@@ -16,7 +16,7 @@ namespace Vouchee.Business.Models.DTOs
         public string? title { get; set; }
         public string? description { get; set; }
         public decimal? percentShow { get; set; }
-        public int responsibilityScore { get; set; }
+        public int? responsibilityScore { get; set; }
     }
 
     public class CreateShopDTO : ShopDTO
@@ -40,14 +40,14 @@ namespace Vouchee.Business.Models.DTOs
             vouchers = new HashSet<GetVoucherDTO>();
         }
 
-        public virtual ICollection<GetVoucherDTO> vouchers { get; }
+        public Guid? id { get; set; }
 
-        public Guid id { get; }
+        public string? status { get; set; }
+        public DateTime? createDate { get; set; }
+        public Guid? createBy { get; set; }
+        public DateTime? updateDate { get; set; }
+        public Guid? updateBy { get; set; }
 
-        public string? status { get; }
-        public DateTime? createDate { get; }
-        public Guid? createBy { get; }
-        public DateTime? updateDate { get; }
-        public Guid? updateBy { get; }
+        public virtual ICollection<GetVoucherDTO>? vouchers { get; set; }
     }
 }

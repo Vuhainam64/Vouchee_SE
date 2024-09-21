@@ -30,14 +30,14 @@ namespace Vouchee.Business.Models.DTOs
             users = new HashSet<GetUserDTO>();
         }
 
-        public virtual ICollection<GetUserDTO> users { get; }
+        public Guid? id { get; set; }
 
-        public Guid id { get; }
+        public string? status { get; set; }
+        public DateTime? createDate { get; set; }
+        public Guid? createBy { get; set; }
+        public DateTime? updateDate { get; set; }
+        public Guid? updateBy { get; set; }
 
-        public string? status { get; }
-        public DateTime? createDate { get; }
-        public Guid? createBy { get; }
-        public DateTime? updateDate { get; }
-        public Guid? updateBy { get; }
+        public virtual ICollection<GetUserDTO>? users { get; set; }
     }
 }
