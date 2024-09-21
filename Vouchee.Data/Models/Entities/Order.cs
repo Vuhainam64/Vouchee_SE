@@ -31,8 +31,6 @@ namespace Vouchee.Data.Models.Entities
         [Key]
         public Guid Id { get; set; }
 
-        [Column(TypeName = "datetime")]
-        public DateTime? OrderDate { get; set; }
         public string? PaymentType { get; set; }
         [Column(TypeName = "decimal")]
         public decimal DiscountValue { get; set; }

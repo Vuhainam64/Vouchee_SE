@@ -6,16 +6,8 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Business.Models.Constants.Enum
 {
-    public enum UserEnum
+    public class VoucherCodeStatusEnum
     {
-        INACTIVE,
-        ACTIVE,
-        SUSPICIOUS,
-        BANNED
-    }
-
-    public enum SortUserEnum
-    {
-
+        
     }
 }

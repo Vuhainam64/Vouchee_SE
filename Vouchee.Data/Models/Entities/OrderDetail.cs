@@ -37,6 +37,8 @@ namespace Vouchee.Data.Models.Entities
         public Guid Id { get; set; }
 
         [Column(TypeName = "decimal")]
+        public decimal UnitPrice { get; set; }
+        [Column(TypeName = "decimal")]
         public decimal DiscountValue { get; set; }
         [Column(TypeName = "decimal")]
         public decimal TotalPrice { get; set; }
