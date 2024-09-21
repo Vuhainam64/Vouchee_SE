@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,6 +38,9 @@ namespace Vouchee.Business.Services.Impls
             try
             {
                 Shop shop = _mapper.Map<Shop>(createShopDTO);
+
+                shop.Status = ShopStatusEnum.ACTIVE.ToString();
+
                 var shopId = await _shopRepository.AddAsync(shop);
                 return shopId;
             }

@@ -34,6 +34,9 @@ namespace Vouchee.Business.Services.Impls
             try
             {
                 var voucherType = _mapper.Map<VoucherType>(createVoucherTypeDTO);
+
+                voucherType.Status = VoucherTypeStatusEnum.ACTIVE.ToString();
+
                 var voucherTypeId = await _voucherTypeRepository.AddAsync(voucherType);
                 return voucherTypeId;
             }

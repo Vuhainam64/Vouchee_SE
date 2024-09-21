@@ -36,6 +36,8 @@ namespace Vouchee.Business.Services.Impls
             {
                 var order = _mapper.Map<Order>(createOrderDTO);
 
+                order.Status = OrderStatusEnum.PENDING.ToString();
+
                 var orderId = await _orderRepository.AddAsync(order);
 
                 return orderId;

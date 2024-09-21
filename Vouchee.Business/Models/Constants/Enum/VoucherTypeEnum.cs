@@ -8,7 +8,8 @@ namespace Vouchee.Business.Models.Constants.Enum
 {
     public enum VoucherTypeStatusEnum
     {
-
+        ACTIVE,
+        INACTIVE
     }
 
     public enum SortVoucherTypeEnum

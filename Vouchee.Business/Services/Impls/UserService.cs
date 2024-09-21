@@ -34,6 +34,9 @@ namespace Vouchee.Business.Services.Impls
             try
             {
                 var user = _mapper.Map<User>(createUserDTO);
+
+                user.Status = UserStatusEnum.ACTIVE.ToString();
+
                 var userId = await _userRepository.AddAsync(user);
                 return userId;
             }

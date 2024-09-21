@@ -29,8 +29,6 @@ namespace Vouchee.Business.Models.DTOs
 
     public class CreateUserDTO : UserDTO
     {
-        [JsonIgnore]
-        public UserStatusEnum status { get; set; }
         public DateTime? createDate = DateTime.Now;
         public Guid? createBy { get; set; }
     }

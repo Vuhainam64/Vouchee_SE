@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Azure.Core;
+using Firebase.Auth;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -46,6 +47,8 @@ namespace Vouchee.Business.Services.Impls
             try
             {
                 Voucher voucher = _mapper.Map<Voucher>(createVoucherDTO);
+
+                voucher.Status = VoucherStatusEnum.ACTIVE.ToString();
 
                 var voucherId = await _voucherRepository.AddAsync(voucher);
 

@@ -34,6 +34,9 @@ namespace Vouchee.Business.Services.Impls
             try
             {
                 var supplier = _mapper.Map<Supplier>(createSupplierDTO);
+
+                supplier.Status = ObjectStatusEnum.ACTIVE.ToString();
+
                 var supplierId = await _supplierRepository.AddAsync(supplier);
                 return supplierId;
             }

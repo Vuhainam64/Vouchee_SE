@@ -21,8 +21,6 @@ namespace Vouchee.Business.Models.DTOs
 
     public class CreateShopDTO : ShopDTO
     {
-        [JsonIgnore]
-        public string? status { get; set; }
         public DateTime? createDate = DateTime.Now;
         public Guid? createBy { get; set; }
     }

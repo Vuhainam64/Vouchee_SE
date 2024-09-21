@@ -25,9 +25,6 @@ namespace Vouchee.Business.Models.DTOs
 
     public class CreateOrderDetailDTO : OrderDetailDTO
     {
-        [JsonIgnore]
-        public ObjectStatusEnum? status { get; set; }
-
         public DateTime? createDate = DateTime.Now;
         public Guid? createBy { get; set; }
     }

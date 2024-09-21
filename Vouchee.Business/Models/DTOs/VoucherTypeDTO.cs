@@ -17,8 +17,6 @@ namespace Vouchee.Business.Models.DTOs
 
     public class CreateVoucherTypeDTO : VoucherTypeDTO
     {
-        [JsonIgnore]
-        public VoucherTypeStatusEnum status { get; set; }
         public DateTime? createDate = DateTime.Now;
         public Guid? createBy { get; set; }
     }

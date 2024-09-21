@@ -15,6 +15,7 @@ using Vouchee.Data.Helpers;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Repositories.IRepos;
 using Vouchee.Data.Repositories.Repos;
+using static Google.Cloud.Firestore.V1.StructuredQuery.Types;
 
 namespace Vouchee.Business.Services.Impls
 {
@@ -34,6 +35,8 @@ namespace Vouchee.Business.Services.Impls
             try
             {
                 var role = _mapper.Map<Role>(createRoleDTO);
+
+                role.Status = ObjectStatusEnum.ACTIVE.ToString();
 
                 var roleId = await _roleRepository.AddAsync(role);
 

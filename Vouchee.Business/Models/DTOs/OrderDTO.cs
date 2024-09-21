@@ -23,17 +23,13 @@ namespace Vouchee.Business.Models.DTOs
 
     public class CreateOrderDTO : OrderDTO
     {
-        [JsonIgnore]
-        public OrderEnum? status { get; set; }
-
         public DateTime? createDate = DateTime.Now;
         public Guid? createBy { get; set; }
     }
 
     public class UpdateOrderDTO : OrderDTO
     {
-        public OrderEnum? status { get; set; }
-
+        public OrderStatusEnum? status { get; set; }
         public DateTime? updateDate = DateTime.Now;
         public Guid? updateBy { get; set; }
     }
