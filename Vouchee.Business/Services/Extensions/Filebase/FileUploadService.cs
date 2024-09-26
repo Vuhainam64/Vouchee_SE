@@ -38,11 +38,11 @@ namespace Vouchee.Business.Services.Extensions.Filebase
                                                     {
                                                         AuthTokenAsyncFactory = () => Task.FromResult(token.FirebaseToken),
                                                         ThrowOnCancel = true,
-                                                    }
-                                                ).Child("Vouchers")
-                                                    .Child(StoragePathEnum.Voucher.ToString())
-                                                    .Child(file.FileName)
-                                                    .PutAsync(file.OpenReadStream());
+                                                    })
+                                                .Child("Vouchers")
+                                                .Child(StoragePathEnum.Voucher.ToString())
+                                                .Child(file.FileName)
+                                                .PutAsync(file.OpenReadStream());
 
                 var downloadUrl = await task;
 

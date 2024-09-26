@@ -1,18 +1,23 @@
+using Google.Api;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Vouchee.API.AppStarts;
 using Vouchee.Business.Exceptions;
 
 var builder = WebApplication.CreateBuilder(args);
-IConfiguration configuration = builder.Configuration;
 
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddDependencyInjection();
-builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+
+IConfiguration configuration = builder.Configuration;
 builder.Services.AddSwaggerServices(configuration);
 builder.Services.AddFirebaseAuthentication(configuration);
+builder.Services.AddSettingObjects(configuration);
+
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
 var app = builder.Build();
 IWebHostEnvironment env = app.Environment;

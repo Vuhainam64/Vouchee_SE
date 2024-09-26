@@ -9,6 +9,7 @@ using Vouchee.Data.Helpers;
 using Vouchee.Data.Repositories.IRepos;
 using Vouchee.Data.Repositories.Repos;
 using Vouchee.Business.Models;
+using System.Text;
 
 namespace Vouchee.API.AppStarts
 {
@@ -65,7 +66,7 @@ namespace Vouchee.API.AppStarts
         {
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "RevenueSharingInvest.API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Vouchee.API", Version = "v1" });
                 c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
                 {
@@ -75,7 +76,6 @@ namespace Vouchee.API.AppStarts
                     BearerFormat = "JWT",
                     In = ParameterLocation.Header,
                     Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer YOUR_TOKEN_HERE\"",
-
                 });
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                  {
@@ -104,10 +104,20 @@ namespace Vouchee.API.AppStarts
             //Firebase authentication
             FirebaseApp.Create(new AppOptions()
             {
-                Credential = GoogleCredential.GetApplicationDefault(),
+                Credential = GoogleCredential.FromFile("C:/dev/Firebase/vouchee-3a5af-firebase-adminsdk-9wyy8-508683f723.json"),
                 ProjectId = firebaseSettings.ProjectId,
                 ServiceAccountId = firebaseSettings.ServiceAccountId
             });
+        }
+
+        public static void AddSettingObjects(this IServiceCollection services, IConfiguration configuration)
+        {
+            // Configure Strongly Typed Settings Objects
+            ///Secret key
+            var appSettingsSection = configuration.GetSection("AppSettings");
+            services.Configure<AppSettings>(appSettingsSection);
+            var appSettings = appSettingsSection.Get<AppSettings>();
+            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
         }
     }
 }

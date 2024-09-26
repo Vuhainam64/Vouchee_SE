@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Entities
 {
-    [Table("Type")]
+    [Table("VoucherType")]
     public partial class VoucherType
     {
         public VoucherType()

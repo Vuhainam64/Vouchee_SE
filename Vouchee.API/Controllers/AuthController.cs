@@ -12,14 +12,10 @@ namespace Vouchee.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
 
-        public AuthController(IAuthService authService, IUserService userService, IRoleService roleService)
+        public AuthController(IAuthService authService)
         {
             _authService = authService;
-            _userService = userService;
-            _roleService = roleService;
         }
 
         [HttpPost]

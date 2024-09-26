@@ -26,7 +26,7 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<Guid?> CreateUserAsync(CreateUserDTO createUserDTO)
+        public async Task<Guid?> CreateUserAsync(CreateUserDTO createUserDTO, ThisUserObj thisUserObj)
         {
             try
             {
@@ -64,6 +64,28 @@ namespace Vouchee.Business.Services.Impls
             {
                 LoggerService.Logger(ex.Message);
                 throw new DeleteObjectException("Lỗi không xác định khi xóa user");
+            }
+        }
+
+        public async Task<GetUserDTO> GetUserByEmailAsync(string email)
+        {
+            try
+            {
+                var user = await _userRepository.GetUserByEmail(email);
+                if (user != null)
+                {
+                    GetUserDTO userDTO = _mapper.Map<GetUserDTO>(user);
+                    return userDTO;
+                }
+                else
+                {
+                    throw new NotFoundException($"Không tìm thấy user với email {email}");
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.Message);
+                throw new LoadException("Lỗi không xác định khi tải user");
             }
         }
 
@@ -118,7 +140,7 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<bool> UpdateUserAsync(Guid id, UpdateUserDTO updateUserDTO)
+        public async Task<bool> UpdateUserAsync(Guid id, UpdateUserDTO updateUserDTO, ThisUserObj thisUserObj)
         {
             try
             {

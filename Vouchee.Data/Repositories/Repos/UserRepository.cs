@@ -20,7 +20,7 @@ namespace Vouchee.Data.Repositories.Repos
         {
             try
             {
-                User user = await _userDAO.GetFirstOrDefaultAsync(x => string.Equals(x.Email, email, StringComparison.OrdinalIgnoreCase));
+                User user = await _userDAO.GetFirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()));
                 if (user != null)
                 {
                     return user;

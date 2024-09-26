@@ -13,6 +13,7 @@ namespace Vouchee.Data.Models.Entities
     [Table("Voucher")]
     [Index(nameof(SupplierId), Name = "IX_Voucher_SupplierId")]
     [Index(nameof(VoucherTypeId), Name = "IX_Voucher_VoucherTypeId")]
+    [Index(nameof(VoucherTypeId), Name = "IX_Voucher_CreateBy")]
     public partial class Voucher
     {
         public Voucher()
