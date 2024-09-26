@@ -52,9 +52,11 @@ namespace Vouchee.Business.Services.Impls
 
             AuthResponse response = new()
             {
+                roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.ADMIN.ToString()),
+                roleName = RoleEnum.ADMIN.ToString(),
                 email = email,
                 uid = uid,
-                id = userObject.Id,
+                id = userObject.Id.ToString(),
                 image = userObject.Image ?? imageUrl,
                 fullName = (userObject.FirstName + "" + userObject.LastName) ?? userRecord.DisplayName
             };
@@ -69,7 +71,7 @@ namespace Vouchee.Business.Services.Impls
             throw new NotImplementedException();
         }
 
-        public Task<AuthResponse> GetTokenSeller(string firebaseToken)
+        public async Task<AuthResponse> GetTokenSeller(string firebaseToken)
         {
             throw new NotImplementedException();
         }
@@ -90,28 +92,11 @@ namespace Vouchee.Business.Services.Impls
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.ADMIN.ToString());
                 buyerId = new Claim(ClaimTypes.GroupSid, "");
-
-            }
-            else if (roleCheck.Equals(RoleEnum.BUYER.ToString()))
-            {
-                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BUYER.ToString());
-                buyerId = new Claim(ClaimTypes.GroupSid, response.buyerId.ToString());
-            }
-            else if (roleCheck.Equals(RoleEnum.SELLER.ToString()))
-            {
-                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.SELLER.ToString());
-                buyerId = new Claim(ClaimTypes.GroupSid, "");
-
-            }
-            else if (roleCheck.Equals(RoleEnum.STAFF.ToString()))
-            {
-                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.STAFF.ToString());
-                buyerId = new Claim(ClaimTypes.GroupSid, "");
             }
             else
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BUYER.ToString());
-                buyerId = new Claim(ClaimTypes.GroupSid, response.buyerId.ToString());
+                buyerId = new Claim(ClaimTypes.GroupSid, response.id.ToString());
             }
 
             int hours;
@@ -133,7 +118,7 @@ namespace Vouchee.Business.Services.Impls
                    new Claim(ClaimTypes.Email, response.email),
                    new Claim(ClaimTypes.Actor, response.fullName),
                    buyerId,
-                   roleClaim,
+                   roleClaim
                 }),
 
                 Expires = DateTime.UtcNow.AddHours(hours),
