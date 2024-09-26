@@ -48,7 +48,7 @@ namespace Vouchee.Data.Helpers
                 new User()
                 {
                     Id = Guid.Parse("deee9638-da34-4230-be77-34137aa5fcff"),
-                    Email = "advouchee1@gmail.com",
+                    Email = "advouchee@gmail.com",
                     RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.ADMIN.ToString())),
                     FirstName = "ADMIN 1",
                 },
@@ -76,7 +76,7 @@ namespace Vouchee.Data.Helpers
                 new User()
                 {
                     Id = Guid.Parse("b4583f49-baba-4916-8e2b-2d44c3412733"),
-                    Email = "sellervouchee1@gmail.com",
+                    Email = "voucheeseller@gmail.com",
                     RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.SELLER.ToString())),
                     FirstName = "SELLER 1",
                     PercentShow = 80,

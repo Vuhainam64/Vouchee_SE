@@ -73,7 +73,34 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<AuthResponse> GetTokenSeller(string firebaseToken)
         {
-            throw new NotImplementedException();
+            FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
+            string uid = decryptedToken.Uid;
+
+            UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
+            string email = userRecord.Email;
+            string ImageUrl = userRecord.PhotoUrl.ToString();
+
+            User userObject = await _userRepository.GetUserByEmail(email);
+
+            AuthResponse response = new();
+
+            if (userObject == null)
+            {
+                throw new NotFoundException("User Not Found!!");
+            }
+            else
+            {
+                response.email = email;
+                response.id = userObject.Id.ToString();
+                response.uid = uid;
+                response.image = userObject.Image ?? ImageUrl;
+                response.roleId = userObject.RoleId.ToString();
+                response.roleName = RoleEnum.SELLER.ToString();
+                response.fullName = userObject.FirstName + " " + userObject.LastName;
+                response = await GenerateTokenAsync(response, RoleEnum.SELLER.ToString());
+            }
+
+            return response;
         }
 
         public Task Logout(string userId, string deviceToken)
@@ -92,6 +119,11 @@ namespace Vouchee.Business.Services.Impls
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.ADMIN.ToString());
                 buyerId = new Claim(ClaimTypes.GroupSid, "");
+            }
+            else if (roleCheck.Equals(RoleEnum.SELLER.ToString()))
+            {
+                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.SELLER.ToString());
+                buyerId = new Claim(ClaimTypes.GroupSid, response.id.ToString());
             }
             else
             {
