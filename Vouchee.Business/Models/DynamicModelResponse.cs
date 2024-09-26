@@ -8,13 +8,13 @@ namespace Vouchee.Business.Models
 {
     public class DynamicResponseModel<T>
     {
-        public PagingMetaData? PagingMetaData { get; set; }
-        public List<T>? Results { get; set; }
+        public MetaData? metaData { get; set; }
+        public List<T>? results { get; set; }
     }
-    public class PagingMetaData
+    public class MetaData
     {
-        public int Page { get; set; }
-        public int Size { get; set; }
-        public int Total { get; set; }
+        public int page { get; set; }
+        public int size { get; set; }
+        public int total { get; set; }
     }
 }

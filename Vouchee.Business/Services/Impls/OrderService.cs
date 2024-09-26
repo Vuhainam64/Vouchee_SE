@@ -109,13 +109,13 @@ namespace Vouchee.Business.Services.Impls
             }
             return new DynamicResponseModel<GetOrderDTO>()
             {
-                PagingMetaData = new PagingMetaData()
+                metaData = new MetaData()
                 {
-                    Page = pagingRequest.page,
-                    Size = pagingRequest.pageSize,
-                    Total = result.Item1
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1
                 },
-                Results = result.Item2.ToList()
+                results = result.Item2.ToList()
             };
         }
 
