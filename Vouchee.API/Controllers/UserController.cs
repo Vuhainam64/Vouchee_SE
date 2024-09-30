@@ -16,17 +16,20 @@ namespace Vouchee.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IRoleService _roleService;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService,
+                                IRoleService roleService)
         {
             _userService = userService;
+            _roleService = roleService;
         }
 
         // CREATE
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromForm] CreateUserDTO createUserDTO)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
             if (currentUser.roleId.Equals(currentUser.adminRoleId)
                     || currentUser.roleId.Equals(currentUser.sellerRoleId)

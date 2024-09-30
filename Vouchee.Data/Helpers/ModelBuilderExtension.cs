@@ -20,25 +20,25 @@ namespace Vouchee.Data.Helpers
                 new Role()
                 {
                     Id = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.ADMIN.ToString())),
-                    Name = "Admin",
+                    Name = "ADMIN",
                     Status = ObjectStatusEnum.ACTIVE.ToString()
                 },
                 new Role()
                 {
                     Id = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.STAFF.ToString())),
-                    Name = "Staff",
+                    Name = "STAFF",
                     Status = ObjectStatusEnum.ACTIVE.ToString()
                 },
                 new Role()
                 {
                     Id = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.BUYER.ToString())),
-                    Name = "Buyer",
+                    Name = "BUYER",
                     Status = ObjectStatusEnum.ACTIVE.ToString()
                 },
                 new Role()
                 {
                     Id = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.SELLER.ToString())),
-                    Name = "Seller",
+                    Name = "SELLER",
                     Status = ObjectStatusEnum.ACTIVE.ToString()
                 }
             );

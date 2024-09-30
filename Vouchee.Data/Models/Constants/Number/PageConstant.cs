@@ -2,8 +2,8 @@
 {
     public class PageConstant
     {
-        public const int DefaultPaging = 50;
-        public const int LimitPaging = 500;
-        public const int DefaultPage = 1;
+        public const int DEFAULT_PAPING = 50;
+        public const int LIMIT_PAGING = 500;
+        public const int DEFAULT_PAGE = 1;
     }
 }

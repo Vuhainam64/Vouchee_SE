@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
@@ -89,9 +90,9 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<DynamicResponseModel<GetRoleDTO>> GetRolesAsync(PagingRequest pagingRequest,
-                                                                                    RoleFilter roleFilter,
-                                                                                    SortRoleEnum sortRoleEnum)
+        public async Task<DynamicResponseModel<GetRoleDTO>> GetRolesAsync(PagingRequest pagingRequest = null,
+                                                                                    RoleFilter roleFilter = null,
+                                                                                    SortRoleEnum sortRoleEnum = 0)
         {
             (int, IQueryable<GetRoleDTO>) result;
             try
@@ -99,7 +100,7 @@ namespace Vouchee.Business.Services.Impls
                 result = _roleRepository.GetTable()
                             .ProjectTo<GetRoleDTO>(_mapper.ConfigurationProvider)
                             .DynamicFilter(_mapper.Map<GetRoleDTO>(roleFilter))
-                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LimitPaging, PageConstant.DefaultPaging);
+                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
             }
             catch (Exception ex)
             {
@@ -116,6 +117,20 @@ namespace Vouchee.Business.Services.Impls
                 },
                 results = result.Item2.ToList()
             };
+        }
+
+        public async Task<List<GetRoleDTO>> GetRolesAsync()
+        {
+            try
+            {
+                var result = await _roleRepository.GetTable().ToListAsync();
+                return _mapper.Map<List<GetRoleDTO>>(result);
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.Message);
+                throw new LoadException("Lỗi không xác định khi tải role");
+            }
         }
 
         public async Task<bool> UpdateRoleAsync(Guid id, UpdateRoleDTO updateRoleDTO)

@@ -8,7 +8,7 @@ namespace Vouchee.Data.Models.Constants.Enum.Sort
 {
     public enum SortEnum
     {
-        Ascending,
-        Descending,
+        ASCENDING,
+        DESCENDING,
     }
 }

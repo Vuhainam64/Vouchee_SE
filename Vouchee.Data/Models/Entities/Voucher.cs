@@ -29,6 +29,8 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
         [InverseProperty(nameof(Shop.Vouchers))]
         public virtual ICollection<Shop> Shops { get; set; }
+        [InverseProperty(nameof(Promotion.Vouchers))]
+        public virtual ICollection<Promotion> Promotions { get; set; }
 
         public Guid? SupplierId { get; set; }
         [ForeignKey(nameof(SupplierId))]

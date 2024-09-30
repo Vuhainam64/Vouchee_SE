@@ -111,7 +111,7 @@ namespace Vouchee.Business.Services.Impls
                 result = _voucherRepository.GetTable()
                             .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
                             .DynamicFilter(_mapper.Map<GetVoucherDTO>(voucherFiler))
-                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LimitPaging, PageConstant.DefaultPaging);
+                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
             }
             catch (Exception ex)
             {

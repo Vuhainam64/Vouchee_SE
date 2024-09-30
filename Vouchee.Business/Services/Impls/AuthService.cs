@@ -113,6 +113,8 @@ namespace Vouchee.Business.Services.Impls
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
 
+            int hours = roleCheck.Equals(RoleEnum.ADMIN.ToString()) ? 8760 : 8760;
+
             Claim roleClaim, buyerId;
 
             if (roleCheck.Equals(RoleEnum.ADMIN.ToString()))
@@ -120,47 +122,48 @@ namespace Vouchee.Business.Services.Impls
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.ADMIN.ToString());
                 buyerId = new Claim(ClaimTypes.GroupSid, "");
             }
+            else if (roleCheck.Equals(RoleEnum.BUYER.ToString()))
+            {
+                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BUYER.ToString());
+                buyerId = new Claim(ClaimTypes.GroupSid, response.buyerId.ToString());
+            }
             else if (roleCheck.Equals(RoleEnum.SELLER.ToString()))
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.SELLER.ToString());
-                buyerId = new Claim(ClaimTypes.GroupSid, response.id.ToString());
+                buyerId = new Claim(ClaimTypes.GroupSid, "");
+            }
+            else if (roleCheck.Equals(RoleEnum.STAFF.ToString()))
+            {
+                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.STAFF.ToString());
+                buyerId = new Claim(ClaimTypes.GroupSid, "");
             }
             else
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BUYER.ToString());
-                buyerId = new Claim(ClaimTypes.GroupSid, response.id.ToString());
-            }
-
-            int hours;
-
-            if (roleCheck.Equals(RoleEnum.ADMIN.ToString()))
-            {
-                hours = 8760;
-            }
-            else
-            {
-                hours = 8760;
+                buyerId = new Claim(ClaimTypes.GroupSid, response.buyerId.ToString());
             }
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                   new Claim(ClaimTypes.SerialNumber, response.id.ToString()),
-                   new Claim(ClaimTypes.Email, response.email),
-                   new Claim(ClaimTypes.Actor, response.fullName),
-                   buyerId,
-                   roleClaim
+                    new Claim(ClaimTypes.SerialNumber, response.id.ToString()),
+                    new Claim(ClaimTypes.Email, response.email),
+                    new Claim(ClaimTypes.Actor, response.fullName),
+                    roleClaim,
+                    buyerId
                 }),
 
                 Expires = DateTime.UtcNow.AddHours(hours),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
 
+            // Create and write the token
             var token = tokenHandler.CreateToken(tokenDescriptor);
-
             response.token = tokenHandler.WriteToken(token);
+
             return response;
+
         }
     }
 }

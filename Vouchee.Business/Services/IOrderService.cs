@@ -17,7 +17,7 @@ namespace Vouchee.Business.Services
                                                                             SortOrderEnum sortOrderEnum);
 
         // UPDATE
-        public Task<bool> UpdateOrderAsync(Guid id, UpdateOrderDTO updateOrderDTO);
+        public Task<bool> UpdateOrderAsync(Guid id, UpdateOrderDTO updateOrderDTO, ThisUserObj thisUserObj);
 
         // DELETE
         public Task<bool> DeleteOrderAsync(Guid id);

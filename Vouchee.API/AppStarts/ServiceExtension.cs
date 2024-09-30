@@ -10,6 +10,8 @@ using Vouchee.Data.Repositories.IRepos;
 using Vouchee.Data.Repositories.Repos;
 using Vouchee.Business.Models;
 using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Vouchee.API.AppStarts
 {
@@ -22,6 +24,8 @@ namespace Vouchee.API.AppStarts
             services.AddSingleton(typeof(BaseDAO<>));
 
             services.AddSingleton(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+
+            services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
             // FILE UPLOAD
             services.AddScoped<IFileUploadService, FileUploadService>();
@@ -78,19 +82,19 @@ namespace Vouchee.API.AppStarts
                     Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer YOUR_TOKEN_HERE\"",
                 });
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                 {
-                     {
-                           new OpenApiSecurityScheme
-                             {
-                                 Reference = new OpenApiReference
-                                 {
-                                     Type = ReferenceType.SecurityScheme,
-                                     Id = "Bearer"
-                                 }
-                             },
-                             new string[] {}
-                     }
-                 });
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
             });
         }
 
@@ -119,5 +123,32 @@ namespace Vouchee.API.AppStarts
             var appSettings = appSettingsSection.Get<AppSettings>();
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
         }
+
+        public static void AddJWTServices(this IServiceCollection services, IConfiguration configuration)
+        {
+            var appSettingsSection = configuration.GetSection("AppSettings");
+            services.Configure<AppSettings>(appSettingsSection);
+            var appSettings = appSettingsSection.Get<AppSettings>();
+            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+
+            //JWT
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                };
+            });
+        }
+
     }
 }

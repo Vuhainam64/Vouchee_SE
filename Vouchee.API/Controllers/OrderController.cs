@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using Vouchee.API.Helpers;
 using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Services;
@@ -14,10 +17,16 @@ namespace Vouchee.API.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
+        private readonly IUserService _userService;
+        private readonly IRoleService _roleService;
 
-        public OrderController(IOrderService orderService)
+        public OrderController(IOrderService orderService,
+                                IUserService userService,
+                                IRoleService roleService)
         {
             _orderService = orderService;
+            _userService = userService;
+            _roleService = roleService;
         }
 
         // CREATE
@@ -49,10 +58,20 @@ namespace Vouchee.API.Controllers
         // UPDATE
         [HttpPut]
         [Route("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateOrder(Guid id, [FromBody] UpdateOrderDTO updateOrderDTO)
         {
-            var result = await _orderService.UpdateOrderAsync(id, updateOrderDTO);
-            return Ok(result);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+
+            //ADMIN
+            if (currentUser.roleId.Equals(currentUser.sellerRoleId)
+                    || currentUser.roleId.Equals(currentUser.buyerRoleId))
+            {
+                var result = await _orderService.UpdateOrderAsync(id, updateOrderDTO, currentUser);
+                return Ok(result);
+            }
+
+            return StatusCode((int)HttpStatusCode.Forbidden, "Chỉ có nhà bán hàng hoặc người mua mới có thể thực hiện chức năng này");
         }
 
         // DELETE

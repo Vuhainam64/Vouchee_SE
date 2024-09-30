@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -11,43 +8,39 @@ namespace Vouchee.Business.Exceptions
 {
     public class AuthorizeMiddleware : ActionResult
     {
-        private static void writeErrorResponse(HttpContext Context, params string[] Errors)
+        private static async Task WriteErrorResponseAsync(HttpContext context, params string[] errors)
         {
-            Context.Response.ContentType = "application/json";
-            using var writer = new Utf8JsonWriter(Context.Response.Body);
-            writer.WriteStartObject();
-            writer.WriteString("Code", "401");
-            writer.WriteString("Message", "You Are Unauthorized");
-            writer.WriteEndObject();
-            writer.Flush();
+            context.Response.ContentType = "application/json";
+
+            var response = new
+            {
+                Code = "401",
+                Message = "Tài khoản chưa được cấp quyền để truy cập"
+            };
+
+            await JsonSerializer.SerializeAsync(context.Response.Body, response);
+            await context.Response.Body.FlushAsync();
         }
 
         private readonly RequestDelegate _request;
 
-        public AuthorizeMiddleware(RequestDelegate RequestDelegate)
+        public AuthorizeMiddleware(RequestDelegate requestDelegate)
         {
-            if (RequestDelegate == null)
-            {
-                throw new ArgumentNullException(nameof(RequestDelegate)
-                    , nameof(RequestDelegate) + " is required");
-            }
-
-            _request = RequestDelegate;
+            _request = requestDelegate ?? throw new ArgumentNullException(nameof(requestDelegate), $"{nameof(requestDelegate)} is required");
         }
 
-        public async Task InvokeAsync(HttpContext Context)
+        public async Task InvokeAsync(HttpContext context)
         {
-            if (Context == null)
+            if (context == null)
             {
-                throw new ArgumentNullException(nameof(Context)
-                    , nameof(Context) + " is required");
+                throw new ArgumentNullException(nameof(context), $"{nameof(context)} is required");
             }
 
-            await _request(Context);
+            await _request(context);
 
-            if (Context.Response.StatusCode == 401)
+            if (context.Response.StatusCode == StatusCodes.Status401Unauthorized)
             {
-                writeErrorResponse(Context, "Unauthorized");
+                await WriteErrorResponseAsync(context, "Unauthorized");
             }
         }
     }

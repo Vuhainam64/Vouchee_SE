@@ -5,7 +5,6 @@ namespace Vouchee.Business.Models.DTOs
 {
     public class OrderDetailDTO
     {
-        public Guid? orderId { get; set; }
         public Guid? voucherId { get; set; }
 
         public decimal unitPrice { get; set; }
@@ -18,12 +17,13 @@ namespace Vouchee.Business.Models.DTOs
 
     public class CreateOrderDetailDTO : OrderDetailDTO
     {
-        public DateTime? createDate = DateTime.Now;
-        public Guid? createBy { get; set; }
+        //public DateTime? createDate = DateTime.Now;
+        //public Guid? createBy { get; set; }
     }
 
     public class UpdateOrderDetailDTO : OrderDetailDTO
     {
+        public Guid? orderId { get; set; }
         public ObjectStatusEnum? status { get; set; }
 
         public DateTime? updateDate = DateTime.Now;

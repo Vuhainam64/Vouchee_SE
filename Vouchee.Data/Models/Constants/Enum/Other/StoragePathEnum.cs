@@ -8,7 +8,6 @@ namespace Vouchee.Data.Models.Constants.Enum.Other
 {
     public enum StoragePathEnum
     {
-        User,
-        Voucher
+        VOUCHER
     }
 }

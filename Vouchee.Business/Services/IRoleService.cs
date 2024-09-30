@@ -1,6 +1,7 @@
 ﻿using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Data.Models.Constants.Enum.Sort;
+using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
 
 namespace Vouchee.Business.Services
@@ -15,6 +16,7 @@ namespace Vouchee.Business.Services
         public Task<DynamicResponseModel<GetRoleDTO>> GetRolesAsync(PagingRequest pagingRequest,
                                                                             RoleFilter roleFilter,
                                                                             SortRoleEnum sortRoleEnum);
+        public Task<List<GetRoleDTO>> GetRolesAsync();
 
         // UPDATE
         public Task<bool> UpdateRoleAsync(Guid id, UpdateRoleDTO updateRoleDTO);

@@ -99,7 +99,7 @@ namespace Vouchee.Business.Services.Impls
                 result = _shopRepository.GetTable()
                             .ProjectTo<GetShopDTO>(_mapper.ConfigurationProvider)
                             .DynamicFilter(_mapper.Map<GetShopDTO>(shopFilter))
-                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LimitPaging, PageConstant.DefaultPaging);
+                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
             }
             catch (Exception ex)
             {

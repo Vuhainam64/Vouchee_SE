@@ -5,6 +5,7 @@ using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Data.Helpers;
+using Vouchee.Data.Models.Constants.Dictionary;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Constants.Number;
@@ -100,7 +101,7 @@ namespace Vouchee.Business.Services.Impls
                 result = _orderRepository.GetTable()
                             .ProjectTo<GetOrderDTO>(_mapper.ConfigurationProvider)
                             .DynamicFilter(_mapper.Map<GetOrderDTO>(voucherFiler))
-                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LimitPaging, PageConstant.DefaultPaging);
+                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
             }
             catch (Exception ex)
             {
@@ -119,7 +120,7 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<bool> UpdateOrderAsync(Guid id, UpdateOrderDTO updateOrderDTO)
+        public async Task<bool> UpdateOrderAsync(Guid id, UpdateOrderDTO updateOrderDTO, ThisUserObj thisUserObj)
         {
             try
             {
@@ -127,6 +128,13 @@ namespace Vouchee.Business.Services.Impls
                 if (existedOrder != null)
                 {
                     var entity = _mapper.Map<Order>(updateOrderDTO);
+
+                    // nếu role là staff thì assign voucher code vào
+                    if (thisUserObj.roleName.Equals(RoleDictionary.role.ElementAt(2)))
+                    {
+                        
+                    }
+
                     return await _orderRepository.UpdateAsync(entity);
                 }
                 else
