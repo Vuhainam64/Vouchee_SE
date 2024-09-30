@@ -16,6 +16,7 @@ namespace Vouchee.Business.Models.DTOs
         public string? city { get; set; }
         public string? district { get; set; }
         public string? address { get; set; }
+        public string? image { get; set; }
         public string? bankName { get; set; }
         public string? bankAccount { get; set; }
     }

@@ -97,7 +97,8 @@ namespace Vouchee.Business.Services.Impls
                     Image = ImageUrl,
                     RoleId = roleId,
                     LastName = lastName,
-                    Status = ObjectStatusEnum.ACTIVE.ToString()
+                    Status = ObjectStatusEnum.ACTIVE.ToString(),
+                    CreateDate = DateTime.Now
                 };
 
                 Guid? newBuyerId = await _userRepository.AddAsync(newBuyer);
@@ -118,17 +119,6 @@ namespace Vouchee.Business.Services.Impls
                         await DeviceTokenCache.UpdateDeviceToken(_cache, newBuyerId.ToString(), newtokens.Last());
                 }
 
-                //Tạo Investor object
-                newBuyer.Id = (Guid) newBuyerId;
-                Guid? newInvestorID = await _userRepository.AddAsync(newBuyer);
-                if (newInvestorID.Equals(""))
-                {
-                    throw new RegisterException("Tạo người mua mới thất bại !!");
-                }
-                else
-                {
-                    //TO DO: tạo ví ở đây
-                }
                 response.email = email;
                 response.id = newBuyerId.ToString();
                 response.uid = uid;
@@ -139,7 +129,9 @@ namespace Vouchee.Business.Services.Impls
             else
             {
                 if (!userObject.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault(RoleEnum.BUYER.ToString())))
+                {
                     throw new RegisterException("Đây không phải gmail của người mua");
+                }
 
                 if (!deviceToken.Equals(""))
                 {
