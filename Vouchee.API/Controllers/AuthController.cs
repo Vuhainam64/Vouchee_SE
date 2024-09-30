@@ -28,9 +28,9 @@ namespace Vouchee.API.Controllers
 
         [HttpPost]
         [Route("buyer")]
-        public async Task<IActionResult> GetTokenBuyer([FromQuery] string token)
+        public async Task<IActionResult> GetTokenBuyer([FromQuery] string token, string deviceToken)
         {
-            var result = await _authService.GetTokenBuyer(token);
+            var result = await _authService.GetTokenBuyer(token, deviceToken);
             return Ok(result);
         }
 

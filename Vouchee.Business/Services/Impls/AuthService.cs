@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FirebaseAdmin.Auth;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -7,8 +8,10 @@ using System.Security.Claims;
 using System.Text;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Models;
+using Vouchee.Business.Services.Extensions.RedisCache;
 using Vouchee.Data.Models.Constants.Dictionary;
 using Vouchee.Data.Models.Constants.Enum.Other;
+using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Repositories.IRepos;
 using UnauthorizedAccessException = Vouchee.Business.Exceptions.UnauthorizedAccessException;
@@ -20,11 +23,14 @@ namespace Vouchee.Business.Services.Impls
         private readonly AppSettings _appSettings;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly IDistributedCache _cache;
 
         public AuthService(IOptions<AppSettings> appSettings, 
-                            IUserRepository userRepository, 
+                            IUserRepository userRepository,
+                            IDistributedCache cache,
                             IMapper mapper)
         {
+            _cache = cache;
             _appSettings = appSettings.Value;
             _userRepository = userRepository;
             _mapper = mapper;
@@ -66,9 +72,95 @@ namespace Vouchee.Business.Services.Impls
             return response;
         }
 
-        public Task<AuthResponse> GetTokenBuyer(string firebaseToken)
+        public async Task<AuthResponse> GetTokenBuyer(string firebaseToken, string deviceToken)
         {
-            throw new NotImplementedException();
+            deviceToken ??= "";
+            FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
+            string uid = decryptedToken.Uid;
+
+            UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
+            string email = userRecord.Email;
+            string lastName = userRecord.DisplayName;
+            string ImageUrl = userRecord.PhotoUrl.ToString();
+
+            User userObject = await _userRepository.GetUserByEmail(email);
+
+            AuthResponse response = new();
+
+            if (userObject == null)
+            {
+                Guid roleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.BUYER.ToString()));
+
+                User newBuyer = new()
+                {
+                    Email = email,
+                    Image = ImageUrl,
+                    RoleId = roleId,
+                    LastName = lastName,
+                    Status = ObjectStatusEnum.ACTIVE.ToString()
+                };
+
+                Guid? newBuyerId = await _userRepository.AddAsync(newBuyer);
+                if (newBuyerId == null)
+                {
+                    throw new RegisterException("Đăng ký người mua mới không thành công");
+                }
+
+                if (!deviceToken.Equals(""))
+                {
+                    List<string> newtokens = new()
+                    {
+                        deviceToken
+                    };
+
+                    newtokens = await DeviceTokenCache.ValidateDeviceToken(newtokens);
+                    if (newtokens.Count > 0)
+                        await DeviceTokenCache.UpdateDeviceToken(_cache, newBuyerId.ToString(), newtokens.Last());
+                }
+
+                //Tạo Investor object
+                newBuyer.Id = (Guid) newBuyerId;
+                Guid? newInvestorID = await _userRepository.AddAsync(newBuyer);
+                if (newInvestorID.Equals(""))
+                {
+                    throw new RegisterException("Tạo người mua mới thất bại !!");
+                }
+                else
+                {
+                    //TO DO: tạo ví ở đây
+                }
+                response.email = email;
+                response.id = newBuyerId.ToString();
+                response.uid = uid;
+                response.image = ImageUrl;
+                response.fullName = userRecord.DisplayName;
+                response = await GenerateTokenAsync(response, RoleEnum.BUYER.ToString());
+            }
+            else
+            {
+                if (!userObject.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault(RoleEnum.BUYER.ToString())))
+                    throw new RegisterException("Đây không phải gmail của người mua");
+
+                if (!deviceToken.Equals(""))
+                {
+                    List<string> newtokens = new()
+                    {
+                        deviceToken
+                    };
+
+                    newtokens = await DeviceTokenCache.ValidateDeviceToken(newtokens);
+                    if (newtokens.Count > 0)
+                        await DeviceTokenCache.UpdateDeviceToken(_cache, userObject.Id.ToString(), newtokens.Last());
+                }
+
+                response.email = email;
+                response.id = userObject.Id.ToString();
+                response.uid = uid;
+                response.image = userObject.Image;
+                response.fullName = (userObject.FirstName + " " + userObject.LastName) ?? userRecord.DisplayName;
+                response = await GenerateTokenAsync(response, RoleEnum.BUYER.ToString());
+            }
+            return response;
         }
 
         public async Task<AuthResponse> GetTokenSeller(string firebaseToken)
@@ -120,27 +212,22 @@ namespace Vouchee.Business.Services.Impls
             if (roleCheck.Equals(RoleEnum.ADMIN.ToString()))
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.ADMIN.ToString());
-                buyerId = new Claim(ClaimTypes.GroupSid, "");
             }
             else if (roleCheck.Equals(RoleEnum.BUYER.ToString()))
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BUYER.ToString());
-                buyerId = new Claim(ClaimTypes.GroupSid, response.buyerId.ToString());
             }
             else if (roleCheck.Equals(RoleEnum.SELLER.ToString()))
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.SELLER.ToString());
-                buyerId = new Claim(ClaimTypes.GroupSid, "");
             }
             else if (roleCheck.Equals(RoleEnum.STAFF.ToString()))
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.STAFF.ToString());
-                buyerId = new Claim(ClaimTypes.GroupSid, "");
             }
             else
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BUYER.ToString());
-                buyerId = new Claim(ClaimTypes.GroupSid, response.buyerId.ToString());
             }
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -151,7 +238,6 @@ namespace Vouchee.Business.Services.Impls
                     new Claim(ClaimTypes.Email, response.email),
                     new Claim(ClaimTypes.Actor, response.fullName),
                     roleClaim,
-                    buyerId
                 }),
 
                 Expires = DateTime.UtcNow.AddHours(hours),
