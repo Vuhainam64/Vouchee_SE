@@ -28,7 +28,7 @@ jobs:
       run: dotnet test --no-build --verbosity normal  
 
     - name: Build Docker image  
-      run: docker build -t your-image-name .  
+      run: docker build -t myimage .  
 
     - name: Push Docker image  
       run: |  
