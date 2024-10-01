@@ -28,13 +28,13 @@ jobs:
       run: dotnet test --no-build --verbosity normal  
 
     - name: Build Docker image  
-      run: docker build -t myimage .  
+      run: docker build -t confident_burnell .  
 
     - name: Push Docker image  
       run: |  
         echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin  
-        docker push myimage  
+        docker push confident_burnell  
 
     - name: Deploy to VPS  
       run: |  
-        ssh Notch272@86436392 'docker pull myimage && docker run -d myimage'
+        ssh Notch272@86436392 'docker pull confident_burnell && docker run -d confident_burnell'
