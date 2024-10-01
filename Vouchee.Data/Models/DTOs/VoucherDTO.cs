@@ -31,9 +31,7 @@ namespace Vouchee.Business.Models.DTOs
     public class CreateVoucherDTO : VoucherDTO
     {
         public IFormFile? image { get; set; }
-
         public DateTime? createDate = DateTime.Now;
-        public Guid? createBy { get; set; }
     }
 
     public class UpdateVoucherDTO : VoucherDTO

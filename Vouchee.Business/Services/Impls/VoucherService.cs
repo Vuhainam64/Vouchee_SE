@@ -30,19 +30,20 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<Guid?> CreateVoucherAsync(CreateVoucherDTO createVoucherDTO)
+        public async Task<Guid?> CreateVoucherAsync(CreateVoucherDTO createVoucherDTO, ThisUserObj thisUserObj)
         {
             try
             {
                 Voucher voucher = _mapper.Map<Voucher>(createVoucherDTO);
 
                 voucher.Status = VoucherStatusEnum.ACTIVE.ToString();
+                voucher.CreateBy = Guid.Parse(thisUserObj.userId);
 
                 var voucherId = await _voucherRepository.AddAsync(voucher);
 
                 if (createVoucherDTO.image != null)
                 {
-                    voucher.Image = await _fileUploadService.UploadImageToFirebaseVoucher(createVoucherDTO.image, voucherId.ToString());
+                    voucher.Image = await _fileUploadService.UploadImageToFirebaseVoucher(createVoucherDTO.image, thisUserObj.userId.ToString());
 
                     await _voucherRepository.UpdateAsync(voucher);
                 }

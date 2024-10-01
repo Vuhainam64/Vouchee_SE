@@ -8,7 +8,7 @@ namespace Vouchee.Business.Models
 {
     public class ErrorResponse
     {
-        public string Code { get; set; }
-        public string Message { get; set; }
+        public string code { get; set; }
+        public string message { get; set; }
     }
 }

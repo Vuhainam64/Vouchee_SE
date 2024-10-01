@@ -204,22 +204,27 @@ namespace Vouchee.Business.Services.Impls
             if (roleCheck.Equals(RoleEnum.ADMIN.ToString()))
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.ADMIN.ToString());
+                buyerId = new Claim(ClaimTypes.GroupSid, "");
             }
             else if (roleCheck.Equals(RoleEnum.BUYER.ToString()))
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BUYER.ToString());
+                buyerId = new Claim(ClaimTypes.GroupSid, response.buyerId);
             }
             else if (roleCheck.Equals(RoleEnum.SELLER.ToString()))
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.SELLER.ToString());
+                buyerId = new Claim(ClaimTypes.GroupSid, "");
             }
             else if (roleCheck.Equals(RoleEnum.STAFF.ToString()))
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.STAFF.ToString());
+                buyerId = new Claim(ClaimTypes.GroupSid, "");
             }
             else
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BUYER.ToString());
+                buyerId = new Claim(ClaimTypes.GroupSid, response.buyerId);
             }
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -230,6 +235,7 @@ namespace Vouchee.Business.Services.Impls
                     new Claim(ClaimTypes.Email, response.email),
                     new Claim(ClaimTypes.Actor, response.fullName),
                     roleClaim,
+                    buyerId
                 }),
 
                 Expires = DateTime.UtcNow.AddHours(hours),

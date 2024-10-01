@@ -8,7 +8,6 @@ namespace Vouchee.API.Controllers
     [ApiController]
     [Route("api/auth")]
     [EnableCors]
-    [AllowAnonymous]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
@@ -20,6 +19,7 @@ namespace Vouchee.API.Controllers
 
         [HttpPost]
         [Route("seller")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetTokenSeller([FromQuery] string token)
         {
             var result = await _authService.GetTokenSeller(token);
@@ -28,6 +28,7 @@ namespace Vouchee.API.Controllers
 
         [HttpPost]
         [Route("buyer")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetTokenBuyer([FromQuery] string token, string? deviceToken)
         {
             var result = await _authService.GetTokenBuyer(token, deviceToken);
@@ -36,6 +37,7 @@ namespace Vouchee.API.Controllers
 
         [HttpPost]
         [Route("admin")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetTokenAdmin([FromQuery] string token)
         {
             var result = await _authService.GetTokenAdmin(token);

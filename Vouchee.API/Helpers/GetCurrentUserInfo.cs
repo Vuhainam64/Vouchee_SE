@@ -35,15 +35,15 @@ namespace Vouchee.API.Helpers
             }
 
             var roleList = await _roleService.GetRolesAsync();
-            GetUserDTO? userDTO = await _userService.GetUserByEmailAsync(currentUser.email);
+            GetUserDTO? user = await _userService.GetUserByEmailAsync(currentUser.email);
 
-            if (userDTO == null)
+            if (user == null)
             {
                 currentUser.roleId = "";
             }
             else
             {
-                currentUser.roleId = userDTO.roleId.ToString();
+                currentUser.roleId = user.roleId.ToString();
 
             }
 
@@ -69,7 +69,6 @@ namespace Vouchee.API.Helpers
                     }
                 }
             }
-
             return currentUser;
         }
     }

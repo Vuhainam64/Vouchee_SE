@@ -16,5 +16,6 @@ namespace Vouchee.Business.Models
         public string? email { get; set; }
         public string? image { get; set; }
         public string? token { get; set; }
+        public string? buyerId { get; set; }
     }
 }

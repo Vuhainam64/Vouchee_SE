@@ -31,6 +31,7 @@ namespace Vouchee.API.Controllers
 
         // CREATE
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateOrder([FromForm] CreateOrderDTO createOrderDTO)
         {
             var result = await _orderService.CreateOrderAsync(createOrderDTO);
@@ -39,6 +40,7 @@ namespace Vouchee.API.Controllers
 
         // READ
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetOrders([FromQuery] PagingRequest pagingRequest,
                                                             [FromQuery] OrderFilter orderFilter,
                                                             [FromQuery] SortOrderEnum sortOrderEnum)
@@ -49,6 +51,7 @@ namespace Vouchee.API.Controllers
 
         [HttpGet]
         [Route("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetOrderById(Guid id)
         {
             var order = await _orderService.GetOrderByIdAsync(id);
@@ -71,12 +74,17 @@ namespace Vouchee.API.Controllers
                 return Ok(result);
             }
 
-            return StatusCode((int)HttpStatusCode.Forbidden, "Chỉ có nhà bán hàng hoặc người mua mới có thể thực hiện chức năng này");
+            return StatusCode((int)HttpStatusCode.Forbidden, new
+            {
+                Code = HttpStatusCode.Forbidden,
+                Message = "Chỉ có nhà bán hàng hoặc người mua mới có thể thực hiện chức năng này"
+            });
         }
 
         // DELETE
         [HttpDelete]
         [Route("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteOrder(Guid id)
         {
             var result = await _orderService.DeleteOrderAsync(id);
