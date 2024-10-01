@@ -28,13 +28,13 @@ jobs:
       run: dotnet test --no-build --verbosity normal  
 
     - name: Build Docker image  
-      run: docker build -t voucheecicd .  
+      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/myimage:1 .  
 
     - name: Push Docker image  
       run: |  
         echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin  
-        docker push voucheecicd   
+        docker push ${{ secrets.DOCKER_USERNAME }}/myimage:1
 
     - name: Deploy to VPS  
       run: |  
-        ssh -o StrictHostKeyChecking=no Notch272@86436392 'docker pull voucheecicd && docker run -d --restart unless-stopped voucheecicd'
+        ssh -o StrictHostKeyChecking=no Notch272@86436392 'docker pull ${{ secrets.DOCKER_USERNAME }}/myimage:1 && docker run -d --restart unless-stopped ${{ secrets.DOCKER_USERNAME }}/myimage:1'
