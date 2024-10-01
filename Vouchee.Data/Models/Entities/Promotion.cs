@@ -15,10 +15,16 @@ namespace Vouchee.Data.Models.Entities
         public Promotion()
         {
             Vouchers = new HashSet<Voucher>();
+            Orders = new HashSet<Order>();
+            OrderDetails = new HashSet<OrderDetail>();
         }
 
         [InverseProperty(nameof(Voucher.Promotions))]
         public virtual ICollection<Voucher> Vouchers { get; set; }
+        [InverseProperty(nameof(Order.Promotion))]
+        public virtual ICollection<Order> Orders { get; set; }
+        [InverseProperty(nameof(OrderDetail.Promotion))]
+        public virtual ICollection<OrderDetail> OrderDetails { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
@@ -28,7 +34,10 @@ namespace Vouchee.Data.Models.Entities
         public string? Description { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public int Quantity { get; set; }
+        public int? Quantity { get; set; }
+        public string? Code { get; set; }
+        public string? Type { get; set; }
+        public string? Policy { get; set; }
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]

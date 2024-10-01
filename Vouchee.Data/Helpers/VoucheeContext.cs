@@ -20,6 +20,7 @@ namespace Vouchee.Data.Helpers
         public virtual DbSet<VoucherType> VoucherTypes { get; set; }
         public virtual DbSet<Voucher> Vouchers { get; set; }
         public virtual DbSet<VoucherCode> VoucherCodes { get; set; }
+        public virtual DbSet<Promotion> Promotions { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -44,6 +45,7 @@ namespace Vouchee.Data.Helpers
             modelBuilder.Entity<Voucher>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<VoucherCode>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<VoucherType>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            modelBuilder.Entity<Promotion>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
 
             modelBuilder.Seed();
 

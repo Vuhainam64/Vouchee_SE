@@ -12,6 +12,7 @@ namespace Vouchee.Data.Models.Entities
 {
     [Table("Order")]
     [Index(nameof(UserId), Name = "IX_Order_UserId")]
+    [Index(nameof(PromotionId), Name = "IX_Order_PromotionId")]
     public partial class Order
     {
         public Order()
@@ -26,6 +27,11 @@ namespace Vouchee.Data.Models.Entities
         [ForeignKey(nameof(UserId))]
         [InverseProperty("Orders")]
         public virtual User? User { get; set; }
+
+        public Guid? PromotionId { get; set; }
+        [ForeignKey(nameof(PromotionId))]
+        [InverseProperty("Orders")]
+        public virtual Promotion? Promotion { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]

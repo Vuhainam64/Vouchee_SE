@@ -12,6 +12,7 @@ namespace Vouchee.Data.Models.Entities
     [Table("OrderDetail")]
     [Index(nameof(OrderId), Name = "IX_OrderDetail_OrderId")]
     [Index(nameof(VoucherId), Name = "IX_OrderDetail_VoucherId")]
+    [Index(nameof(PromotionId), Name = "IX_OrderDetail_PromotionId")]
     public partial class OrderDetail
     {
         public OrderDetail()
@@ -31,6 +32,11 @@ namespace Vouchee.Data.Models.Entities
         [ForeignKey(nameof(VoucherId))]
         [InverseProperty("OrderDetails")]
         public virtual Voucher? Voucher { get; set; }
+
+        public Guid? PromotionId { get; set; }
+        [ForeignKey(nameof(PromotionId))]
+        [InverseProperty("OrderDetails")]
+        public virtual Promotion? Promotion { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
