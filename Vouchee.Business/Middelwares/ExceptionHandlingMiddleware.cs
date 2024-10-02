@@ -2,9 +2,12 @@
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System.Net;
+using Vouchee.Business.Exceptions;
 using Vouchee.Business.Models;
+using FormatException = Vouchee.Business.Exceptions.FormatException;
+using UnauthorizedAccessException = Vouchee.Business.Exceptions.UnauthorizedAccessException;
 
-namespace Vouchee.Business.Exceptions
+namespace Vouchee.Business.Middelwares
 {
     public class ExceptionHandlingMiddleware : AuthorizeAttribute
     {
@@ -26,10 +29,10 @@ namespace Vouchee.Business.Exceptions
         }
         private static Task HandleException(HttpContext context, Exception ex)
         {
-            var errorMessageObject = new ErrorResponse 
-            { 
-                message = ex.Message, 
-                code = "500" 
+            var errorMessageObject = new ErrorResponse
+            {
+                message = ex.Message,
+                code = "500"
             };
             var statusCode = (int)HttpStatusCode.InternalServerError;
             switch (ex)
@@ -76,7 +79,11 @@ namespace Vouchee.Business.Exceptions
                     break;
                 case LoadException:
                     errorMessageObject.code = "L001";
-                    statusCode =(int)HttpStatusCode.ServiceUnavailable;
+                    statusCode = (int)HttpStatusCode.ServiceUnavailable;
+                    break;
+                case QuantityExcessException:
+                    errorMessageObject.code = "Q001";
+                    statusCode = (int)HttpStatusCode.Conflict;
                     break;
             }
 

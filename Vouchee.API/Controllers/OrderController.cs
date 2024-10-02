@@ -32,10 +32,22 @@ namespace Vouchee.API.Controllers
         // CREATE
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> CreateOrder([FromForm] CreateOrderDTO createOrderDTO)
+        public async Task<IActionResult> CreateOrder([FromBody] CreateOrderDTO createOrderDTO)
         {
-            var result = await _orderService.CreateOrderAsync(createOrderDTO);
-            return CreatedAtAction(nameof(GetOrderById), new { result }, result);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+
+            //BUYER
+            if (currentUser.roleId.Equals(currentUser.buyerRoleId))
+            {
+                var result = await _orderService.CreateOrderAsync(createOrderDTO, currentUser);
+                return Ok(result);
+            }
+
+            return StatusCode((int)HttpStatusCode.Forbidden, new
+            {
+                code = HttpStatusCode.Forbidden,
+                message = "Chỉ có người mua mới có thể thực hiện chức năng này"
+            });
         }
 
         // READ
@@ -76,8 +88,8 @@ namespace Vouchee.API.Controllers
 
             return StatusCode((int)HttpStatusCode.Forbidden, new
             {
-                Code = HttpStatusCode.Forbidden,
-                Message = "Chỉ có nhà bán hàng hoặc người mua mới có thể thực hiện chức năng này"
+                code = HttpStatusCode.Forbidden,
+                message = "Chỉ có nhà bán hàng hoặc người mua mới có thể thực hiện chức năng này"
             });
         }
 

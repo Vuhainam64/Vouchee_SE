@@ -17,23 +17,40 @@ namespace Vouchee.Business.Services.Impls
 {
     public class OrderService : IOrderService
     {
+        private readonly IVoucherRepository _voucherRepository;
         private readonly IOrderRepository _orderRepository;
         private readonly IMapper _mapper;
 
-        public OrderService(IOrderRepository orderRepository,
+        public OrderService(IVoucherRepository voucherRepository,
+                                IOrderRepository orderRepository,
                                 IMapper mapper)
         {
+            _voucherRepository = voucherRepository;
             _orderRepository = orderRepository;
             _mapper = mapper;
         }
 
-        public async Task<Guid?> CreateOrderAsync(CreateOrderDTO createOrderDTO)
+        public async Task<Guid?> CreateOrderAsync(CreateOrderDTO createOrderDTO, ThisUserObj thisUserObj)
         {
             try
             {
+                foreach (var orderDetail in createOrderDTO.orderDetails)
+                {
+                    var voucher = _voucherRepository.GetByIdAsync(orderDetail.voucherId).Result;
+                    if (voucher == null)
+                    {
+                        throw new NotFoundException($"Không tìm thấy voucher với ID {orderDetail.voucherId}");
+                    }
+                    if (orderDetail.quantity > voucher.Quantity)
+                    {
+                        throw new QuantityExcessException($"Voucher {orderDetail.voucherId} vượt quá số lượng tồn kho");
+                    }
+                }
+
                 var order = _mapper.Map<Order>(createOrderDTO);
 
                 order.Status = OrderStatusEnum.PENDING.ToString();
+                order.CreateBy = Guid.Parse(thisUserObj.userId);
 
                 var orderId = await _orderRepository.AddAsync(order);
 

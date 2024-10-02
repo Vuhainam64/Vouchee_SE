@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Entities;
 
@@ -22,10 +23,8 @@ namespace Vouchee.Business.Models.DTOs
             orderDetails = new HashSet<CreateOrderDetailDTO>();
         }
 
-        //public DateTime? createDate = DateTime.Now;
-        //public Guid? createBy { get; set; }
-        public string? paymentType { get; set; }
-        public decimal? discountValue { get; set; }
+        public DateTime? createDate = DateTime.Now;
+        public PaymentTypeEnum paymentType { get; set; }
         public virtual ICollection<CreateOrderDetailDTO> orderDetails { get; set; }
     }
 

@@ -46,14 +46,13 @@ namespace Vouchee.Business.Services.Impls
             string imageUrl = userRecord.PhotoUrl.ToString();
 
             User userObject = await _userRepository.GetUserByEmail(email);
-            AuthResponse authResponse = new();
 
             if (userRecord == null)
                 throw new NotFoundException("User not found");
 
             if (!userObject.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault(RoleEnum.ADMIN.ToString())))
             {
-                throw new UnauthorizedAccessException("You Are Not Using An Admin Account!!");
+                throw new UnauthorizedAccessException("Đây không phải tài khoản admin!!");
             }
 
             AuthResponse response = new()
@@ -119,6 +118,7 @@ namespace Vouchee.Business.Services.Impls
                         await DeviceTokenCache.UpdateDeviceToken(_cache, newBuyerId.ToString(), newtokens.Last());
                 }
 
+                response.buyerId = newBuyerId.ToString();
                 response.email = email;
                 response.id = newBuyerId.ToString();
                 response.uid = uid;
@@ -145,6 +145,9 @@ namespace Vouchee.Business.Services.Impls
                         await DeviceTokenCache.UpdateDeviceToken(_cache, userObject.Id.ToString(), newtokens.Last());
                 }
 
+                response.roleId = userObject.RoleId.ToString();
+                response.roleName = RoleEnum.BUYER.ToString();
+                response.buyerId = userObject.Id.ToString();
                 response.email = email;
                 response.id = userObject.Id.ToString();
                 response.uid = uid;
@@ -172,7 +175,8 @@ namespace Vouchee.Business.Services.Impls
             {
                 throw new NotFoundException("User Not Found!!");
             }
-            else
+
+            if (userObject.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault(RoleEnum.SELLER.ToString())))
             {
                 response.email = email;
                 response.id = userObject.Id.ToString();
@@ -183,7 +187,10 @@ namespace Vouchee.Business.Services.Impls
                 response.fullName = userObject.FirstName + " " + userObject.LastName;
                 response = await GenerateTokenAsync(response, RoleEnum.SELLER.ToString());
             }
-
+            else
+            {
+                throw new UnauthorizedAccessException("Đây không phải tài khoản của người bán!");
+            }
             return response;
         }
 

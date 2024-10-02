@@ -1,4 +1,6 @@
-﻿using Vouchee.Data.Models.Constants.Enum.Status;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+using Vouchee.Data.Models.Constants.Enum.Status;
 
 
 namespace Vouchee.Business.Models.DTOs
@@ -6,12 +8,7 @@ namespace Vouchee.Business.Models.DTOs
     public class OrderDetailDTO
     {
         public Guid? voucherId { get; set; }
-
-        public decimal unitPrice { get; set; }
-        public decimal discountValue { get; set; }
-        public decimal totalPrice => unitPrice * quantity;
-        public decimal discountPrice => totalPrice * discountValue / 100;
-        public decimal finalPrice => totalPrice - discountPrice; 
+        [Range(1, int.MaxValue, ErrorMessage = "Số lượng phải lớn hơn 0")]
         public int quantity { get; set; }
     }
 

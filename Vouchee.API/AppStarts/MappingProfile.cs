@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Vouchee.Business.Models.DTOs;
+using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
 
@@ -70,6 +71,13 @@ namespace Vouchee.API.AppStarts
             CreateMap<VoucherType, UpdateVoucherTypeDTO>().ReverseMap();
             CreateMap<VoucherType, GetVoucherTypeDTO>().ReverseMap();
             CreateMap<GetVoucherTypeDTO, VoucherTypeFilter>().ReverseMap();
+
+            // PROMOTION
+            CreateMap<Promotion, PromotionDTO>().ReverseMap();
+            CreateMap<Promotion, CreatePromotionDTO>().ReverseMap();
+            CreateMap<Promotion, UpdatePromotionDTO>().ReverseMap();
+            CreateMap<Promotion, GetPromotionDTO>().ReverseMap();
+            CreateMap<GetPromotionDTO, PromotionFilter>().ReverseMap();
         }
     }
 }
