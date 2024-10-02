@@ -37,4 +37,4 @@ jobs:
 
     - name: Deploy to VPS  
       run: |  
-        ssh -o StrictHostKeyChecking=no Notch272@86436392 'docker pull ${{ secrets.DOCKER_USERNAME }}/myimage:1 && docker run -d --restart unless-stopped ${{ secrets.DOCKER_USERNAME }}/myimage:1'
+        ssh -o StrictHostKeyChecking=no Vouchee123@Vouchee 'docker pull ${{ secrets.DOCKER_USERNAME }}/myimage:1 && docker run -d --restart unless-stopped ${{ secrets.DOCKER_USERNAME }}/myimage:1'
