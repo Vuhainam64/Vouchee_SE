@@ -264,19 +264,15 @@ namespace Vouchee.Data.Helpers
                 {
                     Id = Guid.Parse("01aa28e3-4554-48c5-8324-80c4e6abd582"),
                     TotalPrice = 10000,
-                    DiscountPrice = 1000,
-                    FinalPrice = 9000,
                     Status = OrderStatusEnum.PENDING.ToString(),
-                    UserId = Guid.Parse("e55ee134-b4ec-43f2-a565-8bcec52dff23")
+                    CreateBy = Guid.Parse("e55ee134-b4ec-43f2-a565-8bcec52dff23")
                 },
                 new Order()
                 {
                     Id = Guid.Parse("f87dade4-73ac-4922-a09d-e6efe4f7ac17"),
                     TotalPrice = 20000,
-                    DiscountPrice = 1000,
-                    FinalPrice = 19000,
                     Status = OrderStatusEnum.PENDING.ToString(),
-                    UserId = Guid.Parse("e55ee134-b4ec-43f2-a565-8bcec52dff23")
+                    CreateBy = Guid.Parse("e55ee134-b4ec-43f2-a565-8bcec52dff23")
                 }
             );
 
@@ -285,26 +281,20 @@ namespace Vouchee.Data.Helpers
                 new OrderDetail()
                 {
                     Id = Guid.Parse("9c79e86d-3c11-422d-9e51-0ef985e87084"),
-                    TotalPrice = 2000,
                     Quantity = 2,
                     Status = ObjectStatusEnum.ACTIVE.ToString(),
                     VoucherId = Guid.Parse("494b5347-378e-4e2d-9553-6032a42cd8d1"),
-                    DiscountPrice = 0,
                     DiscountValue = 0,
-                    FinalPrice = 4000,
                     OrderId = Guid.Parse("01aa28e3-4554-48c5-8324-80c4e6abd582"),
                     UnitPrice = 1000,
                 },
                 new OrderDetail()
                 {
                     Id = Guid.Parse("d03c5b75-25b0-4ec8-98b3-9f80fcb9311a"),
-                    TotalPrice = 2000,
                     Quantity = 1,
                     Status = ObjectStatusEnum.ACTIVE.ToString(),
                     VoucherId = Guid.Parse("494b5347-378e-4e2d-9553-6032a42cd8d1"),
-                    DiscountPrice = 0,
                     DiscountValue = 0,
-                    FinalPrice = 4000,
                     OrderId = Guid.Parse("01aa28e3-4554-48c5-8324-80c4e6abd582"),
                     UnitPrice = 1000,
                 }

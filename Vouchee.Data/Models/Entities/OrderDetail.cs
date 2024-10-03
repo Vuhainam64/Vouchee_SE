@@ -45,13 +45,13 @@ namespace Vouchee.Data.Models.Entities
         [Column(TypeName = "decimal")]
         public decimal UnitPrice { get; set; }
         [Column(TypeName = "decimal")]
-        public decimal DiscountValue { get; set; }
+        public decimal DiscountValue { get; set; } = 0;
         [Column(TypeName = "decimal")]
-        public decimal TotalPrice { get; set; }
+        public decimal TotalPrice => UnitPrice * Quantity;
         [Column(TypeName = "decimal")]
-        public decimal DiscountPrice { get; set; }
+        public decimal DiscountPrice => TotalPrice * DiscountValue * 100;
         [Column(TypeName = "decimal")]
-        public decimal FinalPrice { get; set; }
+        public decimal FinalPrice => TotalPrice - DiscountPrice;
         public int Quantity { get; set; }
 
         public string? Status { get; set; }

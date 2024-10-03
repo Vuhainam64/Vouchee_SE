@@ -65,13 +65,7 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<decimal>("DiscountPrice")
-                        .HasColumnType("decimal");
-
                     b.Property<decimal>("DiscountValue")
-                        .HasColumnType("decimal");
-
-                    b.Property<decimal>("FinalPrice")
                         .HasColumnType("decimal");
 
                     b.Property<string>("PaymentType")
@@ -92,14 +86,11 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex(new[] { "PromotionId" }, "IX_Order_PromotionId");
 
-                    b.HasIndex(new[] { "UserId" }, "IX_Order_UserId");
+                    b.HasIndex(new[] { "CreateBy" }, "IX_Order_UserId");
 
                     b.ToTable("Order");
 
@@ -107,22 +98,18 @@ namespace Vouchee.Data.Migrations
                         new
                         {
                             Id = new Guid("01aa28e3-4554-48c5-8324-80c4e6abd582"),
-                            DiscountPrice = 1000m,
+                            CreateBy = new Guid("e55ee134-b4ec-43f2-a565-8bcec52dff23"),
                             DiscountValue = 0m,
-                            FinalPrice = 9000m,
                             Status = "PENDING",
-                            TotalPrice = 10000m,
-                            UserId = new Guid("e55ee134-b4ec-43f2-a565-8bcec52dff23")
+                            TotalPrice = 10000m
                         },
                         new
                         {
                             Id = new Guid("f87dade4-73ac-4922-a09d-e6efe4f7ac17"),
-                            DiscountPrice = 1000m,
+                            CreateBy = new Guid("e55ee134-b4ec-43f2-a565-8bcec52dff23"),
                             DiscountValue = 0m,
-                            FinalPrice = 19000m,
                             Status = "PENDING",
-                            TotalPrice = 20000m,
-                            UserId = new Guid("e55ee134-b4ec-43f2-a565-8bcec52dff23")
+                            TotalPrice = 20000m
                         });
                 });
 
@@ -139,13 +126,7 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<decimal>("DiscountPrice")
-                        .HasColumnType("decimal");
-
                     b.Property<decimal>("DiscountValue")
-                        .HasColumnType("decimal");
-
-                    b.Property<decimal>("FinalPrice")
                         .HasColumnType("decimal");
 
                     b.Property<Guid?>("OrderId")
@@ -159,9 +140,6 @@ namespace Vouchee.Data.Migrations
 
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal");
 
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal");
@@ -189,26 +167,20 @@ namespace Vouchee.Data.Migrations
                         new
                         {
                             Id = new Guid("9c79e86d-3c11-422d-9e51-0ef985e87084"),
-                            DiscountPrice = 0m,
                             DiscountValue = 0m,
-                            FinalPrice = 4000m,
                             OrderId = new Guid("01aa28e3-4554-48c5-8324-80c4e6abd582"),
                             Quantity = 2,
                             Status = "ACTIVE",
-                            TotalPrice = 2000m,
                             UnitPrice = 1000m,
                             VoucherId = new Guid("494b5347-378e-4e2d-9553-6032a42cd8d1")
                         },
                         new
                         {
                             Id = new Guid("d03c5b75-25b0-4ec8-98b3-9f80fcb9311a"),
-                            DiscountPrice = 0m,
                             DiscountValue = 0m,
-                            FinalPrice = 4000m,
                             OrderId = new Guid("01aa28e3-4554-48c5-8324-80c4e6abd582"),
                             Quantity = 1,
                             Status = "ACTIVE",
-                            TotalPrice = 2000m,
                             UnitPrice = 1000m,
                             VoucherId = new Guid("494b5347-378e-4e2d-9553-6032a42cd8d1")
                         });
@@ -676,12 +648,12 @@ namespace Vouchee.Data.Migrations
                         {
                             Id = new Guid("494b5347-378e-4e2d-9553-6032a42cd8d1"),
                             CreateBy = new Guid("b4583f49-baba-4916-8e2b-2d44c3412733"),
-                            EndDate = new DateTime(2024, 10, 5, 18, 53, 56, 640, DateTimeKind.Local).AddTicks(5739),
+                            EndDate = new DateTime(2024, 10, 7, 18, 40, 15, 821, DateTimeKind.Local).AddTicks(6134),
                             Name = "Voucher sale",
                             PercentShow = 10m,
                             Price = 100000m,
                             Quantity = 100,
-                            StarDate = new DateTime(2024, 10, 1, 18, 53, 56, 640, DateTimeKind.Local).AddTicks(5728),
+                            StarDate = new DateTime(2024, 10, 3, 18, 40, 15, 821, DateTimeKind.Local).AddTicks(6124),
                             Status = "ACTIVE",
                             SupplierId = new Guid("a053e9fc-7962-4eaa-8377-91c56c85cda6"),
                             VoucherTypeId = new Guid("3e676315-1a28-4a0b-beb5-eaa5336a108d")
@@ -690,12 +662,12 @@ namespace Vouchee.Data.Migrations
                         {
                             Id = new Guid("0c20c3c9-2200-4b09-81f5-a0ceb74eba8c"),
                             CreateBy = new Guid("b4583f49-baba-4916-8e2b-2d44c3412733"),
-                            EndDate = new DateTime(2024, 10, 5, 18, 53, 56, 640, DateTimeKind.Local).AddTicks(5754),
+                            EndDate = new DateTime(2024, 10, 7, 18, 40, 15, 821, DateTimeKind.Local).AddTicks(6147),
                             Name = "Voucher sale",
                             PercentShow = 10m,
                             Price = 100000m,
                             Quantity = 100,
-                            StarDate = new DateTime(2024, 10, 1, 18, 53, 56, 640, DateTimeKind.Local).AddTicks(5754),
+                            StarDate = new DateTime(2024, 10, 3, 18, 40, 15, 821, DateTimeKind.Local).AddTicks(6147),
                             Status = "ACTIVE",
                             SupplierId = new Guid("a053e9fc-7962-4eaa-8377-91c56c85cda6"),
                             VoucherTypeId = new Guid("3e676315-1a28-4a0b-beb5-eaa5336a108d")
@@ -866,13 +838,13 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Order", b =>
                 {
+                    b.HasOne("Vouchee.Data.Models.Entities.User", "User")
+                        .WithMany("Orders")
+                        .HasForeignKey("CreateBy");
+
                     b.HasOne("Vouchee.Data.Models.Entities.Promotion", "Promotion")
                         .WithMany("Orders")
                         .HasForeignKey("PromotionId");
-
-                    b.HasOne("Vouchee.Data.Models.Entities.User", "User")
-                        .WithMany("Orders")
-                        .HasForeignKey("UserId");
 
                     b.Navigation("Promotion");
 

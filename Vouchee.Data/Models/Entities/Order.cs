@@ -11,7 +11,7 @@ using Vouchee.Data.Helpers;
 namespace Vouchee.Data.Models.Entities
 {
     [Table("Order")]
-    [Index(nameof(UserId), Name = "IX_Order_UserId")]
+    [Index(nameof(CreateBy), Name = "IX_Order_UserId")]
     [Index(nameof(PromotionId), Name = "IX_Order_PromotionId")]
     public partial class Order
     {
@@ -23,8 +23,7 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty(nameof(OrderDetail.Order))]
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
 
-        public Guid? UserId { get; set; }
-        [ForeignKey(nameof(UserId))]
+        [ForeignKey(nameof(CreateBy))]
         [InverseProperty("Orders")]
         public virtual User? User { get; set; }
 
@@ -39,13 +38,13 @@ namespace Vouchee.Data.Models.Entities
 
         public string? PaymentType { get; set; }
         [Column(TypeName = "decimal")]
-        public decimal DiscountValue { get; set; }
+        public decimal DiscountValue { get; set; } = 0;
         [Column(TypeName = "decimal")]
         public decimal TotalPrice { get; set; }
         [Column(TypeName = "decimal")]
-        public decimal DiscountPrice { get; set; }
+        public decimal DiscountPrice => TotalPrice * DiscountValue;
         [Column(TypeName = "decimal")]
-        public decimal FinalPrice { get; set; }
+        public decimal FinalPrice => TotalPrice - DiscountPrice;
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]

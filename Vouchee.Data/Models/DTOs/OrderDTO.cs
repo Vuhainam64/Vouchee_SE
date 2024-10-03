@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Entities;
@@ -7,13 +8,6 @@ namespace Vouchee.Business.Models.DTOs
 {
     public class OrderDTO
     {
-        //public Guid? userId { get; set; }
-
-        //public string? paymentType { get; set; }
-        //public decimal? discountValue { get; set; }
-        //public decimal? totalPrice { get; set; }
-        //public decimal? discountPrice { get; set; }
-        //public decimal? finalPrice => totalPrice - discountPrice;
     }
 
     public class CreateOrderDTO : OrderDTO
@@ -23,6 +17,7 @@ namespace Vouchee.Business.Models.DTOs
             orderDetails = new HashSet<CreateOrderDetailDTO>();
         }
 
+        [JsonIgnore] public string status = ObjectStatusEnum.ACTIVE.ToString();
         public DateTime? createDate = DateTime.Now;
         public PaymentTypeEnum paymentType { get; set; }
         public virtual ICollection<CreateOrderDetailDTO> orderDetails { get; set; }
@@ -44,11 +39,16 @@ namespace Vouchee.Business.Models.DTOs
         }
 
         public Guid? id { get; set; }
+        public Guid? promotionId { get; set; }
+
         public string? paymentType { get; set; }
         public decimal? discountValue { get; set; }
+        public decimal? totalPrice { get; set; }
+        public decimal? discountPrice { get; set; }
+        public decimal? finalPrice { get; set; }
 
         public string? status { get; set; }
-        public DateTime? createDate { get; }
+        public DateTime? createDate { get; set; }
         public Guid? createBy { get; set; }
         public DateTime? updateDate { get; set; }
         public Guid? updateBy { get; set; }

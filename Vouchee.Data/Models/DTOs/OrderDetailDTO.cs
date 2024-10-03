@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using Vouchee.Data.Models.Constants.Enum.Status;
+using Vouchee.Data.Models.Entities;
 
 
 namespace Vouchee.Business.Models.DTOs
@@ -14,8 +16,13 @@ namespace Vouchee.Business.Models.DTOs
 
     public class CreateOrderDetailDTO : OrderDetailDTO
     {
-        //public DateTime? createDate = DateTime.Now;
-        //public Guid? createBy { get; set; }
+        //[JsonIgnore] public decimal UnitPrice { get; set; }
+        //[JsonIgnore] public decimal DiscountValue { get; set; } = 0;
+        //[JsonIgnore] public decimal TotalPrice { get; set; }
+        //public decimal DiscountPrice => TotalPrice * DiscountValue / 100;
+        //public decimal FinalPrice => TotalPrice - DiscountPrice;
+        public string status = OrderStatusEnum.PENDING.ToString();
+        public DateTime? createDate = DateTime.Now;
     }
 
     public class UpdateOrderDetailDTO : OrderDetailDTO
@@ -35,6 +42,13 @@ namespace Vouchee.Business.Models.DTOs
         }
 
         public Guid? id { get; set; }
+        public Guid? orderId { get; set; }
+
+        public decimal? unitPrice { get; set; }
+        public decimal? discountValue { get; set; }
+        public decimal? totalPrice { get; set; }
+        public decimal? discountPrice { get; set; }
+        public decimal? finalPrice { get; set; }
 
         public string? status { get; set; }
         public DateTime? createDate { get; set; }

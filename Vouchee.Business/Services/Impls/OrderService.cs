@@ -34,23 +34,27 @@ namespace Vouchee.Business.Services.Impls
         {
             try
             {
-                foreach (var orderDetail in createOrderDTO.orderDetails)
-                {
-                    var voucher = _voucherRepository.GetByIdAsync(orderDetail.voucherId).Result;
-                    if (voucher == null)
-                    {
-                        throw new NotFoundException($"Không tìm thấy voucher với ID {orderDetail.voucherId}");
-                    }
-                    if (orderDetail.quantity > voucher.Quantity)
-                    {
-                        throw new QuantityExcessException($"Voucher {orderDetail.voucherId} vượt quá số lượng tồn kho");
-                    }
-                }
-
                 var order = _mapper.Map<Order>(createOrderDTO);
 
-                order.Status = OrderStatusEnum.PENDING.ToString();
+                foreach (var orderDetail in order.OrderDetails)
+                {
+                    var voucher = _voucherRepository.GetByIdAsync(orderDetail.VoucherId).Result;
+                    if (voucher == null)
+                    {
+                        throw new NotFoundException($"Không tìm thấy voucher với ID {orderDetail.VoucherId}");
+                    }
+                    if (orderDetail.Quantity > voucher.Quantity)
+                    {
+                        throw new QuantityExcessException($"Voucher {voucher.Id} vượt quá số lượng tồn kho");
+                    }
+
+                    orderDetail.VoucherId = voucher.Id;
+                    orderDetail.CreateBy = Guid.Parse(thisUserObj.userId);
+                    orderDetail.UnitPrice = voucher.Price;
+                }
+
                 order.CreateBy = Guid.Parse(thisUserObj.userId);
+                order.TotalPrice = order.OrderDetails.Sum(x => x.FinalPrice);
 
                 var orderId = await _orderRepository.AddAsync(order);
 
