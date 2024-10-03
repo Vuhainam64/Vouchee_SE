@@ -39,7 +39,7 @@ jobs:
       uses: appleboy/ssh-action@v0.1.2
       with:
         host: 127.0.0.1
-        username: secrets.SSH_PRIVATE_NAME
+        username: ${{ secrets.SSH_PRIVATE_NAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           docker pull ${{ secrets.DOCKER_USERNAME }}/myimage:1
