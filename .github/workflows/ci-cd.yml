@@ -38,7 +38,7 @@ jobs:
     - name: Deploy to VPS using SSH keys
       uses: appleboy/ssh-action@v0.1.2
       with:
-        host: 127.0.0.1
+        host: 115.76.48.202
         username: ${{ secrets.SSH_PRIVATE_NAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
