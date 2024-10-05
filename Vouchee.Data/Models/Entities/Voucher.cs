@@ -21,6 +21,7 @@ namespace Vouchee.Data.Models.Entities
             VoucherCodes = new HashSet<VoucherCode>();
             Shops = new HashSet<Shop>();
             OrderDetails = new HashSet<OrderDetail>();
+            Promotions = new HashSet<Promotion>();
         }
 
         [InverseProperty(nameof(VoucherCode.Voucher))]

@@ -13,6 +13,7 @@ using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Services.Extensions.Filebase;
 using Vouchee.Data.Helpers;
 using Vouchee.Data.Models.Constants.Dictionary;
+using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Constants.Number;
 using Vouchee.Data.Models.DTOs;
@@ -50,7 +51,7 @@ namespace Vouchee.Business.Services.Impls
                 
                 if (createPromotionDTO.image != null && promotionId != null)
                 {
-                    promotion.Image = await _fileUploadService.UploadVoucherImageToFirebase(createPromotionDTO.image, thisUserObj.userId.ToString());
+                    promotion.Image = await _fileUploadService.UploadImageToFirebase(createPromotionDTO.image, thisUserObj.userId.ToString(), StoragePathEnum.PROMOTION);
 
                     await _promotionRepository.UpdateAsync(promotion);
                 }

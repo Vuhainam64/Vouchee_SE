@@ -12,6 +12,8 @@ using Vouchee.Data.Models.Filters;
 
 namespace Vouchee.API.Controllers
 {
+    // Lúc tạo ra sẽ tạo voucher và voucher code bình thường
+    // Gọi voucher controller trước rồi loop cái voucher code controller
     [ApiController]
     [Route("api/voucher")]
     [EnableCors]

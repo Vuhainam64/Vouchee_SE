@@ -6,6 +6,7 @@ using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Services.Extensions.Filebase;
 using Vouchee.Data.Helpers;
+using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Constants.Number;
@@ -43,7 +44,7 @@ namespace Vouchee.Business.Services.Impls
 
                 if (createVoucherDTO.image != null && voucherId != null)
                 {
-                    voucher.Image = await _fileUploadService.UploadVoucherImageToFirebase(createVoucherDTO.image, thisUserObj.userId.ToString());
+                    voucher.Image = await _fileUploadService.UploadImageToFirebase(createVoucherDTO.image, thisUserObj.userId.ToString(), StoragePathEnum.VOUCHER);
 
                     await _voucherRepository.UpdateAsync(voucher);
                 }

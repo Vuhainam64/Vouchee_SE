@@ -21,6 +21,7 @@ namespace Vouchee.Business.Models.DTOs
         //[JsonIgnore] public decimal TotalPrice { get; set; }
         //public decimal DiscountPrice => TotalPrice * DiscountValue / 100;
         //public decimal FinalPrice => TotalPrice - DiscountPrice;
+        public Guid promotionId { get; set; }
         public string status = OrderStatusEnum.PENDING.ToString();
         public DateTime? createDate = DateTime.Now;
     }

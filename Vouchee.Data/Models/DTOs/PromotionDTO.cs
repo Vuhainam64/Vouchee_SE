@@ -49,8 +49,14 @@ namespace Vouchee.Data.Models.DTOs
 
     public class CreatePromotionDTO : PromotionDTO
     {
+        public CreatePromotionDTO()
+        {
+            voucherCodeId = new List<Guid>();
+        }
+
         public IFormFile? image { get; set; }
         public DateTime createDate = DateTime.Now;
+        public virtual IList<Guid> voucherCodeId { get; set; }
     }
 
     public class UpdatePromotionDTO : PromotionDTO

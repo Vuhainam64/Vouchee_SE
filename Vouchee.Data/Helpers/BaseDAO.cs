@@ -146,6 +146,19 @@ namespace Vouchee.Data.Helpers
             }
         }
 
+        public async Task<TEntity?> FindAsync(Guid id)
+        {
+            try
+            {
+                return await Table.FindAsync(id);
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.Message);
+                throw new Exception(ex.Message);
+            }
+        }
+
         public IQueryable<TEntity> GetTable(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null)
         {
             try

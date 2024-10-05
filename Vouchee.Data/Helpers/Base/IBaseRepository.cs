@@ -13,6 +13,7 @@ namespace Vouchee.Data.Helpers.Base
         Task<Guid?> AddAsync(TEntity entity);
         Task<bool> UpdateAsync(TEntity entity);
         Task<bool> DeleteAsync(TEntity entity);
+        Task<TEntity> FindAsync(Guid id);
         Task<TEntity?> GetByIdAsync(object id,
                                     Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null);
         IQueryable<TEntity> GetTable(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null);

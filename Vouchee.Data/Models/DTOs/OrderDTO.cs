@@ -19,6 +19,7 @@ namespace Vouchee.Business.Models.DTOs
 
         [JsonIgnore] public string status = ObjectStatusEnum.ACTIVE.ToString();
         public DateTime? createDate = DateTime.Now;
+        public Guid promotionId { get; set; }
         public PaymentTypeEnum paymentType { get; set; }
         public virtual ICollection<CreateOrderDetailDTO> orderDetails { get; set; }
     }

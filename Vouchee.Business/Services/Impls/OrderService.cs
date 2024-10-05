@@ -30,6 +30,20 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
+        public Task<bool> AssignVoucherCodesToOrderAsync(Guid orderId, List<Guid> voucherCodeId)
+        {
+            try
+            {
+
+                throw new NotImplementedException();
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.Message);
+                throw new CreateObjectException("Lỗi không xác định khi cập nhật order");
+            }
+        }
+
         public async Task<Guid?> CreateOrderAsync(CreateOrderDTO createOrderDTO, ThisUserObj thisUserObj)
         {
             try
@@ -149,13 +163,6 @@ namespace Vouchee.Business.Services.Impls
                 if (existedOrder != null)
                 {
                     var entity = _mapper.Map<Order>(updateOrderDTO);
-
-                    // nếu role là staff thì assign voucher code vào
-                    if (thisUserObj.roleName.Equals(RoleDictionary.role.ElementAt(2)))
-                    {
-                        
-                    }
-
                     return await _orderRepository.UpdateAsync(entity);
                 }
                 else

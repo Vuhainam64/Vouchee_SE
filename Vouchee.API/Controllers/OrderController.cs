@@ -78,7 +78,6 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            //ADMIN
             if (currentUser.roleId.Equals(currentUser.sellerRoleId)
                     || currentUser.roleId.Equals(currentUser.buyerRoleId))
             {
