@@ -38,6 +38,7 @@ namespace Vouchee.Data.Models.Entities
         public string? Code { get; set; }
         public string? Type { get; set; }
         public string? Policy { get; set; }
+        public string? Image { get; set; }
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]

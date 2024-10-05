@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Vouchee.Business.Models.DTOs;
+using Vouchee.Business.Utils;
+using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
@@ -76,7 +78,9 @@ namespace Vouchee.API.AppStarts
             CreateMap<Promotion, PromotionDTO>().ReverseMap();
             CreateMap<Promotion, CreatePromotionDTO>().ReverseMap();
             CreateMap<Promotion, UpdatePromotionDTO>().ReverseMap();
-            CreateMap<Promotion, GetPromotionDTO>().ReverseMap();
+            CreateMap<Promotion, GetPromotionDTO>()
+                .ForMember(des => des.Type, src => src.MapFrom(src => EnumMapper<PromotionTypeEnum>.MapType(src.Type)))
+                .ReverseMap();
             CreateMap<GetPromotionDTO, PromotionFilter>().ReverseMap();
         }
     }

@@ -41,9 +41,9 @@ namespace Vouchee.Business.Services.Impls
 
                 var voucherId = await _voucherRepository.AddAsync(voucher);
 
-                if (createVoucherDTO.image != null)
+                if (createVoucherDTO.image != null && voucherId != null)
                 {
-                    voucher.Image = await _fileUploadService.UploadImageToFirebaseVoucher(createVoucherDTO.image, thisUserObj.userId.ToString());
+                    voucher.Image = await _fileUploadService.UploadVoucherImageToFirebase(createVoucherDTO.image, thisUserObj.userId.ToString());
 
                     await _voucherRepository.UpdateAsync(voucher);
                 }

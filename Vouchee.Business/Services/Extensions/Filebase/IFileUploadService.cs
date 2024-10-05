@@ -9,6 +9,8 @@ namespace Vouchee.Business.Services.Extensions.Filebase
 {
     public interface IFileUploadService
     {
-        public Task<string> UploadImageToFirebaseVoucher(IFormFile file, string uid);
+        public Task<string> UploadVoucherImageToFirebase(IFormFile file, string uid);
+
+        public Task<string> UploadPromotionImageToFirebase(IFormFile file, string uid);
     }
 }

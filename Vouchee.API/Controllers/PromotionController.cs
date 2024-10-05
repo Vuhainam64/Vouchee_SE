@@ -47,8 +47,8 @@ namespace Vouchee.API.Controllers
 
             return StatusCode((int)HttpStatusCode.Forbidden, new
             {
-                Code = HttpStatusCode.Forbidden,
-                Message = "Chỉ có nhà bán hàng hoặc người mua mới có thể thực hiện chức năng này"
+                code = HttpStatusCode.Forbidden,
+                message = "Chỉ có nhà bán hàng mới có thể thực hiện chức năng này"
             });
         }
 

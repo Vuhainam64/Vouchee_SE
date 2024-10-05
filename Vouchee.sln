@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vouchee.API", "Vouchee.API\Vouchee.API.csproj", "{54C09A7F-9658-4E1A-B992-020DCE86C5FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vouchee.API", "Vouchee.API\Vouchee.API.csproj", "{54C09A7F-9658-4E1A-B992-020DCE86C5FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vouchee.Business", "Vouchee.Business\Vouchee.Business.csproj", "{B8175698-C580-4D4D-B280-8BB34CFC7A4E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vouchee.Business", "Vouchee.Business\Vouchee.Business.csproj", "{B8175698-C580-4D4D-B280-8BB34CFC7A4E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vouchee.Data", "Vouchee.Data\Vouchee.Data.csproj", "{9CB0CE77-4C9A-4076-A739-8977AD4F96CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vouchee.Data", "Vouchee.Data\Vouchee.Data.csproj", "{9CB0CE77-4C9A-4076-A739-8977AD4F96CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
