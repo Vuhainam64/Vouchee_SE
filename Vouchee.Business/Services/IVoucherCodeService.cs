@@ -16,15 +16,15 @@ namespace Vouchee.Business.Services
         public Task<Guid?> CreateVoucherCodeAsync(Guid voucherId, CreateVoucherCodeDTO createVoucherCodeDTO, ThisUserObj thisUserObj);
 
         // READ
-        public Task<GetVoucherDTO> GetVoucherCodeByIdAsync(Guid id);
-        public Task<DynamicResponseModel<GetVoucherDTO>> GetVoucherCodesAsync(PagingRequest pagingRequest,
+        public Task<GetVoucherCodeDTO> GetVoucherCodeByIdAsync(Guid id);
+        public Task<DynamicResponseModel<GetVoucherCodeDTO>> GetVoucherCodesAsync(PagingRequest pagingRequest,
                                                                                 VoucherCodeFilter voucherCodeFilter,
                                                                                 SortVoucherCodeEnum sortVoucherCodeEnum);
 
         // UPDATE
-        public Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO);
+        public Task<bool> UpdateVoucherCodeAsync(Guid id, UpdateVoucherCodeDTO updateVoucherCodeDTO);
 
         // DELETE
-        public Task<bool> DeleteVoucherAsync(Guid id);
+        public Task<bool> DeleteVoucherCodeAsync(Guid id);
     }
 }

@@ -7,7 +7,9 @@ using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Services;
 using Vouchee.Business.Services.Impls;
+using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.DTOs;
+using Vouchee.Data.Models.Filters;
 
 namespace Vouchee.API.Controllers
 {
@@ -54,11 +56,40 @@ namespace Vouchee.API.Controllers
             });
         }
 
-
         // READ
+        [HttpGet]
+        public async Task<IActionResult> GetVoucherCodes([FromQuery] PagingRequest pagingRequest,
+                                                            [FromQuery] VoucherCodeFilter voucherCodeFilter,
+                                                            [FromQuery] SortVoucherCodeEnum sortVoucherCodeEnum)
+        {
+            var result = await _voucherCodeService.GetVoucherCodesAsync(pagingRequest, voucherCodeFilter, sortVoucherCodeEnum);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<IActionResult> GetVoucherCodeById(Guid id)
+        {
+            var voucherCode = await _voucherCodeService.GetVoucherCodeByIdAsync(id);
+            return Ok(voucherCode);
+        }
 
         // UPDATE
+        [HttpPut]
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateVoucherCode(Guid id, [FromBody] UpdateVoucherCodeDTO updateVoucherCodeDTO)
+        {
+            var result = await _voucherCodeService.UpdateVoucherCodeAsync(id, updateVoucherCodeDTO);
+            return Ok(result);
+        }
 
         // DELETE
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<IActionResult> DeleteVoucherCode(Guid id)
+        {
+            var result = await _voucherCodeService.DeleteVoucherCodeAsync(id);
+            return Ok(result);
+        }
     }
 }

@@ -65,7 +65,7 @@ namespace Vouchee.API.AppStarts
             CreateMap<VoucherCode, CreateVoucherCodeDTO>().ReverseMap();
             CreateMap<VoucherCode, UpdateVoucherCodeDTO>().ReverseMap();
             CreateMap<VoucherCode, GetVoucherCodeDTO>().ReverseMap();
-            CreateMap<GetVoucherCodeDTO, VoucherCodeDTO>().ReverseMap();
+            CreateMap<GetVoucherCodeDTO, VoucherCodeFilter>().ReverseMap();
 
             // VOUCHER TYPE
             CreateMap<VoucherType, VoucherTypeDTO>().ReverseMap();
