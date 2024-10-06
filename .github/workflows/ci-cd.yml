@@ -45,6 +45,13 @@ jobs:
             set -e  # Exit on error
             docker pull ${{ secrets.DOCKER_USERNAME }}/myimage:1
             docker run -d --restart unless-stopped ${{ secrets.DOCKER_USERNAME }}/myimage:1
+            
+      - name: Add SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_PRIVATE_IP }} >> ~/.ssh/known_hosts
 
       - name: Deploy to Server
         run: |
