@@ -35,19 +35,6 @@ jobs:
           echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
           docker push ${{ secrets.DOCKER_USERNAME }}/myimage:1
 
-      - name: Deploy to VPS using SSH keys
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_PRIVATE_IP }}
-          username: ${{ secrets.SSH_PRIVATE_NAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            set -e  # Exit on error
-            docker pull ${{ secrets.DOCKER_USERNAME }}/myimage:1
-            docker run -d --restart unless-stopped ${{ secrets.DOCKER_USERNAME }}/myimage:1
-
-      
-
       - name: Add SSH key
         run: |
           mkdir -p ~/.ssh
@@ -57,10 +44,9 @@ jobs:
 
       - name: Install Node.js
         run: |
-          ssh -o StrictHostKeyChecking=no vouchee@171.235.242.225 "curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && sudo apt install -y nodejs"
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }} "curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && sudo apt install -y nodejs"
 
       - name: Deploy to Server
         run: |
-          scp -r ./* ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }}:/var/www/Vouchee_SE/
-          ssh ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }} "cd /var/www/Vouchee_SE && npm install && pm2 restart all"
- 
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r ./* ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }}:/var/www/Vouchee_SE/
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }} "cd /var/www/Vouchee_SE && npm install && pm2 restart all"
