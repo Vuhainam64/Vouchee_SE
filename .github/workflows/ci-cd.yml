@@ -46,9 +46,7 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/myimage:1
             docker run -d --restart unless-stopped ${{ secrets.DOCKER_USERNAME }}/myimage:1
 
-      - name: Install Node.js
-        run: |
-          ssh ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }} "curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && sudo apt install -y nodejs"
+      
 
       - name: Add SSH key
         run: |
@@ -56,6 +54,10 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SSH_PRIVATE_IP }} >> ~/.ssh/known_hosts
+
+      - name: Install Node.js
+        run: |
+          ssh -o StrictHostKeyChecking=no vouchee@171.235.242.225 "curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && sudo apt install -y nodejs"
 
       - name: Deploy to Server
         run: |
