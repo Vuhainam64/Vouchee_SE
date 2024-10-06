@@ -36,7 +36,7 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/myimage:1
           
       - name: Deploy to VPS using SSH keys
-        uses: appleboy/ssh-action@v0.1.6 # Updated to the latest version
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_PRIVATE_IP }}
           username: ${{ secrets.SSH_PRIVATE_NAME }}
@@ -45,3 +45,9 @@ jobs:
             set -e  # Exit on error
             docker pull ${{ secrets.DOCKER_USERNAME }}/myimage:1
             docker run -d --restart unless-stopped ${{ secrets.DOCKER_USERNAME }}/myimage:1
+
+      - name: Deploy to Server
+        run: |
+          scp -r ./* ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }}:/var/www/Vouchee_SE/
+          ssh ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }} "cd /var/www/Vouchee_SE && npm install && pm2 restart all"
+ 
