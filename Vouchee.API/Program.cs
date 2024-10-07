@@ -1,7 +1,10 @@
 
 
+using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
+using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Vouchee.API.AppStarts;
 using Vouchee.Business.Middelwares;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +19,12 @@ builder.Services.AddSwaggerServices(configuration);
 builder.Services.AddFirebaseAuthentication(configuration);
 builder.Services.AddSettingObjects(configuration);
 builder.Services.AddJWTServices(configuration);
+builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(@"C:\temp-keys\"))
+                .UseCryptographicAlgorithms(new AuthenticatedEncryptorConfiguration()
+                {
+                    EncryptionAlgorithm = EncryptionAlgorithm.AES_256_CBC,
+                    ValidationAlgorithm = ValidationAlgorithm.HMACSHA256
+                });
 
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
