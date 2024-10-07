@@ -28,6 +28,7 @@ namespace Vouchee.Data.Models.Entities
         public string? Contact { get; set; }
         [Column(TypeName = "decimal")]
         public decimal? PercentShow { get; set; }
+        public bool IsVerfied { get; set; }
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]
@@ -36,5 +37,7 @@ namespace Vouchee.Data.Models.Entities
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
+        public DateTime? VerifiedDate { get; set; }
+        public Guid? VerifiedBy { get; set; }
     }
 }

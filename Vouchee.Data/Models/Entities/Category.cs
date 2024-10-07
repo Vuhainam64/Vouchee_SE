@@ -23,8 +23,6 @@ namespace Vouchee.Data.Models.Entities
         public Guid Id { get; set; }
 
         public string? Title { get; set; }
-        public string? Value { get; set; }
-        public string? Key { get; set; }
         public string? Image { get; set; }
         [Column(TypeName = "decimal")]
         public decimal? PercentShow { get; set; }

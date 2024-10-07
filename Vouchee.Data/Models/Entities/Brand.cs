@@ -8,27 +8,27 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Entities
 {
-    [Table("VoucherType")]
-    public partial class VoucherType
+    [Table("Brand")]
+    public class Brand
     {
-        public VoucherType()
+        public Brand()
         {
             Vouchers = new HashSet<Voucher>();
-            Categories = new HashSet<Category>();
         }
 
-        [InverseProperty(nameof(Voucher.VoucherType))]
+        [InverseProperty(nameof(Voucher.Brand))]
         public virtual ICollection<Voucher> Vouchers { get; set; }
-
-        [InverseProperty(nameof(Category.VoucherType))]
-        public virtual ICollection<Category> Categories { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
 
-        public string? Title { get; set; }
+        public string? Name { get; set; }
+        public string? Description { get; set; }
         public string? Image { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? PercentShow { get; set; }
+        public bool IsVerfied { get; set; }
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]
@@ -37,5 +37,7 @@ namespace Vouchee.Data.Models.Entities
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
+        public DateTime? VerifiedDate { get; set; }
+        public Guid? VerifiedBy { get; set; }
     }
 }

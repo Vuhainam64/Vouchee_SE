@@ -16,12 +16,6 @@ namespace Vouchee.Data.Models.DTOs
         [Required(ErrorMessage = "Cần title")]
         public string? title { get; set; }
 
-        [Required(ErrorMessage = "Cân value")]
-        public string? value { get; set; }
-
-        [Required(ErrorMessage = "Cần key")]
-        public string? key { get; set; }
-
         [Range(0, 100, ErrorMessage = "PersentShow cần từ 0 tới 100")]
         public decimal? percentShow { get; set; }
     }

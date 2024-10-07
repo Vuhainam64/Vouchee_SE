@@ -11,12 +11,6 @@ namespace Vouchee.Business.Models.DTOs
     {
         [Required(ErrorMessage = "Cần title")]
         public string? title { get; set; }
-
-        [Required(ErrorMessage = "Cân value")]
-        public string? value { get; set; }
-
-        [Required(ErrorMessage = "Cần key")]
-        public string? key { get; set; }
     }
 
     public class CreateVoucherTypeDTO : VoucherTypeDTO

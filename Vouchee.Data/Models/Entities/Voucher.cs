@@ -13,7 +13,8 @@ namespace Vouchee.Data.Models.Entities
     [Table("Voucher")]
     [Index(nameof(SupplierId), Name = "IX_Voucher_SupplierId")]
     [Index(nameof(VoucherTypeId), Name = "IX_Voucher_VoucherTypeId")]
-    [Index(nameof(VoucherTypeId), Name = "IX_Voucher_CreateBy")]
+    [Index(nameof(CreateBy), Name = "IX_Voucher_SellerId")]
+    [Index(nameof(BrandId), Name = "IX_Voucher_BrandId")]
     public partial class Voucher
     {
         public Voucher()
@@ -32,6 +33,11 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<Shop> Shops { get; set; }
         [InverseProperty(nameof(Promotion.Vouchers))]
         public virtual ICollection<Promotion> Promotions { get; set; }
+
+        public Guid? BrandId { get; set; }
+        [ForeignKey(nameof(BrandId))]
+        [InverseProperty("Vouchers")]
+        public virtual Brand? Brand { get; set; }
 
         public Guid? SupplierId { get; set; }
         [ForeignKey(nameof(SupplierId))]
