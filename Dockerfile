@@ -7,8 +7,8 @@ EXPOSE 443
 # Build stage for compiling the application
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 ARG BUILD_CONFIGURATION=Release
-WORKDIR /Vouchee.API
-COPY ["Vouchee.API.csproj", "."]
+WORKDIR /src
+COPY ["Vouchee.API/Vouchee.API.csproj", "."]
 RUN dotnet restore
 COPY . .
 RUN dotnet build "Vouchee.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
