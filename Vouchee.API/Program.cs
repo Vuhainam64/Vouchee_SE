@@ -13,7 +13,7 @@ builder.Services.AddDistributedMemoryCache();
 IConfiguration configuration = builder.Configuration;
 
 builder.Services.AddSwaggerServices(configuration);
-builder.Services.AddFirebaseAuthentication(configuration);
+// builder.Services.AddFirebaseAuthentication(configuration);
 builder.Services.AddSettingObjects(configuration);
 builder.Services.AddJWTServices(configuration);
 
