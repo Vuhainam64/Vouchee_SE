@@ -73,10 +73,6 @@ namespace Vouchee.Data.Models.DTOs
             orderDetails = new HashSet<GetOrderDetailDTO>();
         }
 
-        public virtual ICollection<GetVoucherDTO>? vouchers { get; set; }
-        public virtual ICollection<GetOrderDTO>? orders { get; set; }
-        public virtual ICollection<GetOrderDetailDTO>? orderDetails { get; set; }
-
         public Guid? id { get; set; }
 
         public string? status { get; set; }
@@ -86,5 +82,9 @@ namespace Vouchee.Data.Models.DTOs
         [Column(TypeName = "datetime")]
         public DateTime? updateDate { get; set; }
         public Guid? updateBy { get; set; }
+
+        public virtual ICollection<GetVoucherDTO>? vouchers { get; set; }
+        public virtual ICollection<GetOrderDTO>? orders { get; set; }
+        public virtual ICollection<GetOrderDetailDTO>? orderDetails { get; set; }
     }
 }

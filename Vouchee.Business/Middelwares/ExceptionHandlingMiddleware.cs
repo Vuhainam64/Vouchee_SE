@@ -85,6 +85,10 @@ namespace Vouchee.Business.Middelwares
                     errorMessageObject.code = "Q001";
                     statusCode = (int)HttpStatusCode.Conflict;
                     break;
+                case ConflictException:
+                    errorMessageObject.code = "C001";
+                    statusCode = (int)HttpStatusCode.Conflict;
+                    break;
             }
 
             var errorMessage = JsonConvert.SerializeObject(errorMessageObject);

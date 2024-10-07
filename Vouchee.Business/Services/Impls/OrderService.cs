@@ -17,17 +17,63 @@ namespace Vouchee.Business.Services.Impls
 {
     public class OrderService : IOrderService
     {
+        private readonly IVoucherCodeRepository _voucherCodeRepository;
+        private readonly IOrderDetailRepository _orderDetailRepository;
         private readonly IVoucherRepository _voucherRepository;
         private readonly IOrderRepository _orderRepository;
         private readonly IMapper _mapper;
 
         public OrderService(IVoucherRepository voucherRepository,
                                 IOrderRepository orderRepository,
+                                IOrderDetailRepository orderDetailRepository,
+                                IVoucherCodeRepository voucherCodeRepository,
                                 IMapper mapper)
         {
+            _voucherCodeRepository = voucherCodeRepository;
+            _orderDetailRepository = orderDetailRepository;
             _voucherRepository = voucherRepository;
             _orderRepository = orderRepository;
             _mapper = mapper;
+        }
+
+        public async Task<bool> AssignCodeToOrderAsync(Guid orderDetailId, IList<Guid> voucherCodeIds)
+        {
+            try
+            {
+                var existedOrderDetail = await _orderDetailRepository.FindAsync(orderDetailId);
+                if (existedOrderDetail == null)
+                {
+                    throw new NotFoundException("Không tìm thấy order detail");
+                }
+
+                foreach (var voucherCodeId in voucherCodeIds)
+                {
+                    var existedVoucherCode = await _voucherCodeRepository.FindAsync(voucherCodeId);
+                    if (existedVoucherCode == null)
+                    {
+                        throw new NotFoundException($"Không tìm thấy voucher code với id {voucherCodeId}");
+                    }
+                    // check code này có phải là voucher đang đặt không
+                    if (existedOrderDetail.VoucherId != existedVoucherCode.VoucherId)
+                    {
+                        throw new ConflictException("Voucher code này không thuộc voucher đang đặt");
+                    }
+
+                    existedOrderDetail.VoucherCodes.Add(existedVoucherCode);
+                }
+
+                if (!await _orderDetailRepository.UpdateAsync(existedOrderDetail))
+                {
+                    throw new UpdateObjectException("Lỗi không xác định khi cập nhật dữ liệu");
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.Message);
+                throw new Exception(ex.Message);
+            }
         }
 
         public async Task<Guid?> CreateOrderAsync(CreateOrderDTO createOrderDTO, ThisUserObj thisUserObj)

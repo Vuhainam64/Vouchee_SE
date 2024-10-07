@@ -15,8 +15,13 @@ namespace Vouchee.Business.Models.DTOs
         public string? name { get; set; }
         public string? title { get; set; }
         public string? description { get; set; }
+        [Column(TypeName = "decimal")]
         public decimal? percentShow { get; set; }
-        public int? responsibilityScore { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? lat { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? lon { get; set; }
+        public string? address { get; set; }
     }
 
     public class CreateShopDTO : ShopDTO

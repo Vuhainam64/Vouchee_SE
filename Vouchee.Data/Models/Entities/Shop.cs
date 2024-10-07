@@ -30,6 +30,9 @@ namespace Vouchee.Data.Models.Entities
         public decimal? PercentShow { get; set; }
         [Column(TypeName = "decimal")]
         public decimal Lat { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal Lon { get; set; }
+        public string? Address { get; set; }
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]
