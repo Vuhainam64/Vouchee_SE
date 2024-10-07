@@ -30,20 +30,6 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public Task<bool> AssignVoucherCodesToOrderAsync(Guid orderId, List<Guid> voucherCodeId)
-        {
-            try
-            {
-
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new CreateObjectException("Lỗi không xác định khi cập nhật order");
-            }
-        }
-
         public async Task<Guid?> CreateOrderAsync(CreateOrderDTO createOrderDTO, ThisUserObj thisUserObj)
         {
             try

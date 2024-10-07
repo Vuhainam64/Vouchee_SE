@@ -112,23 +112,20 @@ namespace Vouchee.Data.Helpers
                 new VoucherType()
                 {
                     Id = Guid.Parse("3e676315-1a28-4a0b-beb5-eaa5336a108d"),
-                    Name = "FOOD",
+                    Title = "FOOD",
                     Status = ObjectStatusEnum.ACTIVE.ToString(),
-                    PercentShow = 10,
                 },
                 new VoucherType()
                 {
                     Id = Guid.Parse("4eccaac5-ecea-4876-91ae-fb18ad265a91"),
-                    Name = "TRAVEL",
+                    Title = "TRAVEL",
                     Status = ObjectStatusEnum.ACTIVE.ToString(),
-                    PercentShow = 20
                 },
                 new VoucherType()
                 {
                     Id = Guid.Parse("c34c676b-ba20-466b-8577-5234c8c60bef"),
-                    Name = "COSMETIC",
+                    Title = "COSMETIC",
                     Status = ObjectStatusEnum.ACTIVE.ToString(),
-                    PercentShow = 15
                 }
             );
 

@@ -26,13 +26,17 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<Guid?> CreateVoucherTypeAsync(CreateVoucherTypeDTO createVoucherTypeDTO)
+        public async Task<Guid?> CreateVoucherTypeAsync(CreateVoucherTypeDTO createVoucherTypeDTO, ThisUserObj thisUserObj)
         {
             try
             {
                 var voucherType = _mapper.Map<VoucherType>(createVoucherTypeDTO);
+                voucherType.CreateBy = Guid.Parse(thisUserObj.userId);
 
-                voucherType.Status = ObjectStatusEnum.ACTIVE.ToString();
+                foreach (var category in voucherType.Categories)
+                {
+                    category.CreateBy = Guid.Parse(thisUserObj.userId);
+                }
 
                 var voucherTypeId = await _voucherTypeRepository.AddAsync(voucherType);
                 return voucherTypeId;

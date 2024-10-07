@@ -8,7 +8,7 @@ namespace Vouchee.Business.Services
     public interface IVoucherTypeService
     {
         // CREATE
-        public Task<Guid?> CreateVoucherTypeAsync(CreateVoucherTypeDTO createVoucherTypeDTO);
+        public Task<Guid?> CreateVoucherTypeAsync(CreateVoucherTypeDTO createVoucherTypeDTO, ThisUserObj thisUserObj);
 
         // READ
         public Task<GetVoucherTypeDTO> GetVoucherTypeByIdAsync(Guid id);

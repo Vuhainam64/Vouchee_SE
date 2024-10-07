@@ -72,6 +72,10 @@ namespace Vouchee.API.AppStarts
             // VOUCHER CODE
             services.AddScoped<IVoucherCodeService, VoucherCodeService>();
             services.AddScoped<IVoucherCodeRepository, VoucherCodeRepository>();
+
+            // CATEGORY
+            services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
         }
 
         public static void AddSwaggerServices(this IServiceCollection services, IConfiguration configuration)

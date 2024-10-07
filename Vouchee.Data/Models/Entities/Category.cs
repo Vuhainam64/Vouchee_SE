@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,20 +9,14 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Entities
 {
-    [Table("VoucherType")]
-    public partial class VoucherType
+    [Table("Category")]
+    [Index(nameof(VoucherTypeId), Name = "IX_Category_VoucherTypeId")]
+    public class Category
     {
-        public VoucherType()
-        {
-            Vouchers = new HashSet<Voucher>();
-            Categories = new HashSet<Category>();
-        }
-
-        [InverseProperty(nameof(Voucher.VoucherType))]
-        public virtual ICollection<Voucher> Vouchers { get; set; }
-
-        [InverseProperty(nameof(Category.VoucherType))]
-        public virtual ICollection<Category> Categories { get; set; }
+        public Guid? VoucherTypeId { get; set; }
+        [ForeignKey(nameof(VoucherTypeId))]
+        [InverseProperty("Categories")]
+        public virtual VoucherType? VoucherType { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
@@ -30,6 +25,8 @@ namespace Vouchee.Data.Models.Entities
         public string? Title { get; set; }
         public string? Value { get; set; }
         public string? Key { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? PercentShow { get; set; }
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]

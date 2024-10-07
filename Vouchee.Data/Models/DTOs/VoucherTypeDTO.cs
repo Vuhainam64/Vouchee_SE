@@ -1,16 +1,33 @@
-﻿using Vouchee.Data.Models.Constants.Enum.Status;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+using Vouchee.Data.Models.Constants.Enum.Status;
+using Vouchee.Data.Models.Entities;
+using Vouchee.Data.Models.DTOs;
 
 namespace Vouchee.Business.Models.DTOs
 {
     public class VoucherTypeDTO
     {
-        public string? name { get; set; }
+        [Required(ErrorMessage = "Cần title")]
+        public string? title { get; set; }
+
+        [Required(ErrorMessage = "Cân value")]
+        public string? value { get; set; }
+
+        [Required(ErrorMessage = "Cần key")]
+        public string? key { get; set; }
     }
 
     public class CreateVoucherTypeDTO : VoucherTypeDTO
     {
+        public CreateVoucherTypeDTO()
+        {
+            categories = new HashSet<CreateCategoryDTO>();
+        }
+
         public DateTime? createDate = DateTime.Now;
-        public Guid? createBy { get; set; }
+        public string? status = ObjectStatusEnum.ACTIVE.ToString();
+        public virtual ICollection<CreateCategoryDTO> categories { get; set; }
     }
 
     public class UpdateVoucherTypeDTO : VoucherTypeDTO
@@ -25,6 +42,7 @@ namespace Vouchee.Business.Models.DTOs
         public GetVoucherTypeDTO()
         {
             vouchers = new HashSet<GetVoucherDTO>();
+            categories = new HashSet<GetCategoryDTO>();
         }
 
         public Guid? id { get; set; }
@@ -36,5 +54,6 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? updateBy { get; set; }
 
         public virtual ICollection<GetVoucherDTO>? vouchers { get; set; }
+        public virtual ICollection<GetCategoryDTO>? categories { get; set; }
     }
 }

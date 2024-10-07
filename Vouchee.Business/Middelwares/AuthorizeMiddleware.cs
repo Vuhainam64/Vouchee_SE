@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Vouchee.Business.Models;
 
 namespace Vouchee.Business.Middelwares
 {
@@ -15,10 +16,10 @@ namespace Vouchee.Business.Middelwares
         {
             context.Response.ContentType = "application/json";
 
-            var response = new
+            var response = new ErrorResponse()
             {
-                Code = "401",
-                Message = "Tài khoản chưa được cấp quyền để truy cập"
+                code = "401",
+                message = "Tài khoản chưa được cấp quyền"
             };
 
             await JsonSerializer.SerializeAsync(context.Response.Body, response);
