@@ -39,7 +39,7 @@ namespace Vouchee.Business.Services.Extensions.Filebase
                                                         AuthTokenAsyncFactory = () => Task.FromResult(token.FirebaseToken),
                                                         ThrowOnCancel = true,
                                                     })
-                                                    .Child(StoragePathEnum.IMAGE.ToString())
+                                                    .Child("IMAGE")
                                                     .Child(storagePathEnum.ToString())
                                                     .Child(file.FileName)
                                                     .PutAsync(file.OpenReadStream());

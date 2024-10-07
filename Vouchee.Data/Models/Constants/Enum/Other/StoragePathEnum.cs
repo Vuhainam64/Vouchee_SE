@@ -11,6 +11,7 @@ namespace Vouchee.Data.Models.Constants.Enum.Other
         VOUCHER_CODE,
         VOUCHER,
         PROMOTION,
-        IMAGE
+        CATEGORY,
+        VOUCHER_TYPE
     }
 }

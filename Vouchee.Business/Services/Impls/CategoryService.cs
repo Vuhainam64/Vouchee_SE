@@ -1,28 +1,40 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Vouchee.Business.Exceptions;
+using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
+using Vouchee.Business.Services.Extensions.Filebase;
 using Vouchee.Data.Helpers;
+using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
+using Vouchee.Data.Models.Constants.Number;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
 using Vouchee.Data.Repositories.IRepos;
+using Vouchee.Data.Repositories.Repos;
 
 namespace Vouchee.Business.Services.Impls
 {
     public class CategoryService : ICategoryService
     {
+        private readonly IVoucherTypeRepository _voucherTypeRepository;
+        private readonly IFileUploadService _fileUploadService;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
 
-        public CategoryService(ICategoryRepository categoryRepository, 
+        public CategoryService(IVoucherTypeRepository voucherTypeRepository,
+                                IFileUploadService fileUploadService,
+                                ICategoryRepository categoryRepository, 
                                 IMapper mapper)
         {
+            _voucherTypeRepository = voucherTypeRepository;
+            _fileUploadService = fileUploadService;
             _categoryRepository = categoryRepository;
             _mapper = mapper;
         }
@@ -33,9 +45,28 @@ namespace Vouchee.Business.Services.Impls
         {
             try
             {
+                var existedVoucherType = await _voucherTypeRepository.FindAsync(voucherTypeId);
+
+                if (existedVoucherType == null)
+                {
+                    throw new NotFoundException("Không tìm thấy voucher type");
+                }    
+
                 Category category = _mapper.Map<Category>(createCategoryDTO);
+                category.CreateBy = Guid.Parse(thisUserObj.userId);
+                category.VoucherTypeId = voucherTypeId;
 
                 var categoryId = await _categoryRepository.AddAsync(category);
+
+                if (categoryId != null && createCategoryDTO.image != null)
+                {
+                    category.Image = await _fileUploadService.UploadImageToFirebase(createCategoryDTO.image, thisUserObj.userId, StoragePathEnum.CATEGORY);
+
+                    if (!await _categoryRepository.UpdateAsync(category)) 
+                    {
+                        throw new UpdateObjectException("Không thể update category");
+                    }
+                }
 
                 return categoryId;
             }
@@ -68,9 +99,31 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public Task<DynamicResponseModel<GetCategoryDTO>> GetCategoriesAsync(PagingRequest pagingRequest, CategoryFilter categoryFilter, SortEnum sortEnum)
+        public async Task<DynamicResponseModel<GetCategoryDTO>> GetCategoriesAsync(PagingRequest pagingRequest, CategoryFilter categoryFilter, SortEnum sortEnum)
         {
-            throw new NotImplementedException();
+            (int, IQueryable<GetCategoryDTO>) result;
+            try
+            {
+                result = _categoryRepository.GetTable()
+                            .ProjectTo<GetCategoryDTO>(_mapper.ConfigurationProvider)
+                            .DynamicFilter(_mapper.Map<GetCategoryDTO>(categoryFilter))
+                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.Message);
+                throw new LoadException("Lỗi không xác định khi tải category");
+            }
+            return new DynamicResponseModel<GetCategoryDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1
+                },
+                results = result.Item2.ToList()
+            };
         }
 
         public Task<GetCategoryDTO> GetCategoryByIdAsync(Guid id)

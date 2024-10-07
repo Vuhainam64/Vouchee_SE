@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Vouchee.API.Helpers;
@@ -30,8 +31,9 @@ namespace Vouchee.API.Controllers
         }
 
         // CREATE
+        [Authorize]
         [HttpPost]
-        public async Task<IActionResult> CreateVoucherType([FromBody] CreateVoucherTypeDTO createVoucherTypeDTO)
+        public async Task<IActionResult> CreateVoucherType([FromForm] CreateVoucherTypeDTO createVoucherTypeDTO)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 

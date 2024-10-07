@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.DTOs;
+using Microsoft.AspNetCore.Http;
 
 namespace Vouchee.Business.Models.DTOs
 {
@@ -20,14 +21,9 @@ namespace Vouchee.Business.Models.DTOs
 
     public class CreateVoucherTypeDTO : VoucherTypeDTO
     {
-        public CreateVoucherTypeDTO()
-        {
-            categories = new HashSet<CreateCategoryDTO>();
-        }
-
+        public IFormFile? image { get; set; }
         public DateTime? createDate = DateTime.Now;
         public string? status = ObjectStatusEnum.ACTIVE.ToString();
-        public virtual ICollection<CreateCategoryDTO> categories { get; set; }
     }
 
     public class UpdateVoucherTypeDTO : VoucherTypeDTO
@@ -46,6 +42,8 @@ namespace Vouchee.Business.Models.DTOs
         }
 
         public Guid? id { get; set; }
+        public string? image { get; set; }
+
 
         public string? status { get; set; }
         public DateTime? createDate { get; set; }

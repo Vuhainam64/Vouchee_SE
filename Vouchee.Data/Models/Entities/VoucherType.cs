@@ -30,6 +30,7 @@ namespace Vouchee.Data.Models.Entities
         public string? Title { get; set; }
         public string? Value { get; set; }
         public string? Key { get; set; }
+        public string? Image { get; set; }
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]

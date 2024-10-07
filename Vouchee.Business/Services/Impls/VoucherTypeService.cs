@@ -4,7 +4,9 @@ using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
+using Vouchee.Business.Services.Extensions.Filebase;
 using Vouchee.Data.Helpers;
+using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Constants.Number;
@@ -16,13 +18,16 @@ namespace Vouchee.Business.Services.Impls
 {
     public class VoucherTypeService : IVoucherTypeService
     {
+        private readonly IFileUploadService _fileUploadService;
         private readonly IVoucherTypeRepository _voucherTypeRepository;
         private readonly IMapper _mapper;
 
-        public VoucherTypeService(IVoucherTypeRepository voucherTypeService, 
+        public VoucherTypeService(IFileUploadService fileUploadService, 
+                                    IVoucherTypeRepository voucherTypeRepository, 
                                     IMapper mapper)
         {
-            _voucherTypeRepository = voucherTypeService;
+            _fileUploadService = fileUploadService;
+            _voucherTypeRepository = voucherTypeRepository;
             _mapper = mapper;
         }
 
@@ -33,12 +38,18 @@ namespace Vouchee.Business.Services.Impls
                 var voucherType = _mapper.Map<VoucherType>(createVoucherTypeDTO);
                 voucherType.CreateBy = Guid.Parse(thisUserObj.userId);
 
-                foreach (var category in voucherType.Categories)
-                {
-                    category.CreateBy = Guid.Parse(thisUserObj.userId);
-                }
-
                 var voucherTypeId = await _voucherTypeRepository.AddAsync(voucherType);
+                
+                if (voucherTypeId != null && createVoucherTypeDTO.image != null)
+                {
+                    voucherType.Image = await _fileUploadService.UploadImageToFirebase(createVoucherTypeDTO.image, thisUserObj.userId, StoragePathEnum.VOUCHER_TYPE);
+
+                    if (!await _voucherTypeRepository.UpdateAsync(voucherType))
+                    {
+                        throw new UpdateObjectException("Không thể update voucher type");
+                    }
+                }
+                
                 return voucherTypeId;
             }
             catch (Exception ex)

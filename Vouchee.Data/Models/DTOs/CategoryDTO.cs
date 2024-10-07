@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Vouchee.Data.Models.Constants.Enum.Status;
+using Vouchee.Data.Models.Entities;
 
 namespace Vouchee.Data.Models.DTOs
 {
@@ -26,6 +28,7 @@ namespace Vouchee.Data.Models.DTOs
 
     public class CreateCategoryDTO : CategoryDTO
     {
+        public IFormFile? image { get; set; }
         public DateTime createDate = DateTime.Now;
         public string status = ObjectStatusEnum.ACTIVE.ToString();
     }
@@ -37,6 +40,16 @@ namespace Vouchee.Data.Models.DTOs
 
     public class GetCategoryDTO : CategoryDTO
     {
+        public Guid? id { get; set; }
 
+        public Guid? voucherTypeId { get; set; }
+
+        public string? image { get; set; }
+
+        public string? status { get; set; }
+        public DateTime? createDate { get; set; }
+        public Guid? createBy { get; set; }
+        public DateTime? updateDate { get; set; }
+        public Guid? updateBy { get; set; }
     }
 }
