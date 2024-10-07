@@ -14,7 +14,7 @@ WORKDIR /src
 COPY ["Vouchee.API.csproj", "."]
 RUN dotnet restore "./Vouchee.API.csproj"
 COPY . .
-WORKDIR "/src/."
+WORKDIR "/Vouchee.API/."
 RUN dotnet build "./Vouchee.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
