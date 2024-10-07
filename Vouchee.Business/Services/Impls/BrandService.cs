@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
+using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Services.Extensions.Filebase;
 using Vouchee.Data.Helpers;
 using Vouchee.Data.Models.Constants.Enum.Other;
@@ -69,9 +70,26 @@ namespace Vouchee.Business.Services.Impls
             throw new NotImplementedException();
         }
 
-        public Task<GetBrandDTO> GetBrandByIdAsync(Guid id)
+        public async Task<GetBrandDTO> GetBrandByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var brand = await _brandRepository.GetByIdAsync(id);
+                if (brand != null)
+                {
+                    var brandDTO = _mapper.Map<GetBrandDTO>(brand);
+                    return brandDTO;
+                }
+                else
+                {
+                    throw new NotFoundException($"Không tìm thấy brand với id {id}");
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.Message);
+                throw new LoadException("Lỗi không xác định khi tải brand");
+            }
         }
 
         public async Task<DynamicResponseModel<GetBrandDTO>> GetBrandsAsync(PagingRequest pagingRequest, BrandFilter brandFilter, SortEnum sortEnum)

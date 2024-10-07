@@ -6,7 +6,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Vouchee.Business.Models.DTOs;
 using Vouchee.Data.Models.Constants.Enum.Status;
+using Vouchee.Data.Models.Entities;
 
 namespace Vouchee.Data.Models.DTOs
 {
@@ -35,6 +37,26 @@ namespace Vouchee.Data.Models.DTOs
 
     public class GetBrandDTO : BrandDTO
     {
+        public GetBrandDTO()
+        {
+            vouchers = new HashSet<GetVoucherDTO>();
+        }
 
+        public Guid? id { get; set; }
+
+        public string? image { get; set; }
+        public bool? isVerfied { get; set; }
+
+        public string? status { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime? createDate { get; set; }
+        public Guid? createBy { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime? updateDate { get; set; }
+        public Guid? updateBy { get; set; }
+        public DateTime? verifiedDate { get; set; }
+        public Guid? verifiedBy { get; set; }
+
+        public virtual ICollection<GetVoucherDTO> vouchers { get; set; }
     }
 }

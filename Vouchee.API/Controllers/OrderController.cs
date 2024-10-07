@@ -19,14 +19,17 @@ namespace Vouchee.API.Controllers
         private readonly IOrderService _orderService;
         private readonly IUserService _userService;
         private readonly IRoleService _roleService;
+        private readonly IVoucherCodeService _voucherCodeSerivce;
 
         public OrderController(IOrderService orderService,
                                 IUserService userService,
-                                IRoleService roleService)
+                                IRoleService roleService,
+                                IVoucherCodeService voucherCodeSerivce)
         {
             _orderService = orderService;
             _userService = userService;
             _roleService = roleService;
+            _voucherCodeSerivce = voucherCodeSerivce;
         }
 
         // CREATE
@@ -92,6 +95,25 @@ namespace Vouchee.API.Controllers
             });
         }
 
+        [HttpPut]
+        [Route("assign-code")]
+        [Authorize]
+        public async Task<IActionResult> AssignCode(Guid orderDetailId, IList<Guid> voucherCodeId)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+
+            if (currentUser.roleId.Equals(currentUser.sellerRoleId))
+            {
+                var result = await _orderService.AssignCodeToOrderAsync(orderDetailId, voucherCodeId);
+                return Ok(result);
+            }
+
+            return StatusCode((int)HttpStatusCode.Forbidden, new
+            {
+                code = HttpStatusCode.Forbidden,
+                message = "Chỉ có nhà bán hàng hoặc người mua mới có thể thực hiện chức năng này"
+            });
+        }
         // DELETE
         [HttpDelete]
         [Route("{id}")]
