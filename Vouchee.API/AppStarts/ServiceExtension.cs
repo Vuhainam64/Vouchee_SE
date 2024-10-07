@@ -76,6 +76,10 @@ namespace Vouchee.API.AppStarts
             // CATEGORY
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+            // BRAND
+            services.AddScoped<IBrandService, BrandService>();
+            services.AddScoped<IBrandRepository, BrandRepository>();
         }
 
         public static void AddSwaggerServices(this IServiceCollection services, IConfiguration configuration)

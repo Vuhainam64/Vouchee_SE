@@ -1,18 +1,23 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Vouchee.Business.Exceptions;
+using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
 using Vouchee.Business.Services.Extensions.Filebase;
 using Vouchee.Data.Helpers;
+using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
+using Vouchee.Data.Models.Constants.Number;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
 using Vouchee.Data.Repositories.IRepos;
+using Vouchee.Data.Repositories.Repos;
 
 namespace Vouchee.Business.Services.Impls
 {
@@ -31,16 +36,26 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public Task<Guid?> CreateBrandAsync(CreateBrandDTO createBrandDTO, ThisUserObj thisUserObj)
+        public async Task<Guid?> CreateBrandAsync(CreateBrandDTO createBrandDTO, ThisUserObj thisUserObj)
         {
             try
             {
                 var brand = _mapper.Map<Brand>(createBrandDTO);
                 brand.CreateBy = Guid.Parse(thisUserObj.userId);
 
-                var brandId = _brandRepository.AddAsync(brand);
+                var brandId = await _brandRepository.AddAsync(brand);
 
-                return null;
+                if (brandId != null && createBrandDTO.image != null)
+                {
+                    brand.Image = await _fileUploadService.UploadImageToFirebase(createBrandDTO.image, thisUserObj.userId, StoragePathEnum.BRAND);
+
+                    if(!await _brandRepository.UpdateAsync(brand))
+                    {
+                        throw new UpdateObjectException("Lỗi không xác định khi cập nhật brand");
+                    }
+                }
+
+                return brandId;
             }
             catch (Exception ex)
             {
@@ -59,9 +74,31 @@ namespace Vouchee.Business.Services.Impls
             throw new NotImplementedException();
         }
 
-        public Task<DynamicResponseModel<GetBrandDTO>> GetBrandsAsync(PagingRequest pagingRequest, BrandFilter voucherCodeFilter, SortEnum sortEnum)
+        public async Task<DynamicResponseModel<GetBrandDTO>> GetBrandsAsync(PagingRequest pagingRequest, BrandFilter brandFilter, SortEnum sortEnum)
         {
-            throw new NotImplementedException();
+            (int, IQueryable<GetBrandDTO>) result;
+            try
+            {
+                result = _brandRepository.GetTable()
+                            .ProjectTo<GetBrandDTO>(_mapper.ConfigurationProvider)
+                            .DynamicFilter(_mapper.Map<GetBrandDTO>(brandFilter))
+                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.Message);
+                throw new LoadException("Lỗi không xác định khi tải brand");
+            }
+            return new DynamicResponseModel<GetBrandDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1
+                },
+                results = result.Item2.ToList()
+            };
         }
 
         public Task<bool> UpdateBrandAsync(Guid id, UpdateBrandDTO updateBrandDTO)
