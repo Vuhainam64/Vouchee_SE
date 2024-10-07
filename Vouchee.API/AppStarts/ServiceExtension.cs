@@ -127,7 +127,7 @@ namespace Vouchee.API.AppStarts
             //Firebase authentication
             FirebaseApp.Create(new AppOptions()
             {
-                Credential = GoogleCredential.FromFile("C:/dev/Firebase/vouchee-3a5af-firebase-adminsdk-9wyy8-508683f723.json"),
+                Credential = GoogleCredential.GetApplicationDefault(),
                 ProjectId = firebaseSettings.ProjectId,
                 ServiceAccountId = firebaseSettings.ServiceAccountId
             });
