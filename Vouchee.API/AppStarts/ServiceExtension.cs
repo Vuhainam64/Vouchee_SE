@@ -119,7 +119,9 @@ namespace Vouchee.API.AppStarts
 
         public static void AddFirebaseAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
-            string filePath = Path.Combine(AppContext.BaseDirectory, "Firebase", "vouchee-504da-firebase-adminsdk-n2uz5-f948a74403.json");
+            string filePath = Path.Combine(AppContext.BaseDirectory, "Firebase", "vouchee-504da-firebase-adminsdk-n2uz5-4af5399fae.json");
+
+            string jsonContent = File.ReadAllText(filePath);
 
             ///Firebase storage
             var firebaseSettingSection = configuration.GetSection("FirebaseSettings");
