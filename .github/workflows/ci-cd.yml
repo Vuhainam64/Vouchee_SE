@@ -52,7 +52,7 @@ jobs:
         run: |
           docker stop $(docker ps -aq) && docker rm $(docker ps -aq) && docker rmi $(docker images -q)
           docker run -d -p 10000:80 nginx
-          docker run -d -p 5000:5000 ${{ secrets.DOCKER_USERNAME }}/myimage:1  # Change 5000 to your desired port
+          docker run -d -p 5001:5001 ${{ secrets.DOCKER_USERNAME }}/myimage:1  # Change 5000 to your desired port
 
   deploy:
     runs-on: ubuntu-latest
