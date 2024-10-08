@@ -69,7 +69,7 @@ jobs:
            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }}
       - name: Update VM
         run: |
-          docker stop $(docker ps -aq) && docker rm $(docker ps -aq) && docker rmi $(docker images -q)
+          docker ps -aq | xargs -r docker stop && docker ps -aq | xargs -r docker rm && docker images -q | xargs -r docker rmi
       - name: Deploy to Server
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }} "cd /var/www/Vouchee_SE && git pull"
