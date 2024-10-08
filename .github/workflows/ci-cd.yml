@@ -76,7 +76,7 @@ jobs:
     steps:
       - name: Connect to VM
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }}
+           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }}
       - name: Update VM
         run: |
           sudo apt update && sudo apt upgrade -y
