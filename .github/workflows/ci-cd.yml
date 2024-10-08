@@ -68,4 +68,5 @@ jobs:
       - name: Deploy to Server
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }} "cd /var/www/Vouchee_SE && git pull"
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }} "docker stop $(docker ps -aq) && docker rm $(docker ps -aq) && docker rmi $(docker images -q)" 
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }} "docker pull ${{ secrets.DOCKER_USERNAME }}/myimage:1 && docker run -d --restart unless-stopped ${{ secrets.DOCKER_USERNAME }}/myimage:1" 
