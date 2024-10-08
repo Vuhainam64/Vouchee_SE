@@ -1,13 +1,11 @@
 name: CI/CD Pipeline
 
-# Trigger the workflow on pushes to the 'main' branch
 on:
   push:
     branches:
       - main
 
 jobs:
-  # Job for setting up and building the .NET application
   build:
     runs-on: ubuntu-latest
     steps:
@@ -28,10 +26,9 @@ jobs:
       - name: Run tests
         run: dotnet test --no-build --verbosity normal
 
-  # Job for building and pushing the Docker image
   docker:
     runs-on: ubuntu-latest
-    needs: build  # Ensures the build job completes before this job starts
+    needs: build
     steps:
       - name: Build Docker image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/myimage:1 .
@@ -42,10 +39,9 @@ jobs:
           echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
           docker push ${{ secrets.DOCKER_USERNAME }}/myimage:1
 
-  # Job for setting up SSH and deploying the application
   deploy:
     runs-on: ubuntu-latest
-    needs: docker  # Ensures the docker job completes before this job starts
+    needs: docker
     steps:
       - name: Add SSH key
         run: |
