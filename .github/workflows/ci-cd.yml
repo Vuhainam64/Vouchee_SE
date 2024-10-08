@@ -70,7 +70,15 @@ jobs:
       - name: Update VM
         run: |
           docker pull ${{ secrets.DOCKER_USERNAME }}/myimage:1
-          docker ps -aq | xargs -r docker stop && docker ps -aq | xargs -r docker rm && docker images -q | xargs -r docker rmi
+          # Lấy ID của container mới nhất
+          latest_container_id=$(docker ps -q -n 1)
+          # Dừng và xóa tất cả các container ngoại trừ cái mới nhất
+          docker ps -aq | grep -v "$latest_container_id" | xargs -r docker stop
+          docker ps -aq | grep -v "$latest_container_id" | xargs -r docker rm
+          # Lấy ID của image mới nhất
+          latest_image_id=$(docker images -q | head -n 1)
+          # Xóa tất cả các image ngoại trừ cái mới nhất
+          docker images -q | grep -v "$latest_image_id" | xargs -r docker rmi
       - name: Deploy to Server
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }} "cd /var/www/Vouchee_SE && git pull"
