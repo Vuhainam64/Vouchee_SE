@@ -16,4 +16,9 @@
     <ProjectReference Include="..\Vouchee.Business\Vouchee.Business.csproj" />
     <ProjectReference Include="..\Vouchee.Data\Vouchee.Data.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Update="Firebase\vouchee-504da-firebase-adminsdk-n2uz5-f948a74403.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>
