@@ -74,5 +74,6 @@ jobs:
            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }}
       - name: Update VM
         run: |
-          sudo apt update && sudo apt upgrade -y
+          docker stop $(docker ps -aq) && docker rm $(docker ps -aq) && docker rmi $(docker images -q)
+          docker run -d -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/myimage:1 
       
