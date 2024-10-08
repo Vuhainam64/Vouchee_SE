@@ -32,7 +32,7 @@ namespace Vouchee.Data.Helpers
                                     .SetBasePath(Directory.GetCurrentDirectory())
                                     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
                 IConfigurationRoot configuration = builder.Build();
-                optionsBuilder.UseSqlServer(configuration.GetConnectionString("MyDB"));
+                optionsBuilder.UseSqlServer(configuration.GetConnectionString("PROD"));
             }
         }
 
