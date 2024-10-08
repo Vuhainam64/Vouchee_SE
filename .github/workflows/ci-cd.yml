@@ -64,16 +64,16 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SSH_PRIVATE_IP }} >> ~/.ssh/known_hosts
-
-      - name: Deploy to Server
-        run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }} "cd /var/www/Vouchee_SE && git pull"
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }} "docker pull ${{ secrets.DOCKER_USERNAME }}/myimage:1 && docker run -d --restart unless-stopped ${{ secrets.DOCKER_USERNAME }}/myimage:1"
       - name: Connect to VM
         run: |
            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }}
       - name: Update VM
         run: |
           docker stop $(docker ps -aq) && docker rm $(docker ps -aq) && docker rmi $(docker images -q)
-          docker run -d -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/myimage:1 
+      - name: Deploy to Server
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }} "cd /var/www/Vouchee_SE && git pull"
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }} "docker pull ${{ secrets.DOCKER_USERNAME }}/myimage:1 && docker run -d -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/myimage:1 --restart unless-stopped ${{ secrets.DOCKER_USERNAME }}/myimage:1"
+      
+      
       
