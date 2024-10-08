@@ -119,6 +119,8 @@ namespace Vouchee.API.AppStarts
 
         public static void AddFirebaseAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
+            string filePath = "Firebase/vouchee-3a5af-firebase-adminsdk-9wyy8-508683f723.json";
+
             ///Firebase storage
             var firebaseSettingSection = configuration.GetSection("FirebaseSettings");
             services.Configure<FirebaseSettings>(firebaseSettingSection);
@@ -127,7 +129,7 @@ namespace Vouchee.API.AppStarts
             //Firebase authentication
             FirebaseApp.Create(new AppOptions()
             {
-                Credential = GoogleCredential.GetApplicationDefault(),
+                Credential = GoogleCredential.FromFile(filePath),
                 ProjectId = firebaseSettings.ProjectId,
                 ServiceAccountId = firebaseSettings.ServiceAccountId
             });
