@@ -39,30 +39,19 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<Guid?> CreateBrandAsync(CreateBrandDTO createBrandDTO, ThisUserObj thisUserObj)
         {
-            try
+            var brand = _mapper.Map<Brand>(createBrandDTO);
+            brand.CreateBy = Guid.Parse(thisUserObj.userId);
+
+            var brandId = await _brandRepository.AddAsync(brand);
+
+            if (brandId != null && createBrandDTO.image != null)
             {
-                var brand = _mapper.Map<Brand>(createBrandDTO);
-                brand.CreateBy = Guid.Parse(thisUserObj.userId);
+                brand.Image = await _fileUploadService.UploadImageToFirebase(createBrandDTO.image, thisUserObj.userId, StoragePathEnum.BRAND);
 
-                var brandId = await _brandRepository.AddAsync(brand);
-
-                if (brandId != null && createBrandDTO.image != null)
-                {
-                    brand.Image = await _fileUploadService.UploadImageToFirebase(createBrandDTO.image, thisUserObj.userId, StoragePathEnum.BRAND);
-
-                    if(!await _brandRepository.UpdateAsync(brand))
-                    {
-                        throw new UpdateObjectException("Lỗi không xác định khi cập nhật brand");
-                    }
-                }
-
-                return brandId;
+                await _brandRepository.UpdateAsync(brand);
             }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new CreateObjectException("Lỗi không xác định khi tạo brand");
-            }
+
+            return brandId;
         }
 
         public Task<bool> DeleteBrandAsync(Guid id)

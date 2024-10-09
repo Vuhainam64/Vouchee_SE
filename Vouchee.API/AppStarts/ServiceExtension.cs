@@ -124,6 +124,8 @@ namespace Vouchee.API.AppStarts
             services.Configure<FirebaseSettings>(firebaseSettingSection);
             var firebaseSettings = firebaseSettingSection.Get<FirebaseSettings>();
 
+            var check = GoogleCredential.GetApplicationDefault();
+
             //Firebase authentication
             FirebaseApp.Create(new AppOptions()
             {

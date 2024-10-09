@@ -26,9 +26,8 @@ namespace Vouchee.Business.Services.Extensions.Filebase
                     {"permission", "allow" }
                 };
 
-                string storageToken = await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(uid, tokenDescriptor);
-
                 var auth = new FirebaseAuthProvider(new FirebaseConfig(_firebaseSettings.ApiKey));
+                string storageToken = await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(uid, tokenDescriptor);
 
                 //var token = await auth.SignInWithEmailAndPasswordAsync(_firebaseSettings.Email, _firebaseSettings.Password);
                 var token = await auth.SignInWithCustomTokenAsync(storageToken);
