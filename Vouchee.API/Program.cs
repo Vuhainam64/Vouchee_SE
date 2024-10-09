@@ -30,18 +30,13 @@ builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
 var app = builder.Build();
 
-IWebHostEnvironment env = app.Environment;
-
 // Configure the HTTP request pipeline.
-if (env.IsDevelopment())
+app.UseDeveloperExceptionPage();
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseDeveloperExceptionPage();
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
-    });
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
+});
 
 app.UseMiddleware<ExceptionHandlingMiddleware>(); // Use generic type for middleware
 
