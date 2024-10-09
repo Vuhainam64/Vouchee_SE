@@ -55,9 +55,9 @@ jobs:
             # Lấy ID của container mới nhất
             latest_container_id=$(docker ps -q -n 1)
             
-            # Dừng và xóa tất cả các container ngoại trừ cái mới nhất
-            docker ps -aq | grep -v "$latest_container_id" | xargs -r docker stop
-            docker ps -aq | grep -v "$latest_container_id" | xargs -r docker rm
+            # Dừng và xóa tất cả các container
+            docker stop $(docker ps -aq)
+            docker rm $(docker ps -aq)
             
             # Lấy ID của image mới nhất
             latest_image_id=$(docker images -q | head -n 1)
