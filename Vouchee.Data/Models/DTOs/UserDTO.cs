@@ -73,7 +73,7 @@ namespace Vouchee.Business.Models.DTOs
     public class LoginByEmailDTO
     {
         public string? email { get; set; }
-        public string? pasword { get; set; }
+        public string? hashPassword { get; set; }
     }
 
     public class LoginByPhoneNumberDTO

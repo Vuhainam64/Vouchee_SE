@@ -18,7 +18,7 @@ namespace Vouchee.API.Controllers
             _authService = authService;
         }
 
-        [HttpGet("login_with_google_token")]
+        [HttpPost("login_with_google_token")]
         [AllowAnonymous]
         public async Task<IActionResult> LoginWithGoogle([FromQuery] string token)
         {
@@ -26,17 +26,17 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("login_with_phone_number")]
+        [HttpPost("login_with_phone_number")]
         [AllowAnonymous]
-        public async Task<IActionResult> LoginWithPhoneNumber(LoginByPhoneNumberDTO loginByPhoneNumberDTO)
+        public async Task<IActionResult> LoginWithPhoneNumber([FromBody] LoginByPhoneNumberDTO loginByPhoneNumberDTO)
         {
             var result = await _authService.LoginWithPhoneNumber(loginByPhoneNumberDTO);
             return Ok(result);
         }
 
-        [HttpGet("login_with_email")]
+        [HttpPost("login_with_email")]
         [AllowAnonymous]
-        public async Task<IActionResult> LoginWithEmailr(LoginByEmailDTO loginByEmailDTO)
+        public async Task<IActionResult> LoginWithEmail([FromBody] LoginByEmailDTO loginByEmailDTO)
         {
             var result = await _authService.LoginWithEmail(loginByEmailDTO);
             return Ok(result);

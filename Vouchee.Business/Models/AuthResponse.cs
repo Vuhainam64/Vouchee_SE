@@ -17,6 +17,7 @@ namespace Vouchee.Business.Models
         public string? image { get; set; }
         public string? phoneNumber { get; set; }
         //public string? buyerId { get; set; }
-        public string? token { get; set; }
+        public string? accessToken { get; set; }
+        public string? refreshToken { get; set; }
     }
 }

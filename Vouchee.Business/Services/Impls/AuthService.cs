@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using FirebaseAdmin.Auth;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Models;
@@ -111,8 +113,23 @@ namespace Vouchee.Business.Services.Impls
                 response.id = user.Id.ToString();
                 response.email = user.Email.ToString();
                 response.name = user.Name.ToString();
-                response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.BUYER.ToString());
-                response.roleName = RoleEnum.BUYER.ToString();
+                if (user.RoleId.Equals(Guid.Parse("FF54ACC6-C4E9-4B73-A158-FD640B4B6940")))
+                {
+                    response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.ADMIN.ToString());
+                    response.roleName = RoleEnum.ADMIN.ToString();
+                }
+                else if (user.RoleId.Equals(Guid.Parse("2D80393A-3A3D-495D-8DD7-F9261F85CC8F")))
+                {
+                    response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.SELLER.ToString());
+                    response.roleName = RoleEnum.SELLER.ToString();
+                }
+                else
+                {
+                    response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.BUYER.ToString());
+                    response.roleName = RoleEnum.BUYER.ToString();
+                }
+                response.image = user.Image;
+                response.phoneNumber = user.PhoneNumber;
                 response = await GenerateTokenAsync(response, RoleEnum.BUYER.ToString());
             }
 
@@ -324,38 +341,12 @@ namespace Vouchee.Business.Services.Impls
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
 
-            int hours = roleCheck.Equals(RoleEnum.ADMIN.ToString()) ? 8760 : 8760;
+            int accessTokenExpirationHours = roleCheck.Equals(RoleEnum.ADMIN.ToString()) ? 1 : 1; // Access token valid for 1 hour
+            int refreshTokenExpirationDays = 30; // Refresh token valid for 30 days
 
             Claim roleClaim = new Claim(ClaimTypes.Role, roleCheck);
 
-            // Claim roleClaim, buyerId;
-
-            //if (roleCheck.Equals(RoleEnum.ADMIN.ToString()))
-            //{
-            //    roleClaim = new Claim(ClaimTypes.Role, RoleEnum.ADMIN.ToString());
-            //    buyerId = new Claim(ClaimTypes.GroupSid, "");
-            //}
-            //else if (roleCheck.Equals(RoleEnum.BUYER.ToString()))
-            //{
-            //    roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BUYER.ToString());
-            //    buyerId = new Claim(ClaimTypes.GroupSid, response.buyerId);
-            //}
-            //else if (roleCheck.Equals(RoleEnum.SELLER.ToString()))
-            //{
-            //    roleClaim = new Claim(ClaimTypes.Role, RoleEnum.SELLER.ToString());
-            //    buyerId = new Claim(ClaimTypes.GroupSid, "");
-            //}
-            //else if (roleCheck.Equals(RoleEnum.STAFF.ToString()))
-            //{
-            //    roleClaim = new Claim(ClaimTypes.Role, RoleEnum.STAFF.ToString());
-            //    buyerId = new Claim(ClaimTypes.GroupSid, "");
-            //}
-            //else
-            //{
-            //    roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BUYER.ToString());
-            //    buyerId = new Claim(ClaimTypes.GroupSid, response.buyerId);
-            //}
-
+            // Access token claims
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
@@ -365,17 +356,26 @@ namespace Vouchee.Business.Services.Impls
                     new Claim(ClaimTypes.Actor, response.name),
                     roleClaim
                 }),
-
-                Expires = DateTime.UtcNow.AddHours(hours),
+                Expires = DateTime.UtcNow.AddHours(accessTokenExpirationHours),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
 
-            // Create and write the token
+            // Create and write the access token
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            response.token = tokenHandler.WriteToken(token);
+            response.accessToken = tokenHandler.WriteToken(token);
+            response.refreshToken = GenerateRefreshToken(response.accessToken);
 
             return response;
+        }
 
+        private string GenerateRefreshToken(string accessToken)
+        {
+            using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_appSettings.Secret)))
+            {
+                var tokenBytes = Encoding.UTF8.GetBytes(accessToken);
+                var hashBytes = hmac.ComputeHash(tokenBytes);
+                return Convert.ToBase64String(hashBytes);
+            }
         }
     }
 }
