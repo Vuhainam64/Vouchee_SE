@@ -1,4 +1,5 @@
-﻿using Vouchee.Data.Models.Constants.Enum.Status;
+﻿using System.ComponentModel.DataAnnotations;
+using Vouchee.Data.Models.Constants.Enum.Status;
 
 namespace Vouchee.Business.Models.DTOs
 {
@@ -57,8 +58,15 @@ namespace Vouchee.Business.Models.DTOs
     public class RegisterDTO
     {
         public string? phoneNumber { get; set; }
+
+        [EmailAddress(ErrorMessage = "Invalid email address.")]
         public string? email { get; set; }
+
+        [Required(ErrorMessage = "Password is required.")]
         public string? hashPassword { get; set; }
+
+        [Required(ErrorMessage = "Name is required.")]
+        [StringLength(50, ErrorMessage = "Name cannot exceed 50 characters.")]
         public string? name { get; set; }
     }
 
