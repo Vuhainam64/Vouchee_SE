@@ -58,11 +58,9 @@ namespace Vouchee.API.Controllers
         // READ
         [HttpGet("get_all_promotion")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetPromotions([FromQuery] PagingRequest pagingRequest,
-                                                       [FromQuery] PromotionFilter orderFilter,
-                                                       [FromQuery] SortPromotionEnum sortPromotionEnum)
+        public async Task<IActionResult> GetPromotions()
         {
-            var result = await _promotionService.GetPromotionsAsync(pagingRequest, orderFilter, sortPromotionEnum);
+            var result = await _promotionService.GetPromotionsAsync();
             return Ok(result);
         }
 

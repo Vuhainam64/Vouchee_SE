@@ -56,11 +56,9 @@ namespace Vouchee.API.Controllers
         // READ
         [HttpGet("get_all_order")]
         [Authorize]
-        public async Task<IActionResult> GetOrders([FromQuery] PagingRequest pagingRequest,
-                                                   [FromQuery] OrderFilter orderFilter,
-                                                   [FromQuery] SortOrderEnum sortOrderEnum)
+        public async Task<IActionResult> GetOrders()
         {
-            var result = await _orderService.GetOrdersAsync(pagingRequest, orderFilter, sortOrderEnum);
+            var result = await _orderService.GetOrdersAsync();
             return Ok(result);
         }
 

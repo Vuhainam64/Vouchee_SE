@@ -110,31 +110,20 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<DynamicResponseModel<GetPromotionDTO>> GetPromotionsAsync(PagingRequest pagingRequest, PromotionFilter promotionFilter, SortPromotionEnum sortPromotionEnum)
+        public async Task<IList<GetPromotionDTO>> GetPromotionsAsync()
         {
-            (int, IQueryable<GetPromotionDTO>) result;
+            IQueryable<GetPromotionDTO> result;
             try
             {
                 result = _promotionRepository.GetTable()
-                            .ProjectTo<GetPromotionDTO>(_mapper.ConfigurationProvider)
-                            .DynamicFilter(_mapper.Map<GetPromotionDTO>(promotionFilter))
-                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+                            .ProjectTo<GetPromotionDTO>(_mapper.ConfigurationProvider);
             }
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
                 throw new LoadException("Lỗi không xác định khi tải promotion");
             }
-            return new DynamicResponseModel<GetPromotionDTO>()
-            {
-                metaData = new MetaData()
-                {
-                    page = pagingRequest.page,
-                    size = pagingRequest.pageSize,
-                    total = result.Item1
-                },
-                results = result.Item2.ToList()
-            };
+            return result.ToList();
         }
 
         public async Task<bool> UpdatePromotionAsync(Guid id, UpdatePromotionDTO updatePromotionDTO, ThisUserObj thisUserObj)

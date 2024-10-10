@@ -43,11 +43,9 @@ namespace Vouchee.API.Controllers
 
         // READ: Get all users with filtering, sorting, and paging
         [HttpGet("get_all_user")]
-        public async Task<IActionResult> GetUsers([FromQuery] PagingRequest pagingRequest,
-                                                  [FromQuery] UserFilter userFilter,
-                                                  [FromQuery] SortUserEnum sortUserEnum)
+        public async Task<IActionResult> GetUsers()
         {
-            var result = await _userService.GetUsersAsync(pagingRequest, userFilter, sortUserEnum);
+            var result = await _userService.GetUsersAsync();
             return Ok(result);
         }
 

@@ -90,33 +90,20 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<DynamicResponseModel<GetSupplierDTO>> GetSuppliersAsync(PagingRequest pagingRequest,
-                                                                            SupplierFilter supplierFilter,
-                                                                            SortSupplierEnum sortSupplierEnum)
+        public async Task<IList<GetSupplierDTO>> GetSuppliersAsync()
         {
-            (int, IQueryable<GetSupplierDTO>) result;
+            IQueryable<GetSupplierDTO> result;
             try
             {
                 result = _supplierRepository.GetTable()
-                            .ProjectTo<GetSupplierDTO>(_mapper.ConfigurationProvider)
-                            .DynamicFilter(_mapper.Map<GetSupplierDTO>(supplierFilter))
-                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+                            .ProjectTo<GetSupplierDTO>(_mapper.ConfigurationProvider);
             }
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
                 throw new LoadException("Lỗi không xác định khi tải supplier");
             }
-            return new DynamicResponseModel<GetSupplierDTO>()
-            {
-                metaData = new MetaData()
-                {
-                    page = pagingRequest.page,
-                    size = pagingRequest.pageSize,
-                    total = result.Item1
-                },
-                results = result.Item2.ToList()
-            };
+            return result.ToList();
         }
 
         public async Task<bool> UpdateSupplierAsync(Guid id, UpdateSupplierDTO updateSupplierDTO)

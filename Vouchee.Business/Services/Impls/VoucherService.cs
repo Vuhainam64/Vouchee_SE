@@ -103,33 +103,20 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<DynamicResponseModel<GetVoucherDTO>> GetVouchersAsync(PagingRequest pagingRequest,
-                                                                                    VoucherFiler voucherFiler,
-                                                                                    SortVoucherEnum sortVoucherEnum)
+        public async Task<IList<GetVoucherDTO>> GetVouchersAsync()
         {
-            (int, IQueryable<GetVoucherDTO>) result;
+            IQueryable<GetVoucherDTO> result;
             try
             {
                 result = _voucherRepository.GetTable()
-                            .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
-                            .DynamicFilter(_mapper.Map<GetVoucherDTO>(voucherFiler))
-                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+                            .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider);
             }
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
                 throw new LoadException("Lỗi không xác định khi tải voucher");
             }
-            return new DynamicResponseModel<GetVoucherDTO>()
-            {
-                metaData = new MetaData()
-                {
-                    page = pagingRequest.page,
-                    size = pagingRequest.pageSize,
-                    total = result.Item1
-                },
-                results = result.Item2.ToList()
-            };
+            return result.ToList();
         }
 
         public async Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO)

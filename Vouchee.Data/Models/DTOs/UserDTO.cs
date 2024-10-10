@@ -7,8 +7,9 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? roleId { get; set; }
 
         public string? description { get; set; }
-        public string? lastName { get; set; }
-        public string? firstName { get; set; }
+        //public string? lastName { get; set; }
+        //public string? firstName { get; set; }
+        public string? name { get; set; }
         public string? phoneNumber { get; set; }
         public string? email { get; set; }
         public string? gender { get; set; }
@@ -51,5 +52,25 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? updateBy { get; set; }
 
         public virtual ICollection<GetOrderDTO>? orders { get; set; }
+    }
+
+    public class RegisterDTO
+    {
+        public string? phoneNumber { get; set; }
+        public string? email { get; set; }
+        public string? password { get; set; }
+        public string? name { get; set; }
+    }
+
+    public class LoginByEmailDTO
+    {
+        public string? email { get; set; }
+        public string? pasword { get; set; }
+    }
+
+    public class LoginByPhoneNumberDTO
+    {
+        public string? phoneNumber { get; set; }
+        public string? password { get; set; }
     }
 }

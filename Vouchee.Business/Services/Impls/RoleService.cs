@@ -90,35 +90,6 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<DynamicResponseModel<GetRoleDTO>> GetRolesAsync(PagingRequest pagingRequest = null,
-                                                                                    RoleFilter roleFilter = null,
-                                                                                    SortRoleEnum sortRoleEnum = 0)
-        {
-            (int, IQueryable<GetRoleDTO>) result;
-            try
-            {
-                result = _roleRepository.GetTable()
-                            .ProjectTo<GetRoleDTO>(_mapper.ConfigurationProvider)
-                            .DynamicFilter(_mapper.Map<GetRoleDTO>(roleFilter))
-                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải role");
-            }
-            return new DynamicResponseModel<GetRoleDTO>()
-            {
-                metaData = new MetaData()
-                {
-                    page = pagingRequest.page,
-                    size = pagingRequest.pageSize,
-                    total = result.Item1
-                },
-                results = result.Item2.ToList()
-            };
-        }
-
         public async Task<List<GetRoleDTO>> GetRolesAsync()
         {
             try

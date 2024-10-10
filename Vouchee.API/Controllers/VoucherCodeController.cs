@@ -58,11 +58,9 @@ namespace Vouchee.API.Controllers
 
         // READ
         [HttpGet("get_all_voucher_code")]
-        public async Task<IActionResult> GetVoucherCodes([FromQuery] PagingRequest pagingRequest,
-                                                            [FromQuery] VoucherCodeFilter voucherCodeFilter,
-                                                            [FromQuery] SortVoucherCodeEnum sortVoucherCodeEnum)
+        public async Task<IActionResult> GetVoucherCodes()
         {
-            var result = await _voucherCodeService.GetVoucherCodesAsync(pagingRequest, voucherCodeFilter, sortVoucherCodeEnum);
+            var result = await _voucherCodeService.GetVoucherCodesAsync();
             return Ok(result);
         }
 

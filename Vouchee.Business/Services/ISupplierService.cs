@@ -12,9 +12,7 @@ namespace Vouchee.Business.Services
 
         // READ
         public Task<GetSupplierDTO> GetSupplierByIdAsync(Guid id);
-        public Task<DynamicResponseModel<GetSupplierDTO>> GetSuppliersAsync(PagingRequest pagingRequest,
-                                                                                SupplierFilter shopFilter,
-                                                                                SortSupplierEnum sortSupplierEnum);
+        public Task<IList<GetSupplierDTO>> GetSuppliersAsync();
 
         // UPDATE
         public Task<bool> UpdateSupplierAsync(Guid id, UpdateSupplierDTO updateSupplierDTO);
