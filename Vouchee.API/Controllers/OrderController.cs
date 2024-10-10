@@ -12,7 +12,7 @@ using Vouchee.Data.Models.Filters;
 namespace Vouchee.API.Controllers
 {
     [ApiController]
-    [Route("api/order")]
+    [Route("api/v1/order")]
     [EnableCors]
     public class OrderController : ControllerBase
     {
@@ -33,14 +33,13 @@ namespace Vouchee.API.Controllers
         }
 
         // CREATE
-        [HttpPost]
+        [HttpPost("create_order")]
         [Authorize]
         public async Task<IActionResult> CreateOrder([FromBody] CreateOrderDTO createOrderDTO)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            //BUYER
-            if (currentUser.roleId.Equals(currentUser.buyerRoleId))
+            if (RoleHelper.IsBuyer(currentUser))
             {
                 var result = await _orderService.CreateOrderAsync(createOrderDTO, currentUser);
                 return Ok(result);
@@ -54,18 +53,17 @@ namespace Vouchee.API.Controllers
         }
 
         // READ
-        [HttpGet]
+        [HttpGet("get_all_order")]
         [Authorize]
         public async Task<IActionResult> GetOrders([FromQuery] PagingRequest pagingRequest,
-                                                            [FromQuery] OrderFilter orderFilter,
-                                                            [FromQuery] SortOrderEnum sortOrderEnum)
+                                                   [FromQuery] OrderFilter orderFilter,
+                                                   [FromQuery] SortOrderEnum sortOrderEnum)
         {
             var result = await _orderService.GetOrdersAsync(pagingRequest, orderFilter, sortOrderEnum);
             return Ok(result);
         }
 
-        [HttpGet]
-        [Route("{id}")]
+        [HttpGet("get_order_by_id")]
         [Authorize]
         public async Task<IActionResult> GetOrderById(Guid id)
         {
@@ -74,15 +72,14 @@ namespace Vouchee.API.Controllers
         }
 
         // UPDATE
-        [HttpPut]
-        [Route("{id}")]
+        [HttpPut("update_order")]
         [Authorize]
         public async Task<IActionResult> UpdateOrder(Guid id, [FromBody] UpdateOrderDTO updateOrderDTO)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            if (currentUser.roleId.Equals(currentUser.sellerRoleId)
-                    || currentUser.roleId.Equals(currentUser.buyerRoleId))
+            if (RoleHelper.IsSeller(currentUser)
+                    || RoleHelper.IsBuyer(currentUser))
             {
                 var result = await _orderService.UpdateOrderAsync(id, updateOrderDTO, currentUser);
                 return Ok(result);
@@ -95,14 +92,14 @@ namespace Vouchee.API.Controllers
             });
         }
 
-        [HttpPut]
-        [Route("assign-code")]
+        // Assign Voucher Code
+        [HttpPut("voucher/assign_voucher_code_to_order")]
         [Authorize]
         public async Task<IActionResult> AssignCode(Guid orderDetailId, IList<Guid> voucherCodeId)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            if (currentUser.roleId.Equals(currentUser.sellerRoleId))
+            if (RoleHelper.IsSeller(currentUser))
             {
                 var result = await _orderService.AssignCodeToOrderAsync(orderDetailId, voucherCodeId);
                 return Ok(result);
@@ -111,12 +108,12 @@ namespace Vouchee.API.Controllers
             return StatusCode((int)HttpStatusCode.Forbidden, new
             {
                 code = HttpStatusCode.Forbidden,
-                message = "Chỉ có nhà bán hàng hoặc người mua mới có thể thực hiện chức năng này"
+                message = "Chỉ có nhà bán hàng mới có thể thực hiện chức năng này"
             });
         }
+
         // DELETE
-        [HttpDelete]
-        [Route("{id}")]
+        [HttpDelete("delete_order")]
         [Authorize]
         public async Task<IActionResult> DeleteOrder(Guid id)
         {

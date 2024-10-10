@@ -2,10 +2,11 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Threading.Tasks;
 using Vouchee.API.Helpers;
 using Vouchee.Business.Models;
+using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Services;
-using Vouchee.Business.Services.Impls;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Filters;
@@ -13,7 +14,7 @@ using Vouchee.Data.Models.Filters;
 namespace Vouchee.API.Controllers
 {
     [ApiController]
-    [Route("api/brand")]
+    [Route("api/v1/brand")]
     [EnableCors]
     public class BrandController : ControllerBase
     {
@@ -21,9 +22,9 @@ namespace Vouchee.API.Controllers
         private readonly IUserService _userService;
         private readonly IRoleService _roleService;
 
-        public BrandController(IBrandService brandService, 
-                                IUserService userService, 
-                                IRoleService roleService)
+        public BrandController(IBrandService brandService,
+                               IUserService userService,
+                               IRoleService roleService)
         {
             _brandService = brandService;
             _userService = userService;
@@ -31,7 +32,7 @@ namespace Vouchee.API.Controllers
         }
 
         // CREATE
-        [HttpPost]
+        [HttpPost("create_new_brand")]
         [Authorize]
         public async Task<IActionResult> CreateBrand([FromForm] CreateBrandDTO createBrandDTO)
         {
@@ -51,28 +52,30 @@ namespace Vouchee.API.Controllers
         }
 
         // READ
-        [HttpGet]
+        [HttpGet("get_all_brand")]
         [AllowAnonymous]
         public async Task<IActionResult> GetBrands([FromQuery] PagingRequest pagingRequest,
-                                                            [FromQuery] BrandFilter brandFilter,
-                                                            [FromQuery] SortEnum sortEnum)
+                                                    [FromQuery] BrandFilter brandFilter,
+                                                    [FromQuery] SortEnum sortEnum)
         {
             var result = await _brandService.GetBrandsAsync(pagingRequest, brandFilter, sortEnum);
             return Ok(result);
         }
 
-        [HttpGet]
-        [Route("{id}")]
+        [HttpGet("get_brand_by_id/{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetBrandById(Guid id)
         {
             var brand = await _brandService.GetBrandByIdAsync(id);
+            if (brand == null)
+            {
+                return NotFound(new { message = "Brand not found." });
+            }
             return Ok(brand);
         }
 
         // UPDATE
-        [HttpPut]
-        [Route("{id}")]
+        [HttpPut("update_brand/{id}")]
         [Authorize]
         public async Task<IActionResult> UpdateBrand(Guid id, [FromBody] UpdateBrandDTO updateBrandDTO)
         {
@@ -86,20 +89,18 @@ namespace Vouchee.API.Controllers
 
             return StatusCode((int)HttpStatusCode.Forbidden, new
             {
-                Code = HttpStatusCode.Forbidden,
-                Message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
+                code = HttpStatusCode.Forbidden,
+                message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
             });
         }
 
         // DELETE
-        [HttpDelete]
-        [Route("{id}")]
+        [HttpDelete("delete_brand/{id}")]
         [Authorize]
         public async Task<IActionResult> DeleteBrand(Guid id)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            //ADMIN
             if (currentUser.roleId.Equals(currentUser.adminRoleId))
             {
                 var result = await _brandService.DeleteBrandAsync(id);
@@ -108,8 +109,8 @@ namespace Vouchee.API.Controllers
 
             return StatusCode((int)HttpStatusCode.Forbidden, new
             {
-                Code = HttpStatusCode.Forbidden,
-                Message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
+                code = HttpStatusCode.Forbidden,
+                message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
             });
         }
     }

@@ -13,7 +13,7 @@ using Vouchee.Data.Models.Filters;
 namespace Vouchee.API.Controllers
 {
     [ApiController]
-    [Route("api/voucherType")]
+    [Route("api/v1/voucherType")]
     [EnableCors]
     public class VoucherTypeController : ControllerBase
     {
@@ -31,7 +31,7 @@ namespace Vouchee.API.Controllers
         }
 
         // CREATE
-        [Authorize]
+        [Authorize("create_voucher_type")]
         [HttpPost]
         public async Task<IActionResult> CreateVoucherType([FromForm] CreateVoucherTypeDTO createVoucherTypeDTO)
         {
@@ -51,7 +51,7 @@ namespace Vouchee.API.Controllers
         }
 
         // READ
-        [HttpGet]
+        [HttpGet("get_all_voucher_type")]
         public async Task<IActionResult> GetVoucherTypes([FromQuery] PagingRequest pagingRequest,
                                                             [FromQuery] VoucherTypeFilter voucherTypeFilter,
                                                             [FromQuery] SortVoucherTypeEnum sortVoucherTypeEnum)
@@ -60,8 +60,8 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet]
-        [Route("{id}")]
+        // GET
+        [HttpGet("get_voucher_type/{id}")]
         public async Task<IActionResult> GetVoucherTypeById(Guid id)
         {
             var voucherType = await _voucherTypeService.GetVoucherTypeByIdAsync(id);
@@ -69,8 +69,8 @@ namespace Vouchee.API.Controllers
         }
 
         // UPDATE
-        [HttpPut]
-        [Route("{id}")]
+        [Authorize]
+        [HttpPut("update_voucher_type/{id}")]
         public async Task<IActionResult> UpdateVoucherType(Guid id, [FromBody] UpdateVoucherTypeDTO updateVoucherTypeDTO)
         {
             var result = await _voucherTypeService.UpdateVoucherTypeAsync(id, updateVoucherTypeDTO);
@@ -78,8 +78,8 @@ namespace Vouchee.API.Controllers
         }
 
         // DELETE
-        [HttpDelete]
-        [Route("{id}")]
+        [Authorize]
+        [HttpDelete("delete_voucher_type/{id}")]
         public async Task<IActionResult> DeleteVoucherType(Guid id)
         {
             var result = await _voucherTypeService.DeleteVoucherTypeAsync(id);

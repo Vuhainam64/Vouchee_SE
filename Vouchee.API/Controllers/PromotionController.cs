@@ -14,7 +14,7 @@ using Vouchee.Business.Services.Impls;
 namespace Vouchee.API.Controllers
 {
     [ApiController]
-    [Route("api/promotion")]
+    [Route("api/promotion/v1")]
     [EnableCors]
     public class PromotionController : ControllerBase
     {
@@ -31,15 +31,18 @@ namespace Vouchee.API.Controllers
             _roleService = roleService;
         }
 
+        // Helper method to check if the current user is a seller
+        private bool IsSeller(ThisUserObj currentUser) =>
+            currentUser.roleId.Equals(currentUser.sellerRoleId);
+
         // CREATE
-        [HttpPost]
+        [HttpPost("create_promotion")]
         [Authorize]
         public async Task<IActionResult> CreatePromotion([FromForm] CreatePromotionDTO createPromotionDTO)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            //SELLER
-            if (currentUser.roleId.Equals(currentUser.sellerRoleId))
+            if (IsSeller(currentUser))
             {
                 var result = await _promotionService.CreatePromotionAsync(createPromotionDTO, currentUser);
                 return Ok(result);
@@ -53,35 +56,32 @@ namespace Vouchee.API.Controllers
         }
 
         // READ
-        [HttpGet]
+        [HttpGet("get_all_promotion")]
         [AllowAnonymous]
         public async Task<IActionResult> GetPromotions([FromQuery] PagingRequest pagingRequest,
-                                                            [FromQuery] PromotionFilter orderFilter,
-                                                            [FromQuery] SortPromotionEnum sortPromotionEnum)
+                                                       [FromQuery] PromotionFilter orderFilter,
+                                                       [FromQuery] SortPromotionEnum sortPromotionEnum)
         {
             var result = await _promotionService.GetPromotionsAsync(pagingRequest, orderFilter, sortPromotionEnum);
             return Ok(result);
         }
 
-        [HttpGet]
-        [Route("{id}")]
+        [HttpGet("get_promotion_by_id")]
         [AllowAnonymous]
         public async Task<IActionResult> GetPromotionById(Guid id)
         {
-            var order = await _promotionService.GetPromotionByIdAsync(id);
-            return Ok(order);
+            var promotion = await _promotionService.GetPromotionByIdAsync(id);
+            return Ok(promotion);
         }
 
         // UPDATE
-        [HttpPut]
-        [Route("{id}")]
+        [HttpPut("update_promotion")]
         [Authorize]
         public async Task<IActionResult> UpdatePromotion(Guid id, [FromBody] UpdatePromotionDTO updatePromotionDTO)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            //SELLER
-            if (currentUser.roleId.Equals(currentUser.sellerRoleId))
+            if (IsSeller(currentUser))
             {
                 var result = await _promotionService.UpdatePromotionAsync(id, updatePromotionDTO, currentUser);
                 return Ok(result);
@@ -95,15 +95,13 @@ namespace Vouchee.API.Controllers
         }
 
         // DELETE
-        [HttpDelete]
-        [Route("{id}")]
+        [HttpDelete("delete_promotion")]
         [Authorize]
         public async Task<IActionResult> DeletePromotion(Guid id)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            //SELLER
-            if (currentUser.roleId.Equals(currentUser.sellerRoleId))
+            if (IsSeller(currentUser))
             {
                 var result = await _promotionService.DeletePromotionAsync(id, currentUser);
                 return Ok(result);

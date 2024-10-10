@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +21,10 @@ namespace Vouchee.Data.Repositories.Repos
         {
             try
             {
-                User user = await _userDAO.GetFirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()));
+                User user = await _userDAO.GetFirstOrDefaultAsync(
+                                        filter: x => x.Email.ToLower().Equals(email.ToLower()),
+                                        includeProperties: query => query.Include(x => x.Role)
+                                    );
                 if (user != null)
                 {
                     return user;

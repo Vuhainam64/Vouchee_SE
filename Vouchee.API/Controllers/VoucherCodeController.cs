@@ -13,9 +13,9 @@ using Vouchee.Data.Models.Filters;
 
 namespace Vouchee.API.Controllers
 {
-    // gọi sau voucher controller sau khi đã gọi xong trả id về đây để tạo ra voucher code 
+    // Gọi sau voucher controller sau khi đã gọi xong trả id về đây để tạo ra voucher code 
     [ApiController]
-    [Route("api/voucherCode")]
+    [Route("api/v1/voucherCode")]
     [EnableCors]
     public class VoucherCodeController : ControllerBase
     {
@@ -24,9 +24,9 @@ namespace Vouchee.API.Controllers
         private readonly IVoucherCodeService _voucherCodeService;
         private readonly IVoucherService _voucherService;
 
-        public VoucherCodeController(IUserService userService, 
-                                        IRoleService roleService, 
-                                        IVoucherCodeService voucherCodeService, 
+        public VoucherCodeController(IUserService userService,
+                                        IRoleService roleService,
+                                        IVoucherCodeService voucherCodeService,
                                         IVoucherService voucherService)
         {
             _userService = userService;
@@ -36,7 +36,7 @@ namespace Vouchee.API.Controllers
         }
 
         // CREATE
-        [HttpPost]
+        [HttpPost("create_voucher_code")]
         [Authorize]
         public async Task<IActionResult> CreateVoucherCode(Guid voucherId, [FromForm] CreateVoucherCodeDTO createVoucherCodeDTO)
         {
@@ -57,7 +57,7 @@ namespace Vouchee.API.Controllers
         }
 
         // READ
-        [HttpGet]
+        [HttpGet("get_all_voucher_code")]
         public async Task<IActionResult> GetVoucherCodes([FromQuery] PagingRequest pagingRequest,
                                                             [FromQuery] VoucherCodeFilter voucherCodeFilter,
                                                             [FromQuery] SortVoucherCodeEnum sortVoucherCodeEnum)
@@ -66,8 +66,8 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet]
-        [Route("{id}")]
+        // GET BY ID
+        [HttpGet("get_voucher_code_by_id/{id}")]
         public async Task<IActionResult> GetVoucherCodeById(Guid id)
         {
             var voucherCode = await _voucherCodeService.GetVoucherCodeByIdAsync(id);
@@ -75,8 +75,7 @@ namespace Vouchee.API.Controllers
         }
 
         // UPDATE
-        [HttpPut]
-        [Route("{id}")]
+        [HttpPut("update_voucher_code/{id}")]
         public async Task<IActionResult> UpdateVoucherCode(Guid id, [FromBody] UpdateVoucherCodeDTO updateVoucherCodeDTO)
         {
             var result = await _voucherCodeService.UpdateVoucherCodeAsync(id, updateVoucherCodeDTO);
@@ -84,8 +83,7 @@ namespace Vouchee.API.Controllers
         }
 
         // DELETE
-        [HttpDelete]
-        [Route("{id}")]
+        [HttpDelete("delete_voucher_code/{id}")]
         public async Task<IActionResult> DeleteVoucherCode(Guid id)
         {
             var result = await _voucherCodeService.DeleteVoucherCodeAsync(id);

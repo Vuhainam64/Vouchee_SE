@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
@@ -9,7 +10,7 @@ using Vouchee.Data.Models.Filters;
 namespace Vouchee.API.Controllers
 {
     [ApiController]
-    [Route("api/supplier")]
+    [Route("api/v1/supplier")]
     [EnableCors]
     public class SupplierController : ControllerBase
     {
@@ -21,25 +22,25 @@ namespace Vouchee.API.Controllers
         }
 
         // CREATE
-        [HttpPost]
+        [HttpPost("create_supplier")]
+        [Authorize]
         public async Task<IActionResult> CreateSupplier([FromForm] CreateSupplierDTO createSupplierDTO)
         {
             var result = await _supplierService.CreateSupplierAsync(createSupplierDTO);
-            return CreatedAtAction(nameof(GetSupplierById), new { result }, result);
+            return Ok(result);
         }
 
         // READ
-        [HttpGet]
+        [HttpGet("get_all_supplier")]
         public async Task<IActionResult> GetSuppliers([FromQuery] PagingRequest pagingRequest,
-                                                            [FromQuery] SupplierFilter supplierFilter,
-                                                            [FromQuery] SortSupplierEnum sortSupplierEnum)
+                                                      [FromQuery] SupplierFilter supplierFilter,
+                                                      [FromQuery] SortSupplierEnum sortSupplierEnum)
         {
             var result = await _supplierService.GetSuppliersAsync(pagingRequest, supplierFilter, sortSupplierEnum);
             return Ok(result);
         }
 
-        [HttpGet]
-        [Route("{id}")]
+        [HttpGet("get_supplier_by_id/{id}")]
         public async Task<IActionResult> GetSupplierById(Guid id)
         {
             var supplier = await _supplierService.GetSupplierByIdAsync(id);
@@ -47,8 +48,7 @@ namespace Vouchee.API.Controllers
         }
 
         // UPDATE
-        [HttpPut]
-        [Route("{id}")]
+        [HttpPut("update_supplier/{id}")]
         public async Task<IActionResult> UpdateSupplier(Guid id, [FromBody] UpdateSupplierDTO updateSupplierDTO)
         {
             var result = await _supplierService.UpdateSupplierAsync(id, updateSupplierDTO);
@@ -56,8 +56,7 @@ namespace Vouchee.API.Controllers
         }
 
         // DELETE
-        [HttpDelete]
-        [Route("{id}")]
+        [HttpDelete("delete_supplier/{id}")]
         public async Task<IActionResult> DeleteSupplier(Guid id)
         {
             var result = await _supplierService.DeleteSupplierAsync(id);

@@ -12,10 +12,8 @@ using Vouchee.Data.Models.Filters;
 
 namespace Vouchee.API.Controllers
 {
-    // Lúc tạo ra sẽ tạo voucher và voucher code bình thường
-    // Gọi voucher controller trước rồi loop cái voucher code controller
     [ApiController]
-    [Route("api/voucher")]
+    [Route("api/v1/voucher")]
     [EnableCors]
     public class VoucherController : ControllerBase
     {
@@ -23,7 +21,7 @@ namespace Vouchee.API.Controllers
         private readonly IUserService _userService;
         private readonly IRoleService _roleService;
 
-        public VoucherController(IVoucherService voucherService, 
+        public VoucherController(IVoucherService voucherService,
                                     IUserService userService,
                                     IRoleService roleService)
         {
@@ -32,8 +30,8 @@ namespace Vouchee.API.Controllers
             _userService = userService;
         }
 
-        //CREATE
-        [HttpPost]
+        // CREATE
+        [HttpPost("create_voucher")]
         [Authorize]
         public async Task<IActionResult> CreateVoucher([FromForm] CreateVoucherDTO voucherDTO)
         {
@@ -53,8 +51,8 @@ namespace Vouchee.API.Controllers
             });
         }
 
-        //GET ALL
-        [HttpGet]
+        // GET ALL
+        [HttpGet("get_all_voucher")]
         public async Task<IActionResult> GetAllVouchers([FromQuery] PagingRequest pagingRequest,
                                                             [FromQuery] VoucherFiler voucherFiler,
                                                             [FromQuery] SortVoucherEnum sortVoucherEnum)
@@ -63,18 +61,16 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        //GET BY ID
-        [HttpGet]
-        [Route("{id}")]
+        // GET BY ID
+        [HttpGet("get_voucher_by_id/{id}")]
         public async Task<IActionResult> GetVoucherById(Guid id)
         {
             var voucher = await _voucherService.GetVoucherByIdAsync(id);
             return Ok(voucher);
         }
 
-        //UPDATE
-        [HttpPut]
-        [Route("{id}")]
+        // UPDATE
+        [HttpPut("update_voucher/{id}")]
         public async Task<IActionResult> UpdateVoucher(Guid id, [FromBody] UpdateVoucherDTO voucherDTO)
         {
             var result = await _voucherService.UpdateVoucherAsync(id, voucherDTO);
@@ -82,8 +78,7 @@ namespace Vouchee.API.Controllers
         }
 
         // DELETE
-        [HttpDelete]
-        [Route("{id}")]
+        [HttpDelete("delete_voucher/{id}")]
         public async Task<IActionResult> DeleteVoucher(Guid id)
         {
             var result = await _voucherService.DeleteVoucherAsync(id);

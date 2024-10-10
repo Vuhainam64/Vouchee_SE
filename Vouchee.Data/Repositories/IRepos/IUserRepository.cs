@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Vouchee.Business.Models.DTOs;
 using Vouchee.Data.Helpers.Base;
 using Vouchee.Data.Models.Entities;
 

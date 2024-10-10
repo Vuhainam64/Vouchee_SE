@@ -43,6 +43,7 @@ namespace Vouchee.Business.Models.DTOs
 
         public Guid? id { get; set; }
 
+        public string roleName { get; set; }
         public string? status { get; set; }
         public DateTime? createDate { get; set; }
         public Guid? createBy { get; set; }
