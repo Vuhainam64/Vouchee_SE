@@ -46,7 +46,7 @@ namespace Vouchee.Data.Repositories.Repos
             {
                 User user = await _userDAO.GetFirstOrDefaultAsync(
                                         filter: x => x.Email.ToLower().Equals(loginByEmailDTO.email.ToLower()) 
-                                                        && x.HashPassword.Equals(loginByEmailDTO.pasword),
+                                                        && x.HashPassword.Equals(loginByEmailDTO.hashPassword),
                                         includeProperties: query => query.Include(x => x.Role)
                                     );
                 if (user != null)
