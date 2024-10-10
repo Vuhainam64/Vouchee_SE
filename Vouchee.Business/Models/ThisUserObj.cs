@@ -13,7 +13,7 @@ namespace Vouchee.Business.Models
         public string? roleId { get; set; }
         public string? roleName { get; set; }
         public string? fullName { get; set; }
-        public string? buyerId { get; set; }
+        //public string? buyerId { get; set; }
         public string? adminRoleId { get; set; }
         public string? sellerRoleId { get; set; }
         public string? buyerRoleId { get; set; }
