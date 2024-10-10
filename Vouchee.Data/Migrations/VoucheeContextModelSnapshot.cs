@@ -576,16 +576,16 @@ namespace Vouchee.Data.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FirstName")
+                    b.Property<string>("Gender")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Gender")
+                    b.Property<string>("HashPassword")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LastName")
+                    b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("PercentShow")
@@ -624,7 +624,7 @@ namespace Vouchee.Data.Migrations
                         {
                             Id = new Guid("deee9638-da34-4230-be77-34137aa5fcff"),
                             Email = "advouchee@gmail.com",
-                            FirstName = "ADMIN 1",
+                            Name = "ADMIN 1",
                             ResponsibilityScore = 0,
                             RoleId = new Guid("ff54acc6-c4e9-4b73-a158-fd640b4b6940")
                         },
@@ -632,7 +632,7 @@ namespace Vouchee.Data.Migrations
                         {
                             Id = new Guid("fb4fc5a5-4564-4100-8fd2-8d406afa11e7"),
                             Email = "advouchee2@gmail.com",
-                            FirstName = "ADMIN 2",
+                            Name = "ADMIN 2",
                             ResponsibilityScore = 0,
                             RoleId = new Guid("ff54acc6-c4e9-4b73-a158-fd640b4b6940")
                         },
@@ -640,7 +640,7 @@ namespace Vouchee.Data.Migrations
                         {
                             Id = new Guid("fe3f8e20-d720-460a-bdaf-486bfa813eb1"),
                             Email = "stvouchee1@gmail.com",
-                            FirstName = "STAFF 1",
+                            Name = "STAFF 1",
                             ResponsibilityScore = 0,
                             RoleId = new Guid("015ae3c5-eee9-4f5c-befb-57d41a43d9df")
                         },
@@ -648,7 +648,7 @@ namespace Vouchee.Data.Migrations
                         {
                             Id = new Guid("db2d2745-93a8-4cb0-9d04-4de79d58fe43"),
                             Email = "stvouchee2@gmail.com",
-                            FirstName = "STAFF 2",
+                            Name = "STAFF 2",
                             ResponsibilityScore = 0,
                             RoleId = new Guid("015ae3c5-eee9-4f5c-befb-57d41a43d9df")
                         },
@@ -656,7 +656,7 @@ namespace Vouchee.Data.Migrations
                         {
                             Id = new Guid("b4583f49-baba-4916-8e2b-2d44c3412733"),
                             Email = "voucheeseller@gmail.com",
-                            FirstName = "SELLER 1",
+                            Name = "SELLER 1",
                             PercentShow = 80m,
                             ResponsibilityScore = 100,
                             RoleId = new Guid("2d80393a-3a3d-495d-8dd7-f9261f85cc8f")
@@ -665,7 +665,7 @@ namespace Vouchee.Data.Migrations
                         {
                             Id = new Guid("f7618901-65a4-45c1-b23d-4f225ee0c588"),
                             Email = "sellervouchee2@gmail.com",
-                            FirstName = "SELLER 2",
+                            Name = "SELLER 2",
                             PercentShow = 90m,
                             ResponsibilityScore = 70,
                             RoleId = new Guid("2d80393a-3a3d-495d-8dd7-f9261f85cc8f")
@@ -674,7 +674,7 @@ namespace Vouchee.Data.Migrations
                         {
                             Id = new Guid("e55ee134-b4ec-43f2-a565-8bcec52dff23"),
                             Email = "buyervouchee1@gmail.com",
-                            FirstName = "BUYER 2",
+                            Name = "BUYER 2",
                             ResponsibilityScore = 0,
                             RoleId = new Guid("ad5f37da-ca48-4dc5-9f4b-963d94b535e6")
                         },
@@ -682,7 +682,7 @@ namespace Vouchee.Data.Migrations
                         {
                             Id = new Guid("9e1a13f2-738b-4ae4-994d-26d5272c13fa"),
                             Email = "buyervouchee2@gmail.com",
-                            FirstName = "BUYER 2",
+                            Name = "BUYER 2",
                             ResponsibilityScore = 0,
                             RoleId = new Guid("ad5f37da-ca48-4dc5-9f4b-963d94b535e6")
                         });
@@ -763,12 +763,12 @@ namespace Vouchee.Data.Migrations
                         {
                             Id = new Guid("494b5347-378e-4e2d-9553-6032a42cd8d1"),
                             CreateBy = new Guid("b4583f49-baba-4916-8e2b-2d44c3412733"),
-                            EndDate = new DateTime(2024, 10, 11, 20, 17, 50, 240, DateTimeKind.Local).AddTicks(5550),
+                            EndDate = new DateTime(2024, 10, 14, 22, 7, 10, 100, DateTimeKind.Local).AddTicks(4328),
                             Name = "Voucher sale",
                             PercentShow = 10m,
                             Price = 100000m,
                             Quantity = 100,
-                            StarDate = new DateTime(2024, 10, 7, 20, 17, 50, 240, DateTimeKind.Local).AddTicks(5533),
+                            StarDate = new DateTime(2024, 10, 10, 22, 7, 10, 100, DateTimeKind.Local).AddTicks(4319),
                             Status = "ACTIVE",
                             SupplierId = new Guid("a053e9fc-7962-4eaa-8377-91c56c85cda6"),
                             VoucherTypeId = new Guid("3e676315-1a28-4a0b-beb5-eaa5336a108d")
@@ -777,12 +777,12 @@ namespace Vouchee.Data.Migrations
                         {
                             Id = new Guid("0c20c3c9-2200-4b09-81f5-a0ceb74eba8c"),
                             CreateBy = new Guid("b4583f49-baba-4916-8e2b-2d44c3412733"),
-                            EndDate = new DateTime(2024, 10, 11, 20, 17, 50, 240, DateTimeKind.Local).AddTicks(5575),
+                            EndDate = new DateTime(2024, 10, 14, 22, 7, 10, 100, DateTimeKind.Local).AddTicks(4392),
                             Name = "Voucher sale",
                             PercentShow = 10m,
                             Price = 100000m,
                             Quantity = 100,
-                            StarDate = new DateTime(2024, 10, 7, 20, 17, 50, 240, DateTimeKind.Local).AddTicks(5574),
+                            StarDate = new DateTime(2024, 10, 10, 22, 7, 10, 100, DateTimeKind.Local).AddTicks(4391),
                             Status = "ACTIVE",
                             SupplierId = new Guid("a053e9fc-7962-4eaa-8377-91c56c85cda6"),
                             VoucherTypeId = new Guid("3e676315-1a28-4a0b-beb5-eaa5336a108d")

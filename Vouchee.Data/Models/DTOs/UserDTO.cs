@@ -58,7 +58,7 @@ namespace Vouchee.Business.Models.DTOs
     {
         public string? phoneNumber { get; set; }
         public string? email { get; set; }
-        public string? password { get; set; }
+        public string? hashPassword { get; set; }
         public string? name { get; set; }
     }
 
