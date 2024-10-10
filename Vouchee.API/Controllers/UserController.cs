@@ -52,7 +52,7 @@ namespace Vouchee.API.Controllers
         }
 
         // READ: Get user by ID
-        [HttpGet("get_user_by_id/{id}")]
+        [HttpGet("get_user{id}")]
         public async Task<IActionResult> GetUserById(Guid id)
         {
             var user = await _userService.GetUserByIdAsync(id);

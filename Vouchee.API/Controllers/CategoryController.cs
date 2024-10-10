@@ -61,7 +61,7 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("get_category_by_id")]
+        [HttpGet("get_category/{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetCategoryById(Guid id)
         {

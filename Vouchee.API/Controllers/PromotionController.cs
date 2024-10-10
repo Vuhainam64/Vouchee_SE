@@ -66,7 +66,7 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("get_promotion_by_id")]
+        [HttpGet("get_promotion/{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetPromotionById(Guid id)
         {
@@ -75,7 +75,7 @@ namespace Vouchee.API.Controllers
         }
 
         // UPDATE
-        [HttpPut("update_promotion")]
+        [HttpPut("update_promotion/{id}")]
         [Authorize]
         public async Task<IActionResult> UpdatePromotion(Guid id, [FromBody] UpdatePromotionDTO updatePromotionDTO)
         {
@@ -95,7 +95,7 @@ namespace Vouchee.API.Controllers
         }
 
         // DELETE
-        [HttpDelete("delete_promotion")]
+        [HttpDelete("delete_promotion/{id}")]
         [Authorize]
         public async Task<IActionResult> DeletePromotion(Guid id)
         {

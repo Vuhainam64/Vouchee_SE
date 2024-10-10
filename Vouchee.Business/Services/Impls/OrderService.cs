@@ -4,6 +4,7 @@ using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
+using Vouchee.Business.Models.ViewModels;
 using Vouchee.Data.Helpers;
 using Vouchee.Data.Models.Constants.Dictionary;
 using Vouchee.Data.Models.Constants.Enum.Sort;
@@ -36,7 +37,7 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<bool> AssignCodeToOrderAsync(Guid orderDetailId, IList<Guid> voucherCodeIds)
+        public async Task<bool> AssignCodeToOrderAsync(Guid orderDetailId, VoucherCodeList voucherCodeList)
         {
             try
             {
@@ -46,7 +47,7 @@ namespace Vouchee.Business.Services.Impls
                     throw new NotFoundException("Không tìm thấy order detail");
                 }
 
-                foreach (var voucherCodeId in voucherCodeIds)
+                foreach (var voucherCodeId in voucherCodeList.voucherCodeIds)
                 {
                     var existedVoucherCode = await _voucherCodeRepository.FindAsync(voucherCodeId);
                     if (existedVoucherCode == null)

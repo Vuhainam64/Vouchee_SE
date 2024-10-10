@@ -40,7 +40,7 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("get_supplier_by_id/{id}")]
+        [HttpGet("get_supplier/{id}")]
         public async Task<IActionResult> GetSupplierById(Guid id)
         {
             var supplier = await _supplierService.GetSupplierByIdAsync(id);

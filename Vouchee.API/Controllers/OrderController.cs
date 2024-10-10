@@ -5,6 +5,7 @@ using System.Net;
 using Vouchee.API.Helpers;
 using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
+using Vouchee.Business.Models.ViewModels;
 using Vouchee.Business.Services;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Filters;
@@ -63,7 +64,7 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("get_order_by_id")]
+        [HttpGet("get_order/{id}")]
         [Authorize]
         public async Task<IActionResult> GetOrderById(Guid id)
         {
@@ -72,7 +73,7 @@ namespace Vouchee.API.Controllers
         }
 
         // UPDATE
-        [HttpPut("update_order")]
+        [HttpPut("update_order/{id}")]
         [Authorize]
         public async Task<IActionResult> UpdateOrder(Guid id, [FromBody] UpdateOrderDTO updateOrderDTO)
         {
@@ -95,13 +96,13 @@ namespace Vouchee.API.Controllers
         // Assign Voucher Code
         [HttpPut("voucher/assign_voucher_code_to_order")]
         [Authorize]
-        public async Task<IActionResult> AssignCode(Guid orderDetailId, IList<Guid> voucherCodeId)
+        public async Task<IActionResult> AssignCode(Guid orderDetailId, [FromBody] VoucherCodeList voucherCodeList)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
             if (RoleHelper.IsSeller(currentUser))
             {
-                var result = await _orderService.AssignCodeToOrderAsync(orderDetailId, voucherCodeId);
+                var result = await _orderService.AssignCodeToOrderAsync(orderDetailId, voucherCodeList);
                 return Ok(result);
             }
 
@@ -113,7 +114,7 @@ namespace Vouchee.API.Controllers
         }
 
         // DELETE
-        [HttpDelete("delete_order")]
+        [HttpDelete("delete_order/{id}")]
         [Authorize]
         public async Task<IActionResult> DeleteOrder(Guid id)
         {
