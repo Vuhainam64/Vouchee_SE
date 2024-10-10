@@ -138,7 +138,7 @@ namespace Vouchee.Business.Services.Impls
             return response;
         }
 
-        public async Task<AuthResponse> RegisterWithPhoneNumber(RegisterDTO registerDTO)
+        public async Task<AuthResponse> Register(RegisterDTO registerDTO)
         {
             AuthResponse response = new();
             User newUser = _mapper.Map<User>(registerDTO);

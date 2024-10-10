@@ -13,7 +13,7 @@ namespace Vouchee.Business.Services
 
         public Task<AuthResponse> LoginWithPhoneNumber(LoginByPhoneNumberDTO loginByPhoneNumberDTO);
 
-        public Task<AuthResponse> RegisterWithPhoneNumber(RegisterDTO registerDTO);
+        public Task<AuthResponse> Register(RegisterDTO registerDTO);
 
         public Task<AuthResponse> LoginWithEmail(LoginByEmailDTO loginByEmailDTO);
     }

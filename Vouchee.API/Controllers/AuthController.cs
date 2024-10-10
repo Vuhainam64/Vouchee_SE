@@ -42,11 +42,11 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        [HttpPost("register_with_phone_number")]
+        [HttpPost("register")]
         [AllowAnonymous]
         public async Task<IActionResult> RegisterUser(RegisterDTO registerDTO)
         {
-            var result = await _authService.RegisterWithPhoneNumber(registerDTO);
+            var result = await _authService.Register(registerDTO);
             return Ok(result);
         }
     }
