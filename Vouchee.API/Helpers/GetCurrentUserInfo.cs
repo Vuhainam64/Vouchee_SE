@@ -21,7 +21,7 @@ namespace Vouchee.API.Helpers
             {
                 currentUser.userId = "";
                 currentUser.email = "";
-                currentUser.buyerId = "";
+                //currentUser.buyerId = "";
                 currentUser.roleName = "";
                 currentUser.fullName = "";
             }
@@ -29,7 +29,7 @@ namespace Vouchee.API.Helpers
             {
                 currentUser.userId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
                 currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
-                currentUser.buyerId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GroupSid).Value;
+                //currentUser.buyerId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GroupSid).Value;
                 currentUser.roleName = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
                 currentUser.fullName = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Actor).Value;
             }
