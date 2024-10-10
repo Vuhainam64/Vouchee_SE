@@ -62,7 +62,7 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("get_brand_by_id/{id}")]
+        [HttpGet("get_brand/{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetBrandById(Guid id)
         {
