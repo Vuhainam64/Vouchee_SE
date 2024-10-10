@@ -89,33 +89,20 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<DynamicResponseModel<GetShopDTO>> GetShopsAsync(PagingRequest pagingRequest,
-                                                                            ShopFilter shopFilter,
-                                                                            SortShopEnum sortShopEnum)
+        public async Task<IList<GetShopDTO>> GetShopsAsync()
         {
-            (int, IQueryable<GetShopDTO>) result;
+            IQueryable<GetShopDTO> result;
             try
             {
                 result = _shopRepository.GetTable()
-                            .ProjectTo<GetShopDTO>(_mapper.ConfigurationProvider)
-                            .DynamicFilter(_mapper.Map<GetShopDTO>(shopFilter))
-                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+                            .ProjectTo<GetShopDTO>(_mapper.ConfigurationProvider);
             }
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
                 throw new LoadException("Lỗi không xác định khi tải shop");
             }
-            return new DynamicResponseModel<GetShopDTO>()
-            {
-                metaData = new MetaData()
-                {
-                    page = pagingRequest.page,
-                    size = pagingRequest.pageSize,
-                    total = result.Item1
-                },
-                results = result.Item2.ToList()
-            };
+            return result.ToList();
         }
 
         public async Task<bool> UpdateShopAsync(Guid id, UpdateShopDTO updateShopDTO)

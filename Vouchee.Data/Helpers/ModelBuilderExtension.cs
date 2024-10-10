@@ -50,35 +50,35 @@ namespace Vouchee.Data.Helpers
                     Id = Guid.Parse("deee9638-da34-4230-be77-34137aa5fcff"),
                     Email = "advouchee@gmail.com",
                     RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.ADMIN.ToString())),
-                    FirstName = "ADMIN 1",
+                    Name = "ADMIN 1",
                 },
                 new User()
                 {
                     Id = Guid.Parse("fb4fc5a5-4564-4100-8fd2-8d406afa11e7"),
                     Email = "advouchee2@gmail.com",
                     RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.ADMIN.ToString())),
-                    FirstName = "ADMIN 2",
+                    Name = "ADMIN 2",
                 },
                 new User()
                 {
                     Id = Guid.Parse("fe3f8e20-d720-460a-bdaf-486bfa813eb1"),
                     Email = "stvouchee1@gmail.com",
                     RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.STAFF.ToString())),
-                    FirstName = "STAFF 1"
+                    Name = "STAFF 1"
                 },
                 new User()
                 {
                     Id = Guid.Parse("db2d2745-93a8-4cb0-9d04-4de79d58fe43"),
                     Email = "stvouchee2@gmail.com",
                     RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.STAFF.ToString())),
-                    FirstName = "STAFF 2"
+                    Name = "STAFF 2"
                 },
                 new User()
                 {
                     Id = Guid.Parse("b4583f49-baba-4916-8e2b-2d44c3412733"),
                     Email = "voucheeseller@gmail.com",
                     RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.SELLER.ToString())),
-                    FirstName = "SELLER 1",
+                    Name = "SELLER 1",
                     PercentShow = 80,
                     ResponsibilityScore = 100
                 },
@@ -87,7 +87,7 @@ namespace Vouchee.Data.Helpers
                     Id = Guid.Parse("f7618901-65a4-45c1-b23d-4f225ee0c588"),
                     Email = "sellervouchee2@gmail.com",
                     RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.SELLER.ToString())),
-                    FirstName = "SELLER 2",
+                    Name = "SELLER 2",
                     PercentShow = 90,
                     ResponsibilityScore = 70
                 },
@@ -96,14 +96,14 @@ namespace Vouchee.Data.Helpers
                     Id = Guid.Parse("e55ee134-b4ec-43f2-a565-8bcec52dff23"),
                     Email = "buyervouchee1@gmail.com",
                     RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.BUYER.ToString())),
-                    FirstName = "BUYER 2",
+                    Name = "BUYER 2",
                 },
                 new User()
                 {
                     Id = Guid.Parse("9e1a13f2-738b-4ae4-994d-26d5272c13fa"),
                     Email = "buyervouchee2@gmail.com",
                     RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.BUYER.ToString())),
-                    FirstName = "BUYER 2",
+                    Name = "BUYER 2",
                 }
             );
 

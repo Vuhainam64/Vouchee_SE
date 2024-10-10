@@ -13,9 +13,7 @@ namespace Vouchee.Business.Services
 
         // READ
         public Task<GetOrderDTO> GetOrderByIdAsync(Guid id);
-        public Task<DynamicResponseModel<GetOrderDTO>> GetOrdersAsync(PagingRequest pagingRequest,
-                                                                            OrderFilter orderFilter,
-                                                                            SortOrderEnum sortOrderEnum);
+        public Task<IList<GetOrderDTO>> GetOrdersAsync();
 
         // UPDATE
         public Task<bool> UpdateOrderAsync(Guid id, UpdateOrderDTO updateOrderDTO, ThisUserObj thisUserObj);

@@ -13,9 +13,6 @@ namespace Vouchee.Business.Services
 
         // READ
         public Task<GetRoleDTO> GetRoleByIdAsync(Guid id);
-        public Task<DynamicResponseModel<GetRoleDTO>> GetRolesAsync(PagingRequest pagingRequest,
-                                                                            RoleFilter roleFilter,
-                                                                            SortRoleEnum sortRoleEnum);
         public Task<List<GetRoleDTO>> GetRolesAsync();
 
         // UPDATE

@@ -99,31 +99,20 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<DynamicResponseModel<GetCategoryDTO>> GetCategoriesAsync(PagingRequest pagingRequest, CategoryFilter categoryFilter, SortEnum sortEnum)
+        public async Task<IList<GetCategoryDTO>> GetCategoriesAsync()
         {
-            (int, IQueryable<GetCategoryDTO>) result;
+            IQueryable<GetCategoryDTO> result;
             try
             {
                 result = _categoryRepository.GetTable()
-                            .ProjectTo<GetCategoryDTO>(_mapper.ConfigurationProvider)
-                            .DynamicFilter(_mapper.Map<GetCategoryDTO>(categoryFilter))
-                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+                            .ProjectTo<GetCategoryDTO>(_mapper.ConfigurationProvider);
             }
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
                 throw new LoadException("Lỗi không xác định khi tải category");
             }
-            return new DynamicResponseModel<GetCategoryDTO>()
-            {
-                metaData = new MetaData()
-                {
-                    page = pagingRequest.page,
-                    size = pagingRequest.pageSize,
-                    total = result.Item1
-                },
-                results = result.Item2.ToList()
-            };
+            return result.ToList();
         }
 
         public Task<GetCategoryDTO> GetCategoryByIdAsync(Guid id)

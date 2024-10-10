@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Services;
 
 namespace Vouchee.API.Controllers
@@ -17,39 +18,36 @@ namespace Vouchee.API.Controllers
             _authService = authService;
         }
 
-        [HttpPost("login")]
+        [HttpGet("login_with_google_token")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromQuery] string token)
+        public async Task<IActionResult> LoginWithGoogle([FromQuery] string token)
         {
             var result = await _authService.GetToken(token);
             return Ok(result);
         }
 
-        //[HttpPost]
-        //[Route("seller")]
-        //[AllowAnonymous]
-        //public async Task<IActionResult> GetTokenSeller([FromQuery] string token)
-        //{
-        //    var result = await _authService.GetTokenSeller(token);
-        //    return Ok(result);
-        //}
+        [HttpGet("login_with_phone_number")]
+        [AllowAnonymous]
+        public async Task<IActionResult> LoginWithPhoneNumber(LoginByPhoneNumberDTO loginByPhoneNumberDTO)
+        {
+            var result = await _authService.LoginWithPhoneNumber(loginByPhoneNumberDTO);
+            return Ok(result);
+        }
 
-        //[HttpPost]
-        //[Route("buyer")]
-        //[AllowAnonymous]
-        //public async Task<IActionResult> GetTokenBuyer([FromQuery] string token, string? deviceToken)
-        //{
-        //    var result = await _authService.GetTokenBuyer(token, deviceToken);
-        //    return Ok(result);
-        //}
+        [HttpGet("login_with_email")]
+        [AllowAnonymous]
+        public async Task<IActionResult> LoginWithEmailr(LoginByEmailDTO loginByEmailDTO)
+        {
+            var result = await _authService.LoginWithEmail(loginByEmailDTO);
+            return Ok(result);
+        }
 
-        //[HttpPost]
-        //[Route("admin")]
-        //[AllowAnonymous]
-        //public async Task<IActionResult> GetTokenAdmin([FromQuery] string token)
-        //{
-        //    var result = await _authService.GetTokenAdmin(token);
-        //    return Ok(result);
-        //}
+        [HttpPost("register_with_phone_number")]
+        [AllowAnonymous]
+        public async Task<IActionResult> RegisterUser(RegisterDTO registerDTO)
+        {
+            var result = await _authService.RegisterWithPhoneNumber(registerDTO);
+            return Ok(result);
+        }
     }
 }

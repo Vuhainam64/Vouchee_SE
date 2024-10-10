@@ -159,33 +159,20 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<DynamicResponseModel<GetOrderDTO>> GetOrdersAsync(PagingRequest pagingRequest,
-                                                                                    OrderFilter voucherFiler,
-                                                                                    SortOrderEnum sortOrderEnum)
+        public async Task<IList<GetOrderDTO>> GetOrdersAsync()
         {
-            (int, IQueryable<GetOrderDTO>) result;
+            IQueryable<GetOrderDTO> result;
             try
             {
                 result = _orderRepository.GetTable()
-                            .ProjectTo<GetOrderDTO>(_mapper.ConfigurationProvider)
-                            .DynamicFilter(_mapper.Map<GetOrderDTO>(voucherFiler))
-                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+                            .ProjectTo<GetOrderDTO>(_mapper.ConfigurationProvider);
             }
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
                 throw new LoadException("Lỗi không xác định khi tải voucher");
             }
-            return new DynamicResponseModel<GetOrderDTO>()
-            {
-                metaData = new MetaData()
-                {
-                    page = pagingRequest.page,
-                    size = pagingRequest.pageSize,
-                    total = result.Item1
-                },
-                results = result.Item2.ToList()
-            };
+            return result.ToList();
         }
 
         public async Task<bool> UpdateOrderAsync(Guid id, UpdateOrderDTO updateOrderDTO, ThisUserObj thisUserObj)

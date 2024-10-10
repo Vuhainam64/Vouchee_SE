@@ -13,6 +13,7 @@ using Vouchee.Business.Services.Extensions.RedisCache;
 using Vouchee.Data.Models.Constants.Dictionary;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Status;
+using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Repositories.IRepos;
 using UnauthorizedAccessException = Vouchee.Business.Exceptions.UnauthorizedAccessException;
@@ -65,7 +66,7 @@ namespace Vouchee.Business.Services.Impls
                     Email = email,
                     Image = imageUrl,
                     RoleId = roleId,
-                    LastName = lastName,
+                    Name = lastName,
                     Status = ObjectStatusEnum.ACTIVE.ToString(),
                     CreateDate = DateTime.Now
                 };
@@ -81,7 +82,7 @@ namespace Vouchee.Business.Services.Impls
                 response.id = newBuyerId.ToString();
                 response.uid = uid;
                 response.image = imageUrl;
-                response.fullName = userRecord.DisplayName;
+                response.name = userRecord.DisplayName;
                 response = await GenerateTokenAsync(response, RoleEnum.BUYER.ToString());
             }
             else
@@ -92,11 +93,65 @@ namespace Vouchee.Business.Services.Impls
                 response.image = useDTO.image ?? imageUrl;
                 response.roleId = useDTO.roleId.ToString();
                 response.roleName = useDTO.roleName;
-                response.fullName = useDTO.firstName + " " + useDTO.lastName;
+                response.name = useDTO.name;
                 response = await GenerateTokenAsync(response, useDTO.roleName);
             }
 
-            // trường hợp người dùng đã tạo tài khoản
+            return response;
+        }
+
+        public async Task<AuthResponse> LoginWithEmail(LoginByEmailDTO loginByEmailDTO)
+        {
+            AuthResponse response = new();
+
+            User? user = await _userRepository.LoginWithEmail(loginByEmailDTO);
+
+            if (user != null)
+            {
+                response.id = user.Id.ToString();
+                response.email = user.Email.ToString();
+                response.name = user.Name.ToString();
+                response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.BUYER.ToString());
+                response.roleName = RoleEnum.BUYER.ToString();
+                response = await GenerateTokenAsync(response, RoleEnum.BUYER.ToString());
+            }
+
+            return response;
+        }
+
+        public async Task<AuthResponse> LoginWithPhoneNumber(LoginByPhoneNumberDTO loginByPhoneNumberDTO)
+        {
+            AuthResponse response = new();
+
+            User? user = await _userRepository.LoginWithPhone(loginByPhoneNumberDTO);
+
+            if (user != null)
+            {
+                response.id = user.Id.ToString();
+                response.email = user.Email.ToString();
+                response.name = user.Name.ToString();
+                response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.BUYER.ToString());
+                response.roleName = RoleEnum.BUYER.ToString();
+                response = await GenerateTokenAsync(response, RoleEnum.BUYER.ToString());
+            }
+
+            return response;
+        }
+
+        public async Task<AuthResponse> RegisterWithPhoneNumber(RegisterDTO registerDTO)
+        {
+            AuthResponse response = new();
+            User newUser = _mapper.Map<User>(registerDTO);
+            Guid? id = await _userRepository.AddAsync(newUser);
+            if (id != null)
+            {
+                response.id = newUser.Id.ToString();
+                response.email = newUser.Email;
+                response.name = newUser.Name;
+                response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.BUYER.ToString());
+                response.roleName = RoleEnum.BUYER.ToString();
+                response = await GenerateTokenAsync(response, RoleEnum.BUYER.ToString());
+            }
 
             return response;
         }
@@ -307,7 +362,7 @@ namespace Vouchee.Business.Services.Impls
                 {
                     new Claim(ClaimTypes.SerialNumber, response.id.ToString()),
                     new Claim(ClaimTypes.Email, response.email),
-                    new Claim(ClaimTypes.Actor, response.fullName),
+                    new Claim(ClaimTypes.Actor, response.name),
                     roleClaim
                 }),
 

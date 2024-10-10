@@ -18,9 +18,7 @@ namespace Vouchee.Business.Services
 
         // READ
         public Task<GetCategoryDTO> GetCategoryByIdAsync(Guid id);
-        public Task<DynamicResponseModel<GetCategoryDTO>> GetCategoriesAsync(PagingRequest pagingRequest,
-                                                                                CategoryFilter categoryFilter,
-                                                                                SortEnum sortEnum);
+        public Task<IList<GetCategoryDTO>> GetCategoriesAsync();
 
         // UPDATE
         public Task<bool> UpdateCategoryAsync(Guid id, UpdateCategoryDTO updateCategoryDTO);

@@ -12,9 +12,10 @@ namespace Vouchee.Business.Models
         public string? roleId { get; set; }
         public string? roleName { get; set; }
         public string? uid { get; set; }
-        public string? fullName { get; set; }
+        public string? name { get; set; }
         public string? email { get; set; }
         public string? image { get; set; }
+        public string? phoneNumber { get; set; }
         //public string? buyerId { get; set; }
         public string? token { get; set; }
     }

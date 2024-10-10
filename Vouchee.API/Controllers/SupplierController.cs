@@ -32,11 +32,9 @@ namespace Vouchee.API.Controllers
 
         // READ
         [HttpGet("get_all_supplier")]
-        public async Task<IActionResult> GetSuppliers([FromQuery] PagingRequest pagingRequest,
-                                                      [FromQuery] SupplierFilter supplierFilter,
-                                                      [FromQuery] SortSupplierEnum sortSupplierEnum)
+        public async Task<IActionResult> GetSuppliers()
         {
-            var result = await _supplierService.GetSuppliersAsync(pagingRequest, supplierFilter, sortSupplierEnum);
+            var result = await _supplierService.GetSuppliersAsync();
             return Ok(result);
         }
 

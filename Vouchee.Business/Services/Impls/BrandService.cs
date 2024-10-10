@@ -81,31 +81,20 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<DynamicResponseModel<GetBrandDTO>> GetBrandsAsync(PagingRequest pagingRequest, BrandFilter brandFilter, SortEnum sortEnum)
+        public async Task<IList<GetBrandDTO>> GetBrandsAsync()
         {
-            (int, IQueryable<GetBrandDTO>) result;
+            IQueryable<GetBrandDTO> result;
             try
             {
                 result = _brandRepository.GetTable()
-                            .ProjectTo<GetBrandDTO>(_mapper.ConfigurationProvider)
-                            .DynamicFilter(_mapper.Map<GetBrandDTO>(brandFilter))
-                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+                            .ProjectTo<GetBrandDTO>(_mapper.ConfigurationProvider);
             }
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
                 throw new LoadException("Lỗi không xác định khi tải brand");
             }
-            return new DynamicResponseModel<GetBrandDTO>()
-            {
-                metaData = new MetaData()
-                {
-                    page = pagingRequest.page,
-                    size = pagingRequest.pageSize,
-                    total = result.Item1
-                },
-                results = result.Item2.ToList()
-            };
+            return result.ToList();
         }
 
         public Task<bool> UpdateBrandAsync(Guid id, UpdateBrandDTO updateBrandDTO)

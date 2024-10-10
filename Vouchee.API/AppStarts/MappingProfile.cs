@@ -61,6 +61,7 @@ namespace Vouchee.API.AppStarts
                 .ForMember(x => x.roleName, dest => dest.MapFrom(opt => opt.Role.Name))
                 .ReverseMap();
             CreateMap<GetUserDTO, UserFilter>().ReverseMap();
+            CreateMap<User, RegisterDTO>().ReverseMap();
 
             // VOUCHER CODE
             CreateMap<VoucherCode, VoucherCodeDTO>().ReverseMap();
