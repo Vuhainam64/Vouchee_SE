@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
@@ -86,7 +87,9 @@ namespace Vouchee.Business.Services.Impls
         {
             try
             {
-                var voucherType = await _voucherTypeRepository.GetByIdAsync(id);
+                var voucherType = await _voucherTypeRepository.GetByIdAsync(id,
+                                    query => query.Include(e => e.Vouchers)
+                                                    .Include(e => e.Categories));
                 if (voucherType != null)
                 {
                     GetVoucherTypeDTO voucherTypeDTO = _mapper.Map<GetVoucherTypeDTO>(voucherType);

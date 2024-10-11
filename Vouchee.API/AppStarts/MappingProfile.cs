@@ -71,7 +71,6 @@ namespace Vouchee.API.AppStarts
             CreateMap<GetVoucherCodeDTO, VoucherCodeFilter>().ReverseMap();
 
             // VOUCHER TYPE
-            CreateMap<VoucherType, VoucherTypeDTO>().ReverseMap();
             CreateMap<VoucherType, CreateVoucherTypeDTO>().ReverseMap();
             CreateMap<VoucherType, UpdateVoucherTypeDTO>().ReverseMap();
             CreateMap<VoucherType, GetVoucherTypeDTO>().ReverseMap();
@@ -87,7 +86,6 @@ namespace Vouchee.API.AppStarts
             CreateMap<GetPromotionDTO, PromotionFilter>().ReverseMap();
 
             // CATEGORY
-            CreateMap<Category, CategoryDTO>().ReverseMap();
             CreateMap<Category, CreateCategoryDTO>().ReverseMap();
             CreateMap<Category, UpdateCategoryDTO>().ReverseMap();
             CreateMap<Category, GetCategoryDTO>().ReverseMap();
@@ -99,12 +97,6 @@ namespace Vouchee.API.AppStarts
             CreateMap<Brand, UpdateBrandDTO>().ReverseMap();
             CreateMap<Brand, GetBrandDTO>().ReverseMap();
             CreateMap<GetBrandDTO, BrandFilter>().ReverseMap();
-
-            // ADDRESS
-            CreateMap<Address, AddressDTO>().ReverseMap();
-            CreateMap<Address, CreateAddressDTO>().ReverseMap();
-            CreateMap<Address, UpdateAddressDTO>().ReverseMap();
-            CreateMap<Address, GetAddressDTO>().ReverseMap();
         }
     }
 }

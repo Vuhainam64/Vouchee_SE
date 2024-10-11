@@ -19,14 +19,15 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty(nameof(Voucher.Shops))]
         public virtual ICollection<Voucher> Vouchers { get; set; }
 
-        [InverseProperty(nameof(Address.Shop))]
-        public virtual ICollection<Address>? Addresses { get; set; }
-
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
 
-        public string? Title { get; set; }
+        public string? AddressName { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? Lon { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? Lat { get; set; }
         [Column(TypeName = "decimal")]
         public decimal? PercentShow { get; set; }
         public string? Image { get; set; }
