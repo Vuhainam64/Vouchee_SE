@@ -11,6 +11,7 @@ using System.Text;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
+using Vouchee.Business.Models.ViewModels;
 using Vouchee.Business.Services.Extensions.RedisCache;
 using Vouchee.Data.Models.Constants.Dictionary;
 using Vouchee.Data.Models.Constants.Enum.Other;
@@ -104,15 +105,23 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<AuthResponse> LoginWithEmail(LoginByEmailDTO loginByEmailDTO)
         {
+            // Initialize response
             AuthResponse response = new();
 
+            // Get the user based on the email login DTO
             User? user = await _userRepository.LoginWithEmail(loginByEmailDTO);
 
+            // Check if the user exists
             if (user != null)
             {
+                // Populate user details into response
                 response.id = user.Id.ToString();
-                response.email = user.Email.ToString();
-                response.name = user.Name.ToString();
+                response.email = user.Email;
+                response.name = user.Name;
+                response.image = user.Image;
+                response.phoneNumber = user.PhoneNumber;
+
+                // Handle role assignment using RoleId
                 if (user.RoleId.Equals(Guid.Parse("FF54ACC6-C4E9-4B73-A158-FD640B4B6940")))
                 {
                     response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.ADMIN.ToString());
@@ -128,13 +137,23 @@ namespace Vouchee.Business.Services.Impls
                     response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.BUYER.ToString());
                     response.roleName = RoleEnum.BUYER.ToString();
                 }
-                response.image = user.Image;
-                response.phoneNumber = user.PhoneNumber;
-                response = await GenerateTokenAsync(response, RoleEnum.BUYER.ToString());
+
+                // Generate tokens and update response with token details and expiration times
+                response = await GenerateTokenAsync(response, response.roleName);
+
+                // Adding token expiration times
+                response.accessTokenExpiresAt = DateTime.UtcNow.AddMinutes(30);  // e.g., Access token valid for 30 minutes
+                response.refreshTokenExpiresAt = DateTime.UtcNow.AddDays(7);     // e.g., Refresh token valid for 7 days
+
+                if (_userRepository.StoreRefreshToken(user, response.refreshToken, response.refreshTokenExpiresAt).Result == false)
+                {
+                    throw new Exception("Lỗi khi lưu trữ refresh token");
+                }
             }
 
             return response;
         }
+
 
         public async Task<AuthResponse> LoginWithPhoneNumber(LoginByPhoneNumberDTO loginByPhoneNumberDTO)
         {
@@ -341,9 +360,11 @@ namespace Vouchee.Business.Services.Impls
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
 
-            int accessTokenExpirationHours = roleCheck.Equals(RoleEnum.ADMIN.ToString()) ? 1 : 1; // Access token valid for 1 hour
+            // Access token expiration: Admins can have different expiration (example)
+            int accessTokenExpirationHours = roleCheck.Equals(RoleEnum.ADMIN.ToString()) ? 2 : 1; // Admin: 2 hours, others: 1 hour
             int refreshTokenExpirationDays = 30; // Refresh token valid for 30 days
 
+            // Define role claim
             Claim roleClaim = new Claim(ClaimTypes.Role, roleCheck);
 
             // Access token claims
@@ -351,31 +372,95 @@ namespace Vouchee.Business.Services.Impls
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.SerialNumber, response.id.ToString()),
-                    new Claim(ClaimTypes.Email, response.email),
-                    new Claim(ClaimTypes.Actor, response.name),
-                    roleClaim
+            new Claim(ClaimTypes.SerialNumber, response.id.ToString()),
+            new Claim(ClaimTypes.Email, response.email),
+            new Claim(ClaimTypes.Actor, response.name),
+            roleClaim
                 }),
-                Expires = DateTime.UtcNow.AddHours(accessTokenExpirationHours),
+                Expires = DateTime.UtcNow.AddHours(accessTokenExpirationHours), // Set access token expiration
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
 
             // Create and write the access token
             var token = tokenHandler.CreateToken(tokenDescriptor);
             response.accessToken = tokenHandler.WriteToken(token);
+
+            // Generate refresh token (using a custom method)
             response.refreshToken = GenerateRefreshToken(response.accessToken);
+
+            // Add expiration times to the response (for both tokens)
+            response.accessTokenExpiresAt = DateTime.UtcNow.AddHours(accessTokenExpirationHours); // Access token expiry
+            response.refreshTokenExpiresAt = DateTime.UtcNow.AddDays(refreshTokenExpirationDays); // Refresh token expiry
 
             return response;
         }
 
+
         private string GenerateRefreshToken(string accessToken)
         {
-            using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_appSettings.Secret)))
+            // Generate a random token
+            var randomNumber = new byte[32]; // 256-bit length
+            using (var rng = RandomNumberGenerator.Create())
             {
-                var tokenBytes = Encoding.UTF8.GetBytes(accessToken);
-                var hashBytes = hmac.ComputeHash(tokenBytes);
-                return Convert.ToBase64String(hashBytes);
+                rng.GetBytes(randomNumber);
             }
+
+            // Convert the byte array to a base64 string
+            string refreshToken = Convert.ToBase64String(randomNumber);
+
+            // Optionally, you can store the refresh token along with the user identifier in the database
+
+            return refreshToken;
+        }
+
+        public async Task<AuthResponse> Refresh(RefreshTokenRequest refreshTokenRequest)
+        {
+            var user = await _userRepository.FindAsync(refreshTokenRequest.userId);
+
+            if (user == null)
+            {
+                throw new NotFoundException("Không tìm thấy user");
+            }
+
+            if (!refreshTokenRequest.refreshToken.Equals(user.RefreshToken))
+            {
+                throw new Exception("Refresh token không trùng với cơ sở dữ liệu");
+            }
+
+            if (user.RefreshTokenExpirationDate < DateTime.UtcNow)
+            {
+                throw new Exception("Refresh token hết hạn.");
+            }
+
+            AuthResponse response = new();
+
+            response.id = user.Id.ToString();
+            response.email = user.Email;
+            response.name = user.Name;
+            // Handle role assignment using RoleId
+            if (user.RoleId.Equals(Guid.Parse("FF54ACC6-C4E9-4B73-A158-FD640B4B6940")))
+            {
+                response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.ADMIN.ToString());
+                response.roleName = RoleEnum.ADMIN.ToString();
+            }
+            else if (user.RoleId.Equals(Guid.Parse("2D80393A-3A3D-495D-8DD7-F9261F85CC8F")))
+            {
+                response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.SELLER.ToString());
+                response.roleName = RoleEnum.SELLER.ToString();
+            }
+            else
+            {
+                response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.BUYER.ToString());
+                response.roleName = RoleEnum.BUYER.ToString();
+            }
+            response = await GenerateTokenAsync(response, RoleEnum.BUYER.ToString());
+
+            if (_userRepository.StoreRefreshToken(user, response.refreshToken, response.refreshTokenExpiresAt).Result == false)
+            {
+                throw new Exception("Có lỗi khi cập nhật refresh token");
+            }
+
+            return response;
         }
     }
 }

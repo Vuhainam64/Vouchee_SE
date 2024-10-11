@@ -21,6 +21,8 @@ namespace Vouchee.Business.Models.DTOs
         public string? image { get; set; }
         public string? bankName { get; set; }
         public string? bankAccount { get; set; }
+        public string? refreshToken { get; set; }
+        public DateTime? refreshTokenExpirationDate { get; set; }
     }
 
     public class CreateUserDTO : UserDTO
