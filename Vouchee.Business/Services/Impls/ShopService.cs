@@ -26,12 +26,13 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<Guid?> CreateShopAsync(CreateShopDTO createShopDTO)
+        public async Task<Guid?> CreateShopAsync(CreateShopDTO createShopDTO, ThisUserObj thisUserObj)
         {
             try
             {
                 Shop shop = _mapper.Map<Shop>(createShopDTO);
 
+                shop.CreateBy = Guid.Parse(thisUserObj.userId);
                 shop.Status = ShopStatusEnum.ACTIVE.ToString();
 
                 var shopId = await _shopRepository.AddAsync(shop);

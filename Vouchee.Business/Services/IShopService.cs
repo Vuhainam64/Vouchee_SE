@@ -8,7 +8,7 @@ namespace Vouchee.Business.Services
     public interface IShopService
     {
         // CREATE
-        public Task<Guid?> CreateShopAsync(CreateShopDTO createShopDTO);
+        public Task<Guid?> CreateShopAsync(CreateShopDTO createShopDTO, ThisUserObj thisUserObj);
 
         // READ
         public Task<GetShopDTO> GetShopByIdAsync(Guid id);
