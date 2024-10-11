@@ -29,6 +29,7 @@ namespace Vouchee.Data.Models.Entities
         [Column(TypeName = "decimal")]
         public decimal? PercentShow { get; set; }
         public bool IsVerfied { get; set; }
+        public string? Image { get; set; }
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]

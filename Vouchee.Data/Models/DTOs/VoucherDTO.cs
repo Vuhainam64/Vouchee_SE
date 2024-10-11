@@ -14,7 +14,7 @@ using Vouchee.Data.Models.Constants.Enum.Status;
 
 namespace Vouchee.Business.Models.DTOs
 {
-    public class VoucherDTO
+    public class CreateVoucherDTO
     {
         public Guid? brandId { get; set; }
         public Guid? supplierId { get; set; }
@@ -28,16 +28,24 @@ namespace Vouchee.Business.Models.DTOs
         public DateTime? endDate { get; set; }
         public string? policy { get; set; }
         public int? quantity { get; set; }
-    }
-
-    public class CreateVoucherDTO : VoucherDTO
-    {
         public IFormFile? image { get; set; }
         public DateTime? createDate = DateTime.Now;
     }
 
-    public class UpdateVoucherDTO : VoucherDTO
+    public class UpdateVoucherDTO
     {
+        public Guid? brandId { get; set; }
+        public Guid? supplierId { get; set; }
+        public Guid? voucherTypeId { get; set; }
+        public Guid? shopId { get; set; }
+
+        public string? name { get; set; }
+        public string? description { get; set; }
+        public decimal? price { get; set; }
+        public DateTime? starDate { get; set; }
+        public DateTime? endDate { get; set; }
+        public string? policy { get; set; }
+        public int? quantity { get; set; }
         public VoucherStatusEnum? status { get; set; }
         public IFormFile? image { get; set; }
 
@@ -45,16 +53,33 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? updateBy { get; set; }
     }
 
-    public class GetVoucherDTO : VoucherDTO
+    public class GetVoucherDTO
     {
         public GetVoucherDTO()
         {
             voucherCodes = new HashSet<GetVoucherCodeDTO>();
-            orderDetails = new HashSet<GetOrderDetailDTO>();
+            // orderDetails = new HashSet<GetOrderDetailDTO>();
             shops = new HashSet<GetShopDTO>();
         }
 
         public Guid? id { get; set; }
+
+        public string? name { get; set; }
+        public string? description { get; set; }
+        public decimal? price { get; set; }
+        public DateTime? starDate { get; set; }
+        public DateTime? endDate { get; set; }
+        public string? policy { get; set; }
+        public int? quantity { get; set; }
+
+        public Guid? brandId { get; set; }
+        public string? brandName { get; set; }
+        public string? brandImage { get; set; }
+        public Guid? supplierId { get; set; }
+        public string? supplierName { get; set; }
+        public string? supplierImage { get; set; }
+        public Guid? voucherTypeId { get; set; }
+        public string? voucherTypeName { get; set; }
 
         public string? status { get; set; }
         public DateTime? createDate { get; set; }
@@ -62,8 +87,8 @@ namespace Vouchee.Business.Models.DTOs
         public DateTime? updateDate { get; set; }
         public Guid? updateBy { get; set; }
 
-        public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
-        public virtual ICollection<GetOrderDetailDTO>? orderDetails { get; set; }
         public virtual ICollection<GetShopDTO>? shops { get; set; }
+        public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
+        // public virtual ICollection<GetOrderDetailDTO>? orderDetails { get; set; 
     }
 }

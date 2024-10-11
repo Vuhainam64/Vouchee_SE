@@ -408,13 +408,13 @@ namespace Vouchee.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("Lat")
-                        .HasColumnType("decimal");
+                        .HasColumnType("decimal(18, 10)");
 
                     b.Property<decimal?>("Lon")
-                        .HasColumnType("decimal");
+                        .HasColumnType("decimal(18, 10)");
 
                     b.Property<decimal?>("PercentShow")
-                        .HasColumnType("decimal");
+                        .HasColumnType("decimal(5, 2)");
 
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
@@ -465,6 +465,9 @@ namespace Vouchee.Data.Migrations
 
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsVerfied")
                         .HasColumnType("bit");
@@ -748,12 +751,12 @@ namespace Vouchee.Data.Migrations
                         {
                             Id = new Guid("494b5347-378e-4e2d-9553-6032a42cd8d1"),
                             CreateBy = new Guid("b4583f49-baba-4916-8e2b-2d44c3412733"),
-                            EndDate = new DateTime(2024, 10, 15, 16, 52, 59, 223, DateTimeKind.Local).AddTicks(3573),
+                            EndDate = new DateTime(2024, 10, 15, 23, 14, 36, 451, DateTimeKind.Local).AddTicks(2429),
                             Name = "Voucher sale",
                             PercentShow = 10m,
                             Price = 100000m,
                             Quantity = 100,
-                            StarDate = new DateTime(2024, 10, 11, 16, 52, 59, 223, DateTimeKind.Local).AddTicks(3563),
+                            StarDate = new DateTime(2024, 10, 11, 23, 14, 36, 451, DateTimeKind.Local).AddTicks(2420),
                             Status = "ACTIVE",
                             SupplierId = new Guid("a053e9fc-7962-4eaa-8377-91c56c85cda6"),
                             VoucherTypeId = new Guid("3e676315-1a28-4a0b-beb5-eaa5336a108d")
@@ -762,12 +765,12 @@ namespace Vouchee.Data.Migrations
                         {
                             Id = new Guid("0c20c3c9-2200-4b09-81f5-a0ceb74eba8c"),
                             CreateBy = new Guid("b4583f49-baba-4916-8e2b-2d44c3412733"),
-                            EndDate = new DateTime(2024, 10, 15, 16, 52, 59, 223, DateTimeKind.Local).AddTicks(3588),
+                            EndDate = new DateTime(2024, 10, 15, 23, 14, 36, 451, DateTimeKind.Local).AddTicks(2465),
                             Name = "Voucher sale",
                             PercentShow = 10m,
                             Price = 100000m,
                             Quantity = 100,
-                            StarDate = new DateTime(2024, 10, 11, 16, 52, 59, 223, DateTimeKind.Local).AddTicks(3588),
+                            StarDate = new DateTime(2024, 10, 11, 23, 14, 36, 451, DateTimeKind.Local).AddTicks(2465),
                             Status = "ACTIVE",
                             SupplierId = new Guid("a053e9fc-7962-4eaa-8377-91c56c85cda6"),
                             VoucherTypeId = new Guid("3e676315-1a28-4a0b-beb5-eaa5336a108d")

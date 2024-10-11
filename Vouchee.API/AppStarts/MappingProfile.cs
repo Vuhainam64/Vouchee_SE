@@ -13,10 +13,14 @@ namespace Vouchee.API.AppStarts
         public MappingProfile()
         {
             // VOUCHER
-            CreateMap<Voucher, VoucherDTO>().ReverseMap();
             CreateMap<Voucher, CreateVoucherDTO>().ReverseMap();
             CreateMap<Voucher, UpdateVoucherDTO>().ReverseMap();
-            CreateMap<Voucher, GetVoucherDTO>().ReverseMap();
+            CreateMap<Voucher, GetVoucherDTO>()
+                .ForMember(x => x.voucherTypeName, dest => dest.MapFrom(opt => opt.VoucherType.Title))
+                .ForMember(x => x.brandName, dest => dest.MapFrom(opt => opt.Brand.Name))
+                .ForMember(x => x.brandImage, dest => dest.MapFrom(opt => opt.Brand.Image))
+                .ForMember(x => x.supplierName, dest => dest.MapFrom(opt => opt.Supplier.Name))
+                .ReverseMap();
             CreateMap<GetVoucherDTO, VoucherFiler>().ReverseMap();
 
             // ORDER DETAIL
@@ -40,7 +44,6 @@ namespace Vouchee.API.AppStarts
             CreateMap<GetRoleDTO, RoleFilter>().ReverseMap();
 
             // SHOP
-            CreateMap<Shop, ShopDTO>().ReverseMap();
             CreateMap<Shop, CreateShopDTO>().ReverseMap();
             CreateMap<Shop, UpdateShopDTO>().ReverseMap();
             CreateMap<Shop, GetShopDTO>().ReverseMap();

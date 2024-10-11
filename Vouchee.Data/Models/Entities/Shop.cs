@@ -24,11 +24,11 @@ namespace Vouchee.Data.Models.Entities
         public Guid Id { get; set; }
 
         public string? AddressName { get; set; }
-        [Column(TypeName = "decimal")]
+        [Column(TypeName = "decimal(18, 10)")]
         public decimal? Lon { get; set; }
-        [Column(TypeName = "decimal")]
+        [Column(TypeName = "decimal(18, 10)")]
         public decimal? Lat { get; set; }
-        [Column(TypeName = "decimal")]
+        [Column(TypeName = "decimal(5, 2)")]
         public decimal? PercentShow { get; set; }
         public string? Image { get; set; }
 

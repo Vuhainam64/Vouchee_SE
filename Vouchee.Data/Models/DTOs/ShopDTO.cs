@@ -12,7 +12,7 @@ using Vouchee.Data.Models.Entities;
 
 namespace Vouchee.Business.Models.DTOs
 {
-    public class ShopDTO
+    public class CreateShopDTO
     {
         [Column(TypeName = "decimal")]
         public string? addressName { get; set; }
@@ -22,20 +22,24 @@ namespace Vouchee.Business.Models.DTOs
         public decimal? lat { get; set; }
         [Column(TypeName = "decimal")]
         public decimal? percentShow { get; set; }
-    }
-
-    public class CreateShopDTO : ShopDTO
-    {
         public IFormFile? image { get; set; }
         public DateTime? createDate = DateTime.Now;
     }
 
-    public class UpdateShopDTO : ShopDTO
+    public class UpdateShopDTO 
     {
+        [Column(TypeName = "decimal")]
+        public string? addressName { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? lon { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? lat { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? percentShow { get; set; }
         public DateTime? updateDate = DateTime.Now;
     }
 
-    public class GetShopDTO : ShopDTO
+    public class GetShopDTO
     {
         public GetShopDTO()
         {
@@ -46,7 +50,14 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? id { get; set; }
 
         public string? image { get; set; }
-
+        [Column(TypeName = "decimal")]
+        public string? addressName { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? lon { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? lat { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? percentShow { get; set; }
         public string? status { get; set; }
         public DateTime? createDate { get; set; }
         public Guid? createBy { get; set; }
