@@ -23,6 +23,7 @@ namespace Vouchee.Data.Helpers
         public virtual DbSet<Promotion> Promotions { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Brand> Brands { get; set; }
+        public virtual DbSet<Address> Addresses { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -50,6 +51,7 @@ namespace Vouchee.Data.Helpers
             modelBuilder.Entity<Promotion>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Category>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Brand>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            modelBuilder.Entity<Address>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
 
             modelBuilder.Seed();
 

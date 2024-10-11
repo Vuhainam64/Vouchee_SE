@@ -13,6 +13,8 @@ namespace Vouchee.Data.Models.Constants.Enum.Other
         PROMOTION,
         CATEGORY,
         VOUCHER_TYPE,
-        BRAND
+        BRAND,
+        SHOP,
+        ADDRESS
     }
 }

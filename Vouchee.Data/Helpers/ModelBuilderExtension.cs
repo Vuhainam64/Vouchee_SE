@@ -134,32 +134,20 @@ namespace Vouchee.Data.Helpers
                 new Shop()
                 {
                     Id = Guid.Parse("58203073-d9c1-41a0-9aac-fd62977c860c"),
-                    Name = "Katinat 1",
                     Status = ShopStatusEnum.ACTIVE.ToString(),
                     PercentShow = 70,
-                    Description = "Katinat gần phố đi bộ",
-                    Lat = 10.7703411M,
-                    Title = "KATINAT Gất Đẹp",
                 },
                 new Shop()
                 {
                     Id = Guid.Parse("7654b4f2-87ad-4146-8116-3e9303cfe84a"),
-                    Name = "Katinat 2",
                     Status = ShopStatusEnum.ACTIVE.ToString(),
                     PercentShow = 80,
-                    Description = "Katinat gần Hồ Thị Kỷ",
-                    Lat = 10.770832M,
-                    Title = "KATINAT Gất yêu",
                 },
                 new Shop()
                 {
                     Id = Guid.Parse("665dcada-509d-4bef-977b-a3ea097c10ec"),
-                    Name = "Katinat 3",
                     Status = ShopStatusEnum.ACTIVE.ToString(),
                     PercentShow = 80,
-                    Description = "Katinat gần Bến xe",
-                    Lat = 10.770832M,
-                    Title = "KATINAT Zô địch",
                 }
             );
 
