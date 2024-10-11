@@ -19,10 +19,10 @@ namespace Vouchee.Business.Models
 
         // Tokens
         public string? accessToken { get; set; }
-        public string? refreshToken { get; set; }
+        //public string? refreshToken { get; set; }
 
         // Token Expiry Times (in seconds or a DateTime)
-        public DateTime accessTokenExpiresAt { get; set; } // When the access token expires
-        public DateTime refreshTokenExpiresAt { get; set; } // When the refresh token expires
+        //public DateTime accessTokenExpiresAt { get; set; } // When the access token expires
+        //public DateTime refreshTokenExpiresAt { get; set; } // When the refresh token expires
     }
 }

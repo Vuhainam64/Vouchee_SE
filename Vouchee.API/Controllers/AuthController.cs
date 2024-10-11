@@ -27,36 +27,36 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        [HttpPost("login_with_phone_number")]
-        [AllowAnonymous]
-        public async Task<IActionResult> LoginWithPhoneNumber([FromBody] LoginByPhoneNumberDTO loginByPhoneNumberDTO)
-        {
-            var result = await _authService.LoginWithPhoneNumber(loginByPhoneNumberDTO);
-            return Ok(result);
-        }
+        //[HttpPost("login_with_phone_number")]
+        //[AllowAnonymous]
+        //public async Task<IActionResult> LoginWithPhoneNumber([FromBody] LoginByPhoneNumberDTO loginByPhoneNumberDTO)
+        //{
+        //    var result = await _authService.LoginWithPhoneNumber(loginByPhoneNumberDTO);
+        //    return Ok(result);
+        //}
 
-        [HttpPost("login_with_email")]
-        [AllowAnonymous]
-        public async Task<IActionResult> LoginWithEmail([FromBody] LoginByEmailDTO loginByEmailDTO)
-        {
-            var result = await _authService.LoginWithEmail(loginByEmailDTO);
-            return Ok(result);
-        }
+        //[HttpPost("login_with_email")]
+        //[AllowAnonymous]
+        //public async Task<IActionResult> LoginWithEmail([FromBody] LoginByEmailDTO loginByEmailDTO)
+        //{
+        //    var result = await _authService.LoginWithEmail(loginByEmailDTO);
+        //    return Ok(result);
+        //}
 
-        [HttpPost("register")]
-        [AllowAnonymous]
-        public async Task<IActionResult> RegisterUser(RegisterDTO registerDTO)
-        {
-            var result = await _authService.Register(registerDTO);
-            return Ok(result);
-        }
+        //[HttpPost("register")]
+        //[AllowAnonymous]
+        //public async Task<IActionResult> RegisterUser(RegisterDTO registerDTO)
+        //{
+        //    var result = await _authService.Register(registerDTO);
+        //    return Ok(result);
+        //}
 
-        [HttpPost("refresh")]
-        [AllowAnonymous]
-        public async Task<IActionResult> Refresh(RefreshTokenRequest refreshTokenRequest)
-        {
-            var result = await _authService.Refresh(refreshTokenRequest);
-            return Ok(result);
-        }
+        //[HttpPost("refresh")]
+        //[AllowAnonymous]
+        //public async Task<IActionResult> Refresh(RefreshTokenRequest refreshTokenRequest)
+        //{
+        //    var result = await _authService.Refresh(refreshTokenRequest);
+        //    return Ok(result);
+        //}
     }
 }

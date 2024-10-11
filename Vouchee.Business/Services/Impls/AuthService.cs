@@ -53,7 +53,8 @@ namespace Vouchee.Business.Services.Impls
 
             UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
             string email = userRecord.Email;
-            string imageUrl = userRecord.PhotoUrl.ToString();
+            var imageUrl = userRecord.PhotoUrl?.ToString() ?? null;
+            var phoneNumber = userRecord.PhoneNumber?.ToString() ?? null;
             string lastName = userRecord.DisplayName;
 
             var user = await _userRepository.GetUserByEmail(email);
@@ -85,6 +86,7 @@ namespace Vouchee.Business.Services.Impls
                 response.id = newBuyerId.ToString();
                 response.uid = uid;
                 response.image = imageUrl;
+                response.phoneNumber = phoneNumber;
                 response.name = userRecord.DisplayName;
                 response = await GenerateTokenAsync(response, RoleEnum.BUYER.ToString());
             }
@@ -97,6 +99,7 @@ namespace Vouchee.Business.Services.Impls
                 response.roleId = useDTO.roleId.ToString();
                 response.roleName = useDTO.roleName;
                 response.name = useDTO.name;
+                response.phoneNumber = phoneNumber;
                 response = await GenerateTokenAsync(response, useDTO.roleName);
             }
 
@@ -142,13 +145,13 @@ namespace Vouchee.Business.Services.Impls
                 response = await GenerateTokenAsync(response, response.roleName);
 
                 // Adding token expiration times
-                response.accessTokenExpiresAt = DateTime.UtcNow.AddMinutes(30);  // e.g., Access token valid for 30 minutes
-                response.refreshTokenExpiresAt = DateTime.UtcNow.AddDays(7);     // e.g., Refresh token valid for 7 days
+                //response.accessTokenExpiresAt = DateTime.UtcNow.AddMinutes(30);  // e.g., Access token valid for 30 minutes
+                //response.refreshTokenExpiresAt = DateTime.UtcNow.AddDays(7);     // e.g., Refresh token valid for 7 days
 
-                if (_userRepository.StoreRefreshToken(user, response.refreshToken, response.refreshTokenExpiresAt).Result == false)
-                {
-                    throw new Exception("Lỗi khi lưu trữ refresh token");
-                }
+                //if (_userRepository.StoreRefreshToken(user, response.refreshToken, response.refreshTokenExpiresAt).Result == false)
+                //{
+                //    throw new Exception("Lỗi khi lưu trữ refresh token");
+                //}
             }
 
             return response;
@@ -386,11 +389,11 @@ namespace Vouchee.Business.Services.Impls
             response.accessToken = tokenHandler.WriteToken(token);
 
             // Generate refresh token (using a custom method)
-            response.refreshToken = GenerateRefreshToken(response.accessToken);
+            //response.refreshToken = GenerateRefreshToken(response.accessToken);
 
-            // Add expiration times to the response (for both tokens)
-            response.accessTokenExpiresAt = DateTime.UtcNow.AddHours(accessTokenExpirationHours); // Access token expiry
-            response.refreshTokenExpiresAt = DateTime.UtcNow.AddDays(refreshTokenExpirationDays); // Refresh token expiry
+            //// Add expiration times to the response (for both tokens)
+            //response.accessTokenExpiresAt = DateTime.UtcNow.AddHours(accessTokenExpirationHours); // Access token expiry
+            //response.refreshTokenExpiresAt = DateTime.UtcNow.AddDays(refreshTokenExpirationDays); // Refresh token expiry
 
             return response;
         }
@@ -455,10 +458,10 @@ namespace Vouchee.Business.Services.Impls
             }
             response = await GenerateTokenAsync(response, RoleEnum.BUYER.ToString());
 
-            if (_userRepository.StoreRefreshToken(user, response.refreshToken, response.refreshTokenExpiresAt).Result == false)
-            {
-                throw new Exception("Có lỗi khi cập nhật refresh token");
-            }
+            //if (_userRepository.StoreRefreshToken(user, response.refreshToken, response.refreshTokenExpiresAt).Result == false)
+            //{
+            //    throw new Exception("Có lỗi khi cập nhật refresh token");
+            //}
 
             return response;
         }
