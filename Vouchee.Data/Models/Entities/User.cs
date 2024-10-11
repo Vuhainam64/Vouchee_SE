@@ -53,6 +53,8 @@ namespace Vouchee.Data.Models.Entities
         [Column(TypeName = "decimal")]
         public decimal? PercentShow { get; set; }
         public int ResponsibilityScore { get; set; }
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpirationDate { get; set; }
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]

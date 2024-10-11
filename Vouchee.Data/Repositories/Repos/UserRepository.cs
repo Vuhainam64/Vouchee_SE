@@ -83,5 +83,21 @@ namespace Vouchee.Data.Repositories.Repos
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<bool> StoreRefreshToken(User user, string refreshToken, DateTime dateTime)
+        {
+            try
+            {
+                user.RefreshToken = refreshToken;
+                user.RefreshTokenExpirationDate = dateTime;
+
+                return _userDAO.UpdateAsync(user).Result;
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.Message);
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Vouchee.Business.Models.DTOs;
+using Vouchee.Business.Models.ViewModels;
 using Vouchee.Business.Services;
 
 namespace Vouchee.API.Controllers
@@ -47,6 +48,14 @@ namespace Vouchee.API.Controllers
         public async Task<IActionResult> RegisterUser(RegisterDTO registerDTO)
         {
             var result = await _authService.Register(registerDTO);
+            return Ok(result);
+        }
+
+        [HttpPost("refresh")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Refresh(RefreshTokenRequest refreshTokenRequest)
+        {
+            var result = await _authService.Refresh(refreshTokenRequest);
             return Ok(result);
         }
     }
