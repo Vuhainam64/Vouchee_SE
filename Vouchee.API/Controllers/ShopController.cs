@@ -1,16 +1,22 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using Vouchee.API.Helpers;
 using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Services;
+using Vouchee.Business.Services.Impls;
 using Vouchee.Data.Models.Constants.Enum.Sort;
+using Vouchee.Data.Models.DTOs;
+using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
 
 namespace Vouchee.API.Controllers
 {
-    //[ApiController]
-    //[Route("api/shop")]
-    //[EnableCors]
+    [ApiController]
+    [Route("api/shop")]
+    [EnableCors]
     public class ShopController : ControllerBase
     {
         private readonly IShopService _shopService;
@@ -27,23 +33,33 @@ namespace Vouchee.API.Controllers
         }
 
         // CREATE
-        [HttpPost]
+        [Authorize]
+        [HttpPost("create_new_shop")]
         public async Task<IActionResult> CreateShop([FromForm] CreateShopDTO createShopDTO)
         {
-            var result = await _shopService.CreateShopAsync(createShopDTO);
-            return CreatedAtAction(nameof(GetShopById), new { result }, result);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            if (currentUser.roleId.Equals(currentUser.adminRoleId))
+            {
+                var result = await _shopService.CreateShopAsync(createShopDTO, currentUser);
+                return Ok(result);
+            }
+
+            return StatusCode((int)HttpStatusCode.Forbidden, new
+            {
+                code = HttpStatusCode.Forbidden,
+                message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
+            });
         }
 
         // READ
-        [HttpGet]
+        [HttpGet("get_all_shop")]
         public async Task<IActionResult> GetShops()
         {
             var result = await _shopService.GetShopsAsync();
             return Ok(result);
         }
 
-        [HttpGet]
-        [Route("{id}")]
+        [HttpGet("get_shop/{id}")]
         public async Task<IActionResult> GetShopById(Guid id)
         {
             var shop = await _shopService.GetShopByIdAsync(id);
@@ -51,8 +67,7 @@ namespace Vouchee.API.Controllers
         }
 
         // UPDATE
-        [HttpPut]
-        [Route("{id}")]
+        [HttpPut("update_address/{id}")]
         public async Task<IActionResult> UpdateShop(Guid id, [FromBody] UpdateShopDTO updateShopDTO)
         {
             var result = await _shopService.UpdateShopAsync(id, updateShopDTO);
@@ -60,8 +75,7 @@ namespace Vouchee.API.Controllers
         }
 
         // DELETE
-        [HttpDelete]
-        [Route("{id}")]
+        [HttpDelete("delete_shop/{id}")]
         public async Task<IActionResult> DeleteShop(Guid id)
         {
             var result = await _shopService.DeleteShopAsync(id);
