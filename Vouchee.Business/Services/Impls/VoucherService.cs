@@ -40,6 +40,7 @@ namespace Vouchee.Business.Services.Impls
                 voucher.Status = VoucherStatusEnum.ACTIVE.ToString();
                 voucher.CreateBy = Guid.Parse(thisUserObj.userId);
 
+
                 var voucherId = await _voucherRepository.AddAsync(voucher);
 
                 if (createVoucherDTO.image != null && voucherId != null)

@@ -7,27 +7,25 @@ using Microsoft.AspNetCore.Http;
 
 namespace Vouchee.Business.Models.DTOs
 {
-    public class VoucherTypeDTO
+    public class CreateVoucherTypeDTO
     {
         [Required(ErrorMessage = "Cần title")]
         public string? title { get; set; }
-    }
-
-    public class CreateVoucherTypeDTO : VoucherTypeDTO
-    {
         public IFormFile? image { get; set; }
         public DateTime? createDate = DateTime.Now;
         public string? status = ObjectStatusEnum.ACTIVE.ToString();
     }
 
-    public class UpdateVoucherTypeDTO : VoucherTypeDTO
+    public class UpdateVoucherTypeDTO
     {
+        [Required(ErrorMessage = "Cần title")]
+        public string? title { get; set; }
         public ObjectStatusEnum status { get; set; }
         public DateTime? updateDate = DateTime.Now;
         public Guid? updateBy { get; set; }
     }
 
-    public class GetVoucherTypeDTO : VoucherTypeDTO
+    public class GetVoucherTypeDTO
     {
         public GetVoucherTypeDTO()
         {
@@ -37,7 +35,7 @@ namespace Vouchee.Business.Models.DTOs
 
         public Guid? id { get; set; }
         public string? image { get; set; }
-
+        public string? title { get; set; }
 
         public string? status { get; set; }
         public DateTime? createDate { get; set; }
