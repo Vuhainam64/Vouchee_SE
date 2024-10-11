@@ -15,7 +15,7 @@ namespace Vouchee.API.Controllers
 {
     [ApiController]
     [Route("api/v1/brand")]
-    [EnableCors]
+    [EnableCors("MyAllowSpecificOrigins")]
     public class BrandController : ControllerBase
     {
         private readonly IBrandService _brandService;

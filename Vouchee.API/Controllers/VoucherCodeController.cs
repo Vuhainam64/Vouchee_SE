@@ -16,7 +16,7 @@ namespace Vouchee.API.Controllers
     // Gọi sau voucher controller sau khi đã gọi xong trả id về đây để tạo ra voucher code 
     [ApiController]
     [Route("api/v1/voucherCode")]
-    [EnableCors]
+    [EnableCors("MyAllowSpecificOrigins")]
     public class VoucherCodeController : ControllerBase
     {
         private readonly IUserService _userService;

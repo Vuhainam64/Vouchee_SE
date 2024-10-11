@@ -14,7 +14,7 @@ namespace Vouchee.API.Controllers
 {
     [ApiController]
     [Route("api/v1/order")]
-    [EnableCors]
+    [EnableCors("MyAllowSpecificOrigins")]
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;

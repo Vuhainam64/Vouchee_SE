@@ -15,7 +15,7 @@ namespace Vouchee.API.Controllers
 {
     [ApiController]
     [Route("api/promotion/v1")]
-    [EnableCors]
+    [EnableCors("MyAllowSpecificOrigins")]
     public class PromotionController : ControllerBase
     {
         private readonly IPromotionService _promotionService;

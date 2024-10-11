@@ -14,7 +14,7 @@ namespace Vouchee.API.Controllers
 {
     [ApiController]
     [Route("api/v1/category")]
-    [EnableCors]
+    [EnableCors("MyAllowSpecificOrigins")]
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryService _categoryService;

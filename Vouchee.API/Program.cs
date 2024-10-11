@@ -1,5 +1,3 @@
-
-
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Vouchee.API.AppStarts;
@@ -26,12 +24,29 @@ builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(@
                     ValidationAlgorithm = ValidationAlgorithm.HMACSHA256
                 });
 
+// Define CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "MyAllowSpecificOrigins",
+                      policy =>
+                      {
+                          policy.WithOrigins("http://vouchee.shop")
+                                .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
+                                .AllowAnyMethod()
+                                .AllowAnyHeader();
+                      });
+});
+
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-app.UseDeveloperExceptionPage();
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
@@ -40,18 +55,12 @@ app.UseSwaggerUI(c =>
 
 app.UseMiddleware<ExceptionHandlingMiddleware>(); // Use generic type for middleware
 
-app.UseCors(options =>
-{
-    options.WithOrigins("http://vouchee.shop")
-           .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
-           .AllowAnyMethod()
-           .AllowAnyHeader();
-});
-
+// Use CORS with the defined policy
+app.UseCors("MyAllowSpecificOrigins");
 
 app.UseAuthentication();
 
-app.UseMiddleware<AuthorizeMiddleware>();
+app.UseMiddleware<AuthorizeMiddleware>(); // Place before UseAuthorization
 
 app.UseAuthorization();
 

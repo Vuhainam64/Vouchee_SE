@@ -14,7 +14,7 @@ namespace Vouchee.API.Controllers
 {
     [ApiController]
     [Route("api/v1/voucher")]
-    [EnableCors]
+    [EnableCors("MyAllowSpecificOrigins")]
     public class VoucherController : ControllerBase
     {
         private readonly IVoucherService _voucherService;

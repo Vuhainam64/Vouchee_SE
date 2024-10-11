@@ -11,7 +11,7 @@ namespace Vouchee.API.Controllers
 {
     [ApiController]
     [Route("api/v1/user")]
-    [EnableCors]
+    [EnableCors("MyAllowSpecificOrigins")]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;

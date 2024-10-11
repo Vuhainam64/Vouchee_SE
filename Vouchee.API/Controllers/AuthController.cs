@@ -9,7 +9,7 @@ namespace Vouchee.API.Controllers
 {
     [ApiController]
     [Route("api/v1/auth")]
-    [EnableCors]
+    [EnableCors("MyAllowSpecificOrigins")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;

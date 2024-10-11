@@ -16,7 +16,7 @@ namespace Vouchee.API.Controllers
 {
     [ApiController]
     [Route("api/shop")]
-    [EnableCors]
+    [EnableCors("MyAllowSpecificOrigins")]
     public class ShopController : ControllerBase
     {
         private readonly IShopService _shopService;
