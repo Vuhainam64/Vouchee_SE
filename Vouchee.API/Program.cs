@@ -42,10 +42,12 @@ app.UseMiddleware<ExceptionHandlingMiddleware>(); // Use generic type for middle
 
 app.UseCors(options =>
 {
-    options.AllowAnyOrigin() // Adjust CORS policy as needed
+    options.WithOrigins("http://vouchee.shop")
+           .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
            .AllowAnyMethod()
            .AllowAnyHeader();
 });
+
 
 app.UseAuthentication();
 
