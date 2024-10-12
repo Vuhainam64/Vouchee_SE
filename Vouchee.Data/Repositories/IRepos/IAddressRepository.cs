@@ -8,7 +8,7 @@ using Vouchee.Data.Models.Entities;
 
 namespace Vouchee.Data.Repositories.IRepos
 {
-    public interface IShopRepository : IBaseRepository<Shop>
+    public interface IAddressRepository : IBaseRepository<Address>
     {
     }
 }

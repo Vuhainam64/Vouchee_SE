@@ -5,43 +5,66 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Vouchee.Data.Models.Constants.Enum.Status;
+using Vouchee.Data.Models.DTOs;
+using Vouchee.Data.Models.Entities;
 
-namespace Vouchee.Data.Models.DTOs
+namespace Vouchee.Business.Models.DTOs
 {
-    public class AddressDTO
+    public class CreateAddressDTO
     {
-        [Required(ErrorMessage = "Name is required.")]
-        public string? name { get; set; }
+        [Column(TypeName = "decimal")]
+        public string? addressName { get; set; }
+        [Column(TypeName = "decimal")]
         public decimal? lon { get; set; }
+        [Column(TypeName = "decimal")]
         public decimal? lat { get; set; }
-    }
-
-    public class CreateAddressDTO : AddressDTO
-    {
+        [Column(TypeName = "decimal")]
+        public decimal? percentShow { get; set; }
         public IFormFile? image { get; set; }
-        public string status = ObjectStatusEnum.ACTIVE.ToString();
         public DateTime? createDate = DateTime.Now;
     }
 
-    public class UpdateAddressDTO : AddressDTO
+    public class UpdateAddressDTO 
     {
-
+        [Column(TypeName = "decimal")]
+        public string? addressName { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? lon { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? lat { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? percentShow { get; set; }
+        public DateTime? updateDate = DateTime.Now;
     }
 
-    public class GetAddressDTO : AddressDTO
+    public class GetAddressDTO
     {
-        public Guid id { get; set; }
+        public GetAddressDTO()
+        {
+            vouchers = new HashSet<GetVoucherDTO>();
+            //addresses = new HashSet<GetAddressDTO>();
+        }
+
+        public Guid? id { get; set; }
 
         public string? image { get; set; }
-
+        [Column(TypeName = "decimal")]
+        public string? addressName { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? lon { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? lat { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? percentShow { get; set; }
         public string? status { get; set; }
-        [Column(TypeName = "datetime")]
         public DateTime? createDate { get; set; }
         public Guid? createBy { get; set; }
-        [Column(TypeName = "datetime")]
         public DateTime? updateDate { get; set; }
         public Guid? updateBy { get; set; }
+
+        public virtual ICollection<GetVoucherDTO>? vouchers { get; set; }
+        //public virtual ICollection<GetAddressDTO>? addresses { get; set; }
     }
 }

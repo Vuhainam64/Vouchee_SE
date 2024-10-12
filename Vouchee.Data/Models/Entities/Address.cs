@@ -8,15 +8,15 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Entities
 {
-    [Table("Shop")]
-    public partial class Shop
+    [Table("Address")]
+    public partial class Address
     {
-        public Shop()
+        public Address()
         {
             Vouchers = new HashSet<Voucher>();
         }
 
-        [InverseProperty(nameof(Voucher.Shops))]
+        [InverseProperty(nameof(Voucher.Addresses))]
         public virtual ICollection<Voucher> Vouchers { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

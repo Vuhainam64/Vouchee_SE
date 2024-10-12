@@ -9,7 +9,7 @@ using Vouchee.Data.Repositories.IRepos;
 
 namespace Vouchee.Data.Repositories.Repos
 {
-    public class ShopRepository : BaseRepository<Shop>, IShopRepository
+    public class AddressRepository : BaseRepository<Address>, IAddressRepository
     {
     }
 }

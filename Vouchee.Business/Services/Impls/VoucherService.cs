@@ -107,7 +107,7 @@ namespace Vouchee.Business.Services.Impls
             {
                 var voucher = await _voucherRepository.GetByIdAsync(id,
                                         query => query.Include(x => x.VoucherCodes)
-                                                        .Include(x => x.Shops));
+                                                        .Include(x => x.Addresses));
                 if (voucher != null)
                 {
                     GetVoucherDTO voucherDTO = _mapper.Map<GetVoucherDTO>(voucher);

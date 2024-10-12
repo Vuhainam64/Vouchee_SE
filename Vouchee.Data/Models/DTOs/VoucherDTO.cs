@@ -59,7 +59,7 @@ namespace Vouchee.Business.Models.DTOs
         {
             voucherCodes = new HashSet<GetVoucherCodeDTO>();
             // orderDetails = new HashSet<GetOrderDetailDTO>();
-            shops = new HashSet<GetShopDTO>();
+            addresses = new HashSet<GetAddressDTO>();
         }
 
         public Guid? id { get; set; }
@@ -87,7 +87,7 @@ namespace Vouchee.Business.Models.DTOs
         public DateTime? updateDate { get; set; }
         public Guid? updateBy { get; set; }
 
-        public virtual ICollection<GetShopDTO>? shops { get; set; }
+        public virtual ICollection<GetAddressDTO>? addresses { get; set; }
         public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
         // public virtual ICollection<GetOrderDetailDTO>? orderDetails { get; set; 
     }

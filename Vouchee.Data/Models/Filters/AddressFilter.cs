@@ -1,6 +1,6 @@
 ﻿namespace Vouchee.Data.Models.Filters
 {
-    public class ShopFilter
+    public class AddressFilter
     {
         public string? name { get; set; }
         public string? title { get; set; }

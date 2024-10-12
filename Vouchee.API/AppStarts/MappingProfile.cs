@@ -43,11 +43,11 @@ namespace Vouchee.API.AppStarts
             CreateMap<Role, GetRoleDTO>().ReverseMap();
             CreateMap<GetRoleDTO, RoleFilter>().ReverseMap();
 
-            // SHOP
-            CreateMap<Shop, CreateShopDTO>().ReverseMap();
-            CreateMap<Shop, UpdateShopDTO>().ReverseMap();
-            CreateMap<Shop, GetShopDTO>().ReverseMap();
-            CreateMap<GetShopDTO, ShopFilter>().ReverseMap();
+            // ADDRESS
+            CreateMap<Address, CreateAddressDTO>().ReverseMap();
+            CreateMap<Address, UpdateAddressDTO>().ReverseMap();
+            CreateMap<Address, GetAddressDTO>().ReverseMap();
+            CreateMap<GetAddressDTO, AddressFilter>().ReverseMap();
 
             // SUPPLIER
             CreateMap<Supplier, SupplierDTO>().ReverseMap();

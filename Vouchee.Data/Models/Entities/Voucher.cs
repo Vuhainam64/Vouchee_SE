@@ -20,7 +20,7 @@ namespace Vouchee.Data.Models.Entities
         public Voucher()
         {
             VoucherCodes = new HashSet<VoucherCode>();
-            Shops = new HashSet<Shop>();
+            Addresses = new HashSet<Address>();
             OrderDetails = new HashSet<OrderDetail>();
             Promotions = new HashSet<Promotion>();
         }
@@ -29,8 +29,8 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<VoucherCode> VoucherCodes { get; set; }
         [InverseProperty(nameof(OrderDetail.Voucher))]
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
-        [InverseProperty(nameof(Shop.Vouchers))]
-        public virtual ICollection<Shop> Shops { get; set; }
+        [InverseProperty(nameof(Address.Vouchers))]
+        public virtual ICollection<Address> Addresses { get; set; }
         [InverseProperty(nameof(Promotion.Vouchers))]
         public virtual ICollection<Promotion> Promotions { get; set; }
 

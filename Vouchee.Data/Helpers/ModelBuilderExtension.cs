@@ -130,23 +130,23 @@ namespace Vouchee.Data.Helpers
             );
 
             // SHOP
-            modelBuilder.Entity<Shop>().HasData(
-                new Shop()
+            modelBuilder.Entity<Address>().HasData(
+                new Address()
                 {
                     Id = Guid.Parse("58203073-d9c1-41a0-9aac-fd62977c860c"),
-                    Status = ShopStatusEnum.ACTIVE.ToString(),
+                    Status = ObjectStatusEnum.ACTIVE.ToString(),
                     PercentShow = 70,
                 },
-                new Shop()
+                new Address()
                 {
                     Id = Guid.Parse("7654b4f2-87ad-4146-8116-3e9303cfe84a"),
-                    Status = ShopStatusEnum.ACTIVE.ToString(),
+                    Status = ObjectStatusEnum.ACTIVE.ToString(),
                     PercentShow = 80,
                 },
-                new Shop()
+                new Address()
                 {
                     Id = Guid.Parse("665dcada-509d-4bef-977b-a3ea097c10ec"),
-                    Status = ShopStatusEnum.ACTIVE.ToString(),
+                    Status = ObjectStatusEnum.ACTIVE.ToString(),
                     PercentShow = 80,
                 }
             );

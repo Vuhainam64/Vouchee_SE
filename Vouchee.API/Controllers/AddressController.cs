@@ -15,32 +15,32 @@ using Vouchee.Data.Models.Filters;
 namespace Vouchee.API.Controllers
 {
     [ApiController]
-    [Route("api/shop")]
+    [Route("api/address")]
     [EnableCors("MyAllowSpecificOrigins")]
-    public class ShopController : ControllerBase
+    public class AddressController : ControllerBase
     {
-        private readonly IShopService _shopService;
+        private readonly IAddressService _addressRepository;
         private readonly IUserService _userService;
         private readonly IRoleService _roleService;
 
-        public ShopController(IShopService shopService, 
+        public AddressController(IAddressService addressService, 
                                 IUserService userService, 
                                 IRoleService roleService)
         {
-            _shopService = shopService;
+            _addressRepository = addressService;
             _userService = userService;
             _roleService = roleService;
         }
 
         // CREATE
         [Authorize]
-        [HttpPost("create_new_shop")]
-        public async Task<IActionResult> CreateShop([FromForm] CreateShopDTO createShopDTO)
+        [HttpPost("create_new_address")]
+        public async Task<IActionResult> CreateAddress([FromForm] CreateAddressDTO createAddressDTO)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
             if (currentUser.roleId.Equals(currentUser.adminRoleId))
             {
-                var result = await _shopService.CreateShopAsync(createShopDTO, currentUser);
+                var result = await _addressRepository.CreateAddressAsync(createAddressDTO, currentUser);
                 return Ok(result);
             }
 
@@ -52,33 +52,33 @@ namespace Vouchee.API.Controllers
         }
 
         // READ
-        [HttpGet("get_all_shop")]
-        public async Task<IActionResult> GetShops()
+        [HttpGet("get_all_address")]
+        public async Task<IActionResult> GetAddresses()
         {
-            var result = await _shopService.GetShopsAsync();
+            var result = await _addressRepository.GetAddressesAsync();
             return Ok(result);
         }
 
-        [HttpGet("get_shop/{id}")]
-        public async Task<IActionResult> GetShopById(Guid id)
+        [HttpGet("get_address/{id}")]
+        public async Task<IActionResult> GetAddressById(Guid id)
         {
-            var shop = await _shopService.GetShopByIdAsync(id);
-            return Ok(shop);
+            var address = await _addressRepository.GetAddressByIdAsync(id);
+            return Ok(address);
         }
 
         // UPDATE
         [HttpPut("update_address/{id}")]
-        public async Task<IActionResult> UpdateShop(Guid id, [FromBody] UpdateShopDTO updateShopDTO)
+        public async Task<IActionResult> UpdateAddress(Guid id, [FromBody] UpdateAddressDTO updateAddressDTO)
         {
-            var result = await _shopService.UpdateShopAsync(id, updateShopDTO);
+            var result = await _addressRepository.UpdateAddressAsync(id, updateAddressDTO);
             return Ok(result);
         }
 
         // DELETE
-        [HttpDelete("delete_shop/{id}")]
-        public async Task<IActionResult> DeleteShop(Guid id)
+        [HttpDelete("delete_address/{id}")]
+        public async Task<IActionResult> DeleteAddress(Guid id)
         {
-            var result = await _shopService.DeleteShopAsync(id);
+            var result = await _addressRepository.DeleteAddressAsync(id);
             return Ok(result);
         }
     }

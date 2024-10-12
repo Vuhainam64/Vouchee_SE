@@ -15,7 +15,7 @@ namespace Vouchee.Data.Helpers
         public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<OrderDetail> OrderDetails { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
-        public virtual DbSet<Shop> Shops { get; set; }
+        public virtual DbSet<Address> Addresses { get; set; }
         public virtual DbSet<Supplier> Suppliers { get; set; }
         public virtual DbSet<VoucherType> VoucherTypes { get; set; }
         public virtual DbSet<Voucher> Vouchers { get; set; }
@@ -41,7 +41,7 @@ namespace Vouchee.Data.Helpers
             modelBuilder.Entity<Order>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<OrderDetail>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Role>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
-            modelBuilder.Entity<Shop>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            modelBuilder.Entity<Address>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Supplier>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<User>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Voucher>().Property(x => x.Id).HasDefaultValueSql("NEWID()");

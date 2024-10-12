@@ -46,8 +46,8 @@ namespace Vouchee.API.AppStarts
             services.AddScoped<IRoleRepository, RoleRepository>();
 
             // SHOP
-            services.AddScoped<IShopService, ShopService>();
-            services.AddScoped<IShopRepository, ShopRepository>();
+            services.AddScoped<IAddressService, AddressService>();
+            services.AddScoped<IAddressRepository, AddressRepository>();
 
             // SUPPLIER
             services.AddScoped<ISupplierService, SupplierService>();

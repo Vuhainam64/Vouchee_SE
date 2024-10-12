@@ -22,6 +22,21 @@ namespace Vouchee.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("AddressVoucher", b =>
+                {
+                    b.Property<Guid>("AddressesId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("VouchersId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("AddressesId", "VouchersId");
+
+                    b.HasIndex("VouchersId");
+
+                    b.ToTable("AddressVoucher");
+                });
+
             modelBuilder.Entity("PromotionVoucher", b =>
                 {
                     b.Property<Guid>("PromotionsId")
@@ -37,19 +52,66 @@ namespace Vouchee.Data.Migrations
                     b.ToTable("PromotionVoucher");
                 });
 
-            modelBuilder.Entity("ShopVoucher", b =>
+            modelBuilder.Entity("Vouchee.Data.Models.Entities.Address", b =>
                 {
-                    b.Property<Guid>("ShopsId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<string>("AddressName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("CreateBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("VouchersId")
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("Lat")
+                        .HasColumnType("decimal(18, 10)");
+
+                    b.Property<decimal?>("Lon")
+                        .HasColumnType("decimal(18, 10)");
+
+                    b.Property<decimal?>("PercentShow")
+                        .HasColumnType("decimal(5, 2)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("ShopsId", "VouchersId");
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime");
 
-                    b.HasIndex("VouchersId");
+                    b.HasKey("Id");
 
-                    b.ToTable("ShopVoucher");
+                    b.ToTable("Address");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("58203073-d9c1-41a0-9aac-fd62977c860c"),
+                            PercentShow = 70m,
+                            Status = "ACTIVE"
+                        },
+                        new
+                        {
+                            Id = new Guid("7654b4f2-87ad-4146-8116-3e9303cfe84a"),
+                            PercentShow = 80m,
+                            Status = "ACTIVE"
+                        },
+                        new
+                        {
+                            Id = new Guid("665dcada-509d-4bef-977b-a3ea097c10ec"),
+                            PercentShow = 80m,
+                            Status = "ACTIVE"
+                        });
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Brand", b =>
@@ -388,68 +450,6 @@ namespace Vouchee.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.Shop", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWID()");
-
-                    b.Property<string>("AddressName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("CreateBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("Lat")
-                        .HasColumnType("decimal(18, 10)");
-
-                    b.Property<decimal?>("Lon")
-                        .HasColumnType("decimal(18, 10)");
-
-                    b.Property<decimal?>("PercentShow")
-                        .HasColumnType("decimal(5, 2)");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("UpdateBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Shop");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("58203073-d9c1-41a0-9aac-fd62977c860c"),
-                            PercentShow = 70m,
-                            Status = "ACTIVE"
-                        },
-                        new
-                        {
-                            Id = new Guid("7654b4f2-87ad-4146-8116-3e9303cfe84a"),
-                            PercentShow = 80m,
-                            Status = "ACTIVE"
-                        },
-                        new
-                        {
-                            Id = new Guid("665dcada-509d-4bef-977b-a3ea097c10ec"),
-                            PercentShow = 80m,
-                            Status = "ACTIVE"
-                        });
-                });
-
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Supplier", b =>
                 {
                     b.Property<Guid>("Id")
@@ -751,12 +751,12 @@ namespace Vouchee.Data.Migrations
                         {
                             Id = new Guid("494b5347-378e-4e2d-9553-6032a42cd8d1"),
                             CreateBy = new Guid("b4583f49-baba-4916-8e2b-2d44c3412733"),
-                            EndDate = new DateTime(2024, 10, 15, 23, 14, 36, 451, DateTimeKind.Local).AddTicks(2429),
+                            EndDate = new DateTime(2024, 10, 16, 16, 44, 55, 640, DateTimeKind.Local).AddTicks(885),
                             Name = "Voucher sale",
                             PercentShow = 10m,
                             Price = 100000m,
                             Quantity = 100,
-                            StarDate = new DateTime(2024, 10, 11, 23, 14, 36, 451, DateTimeKind.Local).AddTicks(2420),
+                            StarDate = new DateTime(2024, 10, 12, 16, 44, 55, 640, DateTimeKind.Local).AddTicks(876),
                             Status = "ACTIVE",
                             SupplierId = new Guid("a053e9fc-7962-4eaa-8377-91c56c85cda6"),
                             VoucherTypeId = new Guid("3e676315-1a28-4a0b-beb5-eaa5336a108d")
@@ -765,12 +765,12 @@ namespace Vouchee.Data.Migrations
                         {
                             Id = new Guid("0c20c3c9-2200-4b09-81f5-a0ceb74eba8c"),
                             CreateBy = new Guid("b4583f49-baba-4916-8e2b-2d44c3412733"),
-                            EndDate = new DateTime(2024, 10, 15, 23, 14, 36, 451, DateTimeKind.Local).AddTicks(2465),
+                            EndDate = new DateTime(2024, 10, 16, 16, 44, 55, 640, DateTimeKind.Local).AddTicks(900),
                             Name = "Voucher sale",
                             PercentShow = 10m,
                             Price = 100000m,
                             Quantity = 100,
-                            StarDate = new DateTime(2024, 10, 11, 23, 14, 36, 451, DateTimeKind.Local).AddTicks(2465),
+                            StarDate = new DateTime(2024, 10, 12, 16, 44, 55, 640, DateTimeKind.Local).AddTicks(899),
                             Status = "ACTIVE",
                             SupplierId = new Guid("a053e9fc-7962-4eaa-8377-91c56c85cda6"),
                             VoucherTypeId = new Guid("3e676315-1a28-4a0b-beb5-eaa5336a108d")
@@ -906,11 +906,11 @@ namespace Vouchee.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("PromotionVoucher", b =>
+            modelBuilder.Entity("AddressVoucher", b =>
                 {
-                    b.HasOne("Vouchee.Data.Models.Entities.Promotion", null)
+                    b.HasOne("Vouchee.Data.Models.Entities.Address", null)
                         .WithMany()
-                        .HasForeignKey("PromotionsId")
+                        .HasForeignKey("AddressesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -921,11 +921,11 @@ namespace Vouchee.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ShopVoucher", b =>
+            modelBuilder.Entity("PromotionVoucher", b =>
                 {
-                    b.HasOne("Vouchee.Data.Models.Entities.Shop", null)
+                    b.HasOne("Vouchee.Data.Models.Entities.Promotion", null)
                         .WithMany()
-                        .HasForeignKey("ShopsId")
+                        .HasForeignKey("PromotionsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
