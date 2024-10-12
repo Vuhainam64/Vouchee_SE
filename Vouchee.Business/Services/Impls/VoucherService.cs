@@ -83,7 +83,7 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<IList<GetVoucherDTO>> GetNewestVoouchers()
+        public async Task<IList<GetVoucherDTO>> GetNewestVouchers()
         {
             IQueryable<GetVoucherDTO> result;
             try
@@ -125,20 +125,30 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<IList<GetVoucherDTO>> GetVouchersAsync()
+        public async Task<DynamicResponseModel<GetVoucherDTO>> GetVouchersAsync(PagingRequest pagingRequest)
         {
-            IQueryable<GetVoucherDTO> result;
+            (int, IQueryable<GetVoucherDTO>) result;
             try
             {
                 result = _voucherRepository.GetTable()
-                            .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider);
+                            .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
+                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
             }
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
                 throw new LoadException("Lỗi không xác định khi tải voucher");
             }
-            return result.ToList();
+            return new DynamicResponseModel<GetVoucherDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1
+                },
+                results = result.Item2.ToList()
+            };
         }
 
         public async Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO)

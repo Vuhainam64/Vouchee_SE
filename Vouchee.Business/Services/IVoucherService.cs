@@ -12,8 +12,8 @@ namespace Vouchee.Business.Services
 
         // READ
         public Task<GetVoucherDTO> GetVoucherByIdAsync(Guid id);
-        public Task<IList<GetVoucherDTO>> GetVouchersAsync();
-        public Task<IList<GetVoucherDTO>> GetNewestVoouchers();
+        public Task<DynamicResponseModel<GetVoucherDTO>> GetVouchersAsync(PagingRequest pagingRequest);
+        public Task<IList<GetVoucherDTO>> GetNewestVouchers();
 
         // UPDATE
         public Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO);
