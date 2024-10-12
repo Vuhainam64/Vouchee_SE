@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Vouchee.API.AppStarts;
 using Vouchee.Business.Middelwares;
 using Microsoft.AspNetCore.DataProtection;
+using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 builder.Services.AddDependencyInjection();
 builder.Services.AddDistributedMemoryCache();
 

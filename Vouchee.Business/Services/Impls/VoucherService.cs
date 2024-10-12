@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
@@ -82,11 +83,31 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
+        public async Task<IList<GetVoucherDTO>> GetNewestVoouchers()
+        {
+            IQueryable<GetVoucherDTO> result;
+            try
+            {
+                result = _voucherRepository.GetTable()
+                                            .OrderByDescending(x => x.CreateDate)  
+                                            .Take(8)
+                                            .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider);
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.Message);
+                throw new LoadException("Lỗi không xác định khi tải voucher");
+            }
+            return result.ToList();
+        }
+
         public async Task<GetVoucherDTO> GetVoucherByIdAsync(Guid id)
         {
             try
             {
-                var voucher = await _voucherRepository.GetByIdAsync(id);
+                var voucher = await _voucherRepository.GetByIdAsync(id,
+                                        query => query.Include(x => x.VoucherCodes)
+                                                        .Include(x => x.Shops));
                 if (voucher != null)
                 {
                     GetVoucherDTO voucherDTO = _mapper.Map<GetVoucherDTO>(voucher);

@@ -59,6 +59,13 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("get_newest_vouchers")]
+        public async Task<IActionResult> GetNewestVouchers()
+        {
+            var result = await _voucherService.GetVouchersAsync();
+            return Ok(result);
+        }
+
         // GET BY ID
         [HttpGet("get_voucher/{id}")]
         public async Task<IActionResult> GetVoucherById(Guid id)

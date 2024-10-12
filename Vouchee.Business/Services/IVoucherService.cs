@@ -13,6 +13,7 @@ namespace Vouchee.Business.Services
         // READ
         public Task<GetVoucherDTO> GetVoucherByIdAsync(Guid id);
         public Task<IList<GetVoucherDTO>> GetVouchersAsync();
+        public Task<IList<GetVoucherDTO>> GetNewestVoouchers();
 
         // UPDATE
         public Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO);
