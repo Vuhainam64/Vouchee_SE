@@ -68,6 +68,11 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
+        public Task<IList<GetSupplierDTO>> GetBestSuppliers()
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<GetSupplierDTO> GetSupplierByIdAsync(Guid id)
         {
             try

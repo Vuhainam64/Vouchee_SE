@@ -29,7 +29,7 @@ namespace Vouchee.Business.Models.DTOs
     {
         public GetVoucherTypeDTO()
         {
-            vouchers = new HashSet<GetVoucherDTO>();
+            vouchers = new HashSet<GetAllVoucherDTO>();
             categories = new HashSet<GetCategoryDTO>();
         }
 
@@ -43,7 +43,7 @@ namespace Vouchee.Business.Models.DTOs
         public DateTime? updateDate { get; set; }
         public Guid? updateBy { get; set; }
 
-        public virtual ICollection<GetVoucherDTO>? vouchers { get; set; }
+        public virtual ICollection<GetAllVoucherDTO>? vouchers { get; set; }
         public virtual ICollection<GetCategoryDTO>? categories { get; set; }
     }
 }

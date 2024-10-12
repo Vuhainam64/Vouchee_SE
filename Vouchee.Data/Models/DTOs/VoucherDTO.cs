@@ -53,42 +53,53 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? updateBy { get; set; }
     }
 
-    public class GetVoucherDTO
+    public class GetAllVoucherDTO
     {
-        public GetVoucherDTO()
+        public GetAllVoucherDTO()
         {
-            voucherCodes = new HashSet<GetVoucherCodeDTO>();
-            // orderDetails = new HashSet<GetOrderDetailDTO>();
-            addresses = new HashSet<GetAddressDTO>();
+            addresses = new HashSet<GetAllAddressDTO>();
         }
 
         public Guid? id { get; set; }
 
         public string? name { get; set; }
-        public string? description { get; set; }
-        public decimal? price { get; set; }
-        public DateTime? starDate { get; set; }
-        public DateTime? endDate { get; set; }
-        public string? policy { get; set; }
-        public int? quantity { get; set; }
+        //public string? description { get; set; }
+        public string? image { get; set; }
+        //public decimal? price { get; set; }
+        //public DateTime? starDate { get; set; }
+        //public DateTime? endDate { get; set; }
+        //public string? policy { get; set; }
+        //public int? quantity { get; set; }
 
-        public Guid? brandId { get; set; }
-        public string? brandName { get; set; }
-        public string? brandImage { get; set; }
-        public Guid? supplierId { get; set; }
-        public string? supplierName { get; set; }
-        public string? supplierImage { get; set; }
-        public Guid? voucherTypeId { get; set; }
-        public string? voucherTypeName { get; set; }
+        //public Guid? brandId { get; set; }
+        //public string? brandName { get; set; }
+        //public string? brandImage { get; set; }
+        //public Guid? supplierId { get; set; }
+        //public string? supplierName { get; set; }
+        //public string? supplierImage { get; set; }
+        //public Guid? voucherTypeId { get; set; }
+        //public string? voucherTypeName { get; set; }
 
-        public string? status { get; set; }
-        public DateTime? createDate { get; set; }
-        public Guid? createBy { get; set; }
-        public DateTime? updateDate { get; set; }
-        public Guid? updateBy { get; set; }
+        //public string? status { get; set; }
+        //public DateTime? createDate { get; set; }
+        //public Guid? createBy { get; set; }
+        //public DateTime? updateDate { get; set; }
+        //public Guid? updateBy { get; set; }
 
-        public virtual ICollection<GetAddressDTO>? addresses { get; set; }
+        public virtual ICollection<GetAllAddressDTO>? addresses { get; set; }
+    }
+
+    public class GetDetailVoucherDTO
+    {
+        public GetDetailVoucherDTO()
+        {
+            voucherCodes = new HashSet<GetVoucherCodeDTO>();
+            addresses = new HashSet<GetAllAddressDTO>();
+        }
+
+
+
+        public virtual ICollection<GetAllAddressDTO>? addresses { get; set; }
         public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
-        // public virtual ICollection<GetOrderDetailDTO>? orderDetails { get; set; 
     }
 }

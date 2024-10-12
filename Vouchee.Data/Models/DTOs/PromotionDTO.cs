@@ -68,7 +68,7 @@ namespace Vouchee.Data.Models.DTOs
     {
         public GetPromotionDTO()
         {
-            vouchers = new HashSet<GetVoucherDTO>();
+            vouchers = new HashSet<GetAllVoucherDTO>();
             orders = new HashSet<GetOrderDTO>();
             orderDetails = new HashSet<GetOrderDetailDTO>();
         }
@@ -83,7 +83,7 @@ namespace Vouchee.Data.Models.DTOs
         public DateTime? updateDate { get; set; }
         public Guid? updateBy { get; set; }
 
-        public virtual ICollection<GetVoucherDTO>? vouchers { get; set; }
+        public virtual ICollection<GetAllVoucherDTO>? vouchers { get; set; }
         public virtual ICollection<GetOrderDTO>? orders { get; set; }
         public virtual ICollection<GetOrderDetailDTO>? orderDetails { get; set; }
     }

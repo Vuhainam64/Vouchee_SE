@@ -83,15 +83,30 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<IList<GetVoucherDTO>> GetNewestVouchers()
+        public Task<IList<GetAllVoucherDTO>> GetBestSoldVouchers()
         {
-            IQueryable<GetVoucherDTO> result;
+            throw new NotImplementedException();
+        }
+
+        public Task<IList<GetAllVoucherDTO>> GetNearestVouchers(decimal lon, decimal lat)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IList<GetAllVoucherDTO>> GetNearestVouchers(PagingRequest pagingRequest, decimal lon, decimal lat)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IList<GetAllVoucherDTO>> GetNewestVouchers()
+        {
+            IQueryable<GetAllVoucherDTO> result;
             try
             {
                 result = _voucherRepository.GetTable()
                                             .OrderByDescending(x => x.CreateDate)  
                                             .Take(8)
-                                            .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider);
+                                            .ProjectTo<GetAllVoucherDTO>(_mapper.ConfigurationProvider);
             }
             catch (Exception ex)
             {
@@ -101,7 +116,17 @@ namespace Vouchee.Business.Services.Impls
             return result.ToList();
         }
 
-        public async Task<GetVoucherDTO> GetVoucherByIdAsync(Guid id)
+        public Task<IList<GetAllVoucherDTO>> GetTopSaleVouchers()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IList<GetAllVoucherDTO>> GetTopSaleVouchers(PagingRequest pagingRequest)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<GetAllVoucherDTO> GetVoucherByIdAsync(Guid id)
         {
             try
             {
@@ -110,7 +135,7 @@ namespace Vouchee.Business.Services.Impls
                                                         .Include(x => x.Addresses));
                 if (voucher != null)
                 {
-                    GetVoucherDTO voucherDTO = _mapper.Map<GetVoucherDTO>(voucher);
+                    GetAllVoucherDTO voucherDTO = _mapper.Map<GetAllVoucherDTO>(voucher);
                     return voucherDTO;
                 }
                 else
@@ -125,15 +150,15 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<DynamicResponseModel<GetVoucherDTO>> GetVouchersAsync(PagingRequest pagingRequest,
-                                                                                    VoucherFiler voucherFiler)
+        public async Task<DynamicResponseModel<GetAllVoucherDTO>> GetVouchersAsync(PagingRequest pagingRequest,
+                                                                                    VoucherFilter voucherFiler)
         {
-            (int, IQueryable<GetVoucherDTO>) result;
+            (int, IQueryable<GetAllVoucherDTO>) result;
             try
             {
                 result = _voucherRepository.GetTable()
-                            .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
-                            .DynamicFilter(_mapper.Map<GetVoucherDTO>(voucherFiler))
+                            .ProjectTo<GetAllVoucherDTO>(_mapper.ConfigurationProvider)
+                            .DynamicFilter(_mapper.Map<GetAllVoucherDTO>(voucherFiler))
                             .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
             }
             catch (Exception ex)
@@ -141,7 +166,7 @@ namespace Vouchee.Business.Services.Impls
                 LoggerService.Logger(ex.Message);
                 throw new LoadException("Lỗi không xác định khi tải voucher");
             }
-            return new DynamicResponseModel<GetVoucherDTO>()
+            return new DynamicResponseModel<GetAllVoucherDTO>()
             {
                 metaData = new MetaData()
                 {

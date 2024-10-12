@@ -54,7 +54,7 @@ namespace Vouchee.API.Controllers
         // GET ALL
         [HttpGet("get_all_voucher")]
         public async Task<IActionResult> GetAllVouchers([FromQuery] PagingRequest pagingRequest,
-                                                            [FromQuery] VoucherFiler voucherFiler)
+                                                            [FromQuery] VoucherFilter voucherFiler)
         {
             var result = await _voucherService.GetVouchersAsync(pagingRequest, voucherFiler);
             return Ok(result);
@@ -64,6 +64,22 @@ namespace Vouchee.API.Controllers
         public async Task<IActionResult> GetNewestVouchers()
         {
             var result = await _voucherService.GetNewestVouchers();
+            return Ok(result);
+        }
+
+        [HttpGet("get_best_sold_vouchers")]
+        public async Task<IActionResult> GetBestSoldVouchers()
+        {
+            var result = await _voucherService.GetBestSoldVouchers();
+            return Ok(result);
+        }
+
+        [HttpGet("get_nearest_vouchers")]
+        public async Task<IActionResult> GetNearestVouchers([FromQuery] PagingRequest pagingRequest,
+                                                                [FromQuery] decimal lon,
+                                                                [FromQuery] decimal lat)
+        {
+            var result = await _voucherService.GetNearestVouchers(pagingRequest, lon, lat);
             return Ok(result);
         }
 

@@ -68,14 +68,14 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<GetAddressDTO> GetAddressByIdAsync(Guid id)
+        public async Task<GetAllAddressDTO> GetAddressByIdAsync(Guid id)
         {
             try
             {
                 var address = await _addressRepository.GetByIdAsync(id);
                 if (address != null)
                 {
-                    GetAddressDTO addressDTO = _mapper.Map<GetAddressDTO>(address);
+                    GetAllAddressDTO addressDTO = _mapper.Map<GetAllAddressDTO>(address);
                     return addressDTO;
                 }
                 else
@@ -90,13 +90,13 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<IList<GetAddressDTO>> GetAddressesAsync()
+        public async Task<IList<GetAllAddressDTO>> GetAddressesAsync()
         {
-            IQueryable<GetAddressDTO> result;
+            IQueryable<GetAllAddressDTO> result;
             try
             {
                 result = _addressRepository.GetTable()
-                            .ProjectTo<GetAddressDTO>(_mapper.ConfigurationProvider);
+                            .ProjectTo<GetAllAddressDTO>(_mapper.ConfigurationProvider);
             }
             catch (Exception ex)
             {

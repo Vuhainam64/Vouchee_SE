@@ -39,32 +39,35 @@ namespace Vouchee.Business.Models.DTOs
         public DateTime? updateDate = DateTime.Now;
     }
 
-    public class GetAddressDTO
+    public class GetAllAddressDTO
     {
-        public GetAddressDTO()
+        public GetAllAddressDTO()
         {
-            vouchers = new HashSet<GetVoucherDTO>();
+            //vouchers = new HashSet<GetAllVoucherDTO>();
             //addresses = new HashSet<GetAddressDTO>();
         }
 
         public Guid? id { get; set; }
 
-        public string? image { get; set; }
-        [Column(TypeName = "decimal")]
+       //  public string? image { get; set; }
         public string? addressName { get; set; }
         [Column(TypeName = "decimal")]
         public decimal? lon { get; set; }
         [Column(TypeName = "decimal")]
         public decimal? lat { get; set; }
-        [Column(TypeName = "decimal")]
-        public decimal? percentShow { get; set; }
-        public string? status { get; set; }
-        public DateTime? createDate { get; set; }
-        public Guid? createBy { get; set; }
-        public DateTime? updateDate { get; set; }
-        public Guid? updateBy { get; set; }
+        //[Column(TypeName = "decimal")]
+        //public decimal? percentShow { get; set; }
+        //public string? status { get; set; }
+        //public DateTime? createDate { get; set; }
+        //public Guid? createBy { get; set; }
+        //public DateTime? updateDate { get; set; }
+        //public Guid? updateBy { get; set; }
 
-        public virtual ICollection<GetVoucherDTO>? vouchers { get; set; }
-        //public virtual ICollection<GetAddressDTO>? addresses { get; set; }
+        //public virtual ICollection<GetAllVoucherDTO>? vouchers { get; set; }
+    }
+
+    public class GetDetailAddressDTO
+    {
+
     }
 }

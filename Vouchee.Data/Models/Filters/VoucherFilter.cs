@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Filters
 {
-    public class VoucherFiler
+    public class VoucherFilter
     {
         public string? name { get; set; }
         public decimal? price { get; set; }

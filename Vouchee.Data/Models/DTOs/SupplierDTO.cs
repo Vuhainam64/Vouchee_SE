@@ -25,7 +25,7 @@ namespace Vouchee.Business.Models.DTOs
     {
         public GetSupplierDTO()
         {
-            vouchers = new HashSet<GetVoucherDTO>();
+            vouchers = new HashSet<GetAllVoucherDTO>();
         }
 
         public Guid? id { get; set; }
@@ -36,6 +36,6 @@ namespace Vouchee.Business.Models.DTOs
         public DateTime? updateDate { get; set; }
         public Guid? updateBy { get; set; }
 
-        public virtual ICollection<GetVoucherDTO>? vouchers { get; set; }
+        public virtual ICollection<GetAllVoucherDTO>? vouchers { get; set; }
     }
 }

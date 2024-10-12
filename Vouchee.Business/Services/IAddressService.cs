@@ -11,8 +11,8 @@ namespace Vouchee.Business.Services
         public Task<Guid?> CreateAddressAsync(CreateAddressDTO createAddressDTO, ThisUserObj thisUserObj);
 
         // READ
-        public Task<GetAddressDTO> GetAddressByIdAsync(Guid id);
-        public Task<IList<GetAddressDTO>> GetAddressesAsync();
+        public Task<GetAllAddressDTO> GetAddressByIdAsync(Guid id);
+        public Task<IList<GetAllAddressDTO>> GetAddressesAsync();
 
         // UPDATE
         public Task<bool> UpdateAddressAsync(Guid id, UpdateAddressDTO updateAddressDTO);
