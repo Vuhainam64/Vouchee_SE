@@ -53,7 +53,6 @@ namespace Vouchee.API.Controllers
 
         // GET ALL
         [HttpGet("get_all_voucher")]
-        [HttpGet("get_all_voucher")]
         public async Task<IActionResult> GetAllVouchers([FromQuery] PagingRequest pagingRequest)
         {
             var result = await _voucherService.GetVouchersAsync(pagingRequest);
@@ -61,9 +60,9 @@ namespace Vouchee.API.Controllers
         }
 
         [HttpGet("get_newest_vouchers")]
-        public async Task<IActionResult> GetNewestVouchers([FromQuery] PagingRequest pagingRequest)
+        public async Task<IActionResult> GetNewestVouchers()
         {
-            var result = await _voucherService.GetVouchersAsync(pagingRequest);
+            var result = await _voucherService.GetNewestVouchers();
             return Ok(result);
         }
 
