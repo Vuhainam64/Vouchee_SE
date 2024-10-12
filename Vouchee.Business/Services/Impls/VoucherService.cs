@@ -125,13 +125,15 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<DynamicResponseModel<GetVoucherDTO>> GetVouchersAsync(PagingRequest pagingRequest)
+        public async Task<DynamicResponseModel<GetVoucherDTO>> GetVouchersAsync(PagingRequest pagingRequest,
+                                                                                    VoucherFiler voucherFiler)
         {
             (int, IQueryable<GetVoucherDTO>) result;
             try
             {
                 result = _voucherRepository.GetTable()
                             .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
+                            .DynamicFilter(_mapper.Map<GetVoucherDTO>(voucherFiler))
                             .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
             }
             catch (Exception ex)

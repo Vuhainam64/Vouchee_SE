@@ -53,9 +53,10 @@ namespace Vouchee.API.Controllers
 
         // GET ALL
         [HttpGet("get_all_voucher")]
-        public async Task<IActionResult> GetAllVouchers([FromQuery] PagingRequest pagingRequest)
+        public async Task<IActionResult> GetAllVouchers([FromQuery] PagingRequest pagingRequest,
+                                                            [FromQuery] VoucherFiler voucherFiler)
         {
-            var result = await _voucherService.GetVouchersAsync(pagingRequest);
+            var result = await _voucherService.GetVouchersAsync(pagingRequest, voucherFiler);
             return Ok(result);
         }
 
