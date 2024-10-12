@@ -126,16 +126,18 @@ namespace Vouchee.Business.Services.Impls
             throw new NotImplementedException();
         }
 
-        public async Task<GetAllVoucherDTO> GetVoucherByIdAsync(Guid id)
+        public async Task<GetDetailVoucherDTO> GetVoucherByIdAsync(Guid id)
         {
             try
             {
                 var voucher = await _voucherRepository.GetByIdAsync(id,
                                         query => query.Include(x => x.VoucherCodes)
+                                                        .Include(x => x.Brand)
+                                                        .Include(x => x.Supplier)
                                                         .Include(x => x.Addresses));
                 if (voucher != null)
                 {
-                    GetAllVoucherDTO voucherDTO = _mapper.Map<GetAllVoucherDTO>(voucher);
+                    GetDetailVoucherDTO voucherDTO = _mapper.Map<GetDetailVoucherDTO>(voucher);
                     return voucherDTO;
                 }
                 else

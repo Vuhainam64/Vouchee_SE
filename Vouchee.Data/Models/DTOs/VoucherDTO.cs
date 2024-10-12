@@ -97,7 +97,25 @@ namespace Vouchee.Business.Models.DTOs
             addresses = new HashSet<GetAllAddressDTO>();
         }
 
+        public Guid? id { get; set; }
 
+        public string? name { get; set; }
+        public string? description { get; set; }
+        public string? image { get; set; }
+        public decimal? price { get; set; }
+        public DateTime? starDate { get; set; }
+        public DateTime? endDate { get; set; }
+        public string? policy { get; set; }
+        public int? quantity { get; set; }
+
+        public Guid? brandId { get; set; }
+        public string? brandName { get; set; }
+        public string? brandImage { get; set; }
+        public Guid? supplierId { get; set; }
+        public string? supplierName { get; set; }
+        public string? supplierImage { get; set; }
+        public Guid? voucherTypeId { get; set; }
+        public string? voucherTypeName { get; set; }
 
         public virtual ICollection<GetAllAddressDTO>? addresses { get; set; }
         public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
