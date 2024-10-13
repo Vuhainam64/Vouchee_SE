@@ -15,7 +15,7 @@ namespace Vouchee.Data.Helpers
         public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<OrderDetail> OrderDetails { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
-        public virtual DbSet<Address> Addresses { get; set; }
+        public virtual DbSet<Address> Address { get; set; }
         public virtual DbSet<Supplier> Suppliers { get; set; }
         public virtual DbSet<VoucherType> VoucherTypes { get; set; }
         public virtual DbSet<Voucher> Vouchers { get; set; }

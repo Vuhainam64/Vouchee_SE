@@ -27,5 +27,7 @@ namespace Vouchee.Data.Helpers.Base
             _dao.GetTable(includeProperties);
 
         public Task<TEntity> FindAsync(Guid id) => _dao.FindAsync(id);
+
+        public Task<TEntity> Add(TEntity entity) => _dao.Add(entity);
     }
 }
