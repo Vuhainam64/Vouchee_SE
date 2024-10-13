@@ -20,6 +20,7 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? supplierId { get; set; }
         public Guid? voucherTypeId { get; set; }
         public Guid? addressId { get; set; }
+        public Guid? categoryId { get; set; }
 
         public string? name { get; set; }
         public string? description { get; set; }

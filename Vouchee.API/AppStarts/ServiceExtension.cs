@@ -83,6 +83,9 @@ namespace Vouchee.API.AppStarts
 
             // ORDER DETAIL
             services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
+
+            // TEST
+            services.AddScoped<ITestService, TestService>();
         }
 
         public static void AddSwaggerServices(this IServiceCollection services, IConfiguration configuration)

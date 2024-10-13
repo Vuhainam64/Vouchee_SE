@@ -178,5 +178,31 @@ namespace Vouchee.Data.Helpers
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<TEntity?> Add(TEntity entity)
+        {
+            try
+            {
+                // Add the entity to the database context
+                await Table.AddAsync(entity);
+
+                // Save changes to the database
+                var result = await _context.SaveChangesAsync();
+
+                // If the save was successful, return the entity
+                if (result > 0)
+                {
+                    return entity;
+                }
+
+                return null; // Return null if no changes were saved
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.Message);
+                throw new Exception("Error adding entity: " + ex.Message);
+            }
+        }
+
     }
 }

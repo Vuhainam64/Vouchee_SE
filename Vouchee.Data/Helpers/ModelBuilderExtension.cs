@@ -181,12 +181,12 @@ namespace Vouchee.Data.Helpers
                 new Voucher()
                 {
                     Id = Guid.Parse("494b5347-378e-4e2d-9553-6032a42cd8d1"),
-                    StarDate = DateTime.Now,
+                    StartDate = DateTime.Now,
                     EndDate = DateTime.Now.AddDays(4),
                     PercentShow = 10,
                     Price = 100000,
                     Quantity = 100,
-                    Name = "Voucher sale",
+                    Title = "Voucher sale",
                     CreateBy = Guid.Parse("b4583f49-baba-4916-8e2b-2d44c3412733"),
                     Status = ObjectStatusEnum.ACTIVE.ToString(),
                     SupplierId = Guid.Parse("a053e9fc-7962-4eaa-8377-91c56c85cda6"),
@@ -195,12 +195,12 @@ namespace Vouchee.Data.Helpers
                 new Voucher()
                 {
                     Id = Guid.Parse("0c20c3c9-2200-4b09-81f5-a0ceb74eba8c"),
-                    StarDate = DateTime.Now,
+                    StartDate = DateTime.Now,
                     EndDate = DateTime.Now.AddDays(4),
                     PercentShow = 10,
                     Price = 100000,
                     Quantity = 100,
-                    Name = "Voucher sale",
+                    Title = "Voucher sale",
                     CreateBy = Guid.Parse("b4583f49-baba-4916-8e2b-2d44c3412733"),
                     Status = ObjectStatusEnum.ACTIVE.ToString(),
                     SupplierId = Guid.Parse("a053e9fc-7962-4eaa-8377-91c56c85cda6"),

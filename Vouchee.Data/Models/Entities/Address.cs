@@ -17,17 +17,17 @@ namespace Vouchee.Data.Models.Entities
         }
 
         [InverseProperty(nameof(Voucher.Addresses))]
-        public virtual ICollection<Voucher> Vouchers { get; set; }
+        public virtual ICollection<Voucher>? Vouchers { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
 
         public string? AddressName { get; set; }
-        [Column(TypeName = "decimal(18, 10)")]
-        public decimal? Lon { get; set; }
-        [Column(TypeName = "decimal(18, 10)")]
-        public decimal? Lat { get; set; }
+        [Column(TypeName = "decimal(38, 10)")]
+        public decimal Lon { get; set; }
+        [Column(TypeName = "decimal(38, 10)")]
+        public decimal Lat { get; set; }
         [Column(TypeName = "decimal(5, 2)")]
         public decimal? PercentShow { get; set; }
         public string? Image { get; set; }
