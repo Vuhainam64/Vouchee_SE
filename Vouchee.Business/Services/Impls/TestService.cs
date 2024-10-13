@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Google.Api;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -58,8 +59,13 @@ namespace Vouchee.Business.Services.Impls
             {
                 // Check if the address already exists in the database
                 var existedAddress = _addressRepository.GetAddress(address.lon, address.lat);
+                if(existedAddress != null) 
+                {
+                    _voucherRepository.Attach(existedAddress);
 
-                if (existedAddress == null)
+                    voucher.Addresses.Add(existedAddress);
+                }
+                else
                 {
                     // Create a new address if it doesn't exist
                     Address newAddress = new()
@@ -76,10 +82,7 @@ namespace Vouchee.Business.Services.Impls
 
                     voucher.Addresses.Add(newAddress); // Add the newly created address to the voucher
                 }
-                else
-                {
-                    voucher.Addresses.Add(existedAddress);
-                }
+                
             }
 
             // Set voucher details
@@ -104,7 +107,18 @@ namespace Vouchee.Business.Services.Impls
             voucher.SupplierId = supplierID;
             voucher.VoucherTypeId = voucherTypeId;
 
-            await _voucherRepository.AddAsync(voucher);
+            try
+            {
+                await _voucherRepository.AddAsync(voucher);
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or inspect the inner exception
+                var innerException = ex.InnerException?.Message ?? "No inner exception";
+                Console.WriteLine($"Error saving to database: {innerException}");
+            }
+
+
 
             return voucher;
         }
