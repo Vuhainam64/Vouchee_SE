@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Vouchee.Business.Models.DTOs;
@@ -17,6 +18,10 @@ namespace Vouchee.Data.Repositories.Repos
 
         public AddressRepository() => _addressDAO = BaseDAO<Address>.Instance;
 
+        public void Attach(Address existedAddress)
+        {
+            _addressDAO.Attach(existedAddress);
+        }
 
         public Address GetAddress(decimal? lon, decimal? lat)
         {

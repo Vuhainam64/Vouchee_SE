@@ -12,14 +12,18 @@ using Vouchee.Business.Models;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
 
 namespace Vouchee.API.AppStarts
 {
     public static class ServiceExtension
     {
-        public static void AddDependencyInjection(this IServiceCollection services)
+        public static void AddDependencyInjection(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddTransient(typeof(VoucheeContext));
+            services.AddDbContext<VoucheeContext>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("PROD"))
+                       .EnableSensitiveDataLogging() // Enable sensitive data logging
+                       .LogTo(Console.WriteLine, LogLevel.Information)); // Log SQL commands
 
             services.AddSingleton(typeof(BaseDAO<>));
 

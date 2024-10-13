@@ -5,8 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
+using Vouchee.Data.Models.Entities;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Vouchee.Data.Helpers
@@ -204,5 +206,9 @@ namespace Vouchee.Data.Helpers
             }
         }
 
+        internal void Attach(Address entity)
+        {
+            _context.Entry(entity).State = EntityState.Unchanged;
+        }
     }
 }
