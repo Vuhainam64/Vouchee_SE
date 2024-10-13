@@ -54,20 +54,25 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty("Vouchers")]
         public virtual VoucherType? VoucherType { get; set; }
 
+        public Guid? CategoryId { get; set; }
+        [ForeignKey(nameof(CategoryId))]
+        [InverseProperty("Vouchers")]
+        public virtual Category? Category { get; set; }
+
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
 
-        public string? Name { get; set; }
+        public string? Title { get; set; }
         public string? Description { get; set; }
         [Column(TypeName = "decimal")]
         public decimal Price { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime StarDate { get; set; }
+        public DateTime StartDate { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime EndDate { get; set; }
         public string? Policy { get; set; }
-        public int Quantity { get; set; }
+        public int? Quantity { get; set; }
         public string? Image { get; set; }
         [Column(TypeName = "decimal")]
         public decimal? PercentShow { get; set; }

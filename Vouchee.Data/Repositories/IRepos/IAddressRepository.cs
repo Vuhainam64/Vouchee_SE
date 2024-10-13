@@ -10,5 +10,6 @@ namespace Vouchee.Data.Repositories.IRepos
 {
     public interface IAddressRepository : IBaseRepository<Address>
     {
+        public Address GetAddress(decimal? lon, decimal? lat);
     }
 }

@@ -13,10 +13,18 @@ namespace Vouchee.Data.Models.Entities
     [Index(nameof(VoucherTypeId), Name = "IX_Category_VoucherTypeId")]
     public class Category
     {
+        public Category()
+        {
+            Vouchers = new HashSet<Voucher>();
+        }
+
         public Guid? VoucherTypeId { get; set; }
         [ForeignKey(nameof(VoucherTypeId))]
         [InverseProperty("Categories")]
         public virtual VoucherType? VoucherType { get; set; }
+
+        [InverseProperty(nameof(Voucher.Category))]
+        public virtual ICollection<Voucher> Vouchers { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
