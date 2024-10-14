@@ -67,9 +67,9 @@ namespace Vouchee.API.Controllers
         }
 
         [HttpGet("get_best_sold_vouchers")]
-        public async Task<IActionResult> GetBestSoldVouchers()
+        public async Task<IActionResult> GetBestSoldVouchers([FromQuery] PagingRequest pagingRequest)
         {
-            var result = await _voucherService.GetBestSoldVouchers();
+            var result = await _voucherService.GetTopSaleVouchers(pagingRequest);
             return Ok(result);
         }
 

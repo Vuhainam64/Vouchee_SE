@@ -25,7 +25,8 @@ namespace Vouchee.API.AppStarts
             CreateMap<GetAllVoucherDTO, VoucherFilter>().ReverseMap();
             CreateMap<Voucher, GetDetailVoucherDTO>().ReverseMap();
             CreateMap<Voucher, GetAllVoucherDTO>().ReverseMap();
-
+            CreateMap<Voucher, GetBestBuyVoucherDTO>().ReverseMap(); 
+            CreateMap<Voucher, GetNearestVoucherDTO>().ReverseMap();
             // ORDER DETAIL
             CreateMap<OrderDetail, OrderDetailDTO>().ReverseMap();
             CreateMap<OrderDetail, CreateOrderDetailDTO>().ReverseMap();

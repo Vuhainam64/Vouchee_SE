@@ -23,16 +23,19 @@ namespace Vouchee.Business.Services.Impls
         private readonly ICategoryRepository _categoryRepository;
         private readonly IFileUploadService _fileUploadService;
         private readonly IVoucherRepository _voucherRepository;
+        private readonly IOrderDetailRepository _orderDetailRepository;
         private readonly IMapper _mapper;
 
         public VoucherService(ICategoryRepository categoryRepository,
                                 IFileUploadService fileUploadService,
                                 IVoucherRepository voucherRepository,
+                                IOrderDetailRepository orderDetailRepository,
                                 IMapper mapper)
         {
             _categoryRepository = categoryRepository;
             _fileUploadService = fileUploadService;
             _voucherRepository = voucherRepository;
+            _orderDetailRepository = orderDetailRepository;
             _mapper = mapper;
         }
 
@@ -92,7 +95,7 @@ namespace Vouchee.Business.Services.Impls
             throw new NotImplementedException();
         }
 
-        public async Task<IList<GetAllVoucherDTO>> GetNearestVouchers(decimal lon, decimal lat)
+        public async Task<IList<GetNearestVoucherDTO>> GetNearestVouchers(decimal lon, decimal lat)
         {
             decimal maxDistanceKm = 2;
             decimal R = 6371; // Bán kính Trái Đất (km)
@@ -102,7 +105,7 @@ namespace Vouchee.Business.Services.Impls
 
             // Lấy tất cả vouchers và ánh xạ sang DTO
             var vouchers = _voucherRepository.GetTable()
-                .ProjectTo<GetAllVoucherDTO>(_mapper.ConfigurationProvider)
+                .ProjectTo<GetNearestVoucherDTO>(_mapper.ConfigurationProvider)
                 .ToList(); // Materialize dữ liệu
 
             // Tính toán và lọc các voucher với địa chỉ gần nhất
@@ -136,7 +139,7 @@ namespace Vouchee.Business.Services.Impls
 
                     if (nearestAddress != null)
                     {
-                        return new GetAllVoucherDTO
+                        return new GetNearestVoucherDTO
                         {
                             title = voucher.title,
                             categories = voucher.categories,
@@ -183,10 +186,44 @@ namespace Vouchee.Business.Services.Impls
             throw new NotImplementedException();
         }
 
-        public Task<IList<GetAllVoucherDTO>> GetTopSaleVouchers(PagingRequest pagingRequest)
+        public async Task<IList<GetBestBuyVoucherDTO>> GetTopSaleVouchers(PagingRequest pagingRequest)
         {
-            throw new NotImplementedException();
+            // Get all vouchers and their total quantity sold
+            var orderDetails = _orderDetailRepository.GetTable()
+                .GroupBy(od => od.VoucherId)
+                .Select(group => new
+                {
+                    VoucherId = group.Key,
+                    TotalQuantitySold = group.Sum(od => od.Quantity)
+                })
+                .OrderByDescending(vs => vs.TotalQuantitySold)
+                /*.Skip((pagingRequest.PageNumber - 1) * pagingRequest.PageSize)
+                .Take(pagingRequest.PageSize)*/
+                .ToList();
+
+            // Join the vouchers and return with sorted totalQuantitySold
+            var vouchers = _voucherRepository.GetTable()
+                .Where(v => orderDetails.Select(od => od.VoucherId).Contains(v.Id))
+                .ProjectTo<GetBestBuyVoucherDTO>(_mapper.ConfigurationProvider)
+                .ToList();
+
+            // Attach the total quantity sold to each voucher and sort the result
+            var result = vouchers.Select(voucher => new GetBestBuyVoucherDTO
+            {
+                id = voucher.id,
+                title = voucher.title,
+                image = voucher.image,
+                originalPrice = voucher.originalPrice,
+                salePrice = voucher.salePrice,
+                TotalQuantitySold = orderDetails.First(od => od.VoucherId == voucher.id).TotalQuantitySold,
+            })
+            .OrderByDescending(v => v.TotalQuantitySold)
+            .ToList();
+
+            return result;
         }
+
+
 
         public async Task<GetDetailVoucherDTO> GetVoucherByIdAsync(Guid id)
         {
