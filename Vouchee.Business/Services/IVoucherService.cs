@@ -13,7 +13,10 @@ namespace Vouchee.Business.Services
         // READ
         public Task<GetDetailVoucherDTO> GetVoucherByIdAsync(Guid id);
         public Task<DynamicResponseModel<GetAllVoucherDTO>> GetVouchersAsync(PagingRequest pagingRequest,
-                                                                            VoucherFilter voucherFiler);
+                                                                            VoucherFilter voucherFiler,
+                                                                            decimal lon,
+                                                                            decimal lat,
+                                                                            decimal maxDistance);
         public Task<IList<GetAllVoucherDTO>> GetNewestVouchers();
         public Task<IList<GetAllVoucherDTO>> GetBestSoldVouchers();
         public Task<IList<GetAllVoucherDTO>> GetNearestVouchers(PagingRequest pagingRequest, decimal lon, decimal lat);
@@ -24,5 +27,6 @@ namespace Vouchee.Business.Services
 
         // DELETE
         public Task<bool> DeleteVoucherAsync(Guid id);
+        public Task<IList<GetAllVoucherDTO>> GetNearestVouchers(decimal lon, decimal lat);
     }
 }

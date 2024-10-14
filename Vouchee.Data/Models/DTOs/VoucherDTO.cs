@@ -62,7 +62,6 @@ namespace Vouchee.Business.Models.DTOs
             addresses = new HashSet<GetAllAddressDTO>();
             categories = new HashSet<GetCategoryDTO>();
         }
-
         public Guid? id { get; set; }
 
         public string? title { get; set; }
