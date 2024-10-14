@@ -70,8 +70,8 @@ namespace Vouchee.Data.Models.Entities
         public string? Description { get; set; }
         [Column(TypeName = "decimal")]
         public decimal OriginalPrice { get; set; }
-        [Column(TypeName = "decimal")]
-        public decimal SalePrice { get; set; }
+        //[Column(TypeName = "decimal")]
+        //public decimal SalePrice { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime StartDate { get; set; }
         [Column(TypeName = "datetime")]

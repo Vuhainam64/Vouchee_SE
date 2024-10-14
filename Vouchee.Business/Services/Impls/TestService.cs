@@ -98,7 +98,6 @@ namespace Vouchee.Business.Services.Impls
             voucher.OriginalPrice = random.Next(50000, 1000000);
             voucher.SupplierId = supplierID;
             voucher.VoucherTypeId = voucherTypeId;
-            voucher.SalePrice = voucher.OriginalPrice + 10000;
 
             try
             {
