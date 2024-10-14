@@ -1,0 +1,40 @@
+﻿SELECT 
+    v.Id, 
+    v.Title, 
+    v.Description, 
+    v.OriginalPrice, 
+    v.SalePrice, 
+    v.BrandId, 
+    v.CreateDate, 
+    v.CreateBy, 
+    v.UpdateDate, 
+    v.UpdateBy, 
+    v.StartDate, 
+    v.EndDate, 
+    v.Policy, 
+    v.Quantity, 
+    v.Image, 
+    v.Status,
+    v.SupplierId,
+    v.VoucherTypeId,
+    a.Id AS AddressId, 
+    a.AddressName AS AddressName, 
+    a.Lon, 
+    a.Lat,
+    a.PercentShow,
+    a.Image AS AddressImage,
+    (6371 * acos(cos(radians(21.0246119)) * cos(radians(a.Lat)) * 
+    cos(radians(a.Lon) - radians(105.8299177)) + 
+    sin(radians(21.0246119)) * sin(radians(a.Lat)))) AS Distance
+FROM 
+    Voucher v
+JOIN 
+    AddressVoucher av ON v.Id = av.VouchersId
+JOIN 
+    Address a ON av.AddressesId = a.Id
+WHERE 
+    (6371 * acos(cos(radians(21.0246119)) * cos(radians(a.Lat)) * 
+    cos(radians(a.Lon) - radians(105.8299177)) + 
+    sin(radians(21.0246119)) * sin(radians(a.Lat))) <= 2)
+ORDER BY 
+    Distance;

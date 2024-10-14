@@ -43,14 +43,6 @@ namespace Vouchee.Business.Services.Impls
             Random random = new Random();
             Voucher voucher = new();
 
-            // Get categories and brands
-            IList<Category> categories = _categoryRepository.GetTable().ToList();
-            IList<Brand> brands = _brandRepository.GetTable().ToList();
-
-            // Set random category and brand
-            voucher.CategoryId = categories[random.Next(categories.Count)].Id;
-            voucher.BrandId = brands[random.Next(brands.Count)].Id;
-
             // Initialize addresses for the voucher
             voucher.Addresses = new List<Address>();
 
@@ -103,9 +95,10 @@ namespace Vouchee.Business.Services.Impls
             voucher.Image = "https://firebasestorage.googleapis.com/v0/b/vouchee-504da.appspot.com/o/IMAGE%2FVOUCHER%2Ftest.png?alt=media&token=11650450-ca07-45b1-a5d5-abbd90495d7a";
             voucher.PercentShow = random.Next(1, 100);
             voucher.Policy = "Lorem Ipsum is simply dummy text of the printing and typesetting industry...";
-            voucher.Price = random.Next(50000, 1000000);
+            voucher.OriginalPrice = random.Next(50000, 1000000);
             voucher.SupplierId = supplierID;
             voucher.VoucherTypeId = voucherTypeId;
+            voucher.SalePrice = voucher.OriginalPrice + 10000;
 
             try
             {

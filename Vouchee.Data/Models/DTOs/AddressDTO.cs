@@ -14,13 +14,9 @@ namespace Vouchee.Business.Models.DTOs
 {
     public class CreateAddressDTO
     {
-        [Column(TypeName = "decimal")]
         public string? addressName { get; set; }
-        [Column(TypeName = "decimal")]
         public decimal? lon { get; set; }
-        [Column(TypeName = "decimal")]
         public decimal? lat { get; set; }
-        [Column(TypeName = "decimal")]
         public decimal? percentShow { get; set; }
         public IFormFile? image { get; set; }
         public DateTime? createDate = DateTime.Now;
@@ -43,28 +39,21 @@ namespace Vouchee.Business.Models.DTOs
     {
         public GetAllAddressDTO()
         {
-            //vouchers = new HashSet<GetAllVoucherDTO>();
-            //addresses = new HashSet<GetAddressDTO>();
+            // vouchers = new HashSet<GetAllVoucherDTO>();
+            // addresses = new HashSet<GetAddressDTO>();
         }
 
         public Guid? id { get; set; }
-
-       //  public string? image { get; set; }
         public string? addressName { get; set; }
+
         [Column(TypeName = "decimal")]
         public decimal? lon { get; set; }
         [Column(TypeName = "decimal")]
         public decimal? lat { get; set; }
-        //[Column(TypeName = "decimal")]
-        //public decimal? percentShow { get; set; }
-        //public string? status { get; set; }
-        //public DateTime? createDate { get; set; }
-        //public Guid? createBy { get; set; }
-        //public DateTime? updateDate { get; set; }
-        //public Guid? updateBy { get; set; }
 
-        //public virtual ICollection<GetAllVoucherDTO>? vouchers { get; set; }
+        public decimal? distance { get; set; }
     }
+
 
     public class GetDetailAddressDTO
     {

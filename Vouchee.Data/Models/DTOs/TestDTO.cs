@@ -20,8 +20,8 @@ namespace Vouchee.Data.Models.DTOs
 
     public class TestCreateAddressDTO
     {
-        public string address_name { get; set; }
-        public decimal lon { get; set; }
-        public decimal lat { get; set; }
+        public string? address_name { get; set; }
+        public decimal? lon { get; set; }
+        public decimal? lat { get; set; }
     }
 }

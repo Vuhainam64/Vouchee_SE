@@ -23,7 +23,7 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty("Categories")]
         public virtual VoucherType? VoucherType { get; set; }
 
-        [InverseProperty(nameof(Voucher.Category))]
+        [InverseProperty(nameof(Voucher.Categories))]
         public virtual ICollection<Voucher> Vouchers { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

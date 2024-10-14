@@ -23,6 +23,7 @@ namespace Vouchee.Data.Models.Entities
             Addresses = new HashSet<Address>();
             OrderDetails = new HashSet<OrderDetail>();
             Promotions = new HashSet<Promotion>();
+            Categories = new HashSet<Category>();
         }
 
         [InverseProperty(nameof(VoucherCode.Voucher))]
@@ -33,6 +34,8 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<Address> Addresses { get; set; }
         [InverseProperty(nameof(Promotion.Vouchers))]
         public virtual ICollection<Promotion> Promotions { get; set; }
+        [InverseProperty(nameof(Category.Vouchers))]
+        public virtual ICollection<Category> Categories { get; set; }
 
         public Guid? BrandId { get; set; }
         [ForeignKey(nameof(BrandId))]
@@ -54,10 +57,10 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty("Vouchers")]
         public virtual VoucherType? VoucherType { get; set; }
 
-        public Guid? CategoryId { get; set; }
-        [ForeignKey(nameof(CategoryId))]
-        [InverseProperty("Vouchers")]
-        public virtual Category? Category { get; set; }
+        //public Guid? CategoryId { get; set; }
+        //[ForeignKey(nameof(CategoryId))]
+        //[InverseProperty("Vouchers")]
+        //public virtual Category? Category { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
@@ -66,7 +69,9 @@ namespace Vouchee.Data.Models.Entities
         public string? Title { get; set; }
         public string? Description { get; set; }
         [Column(TypeName = "decimal")]
-        public decimal Price { get; set; }
+        public decimal OriginalPrice { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal SalePrice { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime StartDate { get; set; }
         [Column(TypeName = "datetime")]

@@ -97,7 +97,7 @@ namespace Vouchee.Business.Services.Impls
 
                     orderDetail.VoucherId = voucher.Id;
                     orderDetail.CreateBy = Guid.Parse(thisUserObj.userId);
-                    orderDetail.UnitPrice = voucher.Price;
+                    orderDetail.UnitPrice = voucher.OriginalPrice;
                 }
 
                 order.CreateBy = Guid.Parse(thisUserObj.userId);
