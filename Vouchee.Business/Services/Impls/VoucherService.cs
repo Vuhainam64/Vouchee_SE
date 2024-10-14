@@ -206,33 +206,6 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<DynamicResponseModel<GetAllVoucherDTO>> GetVouchersAsync(PagingRequest pagingRequest,
-                                                                                    VoucherFilter voucherFiler)
-        {
-            (int, IQueryable<GetAllVoucherDTO>) result;
-            try
-            {
-                result = _voucherRepository.GetTable()
-                            .ProjectTo<GetAllVoucherDTO>(_mapper.ConfigurationProvider)
-                            .DynamicFilter(_mapper.Map<GetAllVoucherDTO>(voucherFiler))
-                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải voucher");
-            }
-            return new DynamicResponseModel<GetAllVoucherDTO>()
-            {
-                metaData = new MetaData()
-                {
-                    page = pagingRequest.page,
-                    size = pagingRequest.pageSize,
-                    total = result.Item1
-                },
-                results = result.Item2.ToList()
-            };
-        }
 
         public async Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO)
         {
@@ -254,6 +227,81 @@ namespace Vouchee.Business.Services.Impls
                 LoggerService.Logger(ex.Message);
                 throw new UpdateObjectException("Lỗi không xác định khi cập nhật voucher");
             }
+        }
+
+        public async Task<DynamicResponseModel<GetAllVoucherDTO>> GetVouchersAsync(PagingRequest pagingRequest, VoucherFilter voucherFiler, decimal lon, decimal lat, decimal maxDistance)
+        {
+            (int, IQueryable<GetAllVoucherDTO>) result;
+            try
+            {
+                decimal R = 6371; // Earth's radius in kilometers
+                result = _voucherRepository.GetTable()
+                            .ProjectTo<GetAllVoucherDTO>(_mapper.ConfigurationProvider)
+                            .DynamicFilter(_mapper.Map<GetAllVoucherDTO>(voucherFiler))
+                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+                decimal ToRadians(decimal value) => (decimal)(Math.PI / 180) * value;
+
+                var vouchers = result.Item2.ToList()
+                                    .Select(voucher =>
+                                    {
+                                        var nearestAddress = voucher.addresses
+                                            .Where(a => a.lat.HasValue && a.lon.HasValue)
+                                            .Select(a =>
+                                            {
+                                                decimal dLat = ToRadians(lat - (decimal)a.lat);
+                                                decimal dLon = ToRadians(lon - (decimal)a.lon);
+                                                decimal lat1 = ToRadians(lat);
+                                                decimal lat2 = ToRadians((decimal)a.lat);
+
+                                                decimal aVal = (decimal)(Math.Sin((double)dLat / 2) * Math.Sin((double)dLat / 2) +
+                                                                 Math.Cos((double)lat1) * Math.Cos((double)lat2) *
+                                                                 Math.Sin((double)dLon / 2) * Math.Sin((double)dLon / 2));
+
+                                                decimal c = 2 * (decimal)Math.Atan2(Math.Sqrt((double)aVal), Math.Sqrt(1 - (double)aVal));
+
+                                                decimal distance = R * c;
+                                                a.distance = Math.Round(distance, 2) + "km"; // Round to 2 decimal places
+
+                                                return new { Address = a, Distance = distance };
+                                            })
+                                            .Where(a => a.Distance <= maxDistance)
+                                            .OrderBy(a => a.Distance)
+                                            .Select(a => a.Address)
+                                            .FirstOrDefault();
+
+                                        if (nearestAddress != null)
+                                        {
+                                            return new GetAllVoucherDTO
+                                            {
+                                                name = voucher.name,
+                                                addresses = new List<GetAllAddressDTO> { nearestAddress }
+                                            };
+                                        }
+                                        return null;
+                                    })
+                                    .Where(v => v != null) // Filter out vouchers without nearby addresses
+                                    .Take(10) // Limit to the 10 nearest vouchers
+                                    .ToList();
+
+                return new DynamicResponseModel<GetAllVoucherDTO>()
+                {
+                    metaData = new MetaData()
+                    {
+                        page = pagingRequest.page,
+                        size = pagingRequest.pageSize,
+                        total = result.Item1
+                    },
+                    results = vouchers // Return only the filtered voucher list
+                };
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.Message);
+                throw new LoadException("An unexpected error occurred while loading vouchers");
+            }
+
+            return null;
         }
     }
 }
