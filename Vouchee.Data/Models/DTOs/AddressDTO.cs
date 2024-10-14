@@ -46,7 +46,7 @@ namespace Vouchee.Business.Models.DTOs
             //vouchers = new HashSet<GetAllVoucherDTO>();
             //addresses = new HashSet<GetAddressDTO>();
         }
-
+        public string distance;
         public Guid? id { get; set; }
 
        //  public string? image { get; set; }

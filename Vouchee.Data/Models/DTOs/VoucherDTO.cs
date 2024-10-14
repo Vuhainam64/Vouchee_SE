@@ -60,7 +60,6 @@ namespace Vouchee.Business.Models.DTOs
         {
             addresses = new HashSet<GetAllAddressDTO>();
         }
-
         public Guid? id { get; set; }
 
         public string? name { get; set; }
