@@ -20,18 +20,21 @@ namespace Vouchee.Business.Services.Impls
 {
     public class VoucherService : IVoucherService
     {
+        private readonly IPromotionRepository _promotionRepository;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IFileUploadService _fileUploadService;
         private readonly IVoucherRepository _voucherRepository;
         private readonly IOrderDetailRepository _orderDetailRepository;
         private readonly IMapper _mapper;
 
-        public VoucherService(ICategoryRepository categoryRepository,
+        public VoucherService(IPromotionRepository promotionRepository,
+                                ICategoryRepository categoryRepository,
                                 IFileUploadService fileUploadService,
                                 IVoucherRepository voucherRepository,
                                 IOrderDetailRepository orderDetailRepository,
                                 IMapper mapper)
         {
+            _promotionRepository = promotionRepository;
             _categoryRepository = categoryRepository;
             _fileUploadService = fileUploadService;
             _voucherRepository = voucherRepository;
@@ -294,7 +297,7 @@ namespace Vouchee.Business.Services.Impls
                 {
                     // Filter vouchers by the provided categoryID list
                     result.Item2 = result.Item2
-                        .Where(v => v.categories.Any(c => categoryID.Contains((Guid)c.id))).AsQueryable();
+                        .Where(v => v.categories.Any(c => categoryID.Contains((Guid)c.id)));
                 }
 
                 IList<GetAllVoucherDTO> vouchers = new List<GetAllVoucherDTO>();
@@ -351,6 +354,45 @@ namespace Vouchee.Business.Services.Impls
                                         .ToList();
                 }
 
+                var vouchersList = vouchers.Count != 0 ? vouchers.ToList() : result.Item2.ToList();  // Materialize the query into a list
+
+                if (result.Item2.Count() != 0)
+                {
+                    // check available promotion
+                    foreach (var voucher in vouchersList)
+                    {
+                        var currentDate = DateTime.Now;
+                        var promotions = _voucherRepository.GetByIdAsync(voucher.id, includeProperties: query => query.Include(x => x.Promotions)).Result.Promotions;
+
+                        var availablePromotion = promotions.FirstOrDefault(promotion => promotion.StartDate <= currentDate && promotion.EndDate >= currentDate);
+
+                        if (availablePromotion != null)
+                        {
+                            voucher.salePrice = voucher.originalPrice - (voucher.originalPrice * availablePromotion.PercentDiscount / 100);
+                        }
+                    }
+                }
+                else if (vouchers.Count() != 0)
+                {
+                    // check available promotion
+                    foreach (var voucher in vouchersList)
+                    {
+                        var currentDate = DateTime.Now;
+                        var promotions = _voucherRepository.GetByIdAsync(voucher.id, includeProperties: query => query.Include(x => x.Promotions)).Result.Promotions;
+
+                        var availablePromotion = promotions.FirstOrDefault(promotion => promotion.StartDate <= currentDate && promotion.EndDate >= currentDate);
+
+                        if (availablePromotion != null)
+                        {
+                            voucher.salePrice = voucher.originalPrice - (voucher.originalPrice * availablePromotion.PercentDiscount / 100);
+                        }
+                        else
+                        {
+                            voucher.salePrice = 0;
+                        }
+                    }
+                }
+
 
                 return new DynamicResponseModel<GetAllVoucherDTO>()
                 {
@@ -358,9 +400,9 @@ namespace Vouchee.Business.Services.Impls
                     {
                         page = pagingRequest.page,
                         size = pagingRequest.pageSize,
-                        total = vouchers.Count != 0 ? vouchers.Count() : result.Item2.Count()
+                        total = vouchersList.Count()
                     },
-                    results = vouchers.Count != 0 ? vouchers.ToList() : result.Item2.ToList() // Return only the filtered voucher list
+                    results = vouchersList // Return only the filtered voucher list
                 };
             }
             catch (Exception ex)

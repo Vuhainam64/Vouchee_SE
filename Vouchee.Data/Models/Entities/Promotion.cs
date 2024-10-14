@@ -39,6 +39,10 @@ namespace Vouchee.Data.Models.Entities
         public string? Type { get; set; }
         public string? Policy { get; set; }
         public string? Image { get; set; }
+        [Column(TypeName = "decimal(10,2)")]
+        public decimal? PercentDiscount { get; set; }
+        [Column(TypeName = "decimal(10,2)")]
+        public decimal? MoneyDiscount { get; set; }
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]

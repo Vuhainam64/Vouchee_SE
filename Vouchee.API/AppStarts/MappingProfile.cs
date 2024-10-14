@@ -85,11 +85,10 @@ namespace Vouchee.API.AppStarts
             CreateMap<GetVoucherTypeDTO, VoucherTypeFilter>().ReverseMap();
 
             // PROMOTION
-            CreateMap<Promotion, PromotionDTO>().ReverseMap();
             CreateMap<Promotion, CreatePromotionDTO>().ReverseMap();
             CreateMap<Promotion, UpdatePromotionDTO>().ReverseMap();
             CreateMap<Promotion, GetPromotionDTO>()
-                .ForMember(des => des.Type, src => src.MapFrom(src => EnumMapper<PromotionTypeEnum>.MapType(src.Type)))
+                .ForMember(des => des.type, src => src.MapFrom(src => EnumMapper<PromotionTypeEnum>.MapType(src.Type)))
                 .ReverseMap();
             CreateMap<GetPromotionDTO, PromotionFilter>().ReverseMap();
 
