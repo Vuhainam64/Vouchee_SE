@@ -135,7 +135,12 @@ namespace Vouchee.Business.Services.Impls
                     {
                         return new GetAllVoucherDTO
                         {
-                            name = voucher.name,
+                            title = voucher.title,
+                            categories = voucher.categories,
+                            image = voucher.image,
+                            originalPrice = voucher.originalPrice,
+                            salePrice = voucher.salePrice,
+                            id = voucher.id,
                             addresses = new List<GetAllAddressDTO> { nearestAddress }
                         };
                     }
@@ -274,7 +279,12 @@ namespace Vouchee.Business.Services.Impls
                                         {
                                             return new GetAllVoucherDTO
                                             {
-                                                name = voucher.name,
+                                                categories = voucher.categories,
+                                                id = voucher.id,
+                                                image = voucher.image,
+                                                originalPrice = voucher.originalPrice,
+                                                salePrice = voucher.salePrice,
+                                                title = voucher.title,
                                                 addresses = new List<GetAllAddressDTO> { nearestAddress }
                                             };
                                         }

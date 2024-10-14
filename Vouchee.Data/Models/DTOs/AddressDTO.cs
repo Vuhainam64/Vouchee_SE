@@ -50,8 +50,6 @@ namespace Vouchee.Business.Models.DTOs
         public decimal? lon { get; set; }
         [Column(TypeName = "decimal")]
         public decimal? lat { get; set; }
-
-        public decimal? distance { get; set; }
     }
 
 
