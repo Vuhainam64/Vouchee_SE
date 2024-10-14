@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
@@ -369,6 +370,7 @@ namespace Vouchee.Business.Services.Impls
                         if (availablePromotion != null)
                         {
                             voucher.salePrice = voucher.originalPrice - (voucher.originalPrice * availablePromotion.PercentDiscount / 100);
+                            voucher.percentDiscount = availablePromotion.PercentDiscount;
                         }
                     }
                 }
@@ -412,6 +414,23 @@ namespace Vouchee.Business.Services.Impls
             }
 
             return null;
+        }
+
+        public async Task<IList<VoucherDTO>> GetSalestVouchers(PagingRequest pagingRequest)
+        {
+            throw new NotImplementedException();
+        }
+
+        public class VoucherDTO
+        {
+            public Guid id { get; set; }
+
+            public string? title { get; set; }
+            public decimal originalPrice { get; set; }
+            public decimal discountValue { get; set; }
+            public decimal salePrice { get; set; }
+            public int? quantity { get; set; }
+            public string? image { get; set; }
         }
     }
 }

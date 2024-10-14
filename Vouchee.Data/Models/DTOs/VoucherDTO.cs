@@ -69,6 +69,7 @@ namespace Vouchee.Business.Models.DTOs
         public string? image { get; set; }
         public decimal? originalPrice { get; set; }
         public decimal? salePrice { get; set; }
+        public decimal? percentDiscount { get; set; }
         //public DateTime? starDate { get; set; }
         //public DateTime? endDate { get; set; }
         //public string? policy { get; set; }

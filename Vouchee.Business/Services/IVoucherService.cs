@@ -2,6 +2,7 @@
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Filters;
+using static Vouchee.Business.Services.Impls.VoucherService;
 
 namespace Vouchee.Business.Services
 {
@@ -23,6 +24,7 @@ namespace Vouchee.Business.Services
         public Task<IList<GetNearestVoucherDTO>> GetNearestVouchers(decimal lon, decimal lat);
         public Task<IList<GetAllVoucherDTO>> GetNearestVouchers(PagingRequest pagingRequest, decimal lon, decimal lat);
         public Task<IList<GetBestBuyVoucherDTO>> GetTopSaleVouchers(PagingRequest pagingRequest);
+        public Task<IList<VoucherDTO>> GetSalestVouchers(PagingRequest pagingRequest);
 
         // UPDATE
         public Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO);
