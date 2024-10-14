@@ -3,6 +3,7 @@ using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Utils;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.DTOs;
+using Vouchee.Data.Models.DTOs.Dashboard;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
 
@@ -57,6 +58,7 @@ namespace Vouchee.API.AppStarts
             CreateMap<Supplier, UpdateSupplierDTO>().ReverseMap();
             CreateMap<Supplier, GetSupplierDTO>().ReverseMap();
             CreateMap<GetSupplierDTO, SupplierFilter>().ReverseMap();
+            CreateMap<Supplier, BestSuppleriDTO>().ReverseMap();
 
             // USER
             CreateMap<User, UserDTO>().ReverseMap();

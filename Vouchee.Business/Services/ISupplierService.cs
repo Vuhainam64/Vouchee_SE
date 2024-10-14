@@ -1,6 +1,7 @@
 ﻿using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Data.Models.Constants.Enum.Sort;
+using Vouchee.Data.Models.DTOs.Dashboard;
 using Vouchee.Data.Models.Filters;
 
 namespace Vouchee.Business.Services
@@ -13,7 +14,7 @@ namespace Vouchee.Business.Services
         // READ
         public Task<GetSupplierDTO> GetSupplierByIdAsync(Guid id);
         public Task<IList<GetSupplierDTO>> GetSuppliersAsync();
-        public Task<IList<GetSupplierDTO>> GetBestSuppliers();
+        public Task<IList<BestSuppleriDTO>> GetBestSuppliers();
 
         // UPDATE
         public Task<bool> UpdateSupplierAsync(Guid id, UpdateSupplierDTO updateSupplierDTO);
