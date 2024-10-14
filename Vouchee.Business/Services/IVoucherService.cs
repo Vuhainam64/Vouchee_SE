@@ -24,5 +24,6 @@ namespace Vouchee.Business.Services
 
         // DELETE
         public Task<bool> DeleteVoucherAsync(Guid id);
+        public Task<IList<GetAllVoucherDTO>> GetNearestVouchers(decimal lon, decimal lat);
     }
 }

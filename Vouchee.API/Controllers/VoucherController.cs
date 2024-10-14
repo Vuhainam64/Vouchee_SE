@@ -79,7 +79,7 @@ namespace Vouchee.API.Controllers
                                                                 [FromQuery] decimal lon,
                                                                 [FromQuery] decimal lat)
         {
-            var result = await _voucherService.GetNearestVouchers(pagingRequest, lon, lat);
+            var result = await _voucherService.GetNearestVouchers(lon, lat);
             return Ok(result);
         }
 

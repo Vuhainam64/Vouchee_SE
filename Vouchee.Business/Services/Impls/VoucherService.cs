@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
@@ -88,10 +89,63 @@ namespace Vouchee.Business.Services.Impls
             throw new NotImplementedException();
         }
 
-        public Task<IList<GetAllVoucherDTO>> GetNearestVouchers(decimal lon, decimal lat)
+        public async Task<IList<GetAllVoucherDTO>> GetNearestVouchers(decimal lon, decimal lat)
         {
-            throw new NotImplementedException();
+            decimal maxDistanceKm = 2;
+            decimal R = 6371; // Bán kính Trái Đất (km)
+
+            // Chuyển độ sang radian
+            decimal ToRadians(decimal value) => (decimal)(Math.PI / 180) * value;
+
+            // Lấy tất cả vouchers và ánh xạ sang DTO
+            var vouchers = _voucherRepository.GetTable()
+                .ProjectTo<GetAllVoucherDTO>(_mapper.ConfigurationProvider)
+                .ToList(); // Materialize dữ liệu
+
+            // Tính toán và lọc các voucher với địa chỉ gần nhất
+            return vouchers
+                .Select(voucher =>
+                {
+                    var nearestAddress = voucher.addresses
+                        .Where(a => a.lat.HasValue && a.lon.HasValue)
+                        .Select(a =>
+                        {
+                            decimal dLat = ToRadians(lat - (decimal)a.lat);
+                            decimal dLon = ToRadians(lon - (decimal)a.lon);
+                            decimal lat1 = ToRadians(lat);
+                            decimal lat2 = ToRadians((decimal)a.lat);
+
+                            decimal aVal = (decimal)(Math.Sin((double)dLat / 2) * Math.Sin((double)dLat / 2) +
+                                             Math.Cos((double)lat1) * Math.Cos((double)lat2) *
+                                             Math.Sin((double)dLon / 2) * Math.Sin((double)dLon / 2));
+
+                            decimal c = 2 * (decimal)Math.Atan2(Math.Sqrt((double)aVal), Math.Sqrt(1 - (double)aVal));
+
+                            decimal distance = R * c;
+                            a.distance = Math.Round(distance, 2) + "km"; // Làm tròn 2 chữ số
+
+                            return new { Address = a, Distance = distance };
+                        })
+                        .Where(a => a.Distance <= maxDistanceKm)
+                        .OrderBy(a => a.Distance)
+                        .Select(a => a.Address)
+                        .FirstOrDefault();
+
+                    if (nearestAddress != null)
+                    {
+                        return new GetAllVoucherDTO
+                        {
+                            name = voucher.name,
+                            addresses = new List<GetAllAddressDTO> { nearestAddress }
+                        };
+                    }
+                    return null;
+                })
+                .Where(v => v != null) // Loại bỏ các voucher không có địa chỉ gần
+                .Take(10) // Lấy 10 voucher gần nhất
+                .ToList();
         }
+
 
         public Task<IList<GetAllVoucherDTO>> GetNearestVouchers(PagingRequest pagingRequest, decimal lon, decimal lat)
         {
