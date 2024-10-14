@@ -20,14 +20,17 @@ namespace Vouchee.Business.Services.Impls
 {
     public class VoucherService : IVoucherService
     {
+        private readonly ICategoryRepository _categoryRepository;
         private readonly IFileUploadService _fileUploadService;
         private readonly IVoucherRepository _voucherRepository;
         private readonly IMapper _mapper;
 
-        public VoucherService(IFileUploadService fileUploadService,
+        public VoucherService(ICategoryRepository categoryRepository,
+                                IFileUploadService fileUploadService,
                                 IVoucherRepository voucherRepository,
                                 IMapper mapper)
         {
+            _categoryRepository = categoryRepository;
             _fileUploadService = fileUploadService;
             _voucherRepository = voucherRepository;
             _mapper = mapper;
@@ -234,7 +237,12 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<DynamicResponseModel<GetAllVoucherDTO>> GetVouchersAsync(PagingRequest pagingRequest, VoucherFilter voucherFiler, decimal lon, decimal lat, decimal maxDistance)
+        public async Task<DynamicResponseModel<GetAllVoucherDTO>> GetVouchersAsync(PagingRequest pagingRequest, 
+                                                                                        VoucherFilter voucherFiler, 
+                                                                                        decimal lon, 
+                                                                                        decimal lat, 
+                                                                                        decimal maxDistance,
+                                                                                        List<Guid>? categoryID)
         {
             (int, IQueryable<GetAllVoucherDTO>) result;
             try
@@ -245,54 +253,67 @@ namespace Vouchee.Business.Services.Impls
                             .DynamicFilter(_mapper.Map<GetAllVoucherDTO>(voucherFiler))
                             .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
-                decimal ToRadians(decimal value) => (decimal)(Math.PI / 180) * value;
+                if (categoryID != null && categoryID.Count > 0)
+                {
+                    // Filter vouchers by the provided categoryID list
+                    result.Item2 = result.Item2
+                        .Where(v => v.categories.Any(c => categoryID.Contains((Guid)c.id))).AsQueryable();
+                }
 
-                var vouchers = result.Item2.ToList()
-                                    .Select(voucher =>
-                                    {
-                                        var nearestAddress = voucher.addresses
-                                            .Where(a => a.lat.HasValue && a.lon.HasValue)
-                                            .Select(a =>
-                                            {
-                                                decimal dLat = ToRadians(lat - (decimal)a.lat);
-                                                decimal dLon = ToRadians(lon - (decimal)a.lon);
-                                                decimal lat1 = ToRadians(lat);
-                                                decimal lat2 = ToRadians((decimal)a.lat);
+                IList<GetAllVoucherDTO> vouchers = new List<GetAllVoucherDTO>();
 
-                                                decimal aVal = (decimal)(Math.Sin((double)dLat / 2) * Math.Sin((double)dLat / 2) +
-                                                                 Math.Cos((double)lat1) * Math.Cos((double)lat2) *
-                                                                 Math.Sin((double)dLon / 2) * Math.Sin((double)dLon / 2));
+                if (lon != 0 && lat != 0 && maxDistance != 0)
+                {
+                    decimal ToRadians(decimal value) => (decimal)(Math.PI / 180) * value;
 
-                                                decimal c = 2 * (decimal)Math.Atan2(Math.Sqrt((double)aVal), Math.Sqrt(1 - (double)aVal));
-
-                                                decimal distance = R * c;
-                                                a.distance = Math.Round(distance, 2) + "km"; // Round to 2 decimal places
-
-                                                return new { Address = a, Distance = distance };
-                                            })
-                                            .Where(a => a.Distance <= maxDistance)
-                                            .OrderBy(a => a.Distance)
-                                            .Select(a => a.Address)
-                                            .FirstOrDefault();
-
-                                        if (nearestAddress != null)
+                    vouchers = result.Item2.ToList()
+                                        .Select(voucher =>
                                         {
-                                            return new GetAllVoucherDTO
+                                            var nearestAddress = voucher.addresses
+                                                .Where(a => a.lat.HasValue && a.lon.HasValue)
+                                                .Select(a =>
+                                                {
+                                                    decimal dLat = ToRadians(lat - (decimal)a.lat);
+                                                    decimal dLon = ToRadians(lon - (decimal)a.lon);
+                                                    decimal lat1 = ToRadians(lat);
+                                                    decimal lat2 = ToRadians((decimal)a.lat);
+
+                                                    decimal aVal = (decimal)(Math.Sin((double)dLat / 2) * Math.Sin((double)dLat / 2) +
+                                                                     Math.Cos((double)lat1) * Math.Cos((double)lat2) *
+                                                                     Math.Sin((double)dLon / 2) * Math.Sin((double)dLon / 2));
+
+                                                    decimal c = 2 * (decimal)Math.Atan2(Math.Sqrt((double)aVal), Math.Sqrt(1 - (double)aVal));
+
+                                                    decimal distance = R * c;
+                                                    a.distance = Math.Round(distance, 2) + "km"; // Round to 2 decimal places
+
+                                                    return new { Address = a, Distance = distance };
+                                                })
+                                                .Where(a => a.Distance <= maxDistance)
+                                                .OrderBy(a => a.Distance)
+                                                .Select(a => a.Address)
+                                                .FirstOrDefault();
+
+                                            if (nearestAddress != null)
                                             {
-                                                categories = voucher.categories,
-                                                id = voucher.id,
-                                                image = voucher.image,
-                                                originalPrice = voucher.originalPrice,
-                                                salePrice = voucher.salePrice,
-                                                title = voucher.title,
-                                                addresses = new List<GetAllAddressDTO> { nearestAddress }
-                                            };
-                                        }
-                                        return null;
-                                    })
-                                    .Where(v => v != null) // Filter out vouchers without nearby addresses
-                                    .Take(10) // Limit to the 10 nearest vouchers
-                                    .ToList();
+                                                return new GetAllVoucherDTO
+                                                {
+                                                    categories = voucher.categories,
+                                                    id = voucher.id,
+                                                    image = voucher.image,
+                                                    originalPrice = voucher.originalPrice,
+                                                    salePrice = voucher.salePrice,
+                                                    title = voucher.title,
+                                                    addresses = new List<GetAllAddressDTO> { nearestAddress }
+                                                };
+                                            }
+                                            return null;
+                                        })
+                                        .Where(v => v != null) // Filter out vouchers without nearby addresses
+                                        .Take(10) // Limit to the 10 nearest vouchers
+                                        .ToList();
+                }
+
 
                 return new DynamicResponseModel<GetAllVoucherDTO>()
                 {
@@ -300,9 +321,9 @@ namespace Vouchee.Business.Services.Impls
                     {
                         page = pagingRequest.page,
                         size = pagingRequest.pageSize,
-                        total = result.Item1
+                        total = vouchers.Count != 0 ? vouchers.Count() : result.Item2.Count()
                     },
-                    results = vouchers // Return only the filtered voucher list
+                    results = vouchers.Count != 0 ? vouchers.ToList() : result.Item2.ToList() // Return only the filtered voucher list
                 };
             }
             catch (Exception ex)
