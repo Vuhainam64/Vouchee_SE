@@ -19,14 +19,14 @@ namespace Vouchee.Business.Services
                                                                             decimal maxDistance);
         public Task<IList<GetAllVoucherDTO>> GetNewestVouchers();
         public Task<IList<GetAllVoucherDTO>> GetBestSoldVouchers();
+        public Task<IList<GetNearestVoucherDTO>> GetNearestVouchers(decimal lon, decimal lat);
         public Task<IList<GetAllVoucherDTO>> GetNearestVouchers(PagingRequest pagingRequest, decimal lon, decimal lat);
-        public Task<IList<GetAllVoucherDTO>> GetTopSaleVouchers(PagingRequest pagingRequest);
+        public Task<IList<GetBestBuyVoucherDTO>> GetTopSaleVouchers(PagingRequest pagingRequest);
 
         // UPDATE
         public Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO);
 
         // DELETE
         public Task<bool> DeleteVoucherAsync(Guid id);
-        public Task<IList<GetAllVoucherDTO>> GetNearestVouchers(decimal lon, decimal lat);
     }
 }
