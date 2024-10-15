@@ -170,15 +170,16 @@ namespace Vouchee.Business.Models.DTOs
         {
             voucherCodes = new HashSet<GetVoucherCodeDTO>();
             addresses = new HashSet<GetAllAddressDTO>();
+            categories = new HashSet<GetCategoryDTO>();
         }
 
         public Guid? id { get; set; }
 
-        public string? name { get; set; }
+        public string? title { get; set; }
         public string? description { get; set; }
         public string? image { get; set; }
-        public decimal? price { get; set; }
-        public DateTime? starDate { get; set; }
+        public decimal? originalPrice { get; set; }
+        public DateTime? startDate { get; set; }
         public DateTime? endDate { get; set; }
         public string? policy { get; set; }
         public int? quantity { get; set; }
@@ -192,8 +193,12 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? voucherTypeId { get; set; }
         public string? voucherTypeName { get; set; }
 
+        public decimal? salePrice { get; set; }
+        public decimal? percenDiscount { get; set; }
+
         public virtual ICollection<GetAllAddressDTO>? addresses { get; set; }
         public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
+        public virtual ICollection<GetCategoryDTO> categories { get; set; }
     }
 
     public class GetNewestVoucherDTO

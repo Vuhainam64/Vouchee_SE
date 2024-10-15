@@ -72,15 +72,14 @@ namespace Vouchee.API.Controllers
         }
 
         [HttpGet("get_best_sold_vouchers")]
-        public async Task<IActionResult> GetBestSoldVouchers([FromQuery] PagingRequest pagingRequest)
+        public async Task<IActionResult> GetBestSoldVouchers()
         {
-            var result = await _voucherService.GetTopSaleVouchers(pagingRequest);
+            var result = await _voucherService.GetTopSaleVouchers();
             return Ok(result);
         }
 
         [HttpGet("get_nearest_vouchers")]
-        public async Task<IActionResult> GetNearestVouchers([FromQuery] PagingRequest pagingRequest,
-                                                                [FromQuery] decimal lon,
+        public async Task<IActionResult> GetNearestVouchers([FromQuery] decimal lon,
                                                                 [FromQuery] decimal lat)
         {
             var result = await _voucherService.GetNearestVouchers(lon, lat);
@@ -88,9 +87,9 @@ namespace Vouchee.API.Controllers
         }
 
         [HttpGet("get_salest_vouchers")]
-        public async Task<IActionResult> GetSalestVouchers([FromQuery] PagingRequest pagingRequest)
+        public async Task<IActionResult> GetSalestVouchers()
         {
-            var result = await _voucherService.GetSalestVouchers(pagingRequest);
+            var result = await _voucherService.GetSalestVouchers();
             return Ok(result);
         }
 

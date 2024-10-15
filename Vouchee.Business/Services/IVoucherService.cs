@@ -21,9 +21,8 @@ namespace Vouchee.Business.Services
         public Task<IList<GetNewestVoucherDTO>> GetNewestVouchers();
         public Task<IList<GetAllVoucherDTO>> GetBestSoldVouchers();
         public Task<IList<GetNearestVoucherDTO>> GetNearestVouchers(decimal lon, decimal lat);
-        public Task<IList<GetAllVoucherDTO>> GetNearestVouchers(PagingRequest pagingRequest, decimal lon, decimal lat);
-        public Task<IList<GetBestBuyVoucherDTO>> GetTopSaleVouchers(PagingRequest pagingRequest);
-        public Task<IList<VoucherDTO>> GetSalestVouchers(PagingRequest pagingRequest);
+        public Task<IList<GetBestBuyVoucherDTO>> GetTopSaleVouchers();
+        public Task<IList<GetNewestVoucherDTO>> GetSalestVouchers();
 
         // UPDATE
         public Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO);
