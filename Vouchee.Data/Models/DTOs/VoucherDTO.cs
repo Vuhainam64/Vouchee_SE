@@ -74,9 +74,9 @@ namespace Vouchee.Business.Models.DTOs
         //public DateTime? endDate { get; set; }
         //public string? policy { get; set; }
         //public int? quantity { get; set; }
-        //public Guid? brandId { get; set; }
-        //public string? brandName { get; set; }
-        //public string? brandImage { get; set; }
+        public Guid? brandId { get; set; }
+        public string? brandName { get; set; }
+        public string? brandImage { get; set; }
         //public Guid? supplierId { get; set; }
         //public string? supplierName { get; set; }
         //public string? supplierImage { get; set; }
@@ -96,7 +96,7 @@ namespace Vouchee.Business.Models.DTOs
     {
         public GetBestBuyVoucherDTO()
         {
-            addresses = new HashSet<GetAllAddressDTO>();
+            // addresses = new HashSet<GetAllAddressDTO>();
             categories = new HashSet<GetCategoryDTO>();
         }
         public Guid? id { get; set; }
@@ -110,9 +110,9 @@ namespace Vouchee.Business.Models.DTOs
         //public DateTime? endDate { get; set; }
         //public string? policy { get; set; }
         //public int? quantity { get; set; }
-        //public Guid? brandId { get; set; }
-        //public string? brandName { get; set; }
-        //public string? brandImage { get; set; }
+        public Guid? brandId { get; set; }
+        public string? brandName { get; set; }
+        public string? brandImage { get; set; }
         //public Guid? supplierId { get; set; }
         //public string? supplierName { get; set; }
         //public string? supplierImage { get; set; }
@@ -126,7 +126,7 @@ namespace Vouchee.Business.Models.DTOs
         //public Guid? updateBy { get; set; }
         public decimal? TotalQuantitySold { get; set; }
         public virtual ICollection<GetCategoryDTO>? categories { get; set; }
-        public virtual ICollection<GetAllAddressDTO>? addresses { get; set; }
+        // public virtual ICollection<GetAllAddressDTO>? addresses { get; set; }
     }
     public class GetNearestVoucherDTO
     {

@@ -214,6 +214,8 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<IList<GetBestBuyVoucherDTO>> GetTopSaleVouchers(PagingRequest pagingRequest)
         {
+            (int, IQueryable<GetAllVoucherDTO>) voucher;
+
             // Get all vouchers and their total quantity sold
             var orderDetails = _orderDetailRepository.GetTable()
                 .GroupBy(od => od.VoucherId)
@@ -228,13 +230,15 @@ namespace Vouchee.Business.Services.Impls
                 .ToList();
 
             // Join the vouchers and return with sorted totalQuantitySold
-            var vouchers = _voucherRepository.GetTable()
+            voucher = _voucherRepository.GetTable()
+                .Include(x => x.Categories)
+                .Include(x => x.Brand)
                 .Where(v => orderDetails.Select(od => od.VoucherId).Contains(v.Id))
-                .ProjectTo<GetBestBuyVoucherDTO>(_mapper.ConfigurationProvider)
-                .ToList();
+                .ProjectTo<GetAllVoucherDTO>(_mapper.ConfigurationProvider)
+                .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
             // Attach the total quantity sold to each voucher and sort the result
-            var result = vouchers.Select(voucher => new GetBestBuyVoucherDTO
+            var result = voucher.Item2.ToList().Select(voucher => new GetBestBuyVoucherDTO
             {
                 id = voucher.id,
                 title = voucher.title,
@@ -242,11 +246,34 @@ namespace Vouchee.Business.Services.Impls
                 originalPrice = voucher.originalPrice,
                 salePrice = voucher.salePrice,
                 TotalQuantitySold = orderDetails.First(od => od.VoucherId == voucher.id).TotalQuantitySold,
+                categories = voucher.categories,
+                brandId = voucher.brandId,
+                brandImage = voucher.brandImage,
+                brandName = voucher.brandName
             })
             .OrderByDescending(v => v.TotalQuantitySold)
             .ToList();
 
-            return result;
+            var result2 = result;
+
+            foreach (var test in result2)
+            {
+                var currentDate = DateTime.Now;
+                var promotions = _voucherRepository.GetByIdAsync(test.id, includeProperties: query => query.Include(x => x.Promotions)).Result.Promotions;
+
+                var availablePromotion = promotions.FirstOrDefault(promotion => promotion.StartDate <= currentDate && promotion.EndDate >= currentDate);
+
+                if (availablePromotion != null)
+                {
+                    test.salePrice = test.originalPrice - (test.originalPrice * availablePromotion.PercentDiscount / 100);
+                }
+                else
+                {
+                    test.salePrice = 0;
+                }
+            }
+
+            return result2;
         }
 
 
