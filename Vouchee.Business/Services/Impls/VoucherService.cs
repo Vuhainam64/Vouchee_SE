@@ -351,12 +351,11 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<DynamicResponseModel<GetAllVoucherDTO>> GetVouchersAsync(
-    PagingRequest pagingRequest,
-    VoucherFilter voucherFilter,
-    decimal lon,
-    decimal lat,
-    List<Guid>? categoryID)
+        public async Task<DynamicResponseModel<GetAllVoucherDTO>> GetVouchersAsync(PagingRequest pagingRequest,
+                                                                                    VoucherFilter voucherFilter,
+                                                                                    decimal lon,
+                                                                                    decimal lat,
+                                                                                    List<Guid>? categoryID)
         {
             (int, IQueryable<GetAllVoucherDTO>) result;
             try

@@ -128,6 +128,30 @@ namespace Vouchee.Data.Helpers
             }
         }
 
+        public async Task<IEnumerable<TEntity>> GetWhereAsync(Expression<Func<TEntity, bool>> filter,
+                                                                Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null)
+        {
+            try
+            {
+                IQueryable<TEntity> query = Table;
+
+                // Apply includes with ThenInclude support if provided
+                if (includeProperties != null)
+                {
+                    query = includeProperties(query);
+                }
+
+                // Apply the filter and return the matching entities
+                return await query.Where(filter).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.Message);
+                throw new Exception(ex.Message);
+            }
+        }
+
+
         public async Task<TEntity?> GetByIdAsync(object id, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null)
         {
             try
@@ -147,6 +171,7 @@ namespace Vouchee.Data.Helpers
                 throw new Exception(ex.Message);
             }
         }
+
 
         public async Task<TEntity?> FindAsync(Guid id)
         {

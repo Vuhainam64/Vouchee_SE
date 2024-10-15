@@ -17,8 +17,10 @@ namespace Vouchee.Business.Services
         public Task<Guid?> CreatePromotionAsync(CreatePromotionDTO createPromotionDTO, ThisUserObj thisUserObj);
 
         // READ
-        public Task<GetPromotionDTO> GetPromotionByIdAsync(Guid id);
-        public Task<IList<GetPromotionDTO>> GetPromotionsAsync();
+        public Task<GetDetailPromotionDTO> GetPromotionByIdAsync(Guid id);
+        public Task<DynamicResponseModel<GetPromotionDTO>> GetPromotionsAsync(PagingRequest pagingRequest, PromotionFilter promotionFilter);
+        public Task<DynamicResponseModel<GetPromotionDTO>> GetActivePromotion(PagingRequest pagingRequest, PromotionFilter promotionFilter);
+        public Task<IList<GetPromotionDTO>> GetPromotionByBuyerId(Guid buyerId);
 
         // UPDATE
         public Task<bool> UpdatePromotionAsync(Guid id, UpdatePromotionDTO updatePromotionDTO, ThisUserObj thisUserObj);

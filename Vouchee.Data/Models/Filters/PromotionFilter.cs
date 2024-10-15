@@ -8,5 +8,9 @@ namespace Vouchee.Data.Models.Filters
 {
     public class PromotionFilter
     {
+        public string? name { get; set; }
+
+        public DateTime? startDate { get; set; }
+        public DateTime? endDate { get; set; }
     }
 }

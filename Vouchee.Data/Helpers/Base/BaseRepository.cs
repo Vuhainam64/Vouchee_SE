@@ -29,5 +29,11 @@ namespace Vouchee.Data.Helpers.Base
         public Task<TEntity> FindAsync(Guid id) => _dao.FindAsync(id);
 
         public Task<TEntity> Add(TEntity entity) => _dao.Add(entity);
+
+        public Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> filter, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null)
+            => _dao.GetFirstOrDefaultAsync(filter, includeProperties);
+
+        public Task<IEnumerable<TEntity>?> GetWhereAsync(Expression<Func<TEntity, bool>> filter, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null)
+            => _dao.GetWhereAsync(filter, includeProperties);
     }
 }

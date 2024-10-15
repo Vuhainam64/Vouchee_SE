@@ -58,17 +58,32 @@ namespace Vouchee.API.Controllers
         // READ
         [HttpGet("get_all_promotion")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetPromotions()
+        public async Task<IActionResult> GetPromotions([FromQuery] PagingRequest pagingRequest, [FromQuery] PromotionFilter promotionFilter)
         {
-            var result = await _promotionService.GetPromotionsAsync();
+            var result = await _promotionService.GetPromotionsAsync(pagingRequest, promotionFilter);
             return Ok(result);
         }
 
-        [HttpGet("get_promotion/{id}")]
+        [HttpGet("get_all_active_promotion")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetActivePromotions([FromQuery] PagingRequest pagingRequest, [FromQuery] PromotionFilter promotionFilter)
+        {
+            var result = await _promotionService.GetActivePromotion(pagingRequest, promotionFilter);
+            return Ok(result);
+        }
+        [HttpGet("get_promotion_by_id/{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetPromotionById(Guid id)
         {
             var promotion = await _promotionService.GetPromotionByIdAsync(id);
+            return Ok(promotion);
+        }
+
+        [HttpGet("get_promotion_by_buyer/{buyerId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetPromotionByBuyerId(Guid buyerId)
+        {
+            var promotion = await _promotionService.GetPromotionByBuyerId(buyerId);
             return Ok(promotion);
         }
 
