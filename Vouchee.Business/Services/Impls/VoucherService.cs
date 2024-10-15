@@ -102,65 +102,85 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<IList<GetNearestVoucherDTO>> GetNearestVouchers(decimal lon, decimal lat)
         {
-            decimal maxDistanceKm = 2;
-            decimal R = 6371; // Bán kính Trái Đất (km)
+            try
+            {
+                decimal R = 6371; // Earth's radius in kilometers
+                decimal ToRadians(decimal value) => (decimal)(Math.PI / 180) * value;
 
-            // Chuyển độ sang radian
-            decimal ToRadians(decimal value) => (decimal)(Math.PI / 180) * value;
+                // Retrieve all vouchers and map to DTO
+                var vouchers = _voucherRepository.GetTable()
+                    .ProjectTo<GetNearestVoucherDTO>(_mapper.ConfigurationProvider)
+                    .ToList(); // Materialize the data
 
-            // Lấy tất cả vouchers và ánh xạ sang DTO
-            var vouchers = _voucherRepository.GetTable()
-                .ProjectTo<GetNearestVoucherDTO>(_mapper.ConfigurationProvider)
-                .ToList(); // Materialize dữ liệu
-
-            // Tính toán và lọc các voucher với địa chỉ gần nhất
-            return vouchers
-                .Select(voucher =>
-                {
-                    var nearestAddress = voucher.addresses
-                        .Where(a => a.lat.HasValue && a.lon.HasValue)
-                        .Select(a =>
-                        {
-                            decimal dLat = ToRadians(lat - (decimal)a.lat);
-                            decimal dLon = ToRadians(lon - (decimal)a.lon);
-                            decimal lat1 = ToRadians(lat);
-                            decimal lat2 = ToRadians((decimal)a.lat);
-
-                            decimal aVal = (decimal)(Math.Sin((double)dLat / 2) * Math.Sin((double)dLat / 2) +
-                                             Math.Cos((double)lat1) * Math.Cos((double)lat2) *
-                                             Math.Sin((double)dLon / 2) * Math.Sin((double)dLon / 2));
-
-                            decimal c = 2 * (decimal)Math.Atan2(Math.Sqrt((double)aVal), Math.Sqrt(1 - (double)aVal));
-
-                            decimal distance = R * c;
-                            a.distance = Math.Round(distance, 2) + "km"; // Làm tròn 2 chữ số
-
-                            return new { Address = a, Distance = distance };
-                        })
-                        .Where(a => a.Distance <= maxDistanceKm)
-                        .OrderBy(a => a.Distance)
-                        .Select(a => a.Address)
-                        .FirstOrDefault();
-
-                    if (nearestAddress != null)
+                // Calculate nearest vouchers based on addresses
+                var nearestVouchers = vouchers
+                    .Select(voucher =>
                     {
-                        return new GetNearestVoucherDTO
+                        var nearestAddress = voucher.addresses
+                            .Where(a => a.lat.HasValue && a.lon.HasValue)
+                            .Select(a =>
+                            {
+                                decimal dLat = ToRadians(lat - (decimal)a.lat);
+                                decimal dLon = ToRadians(lon - (decimal)a.lon);
+                                decimal lat1 = ToRadians(lat);
+                                decimal lat2 = ToRadians((decimal)a.lat);
+
+                                decimal aVal = (decimal)(Math.Sin((double)dLat / 2) * Math.Sin((double)dLat / 2) +
+                                                         Math.Cos((double)lat1) * Math.Cos((double)lat2) *
+                                                         Math.Sin((double)dLon / 2) * Math.Sin((double)dLon / 2));
+
+                                decimal c = 2 * (decimal)Math.Atan2(Math.Sqrt((double)aVal), Math.Sqrt(1 - (double)aVal));
+
+                                decimal distance = R * c; // Calculate distance
+
+                                return new
+                                {
+                                    Address = a,
+                                    Distance = Math.Round(distance, 2) + "km" // Round distance to 2 decimal places
+                                };
+                            })
+                            .OrderBy(a => a.Distance) // Sort by closest distance
+                            .FirstOrDefault(); // Get the nearest address
+
+                        if (nearestAddress != null)
                         {
-                            title = voucher.title,
-                            categories = voucher.categories,
-                            image = voucher.image,
-                            originalPrice = voucher.originalPrice,
-                            salePrice = voucher.salePrice,
-                            id = voucher.id,
-                            addresses = new List<GetAllAddressDTO> { nearestAddress }
-                        };
-                    }
-                    return null;
-                })
-                .Where(v => v != null) // Loại bỏ các voucher không có địa chỉ gần
-                .Take(10) // Lấy 10 voucher gần nhất
-                .ToList();
+                            return new GetNearestVoucherDTO
+                            {
+                                id = voucher.id,
+                                title = voucher.title,
+                                categories = voucher.categories,
+                                image = voucher.image,
+                                originalPrice = voucher.originalPrice,
+                                salePrice = voucher.salePrice,
+                                addresses = new List<GetAllAddressDTO>
+                                {
+                            new GetAllAddressDTO
+                            {
+                                id = nearestAddress.Address.id,
+                                addressName = nearestAddress.Address.addressName,
+                                lat = nearestAddress.Address.lat,
+                                lon = nearestAddress.Address.lon,
+                                distance = nearestAddress.Distance // Include distance here at the address level
+                            }
+                                }
+                            };
+                        }
+                        return null;
+                    })
+                    .Where(v => v != null) // Filter out vouchers without a nearest address
+                    .Take(8) // Limit to the 8 nearest vouchers
+                    .ToList();
+
+                return nearestVouchers;
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.Message);
+                throw new LoadException("An unexpected error occurred while loading nearest vouchers");
+            }
         }
+
+
 
 
         public Task<IList<GetAllVoucherDTO>> GetNearestVouchers(PagingRequest pagingRequest, decimal lon, decimal lat)
@@ -327,12 +347,11 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<DynamicResponseModel<GetAllVoucherDTO>> GetVouchersAsync(PagingRequest pagingRequest, 
-                                                                                        VoucherFilter voucherFiler, 
-                                                                                        decimal lon, 
-                                                                                        decimal lat, 
-                                                                                        decimal maxDistance,
-                                                                                        List<Guid>? categoryID)
+        public async Task<DynamicResponseModel<GetAllVoucherDTO>> GetVouchersAsync(PagingRequest pagingRequest,
+                                                                             VoucherFilter voucherFiler,
+                                                                             decimal lon,
+                                                                             decimal lat,
+                                                                             List<Guid>? categoryID)
         {
             (int, IQueryable<GetAllVoucherDTO>) result;
             try
@@ -352,7 +371,7 @@ namespace Vouchee.Business.Services.Impls
 
                 IList<GetAllVoucherDTO> vouchers = new List<GetAllVoucherDTO>();
 
-                if (lon != 0 && lat != 0 && maxDistance != 0)
+                if (lon != 0 && lat != 0)
                 {
                     decimal ToRadians(decimal value) => (decimal)(Math.PI / 180) * value;
 
@@ -375,14 +394,11 @@ namespace Vouchee.Business.Services.Impls
                                                     decimal c = 2 * (decimal)Math.Atan2(Math.Sqrt((double)aVal), Math.Sqrt(1 - (double)aVal));
 
                                                     decimal distance = R * c;
-                                                    a.distance = Math.Round(distance, 2) + "km"; // Round to 2 decimal places
 
                                                     return new { Address = a, Distance = distance };
                                                 })
-                                                .Where(a => a.Distance <= maxDistance)
-                                                .OrderBy(a => a.Distance)
-                                                .Select(a => a.Address)
-                                                .FirstOrDefault();
+                                                .OrderBy(a => a.Distance)  // Sort by the closest distance
+                                                .FirstOrDefault(); // Get the nearest address and its distance
 
                                             if (nearestAddress != null)
                                             {
@@ -394,7 +410,20 @@ namespace Vouchee.Business.Services.Impls
                                                     originalPrice = voucher.originalPrice,
                                                     salePrice = voucher.salePrice,
                                                     title = voucher.title,
-                                                    addresses = new List<GetAllAddressDTO> { nearestAddress }
+                                                    brandId = voucher.id,
+                                                    brandName = voucher.brandName,
+                                                    brandImage = voucher.brandImage,
+                                                    addresses = new List<GetAllAddressDTO>
+                                                    {
+                                                new GetAllAddressDTO
+                                                {
+                                                    id = nearestAddress.Address.id,
+                                                    addressName = nearestAddress.Address.addressName,
+                                                    lat = nearestAddress.Address.lat,
+                                                    lon = nearestAddress.Address.lon,
+                                                    distance = Math.Round(nearestAddress.Distance) + "km"  // Include distance here at the address level
+                                                }
+                                                    }
                                                 };
                                             }
                                             return null;
@@ -406,44 +435,20 @@ namespace Vouchee.Business.Services.Impls
 
                 var vouchersList = vouchers.Count != 0 ? vouchers.ToList() : result.Item2.ToList();  // Materialize the query into a list
 
-                if (result.Item2.Count() != 0)
+                // Check for available promotions
+                foreach (var voucher in vouchersList)
                 {
-                    // check available promotion
-                    foreach (var voucher in vouchersList)
+                    var currentDate = DateTime.Now;
+                    var promotions = _voucherRepository.GetByIdAsync(voucher.id, includeProperties: query => query.Include(x => x.Promotions)).Result.Promotions;
+
+                    var availablePromotion = promotions.FirstOrDefault(promotion => promotion.StartDate <= currentDate && promotion.EndDate >= currentDate);
+
+                    if (availablePromotion != null)
                     {
-                        var currentDate = DateTime.Now;
-                        var promotions = _voucherRepository.GetByIdAsync(voucher.id, includeProperties: query => query.Include(x => x.Promotions)).Result.Promotions;
-
-                        var availablePromotion = promotions.FirstOrDefault(promotion => promotion.StartDate <= currentDate && promotion.EndDate >= currentDate);
-
-                        if (availablePromotion != null)
-                        {
-                            voucher.salePrice = voucher.originalPrice - (voucher.originalPrice * availablePromotion.PercentDiscount / 100);
-                            voucher.percentDiscount = availablePromotion.PercentDiscount;
-                        }
+                        voucher.salePrice = voucher.originalPrice - (voucher.originalPrice * availablePromotion.PercentDiscount / 100);
+                        voucher.percentDiscount = availablePromotion.PercentDiscount;
                     }
                 }
-                else if (vouchers.Count() != 0)
-                {
-                    // check available promotion
-                    foreach (var voucher in vouchersList)
-                    {
-                        var currentDate = DateTime.Now;
-                        var promotions = _voucherRepository.GetByIdAsync(voucher.id, includeProperties: query => query.Include(x => x.Promotions)).Result.Promotions;
-
-                        var availablePromotion = promotions.FirstOrDefault(promotion => promotion.StartDate <= currentDate && promotion.EndDate >= currentDate);
-
-                        if (availablePromotion != null)
-                        {
-                            voucher.salePrice = voucher.originalPrice - (voucher.originalPrice * availablePromotion.PercentDiscount / 100);
-                        }
-                        else
-                        {
-                            voucher.salePrice = 0;
-                        }
-                    }
-                }
-
 
                 return new DynamicResponseModel<GetAllVoucherDTO>()
                 {
@@ -453,7 +458,7 @@ namespace Vouchee.Business.Services.Impls
                         size = pagingRequest.pageSize,
                         total = vouchersList.Count()
                     },
-                    results = vouchersList // Return only the filtered voucher list
+                    results = vouchersList // Return the voucher list with nearest address and distance
                 };
             }
             catch (Exception ex)
@@ -464,6 +469,7 @@ namespace Vouchee.Business.Services.Impls
 
             return null;
         }
+
 
         public async Task<IList<VoucherDTO>> GetSalestVouchers(PagingRequest pagingRequest)
         {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Vouchee.API.Helpers;
 using Vouchee.Business.Models;
@@ -53,9 +54,13 @@ namespace Vouchee.API.Controllers
 
         // GET ALL
         [HttpGet("get_all_voucher")]
-        public async Task<IActionResult> GetAllVouchers([FromQuery] PagingRequest pagingRequest, [FromQuery] VoucherFilter voucherFiler, decimal lon, decimal lat, decimal maxDistance, [FromQuery] List<Guid>? categoryIDs)
+        public async Task<IActionResult> GetAllVouchers([FromQuery] PagingRequest pagingRequest, 
+                                                            [FromQuery] VoucherFilter voucherFiler, 
+                                                            [Required] decimal lon, 
+                                                            [Required] decimal lat, 
+                                                            [FromQuery] List<Guid>? categoryIDs)
         {
-            var result = await _voucherService.GetVouchersAsync(pagingRequest, voucherFiler, lon, lat, maxDistance, categoryIDs);
+            var result = await _voucherService.GetVouchersAsync(pagingRequest, voucherFiler, lon, lat, categoryIDs);
             return Ok(result);
         }
 

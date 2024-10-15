@@ -17,7 +17,6 @@ namespace Vouchee.Business.Services
                                                                             VoucherFilter voucherFiler,
                                                                             decimal lon,
                                                                             decimal lat,
-                                                                            decimal maxDistance,
                                                                             List<Guid>? categoryIds);
         public Task<IList<GetNewestVoucherDTO>> GetNewestVouchers();
         public Task<IList<GetAllVoucherDTO>> GetBestSoldVouchers();

@@ -160,7 +160,7 @@ namespace Vouchee.Business.Models.DTOs
         //public Guid? createBy { get; set; }
         //public DateTime? updateDate { get; set; }
         //public Guid? updateBy { get; set; }
-        public string? distance { get; set; }
+        //public string? distance { get; set; }
         public virtual ICollection<GetCategoryDTO>? categories { get; set; }
         public virtual ICollection<GetAllAddressDTO>? addresses { get; set; }
     }
