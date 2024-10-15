@@ -195,4 +195,25 @@ namespace Vouchee.Business.Models.DTOs
         public virtual ICollection<GetAllAddressDTO>? addresses { get; set; }
         public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
     }
+
+    public class GetNewestVoucherDTO
+    {
+        public GetNewestVoucherDTO()
+        {
+            categories = new HashSet<GetCategoryDTO>();
+        }
+
+        public Guid? id { get; set; }
+
+        public string? title { get; set; }
+        public string? image { get; set; }
+        public decimal? originalPrice { get; set; }
+        public decimal? salePrice { get; set; }
+        public decimal? percentDiscount { get; set; }
+        public Guid? brandId { get; set; }
+        public string? brandName { get; set; }
+        public string? brandImage { get; set; }
+
+        public virtual ICollection<GetCategoryDTO>? categories { get; set; }
+    }
 }

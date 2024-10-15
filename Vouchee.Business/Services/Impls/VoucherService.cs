@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Vouchee.Business.Exceptions;
@@ -167,22 +168,43 @@ namespace Vouchee.Business.Services.Impls
             throw new NotImplementedException();
         }
 
-        public async Task<IList<GetAllVoucherDTO>> GetNewestVouchers()
+        public async Task<IList<GetNewestVoucherDTO>> GetNewestVouchers()
         {
-            IQueryable<GetAllVoucherDTO> result;
+            IList<GetNewestVoucherDTO> getNewestVoucherDTOs;
+            IQueryable<GetNewestVoucherDTO> result;
             try
             {
                 result = _voucherRepository.GetTable()
                                             .OrderByDescending(x => x.CreateDate)  
                                             .Take(8)
-                                            .ProjectTo<GetAllVoucherDTO>(_mapper.ConfigurationProvider);
+                                            .ProjectTo<GetNewestVoucherDTO>(_mapper.ConfigurationProvider);
+
+                getNewestVoucherDTOs = result.ToList();
+
+                if (result != null && result.Count() != 0)
+                {
+
+                    foreach (var voucher in getNewestVoucherDTOs)
+                    {
+                        var currentDate = DateTime.Now;
+                        var promotions = _voucherRepository.GetByIdAsync(voucher.id, includeProperties: query => query.Include(x => x.Promotions)).Result.Promotions;
+
+                        var availablePromotion = promotions.FirstOrDefault(promotion => promotion.StartDate <= currentDate && promotion.EndDate >= currentDate);
+
+                        if (availablePromotion != null)
+                        {
+                            voucher.salePrice = voucher.originalPrice - (voucher.originalPrice * availablePromotion.PercentDiscount / 100);
+                            voucher.percentDiscount = availablePromotion.PercentDiscount;
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
                 throw new LoadException("Lỗi không xác định khi tải voucher");
             }
-            return result.ToList();
+            return getNewestVoucherDTOs;
         }
 
         public Task<IList<GetAllVoucherDTO>> GetTopSaleVouchers()

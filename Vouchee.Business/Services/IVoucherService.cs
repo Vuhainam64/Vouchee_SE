@@ -19,7 +19,7 @@ namespace Vouchee.Business.Services
                                                                             decimal lat,
                                                                             decimal maxDistance,
                                                                             List<Guid>? categoryIds);
-        public Task<IList<GetAllVoucherDTO>> GetNewestVouchers();
+        public Task<IList<GetNewestVoucherDTO>> GetNewestVouchers();
         public Task<IList<GetAllVoucherDTO>> GetBestSoldVouchers();
         public Task<IList<GetNearestVoucherDTO>> GetNearestVouchers(decimal lon, decimal lat);
         public Task<IList<GetAllVoucherDTO>> GetNearestVouchers(PagingRequest pagingRequest, decimal lon, decimal lat);
