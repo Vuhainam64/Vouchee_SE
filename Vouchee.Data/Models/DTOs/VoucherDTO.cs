@@ -219,6 +219,8 @@ namespace Vouchee.Business.Models.DTOs
         public string? brandName { get; set; }
         public string? brandImage { get; set; }
 
+        public DateTime? createDate { get; set; }
+
         public virtual ICollection<GetCategoryDTO>? categories { get; set; }
     }
 }
