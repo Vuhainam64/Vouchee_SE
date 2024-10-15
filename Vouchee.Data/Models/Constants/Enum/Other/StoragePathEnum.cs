@@ -15,6 +15,7 @@ namespace Vouchee.Data.Models.Constants.Enum.Other
         VOUCHER_TYPE,
         BRAND,
         SHOP,
-        ADDRESS
+        ADDRESS,
+        OTHER
     }
 }
