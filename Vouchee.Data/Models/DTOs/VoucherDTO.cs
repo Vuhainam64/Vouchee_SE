@@ -17,21 +17,41 @@ namespace Vouchee.Business.Models.DTOs
 {
     public class CreateVoucherDTO
     {
+        [Required(ErrorMessage = "Brand is required.")]
         public Guid? brandId { get; set; }
-        public Guid? supplierId { get; set; }
-        public Guid? voucherTypeId { get; set; }
-        public Guid? addressId { get; set; }
-        public Guid? categoryId { get; set; }
 
-        public string? name { get; set; }
+        [Required(ErrorMessage = "Supplier is required.")]
+        public Guid? supplierId { get; set; }
+
+        [Required(ErrorMessage = "At least one category is required.")]
+        public IList<Guid>? categoryId { get; set; }
+
+        [Required(ErrorMessage = "Title is required.")]
+        [StringLength(100, ErrorMessage = "Title cannot exceed 100 characters.")]
+        public string? title { get; set; }
+
+        [Required(ErrorMessage = "Description is required.")]
+        [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters.")]
         public string? description { get; set; }
+
+        [Required(ErrorMessage = "Price is required.")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0.")]
         public decimal? price { get; set; }
-        public DateTime? starDate { get; set; }
-        public DateTime? endDate { get; set; }
-        public string? policy { get; set; }
+
+        [Required(ErrorMessage = "Quantity is required.")]
+        [Range(0, int.MaxValue, ErrorMessage = "Quantity must be non-negative.")]
         public int? quantity { get; set; }
-        public IFormFile? image { get; set; }
-        public DateTime? createDate = DateTime.Now;
+
+        public IList<IFormFile>? productImage { get; set; }
+
+        public IList<IFormFile>? advertisingImage { get; set; }
+
+        public IFormFile? video { get; set; }
+
+        [Required(ErrorMessage = "Status is required.")]
+        public VoucherStatusEnum status { get; set; }
+
+        public DateTime? createDate { get; set; } = DateTime.Now;
     }
 
     public class UpdateVoucherDTO

@@ -19,6 +19,7 @@ namespace Vouchee.Data.Models.Entities
     {
         public Voucher()
         {
+            Images = new HashSet<Image>();
             VoucherCodes = new HashSet<VoucherCode>();
             Addresses = new HashSet<Address>();
             OrderDetails = new HashSet<OrderDetail>();
@@ -26,6 +27,8 @@ namespace Vouchee.Data.Models.Entities
             Categories = new HashSet<Category>();
         }
 
+        [InverseProperty(nameof(Image.Voucher))]
+        public virtual ICollection<Image> Images { get; set; }
         [InverseProperty(nameof(VoucherCode.Voucher))]
         public virtual ICollection<VoucherCode> VoucherCodes { get; set; }
         [InverseProperty(nameof(OrderDetail.Voucher))]
@@ -72,15 +75,15 @@ namespace Vouchee.Data.Models.Entities
         public decimal OriginalPrice { get; set; }
         //[Column(TypeName = "decimal")]
         //public decimal SalePrice { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime StartDate { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime EndDate { get; set; }
-        public string? Policy { get; set; }
+        //[Column(TypeName = "datetime")]
+        //public DateTime StartDate { get; set; }
+        //[Column(TypeName = "datetime")]
+        //public DateTime EndDate { get; set; }
+        //public string? Policy { get; set; }
         public int? Quantity { get; set; }
-        public string? Image { get; set; }
-        [Column(TypeName = "decimal")]
-        public decimal? PercentShow { get; set; }
+        //public string? Image { get; set; }
+        //[Column(TypeName = "decimal")]
+        //public decimal? PercentShow { get; set; }
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]

@@ -59,12 +59,12 @@ namespace Vouchee.Business.Services.Impls
 
                 var voucherId = await _voucherRepository.AddAsync(voucher);
 
-                if (createVoucherDTO.image != null && voucherId != null)
-                {
-                    voucher.Image = await _fileUploadService.UploadImageToFirebase(createVoucherDTO.image, thisUserObj.userId.ToString(), StoragePathEnum.VOUCHER);
+                //if (createVoucherDTO.image != null && voucherId != null)
+                //{
+                //    voucher.Image = await _fileUploadService.UploadImageToFirebase(createVoucherDTO.image, thisUserObj.userId.ToString(), StoragePathEnum.VOUCHER);
 
-                    await _voucherRepository.UpdateAsync(voucher);
-                }
+                //    await _voucherRepository.UpdateAsync(voucher);
+                //}
 
                 return voucherId;
             }
