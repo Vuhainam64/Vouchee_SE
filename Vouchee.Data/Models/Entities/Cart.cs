@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -19,10 +20,11 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty(nameof(Voucher.Carts))]
         public virtual ICollection<Voucher> Vouchers { get; set; }
         public Guid? UserId { get; set; }
-        [ForeignKey(nameof(UserId))]
-        [InverseProperty("Cart")]
+        [InverseProperty(nameof(User.Cart))]
         public virtual User? User { get; set; }
-        
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key]
+        public Guid? Id { get; set; }
         public decimal? Quantity { get; set; }
     }
 }
