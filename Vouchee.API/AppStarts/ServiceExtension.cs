@@ -20,10 +20,10 @@ namespace Vouchee.API.AppStarts
     {
         public static void AddDependencyInjection(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<VoucheeContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("PROD"))
-                       .EnableSensitiveDataLogging() // Enable sensitive data logging
-                       .LogTo(Console.WriteLine, LogLevel.Information)); // Log SQL commands
+            //services.AddDbContext<VoucheeContext>(options =>
+            //    options.UseSqlServer(configuration.GetConnectionString("PROD"))
+            //           .EnableSensitiveDataLogging() // Enable sensitive data logging
+            //           .LogTo(Console.WriteLine, LogLevel.Information)); // Log SQL commands
 
             services.AddSingleton(typeof(BaseDAO<>));
 

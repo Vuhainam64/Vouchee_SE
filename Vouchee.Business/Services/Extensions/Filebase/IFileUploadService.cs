@@ -11,5 +11,7 @@ namespace Vouchee.Business.Services.Extensions.Filebase
     public interface IFileUploadService
     {
         public Task<string> UploadImageToFirebase(IFormFile file, string uid, StoragePathEnum storagePathEnum);
+        public Task<string> UploadVideoToFirebase(IFormFile file, string uid, StoragePathEnum storagePathEnum);
+        public Task<string> UploadFileToFirebase(IFormFile file, string uid, StoragePathEnum storagePathEnum);
     }
 }

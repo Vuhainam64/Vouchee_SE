@@ -181,9 +181,6 @@ namespace Vouchee.Data.Helpers
                 new Voucher()
                 {
                     Id = Guid.Parse("494b5347-378e-4e2d-9553-6032a42cd8d1"),
-                    StartDate = DateTime.Now,
-                    EndDate = DateTime.Now.AddDays(4),
-                    PercentShow = 10,
                     OriginalPrice = 100000,
                     Quantity = 100,
                     Title = "Voucher sale",
@@ -195,9 +192,6 @@ namespace Vouchee.Data.Helpers
                 new Voucher()
                 {
                     Id = Guid.Parse("0c20c3c9-2200-4b09-81f5-a0ceb74eba8c"),
-                    StartDate = DateTime.Now,
-                    EndDate = DateTime.Now.AddDays(4),
-                    PercentShow = 10,
                     OriginalPrice = 100000,
                     Quantity = 100,
                     Title = "Voucher sale",

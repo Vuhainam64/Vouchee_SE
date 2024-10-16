@@ -84,17 +84,17 @@ namespace Vouchee.Business.Services.Impls
 
             // Generate a random number of days for StartDate and EndDate
             int randomStartDays = random.Next(0, 30); // Start date will be between today and 30 days from now
-            voucher.StartDate = today.AddDays(randomStartDays); // Set StartDate
+            //voucher.StartDate = today.AddDays(randomStartDays); // Set StartDate
 
             int randomEndDays = random.Next(1, 90); // End date will be 1 to 90 days after the StartDate
-            voucher.EndDate = voucher.StartDate.AddDays(randomEndDays); // Set EndDate
+            //voucher.EndDate = voucher.StartDate.AddDays(randomEndDays); // Set EndDate
             voucher.Status = VoucherStatusEnum.ACTIVE.ToString();
             voucher.CreateBy = _userRepository.GetTable().FirstOrDefault(x => x.RoleId.Equals(Guid.Parse("2D80393A-3A3D-495D-8DD7-F9261F85CC8F"))).Id;
             voucher.CreateDate = DateTime.Now;
             voucher.Description = "Lorem Ipsum is simply dummy text of the printing and typesetting industry...";
-            voucher.Image = "https://firebasestorage.googleapis.com/v0/b/vouchee-504da.appspot.com/o/IMAGE%2FVOUCHER%2Ftest.png?alt=media&token=11650450-ca07-45b1-a5d5-abbd90495d7a";
-            voucher.PercentShow = random.Next(1, 100);
-            voucher.Policy = "Lorem Ipsum is simply dummy text of the printing and typesetting industry...";
+            //voucher.Image = "https://firebasestorage.googleapis.com/v0/b/vouchee-504da.appspot.com/o/IMAGE%2FVOUCHER%2Ftest.png?alt=media&token=11650450-ca07-45b1-a5d5-abbd90495d7a";
+            //voucher.PercentShow = random.Next(1, 100);
+            //voucher.Policy = "Lorem Ipsum is simply dummy text of the printing and typesetting industry...";
             voucher.OriginalPrice = random.Next(50000, 1000000);
             voucher.SupplierId = supplierID;
             voucher.VoucherTypeId = voucherTypeId;

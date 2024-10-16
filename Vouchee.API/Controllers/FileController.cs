@@ -27,13 +27,33 @@ namespace Vouchee.API.Controllers
             _roleService = roleService;
         }
 
+        [HttpPost("upload-image")]
+        [Authorize]
+        public async Task<IActionResult> UploadImageToFirebase(IFormFile file)
+        {
+            ThisUserObj thisUserObj = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+
+            var result = await _fileUploadService.UploadImageToFirebase(file, thisUserObj.userId, StoragePathEnum.OTHER);
+            return Ok(result);
+        }
+
+        [HttpPost("upload-video")]
+        [Authorize]
+        public async Task<IActionResult> UploadVideoToFirebase(IFormFile file)
+        {
+            ThisUserObj thisUserObj = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+
+            var result = await _fileUploadService.UploadVideoToFirebase(file, thisUserObj.userId, StoragePathEnum.OTHER);
+            return Ok(result);
+        }
+
         [HttpPost("upload-file")]
         [Authorize]
         public async Task<IActionResult> UploadFileToFirebase(IFormFile file)
         {
             ThisUserObj thisUserObj = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            var result = await _fileUploadService.UploadImageToFirebase(file, thisUserObj.userId, StoragePathEnum.OTHER);
+            var result = await _fileUploadService.UploadFileToFirebase(file, thisUserObj.userId, StoragePathEnum.OTHER);
             return Ok(result);
         }
     }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vouchee.Data.Helpers;
 
@@ -11,9 +12,11 @@ using Vouchee.Data.Helpers;
 namespace Vouchee.Data.Migrations
 {
     [DbContext(typeof(VoucheeContext))]
-    partial class VoucheeContextModelSnapshot : ModelSnapshot
+    [Migration("20241016074437_Reverse")]
+    partial class Reverse
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -216,41 +219,6 @@ namespace Vouchee.Data.Migrations
                     b.HasIndex(new[] { "VoucherTypeId" }, "IX_Category_VoucherTypeId");
 
                     b.ToTable("Category");
-                });
-
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.Image", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWID()");
-
-                    b.Property<Guid?>("CreateBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("UpdateBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<Guid?>("VoucherId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex(new[] { "VoucherId" }, "IX_Image_VoucherId");
-
-                    b.ToTable("Image");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Order", b =>
@@ -751,11 +719,26 @@ namespace Vouchee.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("OriginalPrice")
                         .HasColumnType("decimal");
 
+                    b.Property<decimal?>("PercentShow")
+                        .HasColumnType("decimal");
+
+                    b.Property<string>("Policy")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("Quantity")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
@@ -792,8 +775,11 @@ namespace Vouchee.Data.Migrations
                         {
                             Id = new Guid("494b5347-378e-4e2d-9553-6032a42cd8d1"),
                             CreateBy = new Guid("b4583f49-baba-4916-8e2b-2d44c3412733"),
+                            EndDate = new DateTime(2024, 10, 20, 14, 44, 36, 593, DateTimeKind.Local).AddTicks(6047),
                             OriginalPrice = 100000m,
+                            PercentShow = 10m,
                             Quantity = 100,
+                            StartDate = new DateTime(2024, 10, 16, 14, 44, 36, 593, DateTimeKind.Local).AddTicks(6029),
                             Status = "ACTIVE",
                             SupplierId = new Guid("a053e9fc-7962-4eaa-8377-91c56c85cda6"),
                             Title = "Voucher sale",
@@ -803,8 +789,11 @@ namespace Vouchee.Data.Migrations
                         {
                             Id = new Guid("0c20c3c9-2200-4b09-81f5-a0ceb74eba8c"),
                             CreateBy = new Guid("b4583f49-baba-4916-8e2b-2d44c3412733"),
+                            EndDate = new DateTime(2024, 10, 20, 14, 44, 36, 593, DateTimeKind.Local).AddTicks(6124),
                             OriginalPrice = 100000m,
+                            PercentShow = 10m,
                             Quantity = 100,
+                            StartDate = new DateTime(2024, 10, 16, 14, 44, 36, 593, DateTimeKind.Local).AddTicks(6123),
                             Status = "ACTIVE",
                             SupplierId = new Guid("a053e9fc-7962-4eaa-8377-91c56c85cda6"),
                             Title = "Voucher sale",
@@ -995,15 +984,6 @@ namespace Vouchee.Data.Migrations
                     b.Navigation("VoucherType");
                 });
 
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.Image", b =>
-                {
-                    b.HasOne("Vouchee.Data.Models.Entities.Voucher", "Voucher")
-                        .WithMany("Images")
-                        .HasForeignKey("VoucherId");
-
-                    b.Navigation("Voucher");
-                });
-
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Order", b =>
                 {
                     b.HasOne("Vouchee.Data.Models.Entities.User", "User")
@@ -1132,8 +1112,6 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Voucher", b =>
                 {
-                    b.Navigation("Images");
-
                     b.Navigation("OrderDetails");
 
                     b.Navigation("VoucherCodes");
