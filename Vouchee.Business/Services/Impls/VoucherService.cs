@@ -247,6 +247,8 @@ namespace Vouchee.Business.Services.Impls
                                 supplierId = voucher.supplierId,
                                 supplierImage = voucher.supplierImage,
                                 supplierName = voucher.supplierName,
+                                quantity = voucher.quantity,
+                                rating = voucher.rating,
                                 addresses = new List<GetAllAddressDTO>
                                 {
                                     new GetAllAddressDTO
@@ -379,6 +381,8 @@ namespace Vouchee.Business.Services.Impls
                 supplierId = voucher.supplierId,
                 supplierImage = voucher.supplierImage,
                 supplierName = voucher.supplierName,
+                quantity = voucher.quantity,
+                rating = voucher.rating,
             })
             .OrderByDescending(v => v.TotalQuantitySold)
             .ToList();
@@ -540,6 +544,8 @@ namespace Vouchee.Business.Services.Impls
                                     supplierId = voucher.supplierId,
                                     supplierImage = voucher.supplierImage,
                                     supplierName = voucher.supplierName,
+                                    quantity = voucher.quantity,
+                                    rating = voucher.rating,
                                     addresses = new List<GetAllAddressDTO>
                                     {
                                         new GetAllAddressDTO
