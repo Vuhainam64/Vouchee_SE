@@ -71,7 +71,13 @@ namespace Vouchee.API.Controllers
             }
             return Ok(brand);
         }
-
+        [HttpGet("get_brand_by_name")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetBrandsbyname(string name)
+        {
+            var result = await _brandService.GetBrandsbynameAsync(name);
+            return Ok(result);
+        }
         // UPDATE
         [HttpPut("update_brand/{id}")]
         [Authorize]

@@ -155,6 +155,7 @@ namespace Vouchee.Business.Services.Impls
                                 image = voucher.image,
                                 originalPrice = voucher.originalPrice,
                                 salePrice = voucher.salePrice,
+                                imageBrand = voucher.brand.Image,
                                 addresses = new List<GetAllAddressDTO>
                                 {
                             new GetAllAddressDTO
@@ -164,6 +165,7 @@ namespace Vouchee.Business.Services.Impls
                                 lat = nearestAddress.Address.lat,
                                 lon = nearestAddress.Address.lon,
                                 distance = nearestAddress.Distance // Include distance here at the address level
+                                
                             }
                                 }
                             };

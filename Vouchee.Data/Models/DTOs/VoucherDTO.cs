@@ -183,6 +183,8 @@ namespace Vouchee.Business.Models.DTOs
         //public string? distance { get; set; }
         public virtual ICollection<GetCategoryDTO>? categories { get; set; }
         public virtual ICollection<GetAllAddressDTO>? addresses { get; set; }
+        public Brand brand { get; set; }
+        public string? imageBrand { get; set; }
     }
     public class GetDetailVoucherDTO
     {
