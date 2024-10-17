@@ -26,8 +26,11 @@ namespace Vouchee.Data.Models.Entities
             Promotions = new HashSet<Promotion>();
             Categories = new HashSet<Category>();
             Carts = new HashSet<Cart>();
+            SubVouchers = new HashSet<SubVoucher>();
         }
 
+        [InverseProperty(nameof(SubVoucher.Voucher))]
+        public virtual ICollection<SubVoucher> SubVouchers { get; set; }
         [InverseProperty(nameof(Image.Voucher))]
         public virtual ICollection<Image> Images { get; set; }
         [InverseProperty(nameof(VoucherCode.Voucher))]
@@ -75,8 +78,8 @@ namespace Vouchee.Data.Models.Entities
         public string? Description { get; set; }
         [Column(TypeName = "decimal")]
         public decimal OriginalPrice { get; set; }
-        //[Column(TypeName = "decimal")]
-        //public decimal SalePrice { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal SellPrice { get; set; }
         //[Column(TypeName = "datetime")]
         //public DateTime StartDate { get; set; }
         //[Column(TypeName = "datetime")]
@@ -86,6 +89,7 @@ namespace Vouchee.Data.Models.Entities
         //public string? Image { get; set; }
         //[Column(TypeName = "decimal")]
         //public decimal? PercentShow { get; set; }
+        public int Rating { get; set; }
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]

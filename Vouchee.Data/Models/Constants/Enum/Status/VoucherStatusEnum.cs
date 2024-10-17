@@ -8,9 +8,7 @@ namespace Vouchee.Data.Models.Constants.Enum.Status
 {
     public enum VoucherStatusEnum
     {
-        INACTIVE,
-        ACTIVE,
-        SUSPICIOUS,
-        BANNED
+        NOT_SELL,
+        SELLING
     }
 }

@@ -29,21 +29,21 @@ namespace Vouchee.Business.Models.DTOs
     {
         public GetVoucherTypeDTO()
         {
-            vouchers = new HashSet<GetAllVoucherDTO>();
+            //vouchers = new HashSet<GetAllVoucherDTO>();
             categories = new HashSet<GetCategoryDTO>();
         }
 
         public Guid? id { get; set; }
-        public string? image { get; set; }
+        //public string? image { get; set; }
         public string? title { get; set; }
 
-        public string? status { get; set; }
-        public DateTime? createDate { get; set; }
-        public Guid? createBy { get; set; }
-        public DateTime? updateDate { get; set; }
-        public Guid? updateBy { get; set; }
+        //public string? status { get; set; }
+        //public DateTime? createDate { get; set; }
+        //public Guid? createBy { get; set; }
+        //public DateTime? updateDate { get; set; }
+        //public Guid? updateBy { get; set; }
 
-        public virtual ICollection<GetAllVoucherDTO>? vouchers { get; set; }
+        //public virtual ICollection<GetAllVoucherDTO>? vouchers { get; set; }
         public virtual ICollection<GetCategoryDTO>? categories { get; set; }
     }
 }

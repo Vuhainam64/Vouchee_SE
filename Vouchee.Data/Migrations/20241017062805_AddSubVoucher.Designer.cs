@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vouchee.Data.Helpers;
 
@@ -11,9 +12,11 @@ using Vouchee.Data.Helpers;
 namespace Vouchee.Data.Migrations
 {
     [DbContext(typeof(VoucheeContext))]
-    partial class VoucheeContextModelSnapshot : ModelSnapshot
+    [Migration("20241017062805_AddSubVoucher")]
+    partial class AddSubVoucher
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -580,12 +583,7 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<Guid?>("VoucherId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("VoucherId");
 
                     b.ToTable("SubVoucher");
                 });
@@ -1165,15 +1163,6 @@ namespace Vouchee.Data.Migrations
                     b.Navigation("Voucher");
                 });
 
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.SubVoucher", b =>
-                {
-                    b.HasOne("Vouchee.Data.Models.Entities.Voucher", "Voucher")
-                        .WithMany("SubVouchers")
-                        .HasForeignKey("VoucherId");
-
-                    b.Navigation("Voucher");
-                });
-
             modelBuilder.Entity("Vouchee.Data.Models.Entities.User", b =>
                 {
                     b.HasOne("Vouchee.Data.Models.Entities.Cart", "Cart")
@@ -1285,8 +1274,6 @@ namespace Vouchee.Data.Migrations
                     b.Navigation("Images");
 
                     b.Navigation("OrderDetails");
-
-                    b.Navigation("SubVouchers");
 
                     b.Navigation("VoucherCodes");
                 });

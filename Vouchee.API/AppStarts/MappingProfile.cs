@@ -108,7 +108,6 @@ namespace Vouchee.API.AppStarts
             CreateMap<GetCategoryDTO, CategoryFilter>().ReverseMap();
 
             // BRAND
-            CreateMap<Brand, BrandDTO>().ReverseMap();
             CreateMap<Brand, CreateBrandDTO>().ReverseMap();
             CreateMap<Brand, UpdateBrandDTO>().ReverseMap();
             CreateMap<Brand, GetBrandDTO>().ReverseMap();

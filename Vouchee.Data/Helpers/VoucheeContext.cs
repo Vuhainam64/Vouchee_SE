@@ -53,6 +53,7 @@ namespace Vouchee.Data.Helpers
             modelBuilder.Entity<Brand>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Image>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Cart>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            modelBuilder.Entity<SubVoucher>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
 
             modelBuilder.Seed();
 

@@ -11,9 +11,11 @@ using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Constants.Number;
+using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
 using Vouchee.Data.Repositories.IRepos;
+using Vouchee.Data.Repositories.Repos;
 
 namespace Vouchee.Business.Services.Impls
 {
@@ -107,20 +109,31 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<IList<GetVoucherTypeDTO>> GetVoucherTypesAsync()
+        public async Task<DynamicResponseModel<GetVoucherTypeDTO>> GetVoucherTypesAsync(PagingRequest pagingRequest, VoucherTypeFilter voucherTypeFilter)
         {
-            IQueryable<GetVoucherTypeDTO> result;
+            (int, IQueryable<GetVoucherTypeDTO>) result;
             try
             {
                 result = _voucherTypeRepository.GetTable()
-                            .ProjectTo<GetVoucherTypeDTO>(_mapper.ConfigurationProvider);
+                            .ProjectTo<GetVoucherTypeDTO>(_mapper.ConfigurationProvider)
+                            .DynamicFilter(_mapper.Map<GetVoucherTypeDTO>(voucherTypeFilter))
+                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
             }
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
                 throw new LoadException("Lỗi không xác định khi tải voucher type");
             }
-            return result.ToList();
+            return new DynamicResponseModel<GetVoucherTypeDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = result.Item2.ToList() // Return the paged voucher list with nearest address and distance
+            };
         }
 
         public async Task<bool> UpdateVoucherTypeAsync(Guid id, UpdateVoucherTypeDTO updateVoucherTypeDTO)

@@ -52,9 +52,10 @@ namespace Vouchee.API.Controllers
 
         // READ
         [HttpGet("get_all_voucher_type")]
-        public async Task<IActionResult> GetVoucherTypes()
+        public async Task<IActionResult> GetVoucherTypes([FromQuery] PagingRequest pagingRequest,
+                                                            [FromQuery] VoucherTypeFilter voucherTypeFilter)
         {
-            var result = await _voucherTypeService.GetVoucherTypesAsync();
+            var result = await _voucherTypeService.GetVoucherTypesAsync(pagingRequest, voucherTypeFilter);
             return Ok(result);
         }
 

@@ -53,7 +53,7 @@ namespace Vouchee.Business.Services.Impls
             {
                 Voucher voucher = _mapper.Map<Voucher>(createVoucherDTO);
 
-                voucher.Status = VoucherStatusEnum.ACTIVE.ToString();
+                voucher.Status = VoucherStatusEnum.SELLING.ToString();
                 voucher.CreateBy = Guid.Parse(thisUserObj.userId);
 
 
