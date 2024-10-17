@@ -34,6 +34,7 @@ namespace Vouchee.Data.Helpers
                                     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
                 IConfigurationRoot configuration = builder.Build();
                 optionsBuilder.UseSqlServer(configuration.GetConnectionString("PROD"));
+                /*optionsBuilder.UseSqlServer("Server=(local);uid=sa;pwd=12345;database=Vouchee1;TrustServerCertificate=True;");*/
             }
         }
 
