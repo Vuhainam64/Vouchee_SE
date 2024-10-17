@@ -108,7 +108,7 @@ namespace Vouchee.Business.Services.Impls
                 {
                     throw new NotFoundException("Không tìm thấy Cart");
                 }
-                cart.Quantity = updateCartDTO.Quantity;
+                //cart.Quantity = updateCartDTO.Quantity;
 
                 await _cartRepository.UpdateAsync(cart);
                 return true;
