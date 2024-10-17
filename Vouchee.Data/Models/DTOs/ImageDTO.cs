@@ -28,7 +28,6 @@ namespace Vouchee.Data.Models.DTOs
     public class GetImageDTO
     {
         public Guid id { get; set; }
-        public Guid? voucherId { get; set; }
         public string? imageUrl { get; set; }
     }
 }

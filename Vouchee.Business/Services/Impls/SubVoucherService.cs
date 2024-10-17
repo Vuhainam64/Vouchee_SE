@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -83,12 +84,15 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<GetSubVoucherDTO> GetSubVoucherByIdAsync(Guid id)
         {
-            SubVoucher subVoucher = await _subVoucherRepository.GetByIdAsync(id);
+            SubVoucher subVoucher = await _subVoucherRepository.GetByIdAsync(id,
+                includeProperties: query => query.Include(x => x.Images));
             if (subVoucher != null)
             {
-                return _mapper.Map<GetSubVoucherDTO>(subVoucher);
+                GetSubVoucherDTO getSubVoucherDTO = _mapper.Map<GetSubVoucherDTO>(subVoucher);
+                getSubVoucherDTO.image = getSubVoucherDTO.images.Count != 0 ? getSubVoucherDTO.images.FirstOrDefault().imageUrl : null;
+                return getSubVoucherDTO;
             }
-            return null;
+            throw new NotFoundException("Khong tim thay sub voucher");
         }
 
         public async Task<DynamicResponseModel<GetSubVoucherDTO>> GetSubVouchersAsync(PagingRequest pagingRequest, SubVoucherFilter subVoucherFilter)

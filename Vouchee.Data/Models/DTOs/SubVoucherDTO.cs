@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Vouchee.Data.Models.Constants.Enum.Status;
+using Vouchee.Data.Models.Entities;
 
 namespace Vouchee.Data.Models.DTOs
 {
@@ -42,5 +43,20 @@ namespace Vouchee.Data.Models.DTOs
     public class GetSubVoucherDTO
     {
 
+        public GetSubVoucherDTO()
+        {
+            images = new HashSet<GetImageDTO>();
+        }
+
+        public Guid id { get; set; }
+        public Guid? voucherId { get; set; }
+
+        public string? title { get; set; }
+        public decimal? originalPrice { get; set; }
+        public decimal? sellPrice { get; set; }
+        public int? quantity { get; set; }
+        public string? image { get; set; }
+
+        public virtual ICollection<GetImageDTO>? images { get; set; }
     }
 }
