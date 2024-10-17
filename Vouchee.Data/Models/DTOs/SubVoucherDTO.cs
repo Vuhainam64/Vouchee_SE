@@ -30,7 +30,8 @@ namespace Vouchee.Data.Models.DTOs
 
         public VoucherStatusEnum status { get; set; }
 
-        public IList<IFormFile>? productImages { get; set; }
+        //public IList<IFormFile>? productImages { get; set; }
+        public IList<string>? productImagesUrl { get; set; }
 
         public DateTime createDate = DateTime.Now;
     }

@@ -53,7 +53,7 @@ namespace Vouchee.Business.Services.Impls
             subVoucher.VoucherId = voucherId;
             subVoucher.CreateBy = Guid.Parse(thisUserObj.userId);
 
-            foreach (var image in createSubVoucherDTO.productImages)
+            foreach (var image in createSubVoucherDTO.productImagesUrl)
             {
                 Image newImage = new();
 
@@ -61,7 +61,8 @@ namespace Vouchee.Business.Services.Impls
                 newImage.CreateDate = DateTime.Now;
                 newImage.ImageType = "PRODUCT";
                 newImage.Status = ObjectStatusEnum.ACTIVE.ToString();
-                newImage.ImageUrl = await _fileUploadService.UploadImageToFirebase(image, thisUserObj.userId, StoragePathEnum.VOUCHER);
+                // newImage.ImageUrl = await _fileUploadService.UploadImageToFirebase(image, thisUserObj.userId, StoragePathEnum.VOUCHER);
+                newImage.ImageUrl = image;
 
                 if (newImage != null)
                 {

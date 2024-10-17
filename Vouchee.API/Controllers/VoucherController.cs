@@ -34,7 +34,7 @@ namespace Vouchee.API.Controllers
         // CREATE
         [HttpPost("create_voucher")]
         [Authorize]
-        public async Task<IActionResult> CreateVoucher([FromForm] CreateVoucherDTO voucherDTO)
+        public async Task<IActionResult> CreateVoucher([FromBody] CreateVoucherDTO voucherDTO)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 

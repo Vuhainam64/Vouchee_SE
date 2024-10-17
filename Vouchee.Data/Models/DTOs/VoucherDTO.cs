@@ -17,6 +17,11 @@ namespace Vouchee.Business.Models.DTOs
 {
     public class CreateVoucherDTO
     {
+        public CreateVoucherDTO()
+        {
+            subVouchers = new HashSet<CreateSubVoucherDTO>();
+        }
+
         [Required(ErrorMessage = "Brand is required.")]
         public Guid brandId { get; set; }
 
@@ -46,16 +51,24 @@ namespace Vouchee.Business.Models.DTOs
         [Range(0, int.MaxValue, ErrorMessage = "Quantity must be non-negative.")]
         public int quantity { get; set; }
 
-        public IList<IFormFile>? productImage { get; set; }
+        //public IList<IFormFile>? productImage { get; set; }
 
-        public IList<IFormFile>? advertisingImage { get; set; }
+        //public IList<IFormFile>? advertisingImage { get; set; }
 
-        public IFormFile? video { get; set; }
+        //public IFormFile? video { get; set; }
+
+        public IList<string>? productImageUrl { get; set; }
+
+        public IList<string>? advertisingImageUrl { get; set; }
+
+        public string? videoUrl { get; set; }
 
         [Required(ErrorMessage = "Status is required.")]
         public VoucherStatusEnum status { get; set; }
 
         public DateTime? createDate = DateTime.Now;
+
+        public virtual ICollection<CreateSubVoucherDTO> subVouchers { get; set; }
     }
 
     public class UpdateVoucherDTO

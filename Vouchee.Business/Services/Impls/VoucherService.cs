@@ -87,13 +87,14 @@ namespace Vouchee.Business.Services.Impls
 
                 voucher.CreateBy = Guid.Parse(thisUserObj.userId);
 
-                if (createVoucherDTO.productImage != null && createVoucherDTO.productImage.Count != 0)
+                if (createVoucherDTO.productImageUrl != null && createVoucherDTO.productImageUrl.Count != 0)
                 {
-                    foreach (var productImage in createVoucherDTO.productImage)
+                    foreach (var productImage in createVoucherDTO.productImageUrl)
                     {
                         Image image = new();
 
-                        image.ImageUrl = await _fileUploadService.UploadImageToFirebase(productImage, thisUserObj.userId.ToString(), StoragePathEnum.VOUCHER);
+                        // image.ImageUrl = await _fileUploadService.UploadImageToFirebase(productImage, thisUserObj.userId.ToString(), StoragePathEnum.VOUCHER);
+                        image.ImageUrl = productImage;
                         image.Status = ObjectStatusEnum.ACTIVE.ToString();
                         image.CreateBy = Guid.Parse(thisUserObj.userId);
                         image.CreateDate = DateTime.Now;
@@ -103,13 +104,14 @@ namespace Vouchee.Business.Services.Impls
                     }
                 }
 
-                if (createVoucherDTO.advertisingImage != null && createVoucherDTO.advertisingImage.Count != 0)
+                if (createVoucherDTO.advertisingImageUrl != null && createVoucherDTO.advertisingImageUrl.Count != 0)
                 {
-                    foreach (var advertisingImage in createVoucherDTO.advertisingImage)
+                    foreach (var advertisingImage in createVoucherDTO.advertisingImageUrl)
                     {
                         Image image = new();
 
-                        image.ImageUrl = await _fileUploadService.UploadImageToFirebase(advertisingImage, thisUserObj.userId.ToString(), StoragePathEnum.VOUCHER);
+                        // image.ImageUrl = await _fileUploadService.UploadImageToFirebase(advertisingImage, thisUserObj.userId.ToString(), StoragePathEnum.VOUCHER);
+                        image.ImageUrl = advertisingImage;
                         image.Status = ObjectStatusEnum.ACTIVE.ToString();
                         image.CreateBy = Guid.Parse(thisUserObj.userId);
                         image.CreateDate = DateTime.Now;
@@ -122,10 +124,12 @@ namespace Vouchee.Business.Services.Impls
                     }
                 }
 
-                if (createVoucherDTO.video != null)
+                if (createVoucherDTO.videoUrl != null)
                 {
                     Image image = new();
-                    image.ImageUrl = await _fileUploadService.UploadVideoToFirebase(createVoucherDTO.video, thisUserObj.userId.ToString(), StoragePathEnum.VOUCHER);
+
+                    //image.ImageUrl = await _fileUploadService.UploadVideoToFirebase(createVoucherDTO.videoUrl, thisUserObj.userId.ToString(), StoragePathEnum.VOUCHER);
+                    image.ImageUrl = createVoucherDTO.videoUrl;
                     image.Status = ObjectStatusEnum.ACTIVE.ToString();
                     image.CreateBy = Guid.Parse(thisUserObj.userId);
                     image.CreateDate = DateTime.Now;
@@ -137,12 +141,15 @@ namespace Vouchee.Business.Services.Impls
                     }
                 }
 
-                //if (createVoucherDTO.image != null && voucherId != null)
-                //{
-                //    voucher.Image = await _fileUploadService.UploadImageToFirebase(createVoucherDTO.image, thisUserObj.userId.ToString(), StoragePathEnum.VOUCHER);
-
-                //    await _voucherRepository.UpdateAsync(voucher);
-                //}
+                if (createVoucherDTO.subVouchers != null && createVoucherDTO.subVouchers.Count != 0)
+                {
+                    foreach (var subVoucher in createVoucherDTO.subVouchers)
+                    {
+                        SubVoucher newSubVoucher = _mapper.Map<SubVoucher>(subVoucher);
+                        newSubVoucher.CreateBy = Guid.Parse(thisUserObj.userId);
+                        voucher.SubVouchers.Add(newSubVoucher);
+                    }
+                }
 
                 var voucherId = await _voucherRepository.AddAsync(voucher);
 
