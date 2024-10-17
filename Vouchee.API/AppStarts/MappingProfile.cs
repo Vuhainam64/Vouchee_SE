@@ -118,6 +118,13 @@ namespace Vouchee.API.AppStarts
             CreateMap<Image, CreateImageDTO>().ReverseMap();
             CreateMap<Image, UpdateImageDTO>().ReverseMap();
             CreateMap<Image, GetImageDTO>().ReverseMap();
+            
+
+            //Cart
+            CreateMap<Cart,CartDTO>().ReverseMap();
+            CreateMap<Cart,CreateCartDTO>().ReverseMap();
+            CreateMap<Cart,UpdateCartDTO>().ReverseMap();
+            CreateMap<Cart, GetCartDTO>().ReverseMap();
         }
     }
 }
