@@ -30,10 +30,12 @@ namespace Vouchee.Data.Models.Entities
         [ForeignKey(nameof(RoleId))]
         [InverseProperty("Users")]
         public virtual Role? Role { get; set; }
+
         public Guid? CartId { get; set; }
         [ForeignKey(nameof(CartId))]
-        [InverseProperty(nameof(Cart.User))]
+        [InverseProperty(nameof(User))]
         public virtual Cart? Cart { get; set; }
+
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }

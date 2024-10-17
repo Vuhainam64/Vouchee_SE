@@ -19,12 +19,14 @@ namespace Vouchee.Data.Models.Entities
         }
         [InverseProperty(nameof(Voucher.Carts))]
         public virtual ICollection<Voucher> Vouchers { get; set; }
+
         public Guid? UserId { get; set; }
-        [InverseProperty(nameof(User.Cart))]
+        [InverseProperty(nameof(Cart))]
         public virtual User? User { get; set; }
+
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid? Id { get; set; }
-        public decimal? Quantity { get; set; }
+        public int? Quantity { get; set; }
     }
 }
