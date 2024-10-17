@@ -98,10 +98,10 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public Task<IList<GetAllVoucherDTO>> GetBestSoldVouchers()
-        {
-            throw new NotImplementedException();
-        }
+        //public Task<IList<GetAllVoucherDTO>> GetBestSoldVouchers()
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         public async Task<IList<GetNearestVoucherDTO>> GetNearestVouchers(decimal lon, decimal lat)
         {
@@ -152,19 +152,20 @@ namespace Vouchee.Business.Services.Impls
                                 id = voucher.id,
                                 title = voucher.title,
                                 categories = voucher.categories,
-                                image = voucher.image,
+                                image = voucher.images.FirstOrDefault().imageUrl,
                                 originalPrice = voucher.originalPrice,
                                 salePrice = voucher.salePrice,
+                                imageBrand = voucher.brand.Image,
                                 addresses = new List<GetAllAddressDTO>
                                 {
-                            new GetAllAddressDTO
-                            {
-                                id = nearestAddress.Address.id,
-                                addressName = nearestAddress.Address.addressName,
-                                lat = nearestAddress.Address.lat,
-                                lon = nearestAddress.Address.lon,
-                                distance = nearestAddress.Distance // Include distance here at the address level
-                            }
+                                    new GetAllAddressDTO
+                                    {
+                                        id = nearestAddress.Address.id,
+                                        addressName = nearestAddress.Address.addressName,
+                                        lat = nearestAddress.Address.lat,
+                                        lon = nearestAddress.Address.lon,
+                                        distance = nearestAddress.Distance // Include distance here at the address level
+                                    }
                                 }
                             };
                         }
@@ -190,6 +191,7 @@ namespace Vouchee.Business.Services.Impls
             try
             {
                 result = _voucherRepository.GetTable()
+                                            .Include(x => x.Images)
                                             .OrderByDescending(x => x.CreateDate)
                                             .Take(8)
                                             .ProjectTo<GetNewestVoucherDTO>(_mapper.ConfigurationProvider);
@@ -211,6 +213,8 @@ namespace Vouchee.Business.Services.Impls
                             voucher.salePrice = voucher.originalPrice - (voucher.originalPrice * availablePromotion.PercentDiscount / 100);
                             voucher.percentDiscount = availablePromotion.PercentDiscount;
                         }
+
+                        voucher.image = voucher.images.FirstOrDefault().imageUrl;
                     }
                 }
             }
@@ -251,7 +255,7 @@ namespace Vouchee.Business.Services.Impls
             {
                 id = voucher.id,
                 title = voucher.title,
-                image = voucher.image,
+                image = voucher.images.FirstOrDefault().imageUrl,
                 originalPrice = voucher.originalPrice,
                 salePrice = voucher.salePrice,
                 TotalQuantitySold = orderDetails.First(od => od.VoucherId == voucher.id).TotalQuantitySold,
@@ -297,7 +301,9 @@ namespace Vouchee.Business.Services.Impls
                                                         .Include(x => x.Supplier)
                                                         .Include(x => x.Addresses)
                                                         .Include(x => x.Categories)
-                                                        .Include(x => x.VoucherType));
+                                                        .Include(x => x.Images)
+                                                        .Include(x => x.VoucherType)
+                                                        .Include(x => x.Seller));
 
                 if (voucher != null)
                 {
@@ -312,6 +318,7 @@ namespace Vouchee.Business.Services.Impls
                     {
                         voucherDTO.salePrice = voucherDTO.originalPrice - (voucherDTO.originalPrice * availablePromotion.PercentDiscount / 100);
                         voucherDTO.percenDiscount = availablePromotion.PercentDiscount;
+                        voucherDTO.image = voucherDTO.images.FirstOrDefault().imageUrl;
                     }
 
                     return voucherDTO;
@@ -362,6 +369,7 @@ namespace Vouchee.Business.Services.Impls
             {
                 decimal R = 6371; // Earth's radius in kilometers
                 result.Item2 = _voucherRepository.GetTable()
+                    .Include(x => x.Images)
                     .ProjectTo<GetAllVoucherDTO>(_mapper.ConfigurationProvider)
                     .DynamicFilter(_mapper.Map<GetAllVoucherDTO>(voucherFilter));
 
@@ -409,7 +417,8 @@ namespace Vouchee.Business.Services.Impls
                                 {
                                     categories = voucher.categories,
                                     id = voucher.id,
-                                    image = voucher.image,
+                                    images = voucher.images,
+                                    image = voucher.images.FirstOrDefault().imageUrl,
                                     originalPrice = voucher.originalPrice,
                                     salePrice = voucher.salePrice,
                                     title = voucher.title,
@@ -418,14 +427,14 @@ namespace Vouchee.Business.Services.Impls
                                     brandImage = voucher.brandImage,
                                     addresses = new List<GetAllAddressDTO>
                                     {
-                                new GetAllAddressDTO
-                                {
-                                    id = nearestAddress.Address.id,
-                                    addressName = nearestAddress.Address.addressName,
-                                    lat = nearestAddress.Address.lat,
-                                    lon = nearestAddress.Address.lon,
-                                    distance = Math.Round(nearestAddress.Distance, 2) // Round distance to 2 decimal places
-                                }
+                                        new GetAllAddressDTO
+                                        {
+                                            id = nearestAddress.Address.id,
+                                            addressName = nearestAddress.Address.addressName,
+                                            lat = nearestAddress.Address.lat,
+                                            lon = nearestAddress.Address.lon,
+                                            distance = Math.Round(nearestAddress.Distance, 2) // Round distance to 2 decimal places
+                                        }
                                     }
                                 };
                             }
@@ -449,6 +458,7 @@ namespace Vouchee.Business.Services.Impls
                     {
                         voucher.salePrice = voucher.originalPrice - (voucher.originalPrice * availablePromotion.PercentDiscount / 100);
                         voucher.percentDiscount = availablePromotion.PercentDiscount;
+                        voucher.image = voucher.images.FirstOrDefault().imageUrl;
                     }
                 }
 
@@ -490,6 +500,8 @@ namespace Vouchee.Business.Services.Impls
                                                                     .ThenInclude(v => v.Categories) // Include categories of the vouchers
                                                                 .Include(x => x.Vouchers)
                                                                     .ThenInclude(v => v.Brand) // Include the brand of the vouchers
+                                                                .Include(x => x.Vouchers)
+                                                                    .ThenInclude(x => x.Images)
                                                                 .ToList()
                                                                 .Where(x => x.StartDate <= currenDate && currenDate <= x.EndDate)
                                                                 .ToList();
@@ -504,11 +516,11 @@ namespace Vouchee.Business.Services.Impls
                             var existedVoucher = _mapper.Map<GetNewestVoucherDTO>(voucher);
                             existedVoucher.salePrice = existedVoucher.originalPrice - (existedVoucher.originalPrice * promotion.PercentDiscount / 100);
                             existedVoucher.percentDiscount = promotion.PercentDiscount;
+                            existedVoucher.image = existedVoucher.images.FirstOrDefault().imageUrl;
                             vouchers.Add(existedVoucher);
                         }
                     }
                 }
-
                 return vouchers;
             }
 

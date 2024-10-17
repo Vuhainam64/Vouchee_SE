@@ -97,6 +97,23 @@ namespace Vouchee.Business.Services.Impls
             return result.ToList();
         }
 
+        public async Task<IList<GetBrandDTO>> GetBrandsbynameAsync(string name)
+        {
+            IQueryable<GetBrandDTO> result;
+            try
+            {
+                result = _brandRepository.GetTable()
+                            .Where(b => b.Name.Equals(name))
+                            .ProjectTo<GetBrandDTO>(_mapper.ConfigurationProvider);
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.Message);
+                throw new LoadException("Lỗi không xác định khi tải brand");
+            }
+            return result.ToList();
+        }
+
         public Task<bool> UpdateBrandAsync(Guid id, UpdateBrandDTO updateBrandDTO)
         {
             throw new NotImplementedException();

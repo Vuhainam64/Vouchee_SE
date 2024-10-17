@@ -19,6 +19,7 @@ namespace Vouchee.Business.Services
         // READ
         public Task<GetBrandDTO> GetBrandByIdAsync(Guid id);
         public Task<IList<GetBrandDTO>> GetBrandsAsync();
+        public Task<IList<GetBrandDTO>> GetBrandsbynameAsync(string name);
 
         // UPDATE
         public Task<bool> UpdateBrandAsync(Guid id, UpdateBrandDTO updateBrandDTO);
