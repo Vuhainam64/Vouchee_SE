@@ -25,6 +25,7 @@ namespace Vouchee.Data.Models.Entities
             OrderDetails = new HashSet<OrderDetail>();
             Promotions = new HashSet<Promotion>();
             Categories = new HashSet<Category>();
+            Carts = new HashSet<Cart>();
         }
 
         [InverseProperty(nameof(Image.Voucher))]
@@ -39,7 +40,8 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<Promotion> Promotions { get; set; }
         [InverseProperty(nameof(Category.Vouchers))]
         public virtual ICollection<Category> Categories { get; set; }
-
+        [InverseProperty(nameof(Cart.Vouchers))]
+        public virtual ICollection<Cart> Carts { get; set; }
         public Guid? BrandId { get; set; }
         [ForeignKey(nameof(BrandId))]
         [InverseProperty("Vouchers")]
