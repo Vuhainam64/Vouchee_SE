@@ -23,21 +23,21 @@ namespace Vouchee.Business.Models.DTOs
         }
 
         [Required(ErrorMessage = "Brand is required.")]
-        public Guid brandId { get; set; }
+        public Guid? brandId { get; set; }
 
         [Required(ErrorMessage = "Supplier is required.")]
-        public Guid supplierId { get; set; }
+        public Guid? supplierId { get; set; }
 
         [Required(ErrorMessage = "At least one category is required.")]
-        public IList<Guid> categoryId { get; set; }
+        public IList<Guid>? categoryId { get; set; }
 
         [Required(ErrorMessage = "Title is required.")]
         [StringLength(100, ErrorMessage = "Title cannot exceed 100 characters.")]
-        public string title { get; set; }
+        public string? title { get; set; }
 
         [Required(ErrorMessage = "Description is required.")]
         [StringLength(2000, ErrorMessage = "Description cannot exceed 2000 characters.")]
-        public string description { get; set; }
+        public string? description { get; set; }
 
         [Required(ErrorMessage = "Original Price is required.")]
         [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0.")]
@@ -59,7 +59,8 @@ namespace Vouchee.Business.Models.DTOs
 
         public IList<string>? productImageUrl { get; set; }
 
-        public IList<string>? advertisingImageUrl { get; set; }
+        //public IList<string>? advertisingImageUrl { get; set; }
+        public string? advertisingImageUrl { get; set; }
 
         public string? videoUrl { get; set; }
 

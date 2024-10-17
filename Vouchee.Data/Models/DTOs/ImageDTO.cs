@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Constants.Enum.Status;
+using Vouchee.Data.Models.Constants.Enum.Other;
 
 namespace Vouchee.Data.Models.DTOs
 {
@@ -29,5 +30,6 @@ namespace Vouchee.Data.Models.DTOs
     {
         public Guid id { get; set; }
         public string? imageUrl { get; set; }
+        public ImageEnum? imageType { get; set; }
     }
 }
