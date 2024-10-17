@@ -12,7 +12,6 @@ namespace Vouchee.Data.Models.Entities
 {
     [Table("User")]
     [Index(nameof(RoleId), Name = "IX_User_RoleId")]
-    [Index(nameof(CartId), Name = "IX_User_CartId")]
     public partial class User
     {
         public User()
@@ -25,16 +24,13 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<Order> Orders { get; set; }
         [InverseProperty(nameof(Voucher.Seller))]
         public virtual ICollection<Voucher> Vouchers { get; set; }
+        [InverseProperty(nameof(Cart.User))]
+        public virtual ICollection<Cart> Carts { get; set; }
 
         public Guid? RoleId { get; set; }
         [ForeignKey(nameof(RoleId))]
         [InverseProperty("Users")]
         public virtual Role? Role { get; set; }
-
-        public Guid? CartId { get; set; }
-        [ForeignKey(nameof(CartId))]
-        [InverseProperty(nameof(User))]
-        public virtual Cart? Cart { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]

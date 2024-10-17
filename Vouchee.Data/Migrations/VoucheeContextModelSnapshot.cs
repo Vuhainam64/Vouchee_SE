@@ -199,8 +199,23 @@ namespace Vouchee.Data.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("NEWID()");
 
+                    b.Property<Guid?>("CreateBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime");
+
                     b.Property<int?>("Quantity")
                         .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("UpdateBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime");
 
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -686,9 +701,6 @@ namespace Vouchee.Data.Migrations
                     b.Property<string>("BankName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("CartId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("City")
                         .HasColumnType("nvarchar(max)");
 
@@ -751,13 +763,6 @@ namespace Vouchee.Data.Migrations
                         .HasColumnType("datetime");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CartId")
-                        .IsUnique()
-                        .HasFilter("[CartId] IS NOT NULL");
-
-                    b.HasIndex(new[] { "CartId" }, "IX_User_CartId")
-                        .HasDatabaseName("IX_User_CartId1");
 
                     b.HasIndex(new[] { "RoleId" }, "IX_User_RoleId");
 
@@ -1104,6 +1109,15 @@ namespace Vouchee.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Vouchee.Data.Models.Entities.Cart", b =>
+                {
+                    b.HasOne("Vouchee.Data.Models.Entities.User", "User")
+                        .WithMany("Carts")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Category", b =>
                 {
                     b.HasOne("Vouchee.Data.Models.Entities.VoucherType", "VoucherType")
@@ -1175,15 +1189,9 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.User", b =>
                 {
-                    b.HasOne("Vouchee.Data.Models.Entities.Cart", "Cart")
-                        .WithOne("User")
-                        .HasForeignKey("Vouchee.Data.Models.Entities.User", "CartId");
-
                     b.HasOne("Vouchee.Data.Models.Entities.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId");
-
-                    b.Navigation("Cart");
 
                     b.Navigation("Role");
                 });
@@ -1229,11 +1237,6 @@ namespace Vouchee.Data.Migrations
                     b.Navigation("Vouchers");
                 });
 
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.Cart", b =>
-                {
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Order", b =>
                 {
                     b.Navigation("OrderDetails");
@@ -1268,6 +1271,8 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.User", b =>
                 {
+                    b.Navigation("Carts");
+
                     b.Navigation("Orders");
 
                     b.Navigation("Vouchers");

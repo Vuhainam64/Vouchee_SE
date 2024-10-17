@@ -21,12 +21,21 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<Voucher> Vouchers { get; set; }
 
         public Guid? UserId { get; set; }
-        [InverseProperty(nameof(Cart))]
+        [ForeignKey(nameof(UserId))]
+        [InverseProperty("Carts")]
         public virtual User? User { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid? Id { get; set; }
         public int? Quantity { get; set; }
+
+        public string? Status { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime? CreateDate { get; set; }
+        public Guid? CreateBy { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime? UpdateDate { get; set; }
+        public Guid? UpdateBy { get; set; }
     }
 }
