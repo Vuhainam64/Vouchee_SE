@@ -235,5 +235,10 @@ namespace Vouchee.Data.Helpers
         {
             _context.Entry(entity).State = EntityState.Unchanged;
         }
+
+        public void Attach(Category category)
+        {
+            _context.Attach(category);
+        }
     }
 }

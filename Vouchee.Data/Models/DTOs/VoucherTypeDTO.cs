@@ -46,4 +46,10 @@ namespace Vouchee.Business.Models.DTOs
         //public virtual ICollection<GetAllVoucherDTO>? vouchers { get; set; }
         public virtual ICollection<GetCategoryDTO>? categories { get; set; }
     }
+
+    public class GetDetailVoucherType
+    {
+        public Guid? id { get; set; }
+        public string? title { get; set; }
+    }
 }

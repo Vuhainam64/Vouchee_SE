@@ -17,7 +17,6 @@ namespace Vouchee.API.AppStarts
             CreateMap<Voucher, CreateVoucherDTO>().ReverseMap();
             CreateMap<Voucher, UpdateVoucherDTO>().ReverseMap();
             CreateMap<Voucher, GetDetailVoucherDTO>()
-                .ForMember(x => x.voucherTypeName, dest => dest.MapFrom(opt => opt.VoucherType.Title))
                 .ForMember(x => x.brandName, dest => dest.MapFrom(opt => opt.Brand.Name))
                 .ForMember(x => x.brandImage, dest => dest.MapFrom(opt => opt.Brand.Image))
                 .ForMember(x => x.supplierName, dest => dest.MapFrom(opt => opt.Supplier.Name))
@@ -104,7 +103,9 @@ namespace Vouchee.API.AppStarts
             // CATEGORY
             CreateMap<Category, CreateCategoryDTO>().ReverseMap();
             CreateMap<Category, UpdateCategoryDTO>().ReverseMap();
-            CreateMap<Category, GetCategoryDTO>().ReverseMap();
+            CreateMap<Category, GetCategoryDTO>()
+                .ForMember(x => x.voucherTypeTitle, dest => dest.MapFrom(opt => opt.VoucherType.Title))
+                .ReverseMap();
             CreateMap<GetCategoryDTO, CategoryFilter>().ReverseMap();
 
             // BRAND
@@ -117,6 +118,12 @@ namespace Vouchee.API.AppStarts
             CreateMap<Image, CreateImageDTO>().ReverseMap();
             CreateMap<Image, UpdateImageDTO>().ReverseMap();
             CreateMap<Image, GetImageDTO>().ReverseMap();
+
+            // SUB VOUCHER
+            CreateMap<SubVoucher, CreateSubVoucherDTO>().ReverseMap();
+            CreateMap<SubVoucher, UpdateSubVoucherDTO>().ReverseMap();
+            CreateMap<SubVoucher, GetSubVoucherDTO>().ReverseMap();
+            CreateMap<GetSubVoucherDTO, SubVoucherFilter>().ReverseMap();
         }
     }
 }

@@ -30,6 +30,7 @@ namespace Vouchee.Data.Models.Entities
 
         public string? ImageUrl { get; set; }
         public int? Priority { get; set; }
+        public string? ImageType { get; set; }
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]

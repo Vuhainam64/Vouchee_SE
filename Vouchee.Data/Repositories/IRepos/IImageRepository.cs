@@ -5,11 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Vouchee.Data.Helpers.Base;
 using Vouchee.Data.Models.Entities;
-using Vouchee.Data.Repositories.IRepos;
 
-namespace Vouchee.Data.Repositories.Repos
+namespace Vouchee.Data.Repositories.IRepos
 {
-    public class SubVoucherRepository : BaseRepository<SubVoucher>, ISubVoucherRepository
+    public interface IImageRepository : IBaseRepository<Image>
     {
     }
 }

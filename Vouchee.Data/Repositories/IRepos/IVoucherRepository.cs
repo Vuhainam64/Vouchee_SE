@@ -12,5 +12,6 @@ namespace Vouchee.Data.Repositories.IRepos
     public interface IVoucherRepository : IBaseRepository<Voucher>
     {
         void Attach(Address existedAddress);
+        void Attach(Category existedCategory);
     }
 }

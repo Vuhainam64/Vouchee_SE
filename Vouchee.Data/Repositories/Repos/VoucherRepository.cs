@@ -19,5 +19,9 @@ namespace Vouchee.Data.Repositories.Repos
         {
             _voucherDAO.Attach(existedAddress);
         }
+        public void Attach(Category existedCategory)
+        {
+            _voucherDAO.Attach(existedCategory);
+        }
     }
 }

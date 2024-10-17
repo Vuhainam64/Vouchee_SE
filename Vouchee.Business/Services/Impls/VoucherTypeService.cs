@@ -90,8 +90,7 @@ namespace Vouchee.Business.Services.Impls
             try
             {
                 var voucherType = await _voucherTypeRepository.GetByIdAsync(id,
-                                    query => query.Include(e => e.Vouchers)
-                                                    .Include(e => e.Categories));
+                                    query => query.Include(e => e.Categories));
                 if (voucherType != null)
                 {
                     GetVoucherTypeDTO voucherTypeDTO = _mapper.Map<GetVoucherTypeDTO>(voucherType);

@@ -12,7 +12,7 @@ namespace Vouchee.Data.Models.Entities
 {
     [Table("Voucher")]
     [Index(nameof(SupplierId), Name = "IX_Voucher_SupplierId")]
-    [Index(nameof(VoucherTypeId), Name = "IX_Voucher_VoucherTypeId")]
+    //[Index(nameof(VoucherTypeId), Name = "IX_Voucher_VoucherTypeId")]
     [Index(nameof(CreateBy), Name = "IX_Voucher_SellerId")]
     [Index(nameof(BrandId), Name = "IX_Voucher_BrandId")]
     public partial class Voucher
@@ -60,10 +60,10 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty("Vouchers")]
         public virtual User? Seller { get; set; }
 
-        public Guid? VoucherTypeId { get; set; }
-        [ForeignKey(nameof(VoucherTypeId))]
-        [InverseProperty("Vouchers")]
-        public virtual VoucherType? VoucherType { get; set; }
+        //public Guid? VoucherTypeId { get; set; }
+        //[ForeignKey(nameof(VoucherTypeId))]
+        //[InverseProperty("Vouchers")]
+        //public virtual VoucherType? VoucherType { get; set; }
 
         //public Guid? CategoryId { get; set; }
         //[ForeignKey(nameof(CategoryId))]
@@ -89,7 +89,8 @@ namespace Vouchee.Data.Models.Entities
         //public string? Image { get; set; }
         //[Column(TypeName = "decimal")]
         //public decimal? PercentShow { get; set; }
-        public int Rating { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal Rating { get; set; }
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]

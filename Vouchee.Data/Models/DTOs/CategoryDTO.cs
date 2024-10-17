@@ -32,7 +32,8 @@ namespace Vouchee.Data.Models.DTOs
     {
         public Guid? id { get; set; }
 
-        //public Guid? voucherTypeId { get; set; }
+        public Guid? voucherTypeId { get; set; }
+        public string? voucherTypeTitle { get; set; }
 
         public string? title { get; set; }
         //public decimal? percentShow { get; set; }

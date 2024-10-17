@@ -97,7 +97,7 @@ namespace Vouchee.Business.Services.Impls
             //voucher.Policy = "Lorem Ipsum is simply dummy text of the printing and typesetting industry...";
             voucher.OriginalPrice = random.Next(50000, 1000000);
             voucher.SupplierId = supplierID;
-            voucher.VoucherTypeId = voucherTypeId;
+            //voucher.VoucherTypeId = voucherTypeId;
 
             try
             {
