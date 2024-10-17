@@ -90,6 +90,13 @@ namespace Vouchee.API.AppStarts
 
             // TEST
             services.AddScoped<ITestService, TestService>();
+
+            // SUB VOUCHER
+            services.AddScoped<ISubVoucherService, SubVoucherService>();
+            services.AddScoped<ISubVoucherRepository, SubVoucherRepository>();
+
+            // IMAGE
+            services.AddScoped<IImageRepository, ImageRepository>();
         }
 
         public static void AddSwaggerServices(this IServiceCollection services, IConfiguration configuration)

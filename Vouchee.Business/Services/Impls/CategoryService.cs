@@ -99,20 +99,31 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<IList<GetCategoryDTO>> GetCategoriesAsync()
+        public async Task<DynamicResponseModel<GetCategoryDTO>> GetCategoriesAsync(PagingRequest pagingRequest, CategoryFilter categoryFilter)
         {
-            IQueryable<GetCategoryDTO> result;
+            (int, IQueryable<GetCategoryDTO>) result;
             try
             {
                 result = _categoryRepository.GetTable()
-                            .ProjectTo<GetCategoryDTO>(_mapper.ConfigurationProvider);
+                            .ProjectTo<GetCategoryDTO>(_mapper.ConfigurationProvider)
+                            .DynamicFilter(_mapper.Map<GetCategoryDTO>(categoryFilter))
+                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
             }
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
                 throw new LoadException("Lỗi không xác định khi tải category");
             }
-            return result.ToList();
+            return new DynamicResponseModel<GetCategoryDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = result.Item2.ToList() // Return the paged voucher list with nearest address and distance
+            };
         }
 
         public Task<GetCategoryDTO> GetCategoryByIdAsync(Guid id)

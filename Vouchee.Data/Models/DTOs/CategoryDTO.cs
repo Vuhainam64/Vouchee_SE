@@ -32,11 +32,12 @@ namespace Vouchee.Data.Models.DTOs
     {
         public Guid? id { get; set; }
 
-        //public Guid? voucherTypeId { get; set; }
+        public Guid? voucherTypeId { get; set; }
+        public string? voucherTypeTitle { get; set; }
 
         public string? title { get; set; }
         //public decimal? percentShow { get; set; }
-        //public string? image { get; set; }
+        public string? image { get; set; }
 
         //public string? status { get; set; }
         //public DateTime? createDate { get; set; }

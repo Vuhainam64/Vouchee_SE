@@ -81,20 +81,31 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<IList<GetBrandDTO>> GetBrandsAsync()
+        public async Task<DynamicResponseModel<GetBrandDTO>> GetBrandsAsync(PagingRequest pagingRequest, BrandFilter brandFilter)
         {
-            IQueryable<GetBrandDTO> result;
+            (int, IQueryable<GetBrandDTO>) result;
             try
             {
                 result = _brandRepository.GetTable()
-                            .ProjectTo<GetBrandDTO>(_mapper.ConfigurationProvider);
+                            .ProjectTo<GetBrandDTO>(_mapper.ConfigurationProvider)
+                            .DynamicFilter(_mapper.Map<GetBrandDTO>(brandFilter))
+                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
             }
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
                 throw new LoadException("Lỗi không xác định khi tải brand");
             }
-            return result.ToList();
+            return new DynamicResponseModel<GetBrandDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = result.Item2.ToList() // Return the paged voucher list with nearest address and distance
+            };
         }
 
         public async Task<IList<GetBrandDTO>> GetBrandsbynameAsync(string name)

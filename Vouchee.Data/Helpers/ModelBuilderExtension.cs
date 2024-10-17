@@ -187,7 +187,7 @@ namespace Vouchee.Data.Helpers
                     CreateBy = Guid.Parse("b4583f49-baba-4916-8e2b-2d44c3412733"),
                     Status = ObjectStatusEnum.ACTIVE.ToString(),
                     SupplierId = Guid.Parse("a053e9fc-7962-4eaa-8377-91c56c85cda6"),
-                    VoucherTypeId = Guid.Parse("3e676315-1a28-4a0b-beb5-eaa5336a108d")
+                    //VoucherTypeId = Guid.Parse("3e676315-1a28-4a0b-beb5-eaa5336a108d")
                 },
                 new Voucher()
                 {
@@ -198,7 +198,7 @@ namespace Vouchee.Data.Helpers
                     CreateBy = Guid.Parse("b4583f49-baba-4916-8e2b-2d44c3412733"),
                     Status = ObjectStatusEnum.ACTIVE.ToString(),
                     SupplierId = Guid.Parse("a053e9fc-7962-4eaa-8377-91c56c85cda6"),
-                    VoucherTypeId = Guid.Parse("3e676315-1a28-4a0b-beb5-eaa5336a108d")
+                    //VoucherTypeId = Guid.Parse("3e676315-1a28-4a0b-beb5-eaa5336a108d")
                 }
             );
 

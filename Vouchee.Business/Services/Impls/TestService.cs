@@ -88,7 +88,7 @@ namespace Vouchee.Business.Services.Impls
 
             int randomEndDays = random.Next(1, 90); // End date will be 1 to 90 days after the StartDate
             //voucher.EndDate = voucher.StartDate.AddDays(randomEndDays); // Set EndDate
-            voucher.Status = VoucherStatusEnum.ACTIVE.ToString();
+            voucher.Status = VoucherStatusEnum.SELLING.ToString();
             voucher.CreateBy = _userRepository.GetTable().FirstOrDefault(x => x.RoleId.Equals(Guid.Parse("2D80393A-3A3D-495D-8DD7-F9261F85CC8F"))).Id;
             voucher.CreateDate = DateTime.Now;
             voucher.Description = "Lorem Ipsum is simply dummy text of the printing and typesetting industry...";
@@ -97,7 +97,7 @@ namespace Vouchee.Business.Services.Impls
             //voucher.Policy = "Lorem Ipsum is simply dummy text of the printing and typesetting industry...";
             voucher.OriginalPrice = random.Next(50000, 1000000);
             voucher.SupplierId = supplierID;
-            voucher.VoucherTypeId = voucherTypeId;
+            //voucher.VoucherTypeId = voucherTypeId;
 
             try
             {

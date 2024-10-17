@@ -53,9 +53,10 @@ namespace Vouchee.API.Controllers
         // READ
         [HttpGet("get_all_category")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetCategories()
+        public async Task<IActionResult> GetCategories([FromQuery] PagingRequest pagingRequest,
+                                                            [FromQuery] CategoryFilter categoryFilter)
         {
-            var result = await _categoryService.GetCategoriesAsync();
+            var result = await _categoryService.GetCategoriesAsync(pagingRequest, categoryFilter);
             return Ok(result);
         }
 

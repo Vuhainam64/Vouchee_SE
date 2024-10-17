@@ -13,12 +13,12 @@ namespace Vouchee.Data.Models.Entities
     {
         public VoucherType()
         {
-            Vouchers = new HashSet<Voucher>();
+            //Vouchers = new HashSet<Voucher>();
             Categories = new HashSet<Category>();
         }
 
-        [InverseProperty(nameof(Voucher.VoucherType))]
-        public virtual ICollection<Voucher> Vouchers { get; set; }
+        //[InverseProperty(nameof(Voucher.VoucherType))]
+        //public virtual ICollection<Voucher> Vouchers { get; set; }
 
         [InverseProperty(nameof(Category.VoucherType))]
         public virtual ICollection<Category> Categories { get; set; }

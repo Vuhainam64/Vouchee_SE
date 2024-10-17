@@ -12,7 +12,7 @@ namespace Vouchee.Business.Services
 
         // READ
         public Task<GetVoucherTypeDTO> GetVoucherTypeByIdAsync(Guid id);
-        public Task<IList<GetVoucherTypeDTO>> GetVoucherTypesAsync();
+        public Task<DynamicResponseModel<GetVoucherTypeDTO>> GetVoucherTypesAsync(PagingRequest pagingRequest, VoucherTypeFilter voucherTypeFilter);
 
         // UPDATE
         public Task<bool> UpdateVoucherTypeAsync(Guid id, UpdateVoucherTypeDTO updateVoucherTypeDTO);

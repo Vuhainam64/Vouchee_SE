@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vouchee.Data.Helpers;
 
@@ -11,9 +12,11 @@ using Vouchee.Data.Helpers;
 namespace Vouchee.Data.Migrations
 {
     [DbContext(typeof(VoucheeContext))]
-    partial class VoucheeContextModelSnapshot : ModelSnapshot
+    [Migration("20241017094439_FixRating")]
+    partial class FixRating
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -265,9 +268,6 @@ namespace Vouchee.Data.Migrations
 
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime");
-
-                    b.Property<string>("ImageType")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
@@ -559,20 +559,17 @@ namespace Vouchee.Data.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("NEWID()");
 
-                    b.Property<Guid?>("CreateBy")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime");
 
                     b.Property<decimal>("OriginalPrice")
-                        .HasColumnType("decimal(20,3)");
+                        .HasColumnType("decimal");
 
                     b.Property<int?>("Quantity")
                         .HasColumnType("int");
 
                     b.Property<decimal>("SellPrice")
-                        .HasColumnType("decimal(20,3)");
+                        .HasColumnType("decimal");
 
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
@@ -878,6 +875,9 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime");
 
+                    b.Property<Guid?>("VoucherTypeId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex(new[] { "BrandId" }, "IX_Voucher_BrandId");
@@ -885,6 +885,8 @@ namespace Vouchee.Data.Migrations
                     b.HasIndex(new[] { "CreateBy" }, "IX_Voucher_SellerId");
 
                     b.HasIndex(new[] { "SupplierId" }, "IX_Voucher_SupplierId");
+
+                    b.HasIndex(new[] { "VoucherTypeId" }, "IX_Voucher_VoucherTypeId");
 
                     b.ToTable("Voucher");
 
@@ -899,7 +901,8 @@ namespace Vouchee.Data.Migrations
                             SellPrice = 0m,
                             Status = "ACTIVE",
                             SupplierId = new Guid("a053e9fc-7962-4eaa-8377-91c56c85cda6"),
-                            Title = "Voucher sale"
+                            Title = "Voucher sale",
+                            VoucherTypeId = new Guid("3e676315-1a28-4a0b-beb5-eaa5336a108d")
                         },
                         new
                         {
@@ -911,7 +914,8 @@ namespace Vouchee.Data.Migrations
                             SellPrice = 0m,
                             Status = "ACTIVE",
                             SupplierId = new Guid("a053e9fc-7962-4eaa-8377-91c56c85cda6"),
-                            Title = "Voucher sale"
+                            Title = "Voucher sale",
+                            VoucherTypeId = new Guid("3e676315-1a28-4a0b-beb5-eaa5336a108d")
                         });
                 });
 
@@ -1202,11 +1206,17 @@ namespace Vouchee.Data.Migrations
                         .WithMany("Vouchers")
                         .HasForeignKey("SupplierId");
 
+                    b.HasOne("Vouchee.Data.Models.Entities.VoucherType", "VoucherType")
+                        .WithMany("Vouchers")
+                        .HasForeignKey("VoucherTypeId");
+
                     b.Navigation("Brand");
 
                     b.Navigation("Seller");
 
                     b.Navigation("Supplier");
+
+                    b.Navigation("VoucherType");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.VoucherCode", b =>
@@ -1287,6 +1297,8 @@ namespace Vouchee.Data.Migrations
             modelBuilder.Entity("Vouchee.Data.Models.Entities.VoucherType", b =>
                 {
                     b.Navigation("Categories");
+
+                    b.Navigation("Vouchers");
                 });
 #pragma warning restore 612, 618
         }

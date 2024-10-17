@@ -54,9 +54,10 @@ namespace Vouchee.API.Controllers
         // READ
         [HttpGet("get_all_brand")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetBrands()
+        public async Task<IActionResult> GetBrands([FromQuery] PagingRequest pagingRequest,
+                                                        [FromQuery] BrandFilter brandFilter)
         {
-            var result = await _brandService.GetBrandsAsync();
+            var result = await _brandService.GetBrandsAsync(pagingRequest, brandFilter);
             return Ok(result);
         }
 
