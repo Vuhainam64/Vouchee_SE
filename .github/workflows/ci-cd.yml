@@ -47,7 +47,6 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > $HOME/.ssh/id_rsa  # Store the SSH key
           chmod 600 $HOME/.ssh/id_rsa  # Set permissions for the key
           ssh-keyscan -H ${{ secrets.SSH_PRIVATE_IP }} >> $HOME/.ssh/known_hosts  # Add host to known hosts
-          shell: /usr/bin/bash -e {0}
 
       
       - name: Update and deploy on VM
