@@ -75,6 +75,7 @@ jobs:
             # Khởi động container mới
             docker run -d -p 8080:8080 \
             -e GOOGLE_APPLICATION_CREDENTIALS="${{ secrets.GG_PATH }}" \
+            -v "${{ secrets.GG_PATH }}:${{ secrets.GG_PATH }}" \
             --restart unless-stopped ${{ secrets.DOCKER_USERNAME }}/myimage:1
 
             # docker run -d -p 8080:8080 --restart unless-stopped ${{ secrets.DOCKER_USERNAME }}/myimage:1
