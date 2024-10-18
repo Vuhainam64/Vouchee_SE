@@ -5,7 +5,6 @@ on:
     branches:
       - main
 
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -42,7 +41,7 @@ jobs:
     steps:
       - name: Add SSH key
         run: |
-          mkdir -p ~/.ssh
+          mkdir -p $HOME/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SSH_PRIVATE_IP }} >> ~/.ssh/known_hosts
