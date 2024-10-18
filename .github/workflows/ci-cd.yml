@@ -48,7 +48,10 @@ jobs:
           chmod 600 $HOME/.ssh/id_rsa  # Set permissions for the key
           ssh-keyscan -H ${{ secrets.SSH_PRIVATE_IP }} >> $HOME/.ssh/known_hosts  # Add host to known hosts
 
-      
+      - name: Pull latest code
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }} "cd /home/vouchee/Vouchee_SE && git pull"
+          
       - name: Update and deploy on VM
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }} << 'EOF'
@@ -77,6 +80,4 @@ jobs:
             # docker run -d -p 8080:8080 --restart unless-stopped ${{ secrets.DOCKER_USERNAME }}/myimage:1
           EOF
 
-      - name: Pull latest code
-        run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }} "cd /home/vouchee/Vouchee_SE && git pull"
+     
