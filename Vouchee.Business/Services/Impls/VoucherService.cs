@@ -11,7 +11,6 @@ using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Services.Extensions.Filebase;
 using Vouchee.Data.Helpers;
-using Vouchee.Data.Migrations;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Constants.Enum.Status;

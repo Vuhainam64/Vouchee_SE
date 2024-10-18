@@ -18,6 +18,7 @@ namespace Vouchee.Data.Models.Entities
         {
             Orders = new HashSet<Order>();
             Vouchers = new HashSet<Voucher>();
+            Carts = new HashSet<Cart>();
         }
 
         [InverseProperty(nameof(Order.User))]

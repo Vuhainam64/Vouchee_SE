@@ -43,7 +43,7 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<Promotion> Promotions { get; set; }
         [InverseProperty(nameof(Category.Vouchers))]
         public virtual ICollection<Category> Categories { get; set; }
-        [InverseProperty(nameof(Cart.Vouchers))]
+        [InverseProperty(nameof(Cart.Voucher))]
         public virtual ICollection<Cart> Carts { get; set; }
         public Guid? BrandId { get; set; }
         [ForeignKey(nameof(BrandId))]
