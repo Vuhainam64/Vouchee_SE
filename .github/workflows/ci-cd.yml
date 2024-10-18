@@ -70,6 +70,7 @@ jobs:
             
             # Xóa tất cả các image ngoại trừ cái mới nhất
             docker images -q | grep -v "$latest_image_id" | xargs -r docker rmi
+
             
             # Khởi động container mới
             docker run -d -p 8080:8080 \
