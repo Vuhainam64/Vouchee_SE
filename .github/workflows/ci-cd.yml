@@ -57,27 +57,25 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }} << 'EOF'
             # Pull the latest image
             docker pull ${{ secrets.DOCKER_USERNAME }}/myimage:1
-            
-            # Lấy ID của container mới nhất
-            latest_container_id=$(docker ps -q -n 1)
-            
-            # Dừng và xóa tất cả các container
-            docker stop $(docker ps -aq)
+      
+            # Dừng tất cả container đang chạy
+            docker stop $(docker ps -q)
+      
+            # Xóa các container không còn chạy
             docker rm $(docker ps -aq)
-            
+      
             # Lấy ID của image mới nhất
-            latest_image_id=$(docker images -q | head -n 1)
-            
+            latest_image_id=$(docker images -q ${{ secrets.DOCKER_USERNAME }}/myimage:1)
+      
             # Xóa tất cả các image ngoại trừ cái mới nhất
-            docker images -q | grep -v "$latest_image_id" | xargs -r docker rmi
-
+            docker images -q | grep -v "$latest_image_id" | xargs -r docker rmi || true
+      
             # Khởi động container mới
             docker run -d -p 8080:8080 \
             -e GOOGLE_APPLICATION_CREDENTIALS="${{ secrets.GG_PATH }}" \
             -v "${{ secrets.GG_PATH }}:${{ secrets.GG_PATH }}" \
             --restart unless-stopped ${{ secrets.DOCKER_USERNAME }}/myimage:1
-
-            # docker run -d -p 8080:8080 --restart unless-stopped ${{ secrets.DOCKER_USERNAME }}/myimage:1
           EOF
+
 
      
