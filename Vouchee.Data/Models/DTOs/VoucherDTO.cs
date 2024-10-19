@@ -300,4 +300,15 @@ namespace Vouchee.Business.Models.DTOs
         public virtual ICollection<GetImageDTO> images { get; set; }
         public virtual ICollection<GetCategoryDTO>? categories { get; set; }
     }
+
+    public class VoucherDTO
+    {
+        public Guid? id { get; set; }
+
+        public string? title { get; set; }
+        public decimal? originalPrice { get; set; }
+        public decimal? sellPrice { get; set; }
+        public decimal? salePrice { get; set; }
+        public decimal? percentDiscount { get; set; }
+    }
 }

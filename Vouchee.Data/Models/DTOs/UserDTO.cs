@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Vouchee.Data.Models.Constants.Enum.Status;
+using Vouchee.Data.Models.DTOs;
+using Vouchee.Data.Models.Entities;
 
 namespace Vouchee.Business.Models.DTOs
 {
@@ -43,17 +45,21 @@ namespace Vouchee.Business.Models.DTOs
         public GetUserDTO()
         {
             orders = new HashSet<GetOrderDTO>();
+            vouchers = new HashSet<GetNewestVoucherDTO>();
+            carts = new HashSet<CartDTO>();
         }
 
         public Guid? id { get; set; }
 
-        public string roleName { get; set; }
+        public string? roleName { get; set; }
         public string? status { get; set; }
         public DateTime? createDate { get; set; }
         public Guid? createBy { get; set; }
         public DateTime? updateDate { get; set; }
         public Guid? updateBy { get; set; }
 
+        public virtual ICollection<CartDTO> carts { get; set; }
+        public virtual ICollection<GetNewestVoucherDTO> vouchers { get; set; }
         public virtual ICollection<GetOrderDTO>? orders { get; set; }
     }
 

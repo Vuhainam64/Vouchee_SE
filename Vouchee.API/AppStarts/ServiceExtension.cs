@@ -24,10 +24,9 @@ namespace Vouchee.API.AppStarts
             //    options.UseSqlServer(configuration.GetConnectionString("PROD"))
             //           .EnableSensitiveDataLogging() // Enable sensitive data logging
             //           .LogTo(Console.WriteLine, LogLevel.Information)); // Log SQL commands
+            services.AddScoped(typeof(BaseDAO<>));
 
-            services.AddSingleton(typeof(BaseDAO<>));
-
-            services.AddSingleton(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+            services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 
             services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
@@ -97,6 +96,10 @@ namespace Vouchee.API.AppStarts
 
             // IMAGE
             services.AddScoped<IImageRepository, ImageRepository>();
+
+            // CART
+            services.AddScoped<ICartService, CartService>();
+            services.AddScoped<ICartRepository, CartRepository>();
         }
 
         public static void AddSwaggerServices(this IServiceCollection services, IConfiguration configuration)

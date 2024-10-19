@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ using Vouchee.Data.Helpers;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
+using Vouchee.Data.Models.Filters;
 using Vouchee.Data.Repositories.IRepos;
 using Vouchee.Data.Repositories.Repos;
 
@@ -20,104 +22,103 @@ namespace Vouchee.Business.Services.Impls
 {
     public class CartService : ICartService
     {
+        private readonly IVoucherRepository _voucherRepository;
+        private readonly IUserRepository _userRepository;
         private readonly ICartRepository _cartRepository;
         private readonly IMapper _mapper;
 
-        public CartService(ICartRepository cartRepository, IMapper mapper)
+        public CartService(IVoucherRepository voucherRepository,
+                            IUserRepository userRepository, 
+                            ICartRepository cartRepository, 
+                            IMapper mapper)
         {
+            _voucherRepository = voucherRepository;
+            _userRepository = userRepository;
             _cartRepository = cartRepository;
             _mapper = mapper;
         }
 
-        public async Task<Guid?> CreateCartAsync(CreateCartDTO createCartDTO, ThisUserObj thisUserObj)
+        public async Task<bool> AddItemAsync(Guid voucherId, ThisUserObj thisUserObj)
         {
-            try
+            Guid userId = Guid.Parse(thisUserObj.userId);
+            Voucher existedVoucher = await _voucherRepository.FindAsync(voucherId);
+            if (existedVoucher == null)
             {
-                Cart cart = _mapper.Map<Cart>(createCartDTO);
-                var cartId = await _cartRepository.AddAsync(cart);
-
-                return cartId;
+                throw new NotFoundException("Không tìm thầy voucher này");
             }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new CreateObjectException("Lỗi không xác định khi tạo Cart");
-            }
-        }
 
-        public async Task<bool> DeleteCartAsync(Guid id)
-        {
-            try
+            User? userInstance = null;
+            IQueryable<User> users = _userRepository.CheckLocal();
+
+            if (users != null && users.Count() != 0)
             {
-                var cart = await _cartRepository.GetByIdAsync(id); // Fetch the cart by Id
-                if (cart == null)
+                userInstance = users.FirstOrDefault(x => x.Id == userId);
+            }
+
+            if (userInstance == null)
+            {
+                userInstance = await _userRepository.GetByIdAsync(userId, includeProperties: x => x.Include(x => x.Carts));
+            }
+
+            var haveVoucher = userInstance.Carts.FirstOrDefault(x => x.VoucherId == voucherId);
+            if (haveVoucher != null)
+            {
+                haveVoucher.Quantity += 1;
+                haveVoucher.UpdateBy = Guid.Parse(thisUserObj.userId);
+                haveVoucher.UpdateDate = DateTime.Now;
+            }
+            else
+            {
+                userInstance.Carts.Add(new()
                 {
-                    throw new NotFoundException("Không tìm thấy Cart");
-                }
+                    VoucherId = voucherId,
+                    CreateBy = Guid.Parse(thisUserObj.userId),
+                    CreateDate = DateTime.Now,
+                    Quantity = 1,
+                    Status = ObjectStatusEnum.ACTIVE.ToString()
+                });
+            }
 
-                await _cartRepository.DeleteAsync(cart); // Remove the cart
-                return true; // Return success
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi khi xóa Cart");
-            }
+            return await _userRepository.UpdateAsync(userInstance);
         }
 
-        public async Task<IList<GetCartDTO>> GetCartsAsync()
+        public Task<bool> DecreaseQuantityAsync(Guid voucherId, ThisUserObj thisUserObj)
         {
-            IQueryable<GetCartDTO> result;
-            try
-            {
-                result = _cartRepository.GetTable()
-                            .ProjectTo<GetCartDTO>(_mapper.ConfigurationProvider);
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải cart");
-            }
-            return result.ToList();
+            throw new NotImplementedException();
         }
 
-        public async Task<IList<GetCartDTO>> GetCartsbyUIdAsync(Guid id)
+        public async Task<DynamicResponseModel<CartDTO>> GetCartsAsync(PagingRequest pagingRequest, CartFilter cartFilter, ThisUserObj thisUserObj)
         {
+            User? user = await _userRepository.GetByIdAsync(thisUserObj.userId, includeProperties: x => x.Include(x => x.Carts)
+                                                                                                            .ThenInclude(x => x.Voucher));
 
-            IQueryable<GetCartDTO> result;
-            try
-            {
-                result = _cartRepository.GetTable()
-                            .Where(x => x.User.Id == id)
-                            .ProjectTo<GetCartDTO>(_mapper.ConfigurationProvider);
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải cart");
-            }
-            return result.ToList();
-        }
+            GetUserDTO userDTO = _mapper.Map<GetUserDTO>(user);
 
-        public async Task<bool> UpdatCartAsync(Guid id, UpdateCartDTO updateCartDTO)
-        { 
-            try
+            return new DynamicResponseModel<CartDTO>()
             {
-                var cart = await _cartRepository.GetByIdAsync(id);
-                if (cart == null)
+                metaData = new MetaData()
                 {
-                    throw new NotFoundException("Không tìm thấy Cart");
-                }
-                //cart.Quantity = updateCartDTO.Quantity;
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = user.Carts.Count() // Total vouchers count for metadata
+                },
+                results = null // Return the paged voucher list with nearest address and distance
+            };
+        }
 
-                await _cartRepository.UpdateAsync(cart);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi khi cập nhật Cart");
-            }
+        public Task<bool> IncreaseQuantityAsync(Guid voucherId, ThisUserObj thisUserObj)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> RemoveItemAsync(Guid voucherId, ThisUserObj thisUserObj)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> UpdateQuantityAsync(Guid voucherId, int quantity, ThisUserObj thisUserObj)
+        {
+            throw new NotImplementedException();
         }
     }
 }

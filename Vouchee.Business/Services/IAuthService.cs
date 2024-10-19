@@ -18,6 +18,6 @@ namespace Vouchee.Business.Services
 
         public Task<AuthResponse> LoginWithEmail(LoginByEmailDTO loginByEmailDTO);
 
-        public Task<AuthResponse> Refresh(RefreshTokenRequest refreshTokenRequest);
+        //public Task<AuthResponse> Refresh(RefreshTokenRequest refreshTokenRequest);
     }
 }

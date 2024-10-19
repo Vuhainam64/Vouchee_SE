@@ -364,8 +364,8 @@ namespace Vouchee.Business.Services.Impls
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
 
             // Access token expiration: Admins can have different expiration (example)
-            int accessTokenExpirationHours = roleCheck.Equals(RoleEnum.ADMIN.ToString()) ? 2 : 1; // Admin: 2 hours, others: 1 hour
-            int refreshTokenExpirationDays = 30; // Refresh token valid for 30 days
+            //int accessTokenExpirationHours = roleCheck.Equals(RoleEnum.ADMIN.ToString()) ? 2 : 1; // Admin: 2 hours, others: 1 hour
+            //int refreshTokenExpirationDays = 30; // Refresh token valid for 30 days
 
             // Define role claim
             Claim roleClaim = new Claim(ClaimTypes.Role, roleCheck);
@@ -375,12 +375,12 @@ namespace Vouchee.Business.Services.Impls
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-            new Claim(ClaimTypes.SerialNumber, response.id.ToString()),
-            new Claim(ClaimTypes.Email, response.email),
-            new Claim(ClaimTypes.Actor, response.name),
-            roleClaim
+                    new Claim(ClaimTypes.SerialNumber, response.id.ToString()),
+                    new Claim(ClaimTypes.Email, response.email),
+                    new Claim(ClaimTypes.Actor, response.name),
+                    roleClaim
                 }),
-                Expires = DateTime.UtcNow.AddHours(accessTokenExpirationHours), // Set access token expiration
+                Expires = DateTime.UtcNow.AddHours(24), // Set access token expiration
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
 
@@ -399,71 +399,71 @@ namespace Vouchee.Business.Services.Impls
         }
 
 
-        private string GenerateRefreshToken(string accessToken)
-        {
-            // Generate a random token
-            var randomNumber = new byte[32]; // 256-bit length
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(randomNumber);
-            }
+        //private string GenerateRefreshToken(string accessToken)
+        //{
+        //    // Generate a random token
+        //    var randomNumber = new byte[32]; // 256-bit length
+        //    using (var rng = RandomNumberGenerator.Create())
+        //    {
+        //        rng.GetBytes(randomNumber);
+        //    }
 
-            // Convert the byte array to a base64 string
-            string refreshToken = Convert.ToBase64String(randomNumber);
+        //    // Convert the byte array to a base64 string
+        //    string refreshToken = Convert.ToBase64String(randomNumber);
 
-            // Optionally, you can store the refresh token along with the user identifier in the database
+        //    // Optionally, you can store the refresh token along with the user identifier in the database
 
-            return refreshToken;
-        }
+        //    return refreshToken;
+        //}
 
-        public async Task<AuthResponse> Refresh(RefreshTokenRequest refreshTokenRequest)
-        {
-            var user = await _userRepository.FindAsync(refreshTokenRequest.userId);
+        //public async Task<AuthResponse> Refresh(RefreshTokenRequest refreshTokenRequest)
+        //{
+        //    var user = await _userRepository.FindAsync(refreshTokenRequest.userId);
 
-            if (user == null)
-            {
-                throw new NotFoundException("Không tìm thấy user");
-            }
+        //    if (user == null)
+        //    {
+        //        throw new NotFoundException("Không tìm thấy user");
+        //    }
 
-            //if (!refreshTokenRequest.refreshToken.Equals(user.RefreshToken))
-            //{
-            //    throw new Exception("Refresh token không trùng với cơ sở dữ liệu");
-            //}
+        //    //if (!refreshTokenRequest.refreshToken.Equals(user.RefreshToken))
+        //    //{
+        //    //    throw new Exception("Refresh token không trùng với cơ sở dữ liệu");
+        //    //}
 
-            //if (user.RefreshTokenExpirationDate < DateTime.UtcNow)
-            //{
-            //    throw new Exception("Refresh token hết hạn.");
-            //}
+        //    //if (user.RefreshTokenExpirationDate < DateTime.UtcNow)
+        //    //{
+        //    //    throw new Exception("Refresh token hết hạn.");
+        //    //}
 
-            AuthResponse response = new();
+        //    AuthResponse response = new();
 
-            response.id = user.Id.ToString();
-            response.email = user.Email;
-            response.name = user.Name;
-            // Handle role assignment using RoleId
-            if (user.RoleId.Equals(Guid.Parse("FF54ACC6-C4E9-4B73-A158-FD640B4B6940")))
-            {
-                response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.ADMIN.ToString());
-                response.roleName = RoleEnum.ADMIN.ToString();
-            }
-            else if (user.RoleId.Equals(Guid.Parse("2D80393A-3A3D-495D-8DD7-F9261F85CC8F")))
-            {
-                response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.SELLER.ToString());
-                response.roleName = RoleEnum.SELLER.ToString();
-            }
-            else
-            {
-                response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.BUYER.ToString());
-                response.roleName = RoleEnum.BUYER.ToString();
-            }
-            response = await GenerateTokenAsync(response, RoleEnum.BUYER.ToString());
+        //    response.id = user.Id.ToString();
+        //    response.email = user.Email;
+        //    response.name = user.Name;
+        //    // Handle role assignment using RoleId
+        //    if (user.RoleId.Equals(Guid.Parse("FF54ACC6-C4E9-4B73-A158-FD640B4B6940")))
+        //    {
+        //        response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.ADMIN.ToString());
+        //        response.roleName = RoleEnum.ADMIN.ToString();
+        //    }
+        //    else if (user.RoleId.Equals(Guid.Parse("2D80393A-3A3D-495D-8DD7-F9261F85CC8F")))
+        //    {
+        //        response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.SELLER.ToString());
+        //        response.roleName = RoleEnum.SELLER.ToString();
+        //    }
+        //    else
+        //    {
+        //        response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.BUYER.ToString());
+        //        response.roleName = RoleEnum.BUYER.ToString();
+        //    }
+        //    response = await GenerateTokenAsync(response, RoleEnum.BUYER.ToString());
 
-            //if (_userRepository.StoreRefreshToken(user, response.refreshToken, response.refreshTokenExpiresAt).Result == false)
-            //{
-            //    throw new Exception("Có lỗi khi cập nhật refresh token");
-            //}
+        //    //if (_userRepository.StoreRefreshToken(user, response.refreshToken, response.refreshTokenExpiresAt).Result == false)
+        //    //{
+        //    //    throw new Exception("Có lỗi khi cập nhật refresh token");
+        //    //}
 
-            return response;
-        }
+        //    return response;
+        //}
     }
 }

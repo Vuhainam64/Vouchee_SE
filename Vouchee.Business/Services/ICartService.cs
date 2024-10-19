@@ -5,20 +5,24 @@ using System.Text;
 using System.Threading.Tasks;
 using Vouchee.Business.Models;
 using Vouchee.Data.Models.DTOs;
+using Vouchee.Data.Models.Filters;
 
 namespace Vouchee.Business.Services
 {
     public interface ICartService
     {
-        public Task<IList<GetCartDTO>> GetCartsAsync();
-        public Task<IList<GetCartDTO>> GetCartsbyUIdAsync(Guid id);
         // CREATE
-        public Task<Guid?> CreateCartAsync(CreateCartDTO createBrandDTO, ThisUserObj thisUserObj);
+        public Task<bool> AddItemAsync(Guid voucherId, ThisUserObj thisUserObj);
+
+        // READ
+        public Task<DynamicResponseModel<CartDTO>> GetCartsAsync(PagingRequest pagingRequest, CartFilter cartFilter, ThisUserObj thisUserObj);
 
         // UPDATE
-        public Task<bool> UpdatCartAsync(Guid id, UpdateCartDTO updateBrandDTO);
+        public Task<bool> IncreaseQuantityAsync(Guid voucherId, ThisUserObj thisUserObj);
+        public Task<bool> DecreaseQuantityAsync(Guid voucherId, ThisUserObj thisUserObj);
+        public Task<bool> UpdateQuantityAsync(Guid voucherId, int quantity, ThisUserObj thisUserObj);
 
         // DELETE
-        public Task<bool> DeleteCartAsync(Guid id);
+        public Task<bool> RemoveItemAsync(Guid voucherId, ThisUserObj thisUserObj);
     }
 }

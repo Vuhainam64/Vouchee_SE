@@ -130,9 +130,6 @@ namespace Vouchee.API.AppStarts
 
             //Cart
             CreateMap<Cart,CartDTO>().ReverseMap();
-            CreateMap<Cart,CreateCartDTO>().ReverseMap();
-            CreateMap<Cart,UpdateCartDTO>().ReverseMap();
-            CreateMap<Cart, GetCartDTO>().ReverseMap();
 
             // SUB VOUCHER
             CreateMap<SubVoucher, CreateSubVoucherDTO>().ReverseMap();

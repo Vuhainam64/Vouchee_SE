@@ -73,11 +73,6 @@ namespace Vouchee.Data.Helpers
             try
             {
                 _context.Entry(entity).CurrentValues.SetValues(entity);
-                if (_context.Entry(entity).State == EntityState.Unchanged)
-                {
-                    return true;
-                }
-
                 Table.Update(entity);
                 await _context.SaveChangesAsync();
                 return true;
@@ -163,7 +158,7 @@ namespace Vouchee.Data.Helpers
                     query = includeProperties(query);
                 }
 
-                return await query.FirstOrDefaultAsync(e => EF.Property<object>(e, "Id").Equals(id));
+                return await query.AsNoTracking().FirstOrDefaultAsync(e => EF.Property<object>(e, "Id").Equals(id));
             }
             catch (Exception ex)
             {
@@ -229,6 +224,17 @@ namespace Vouchee.Data.Helpers
                 LoggerService.Logger(ex.Message);
                 return null;
             }
+        }
+
+        public void Attach(TEntity entity)
+        {
+            _context.Attach(entity);
+        }
+
+        public IQueryable<TEntity> CheckLocal()
+        {
+            // Retrieve the set for the specific entity type
+            return _context.Set<TEntity>().Local.AsQueryable();
         }
 
         public void Attach(Category category)

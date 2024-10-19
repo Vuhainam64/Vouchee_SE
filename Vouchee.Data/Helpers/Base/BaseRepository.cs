@@ -36,6 +36,8 @@ namespace Vouchee.Data.Helpers.Base
         public Task<IEnumerable<TEntity>?> GetWhereAsync(Expression<Func<TEntity, bool>> filter, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null)
             => _dao.GetWhereAsync(filter, includeProperties);
 
-        //public void Attach(TEntity entity) => _dao.Attach(entity);
+        public void Attach(TEntity entity) => _dao.Attach(entity);
+
+        public IQueryable<TEntity> CheckLocal() => _dao.CheckLocal();
     }
 }
