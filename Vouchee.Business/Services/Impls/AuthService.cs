@@ -425,15 +425,15 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Không tìm thấy user");
             }
 
-            if (!refreshTokenRequest.refreshToken.Equals(user.RefreshToken))
-            {
-                throw new Exception("Refresh token không trùng với cơ sở dữ liệu");
-            }
+            //if (!refreshTokenRequest.refreshToken.Equals(user.RefreshToken))
+            //{
+            //    throw new Exception("Refresh token không trùng với cơ sở dữ liệu");
+            //}
 
-            if (user.RefreshTokenExpirationDate < DateTime.UtcNow)
-            {
-                throw new Exception("Refresh token hết hạn.");
-            }
+            //if (user.RefreshTokenExpirationDate < DateTime.UtcNow)
+            //{
+            //    throw new Exception("Refresh token hết hạn.");
+            //}
 
             AuthResponse response = new();
 

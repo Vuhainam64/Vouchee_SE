@@ -12,8 +12,8 @@ using Vouchee.Data.Helpers;
 namespace Vouchee.Data.Migrations
 {
     [DbContext(typeof(VoucheeContext))]
-    [Migration("20241013144147_FixPresision2")]
-    partial class FixPresision2
+    [Migration("20241018075931_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -110,26 +110,6 @@ namespace Vouchee.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Address");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("58203073-d9c1-41a0-9aac-fd62977c860c"),
-                            PercentShow = 70m,
-                            Status = "ACTIVE"
-                        },
-                        new
-                        {
-                            Id = new Guid("7654b4f2-87ad-4146-8116-3e9303cfe84a"),
-                            PercentShow = 80m,
-                            Status = "ACTIVE"
-                        },
-                        new
-                        {
-                            Id = new Guid("665dcada-509d-4bef-977b-a3ea097c10ec"),
-                            PercentShow = 80m,
-                            Status = "ACTIVE"
-                        });
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Brand", b =>
@@ -180,6 +160,41 @@ namespace Vouchee.Data.Migrations
                     b.ToTable("Brand");
                 });
 
+            modelBuilder.Entity("Vouchee.Data.Models.Entities.Cart", b =>
+                {
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("VoucherId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreateBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<int?>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("UpdateBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime");
+
+                    b.HasKey("UserId", "VoucherId");
+
+                    b.HasIndex(new[] { "UserId" }, "IX_Cart_UserId");
+
+                    b.HasIndex(new[] { "VoucherId" }, "IX_Voucher_UserId");
+
+                    b.ToTable("Cart");
+                });
+
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Category", b =>
                 {
                     b.Property<Guid>("Id")
@@ -219,6 +234,52 @@ namespace Vouchee.Data.Migrations
                     b.HasIndex(new[] { "VoucherTypeId" }, "IX_Category_VoucherTypeId");
 
                     b.ToTable("Category");
+                });
+
+            modelBuilder.Entity("Vouchee.Data.Models.Entities.Image", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<Guid?>("CreateBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("ImageType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Priority")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("SubVoucherId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("UpdateBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<Guid?>("VoucherId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "SubVoucherId" }, "IX_Image_SubVoucherId");
+
+                    b.HasIndex(new[] { "VoucherId" }, "IX_Image_VoucherId");
+
+                    b.ToTable("Image");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Order", b =>
@@ -262,24 +323,6 @@ namespace Vouchee.Data.Migrations
                     b.HasIndex(new[] { "CreateBy" }, "IX_Order_UserId");
 
                     b.ToTable("Order");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("01aa28e3-4554-48c5-8324-80c4e6abd582"),
-                            CreateBy = new Guid("e55ee134-b4ec-43f2-a565-8bcec52dff23"),
-                            DiscountValue = 0m,
-                            Status = "PENDING",
-                            TotalPrice = 10000m
-                        },
-                        new
-                        {
-                            Id = new Guid("f87dade4-73ac-4922-a09d-e6efe4f7ac17"),
-                            CreateBy = new Guid("e55ee134-b4ec-43f2-a565-8bcec52dff23"),
-                            DiscountValue = 0m,
-                            Status = "PENDING",
-                            TotalPrice = 20000m
-                        });
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.OrderDetail", b =>
@@ -331,28 +374,6 @@ namespace Vouchee.Data.Migrations
                     b.HasIndex(new[] { "VoucherId" }, "IX_OrderDetail_VoucherId");
 
                     b.ToTable("OrderDetail");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("9c79e86d-3c11-422d-9e51-0ef985e87084"),
-                            DiscountValue = 0m,
-                            OrderId = new Guid("01aa28e3-4554-48c5-8324-80c4e6abd582"),
-                            Quantity = 2,
-                            Status = "ACTIVE",
-                            UnitPrice = 1000m,
-                            VoucherId = new Guid("494b5347-378e-4e2d-9553-6032a42cd8d1")
-                        },
-                        new
-                        {
-                            Id = new Guid("d03c5b75-25b0-4ec8-98b3-9f80fcb9311a"),
-                            DiscountValue = 0m,
-                            OrderId = new Guid("01aa28e3-4554-48c5-8324-80c4e6abd582"),
-                            Quantity = 1,
-                            Status = "ACTIVE",
-                            UnitPrice = 1000m,
-                            VoucherId = new Guid("494b5347-378e-4e2d-9553-6032a42cd8d1")
-                        });
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Promotion", b =>
@@ -380,8 +401,14 @@ namespace Vouchee.Data.Migrations
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal?>("MoneyDiscount")
+                        .HasColumnType("decimal(10,2)");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("PercentDiscount")
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<string>("Policy")
                         .HasColumnType("nvarchar(max)");
@@ -440,32 +467,50 @@ namespace Vouchee.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Role");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("ff54acc6-c4e9-4b73-a158-fd640b4b6940"),
-                            Name = "ADMIN",
-                            Status = "ACTIVE"
-                        },
-                        new
-                        {
-                            Id = new Guid("015ae3c5-eee9-4f5c-befb-57d41a43d9df"),
-                            Name = "STAFF",
-                            Status = "ACTIVE"
-                        },
-                        new
-                        {
-                            Id = new Guid("ad5f37da-ca48-4dc5-9f4b-963d94b535e6"),
-                            Name = "BUYER",
-                            Status = "ACTIVE"
-                        },
-                        new
-                        {
-                            Id = new Guid("2d80393a-3a3d-495d-8dd7-f9261f85cc8f"),
-                            Name = "SELLER",
-                            Status = "ACTIVE"
-                        });
+            modelBuilder.Entity("Vouchee.Data.Models.Entities.SubVoucher", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<Guid?>("CreateBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<decimal>("OriginalPrice")
+                        .HasColumnType("decimal(20,3)");
+
+                    b.Property<int?>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("SellPrice")
+                        .HasColumnType("decimal(20,3)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("UpdateBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<Guid?>("VoucherId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VoucherId");
+
+                    b.ToTable("SubVoucher");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Supplier", b =>
@@ -514,32 +559,6 @@ namespace Vouchee.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Supplier");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("a053e9fc-7962-4eaa-8377-91c56c85cda6"),
-                            IsVerfied = false,
-                            Name = "Katinat",
-                            PercentShow = 5m,
-                            Status = "ACTIVE"
-                        },
-                        new
-                        {
-                            Id = new Guid("2ab13953-4e2f-4233-a1ff-f10434982ee7"),
-                            IsVerfied = false,
-                            Name = "Katinat",
-                            PercentShow = 5m,
-                            Status = "ACTIVE"
-                        },
-                        new
-                        {
-                            Id = new Guid("fa01b122-47db-4d5d-9c35-9bb6f94c4861"),
-                            IsVerfied = false,
-                            Name = "Katinat",
-                            PercentShow = 5m,
-                            Status = "ACTIVE"
-                        });
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.User", b =>
@@ -624,74 +643,6 @@ namespace Vouchee.Data.Migrations
                     b.HasIndex(new[] { "RoleId" }, "IX_User_RoleId");
 
                     b.ToTable("User");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("deee9638-da34-4230-be77-34137aa5fcff"),
-                            Email = "advouchee@gmail.com",
-                            Name = "ADMIN 1",
-                            ResponsibilityScore = 0,
-                            RoleId = new Guid("ff54acc6-c4e9-4b73-a158-fd640b4b6940")
-                        },
-                        new
-                        {
-                            Id = new Guid("fb4fc5a5-4564-4100-8fd2-8d406afa11e7"),
-                            Email = "advouchee2@gmail.com",
-                            Name = "ADMIN 2",
-                            ResponsibilityScore = 0,
-                            RoleId = new Guid("ff54acc6-c4e9-4b73-a158-fd640b4b6940")
-                        },
-                        new
-                        {
-                            Id = new Guid("fe3f8e20-d720-460a-bdaf-486bfa813eb1"),
-                            Email = "stvouchee1@gmail.com",
-                            Name = "STAFF 1",
-                            ResponsibilityScore = 0,
-                            RoleId = new Guid("015ae3c5-eee9-4f5c-befb-57d41a43d9df")
-                        },
-                        new
-                        {
-                            Id = new Guid("db2d2745-93a8-4cb0-9d04-4de79d58fe43"),
-                            Email = "stvouchee2@gmail.com",
-                            Name = "STAFF 2",
-                            ResponsibilityScore = 0,
-                            RoleId = new Guid("015ae3c5-eee9-4f5c-befb-57d41a43d9df")
-                        },
-                        new
-                        {
-                            Id = new Guid("b4583f49-baba-4916-8e2b-2d44c3412733"),
-                            Email = "voucheeseller@gmail.com",
-                            Name = "SELLER 1",
-                            PercentShow = 80m,
-                            ResponsibilityScore = 100,
-                            RoleId = new Guid("2d80393a-3a3d-495d-8dd7-f9261f85cc8f")
-                        },
-                        new
-                        {
-                            Id = new Guid("f7618901-65a4-45c1-b23d-4f225ee0c588"),
-                            Email = "sellervouchee2@gmail.com",
-                            Name = "SELLER 2",
-                            PercentShow = 90m,
-                            ResponsibilityScore = 70,
-                            RoleId = new Guid("2d80393a-3a3d-495d-8dd7-f9261f85cc8f")
-                        },
-                        new
-                        {
-                            Id = new Guid("e55ee134-b4ec-43f2-a565-8bcec52dff23"),
-                            Email = "buyervouchee1@gmail.com",
-                            Name = "BUYER 2",
-                            ResponsibilityScore = 0,
-                            RoleId = new Guid("ad5f37da-ca48-4dc5-9f4b-963d94b535e6")
-                        },
-                        new
-                        {
-                            Id = new Guid("9e1a13f2-738b-4ae4-994d-26d5272c13fa"),
-                            Email = "buyervouchee2@gmail.com",
-                            Name = "BUYER 2",
-                            ResponsibilityScore = 0,
-                            RoleId = new Guid("ad5f37da-ca48-4dc5-9f4b-963d94b535e6")
-                        });
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Voucher", b =>
@@ -713,29 +664,17 @@ namespace Vouchee.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<decimal>("OriginalPrice")
                         .HasColumnType("decimal");
-
-                    b.Property<decimal?>("PercentShow")
-                        .HasColumnType("decimal");
-
-                    b.Property<string>("Policy")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("SalePrice")
+                    b.Property<decimal>("Rating")
                         .HasColumnType("decimal");
 
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime");
+                    b.Property<decimal>("SellPrice")
+                        .HasColumnType("decimal");
 
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
@@ -752,9 +691,6 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<Guid?>("VoucherTypeId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex(new[] { "BrandId" }, "IX_Voucher_BrandId");
@@ -763,41 +699,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasIndex(new[] { "SupplierId" }, "IX_Voucher_SupplierId");
 
-                    b.HasIndex(new[] { "VoucherTypeId" }, "IX_Voucher_VoucherTypeId");
-
                     b.ToTable("Voucher");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("494b5347-378e-4e2d-9553-6032a42cd8d1"),
-                            CreateBy = new Guid("b4583f49-baba-4916-8e2b-2d44c3412733"),
-                            EndDate = new DateTime(2024, 10, 17, 21, 41, 47, 336, DateTimeKind.Local).AddTicks(9306),
-                            OriginalPrice = 100000m,
-                            PercentShow = 10m,
-                            Quantity = 100,
-                            SalePrice = 0m,
-                            StartDate = new DateTime(2024, 10, 13, 21, 41, 47, 336, DateTimeKind.Local).AddTicks(9297),
-                            Status = "ACTIVE",
-                            SupplierId = new Guid("a053e9fc-7962-4eaa-8377-91c56c85cda6"),
-                            Title = "Voucher sale",
-                            VoucherTypeId = new Guid("3e676315-1a28-4a0b-beb5-eaa5336a108d")
-                        },
-                        new
-                        {
-                            Id = new Guid("0c20c3c9-2200-4b09-81f5-a0ceb74eba8c"),
-                            CreateBy = new Guid("b4583f49-baba-4916-8e2b-2d44c3412733"),
-                            EndDate = new DateTime(2024, 10, 17, 21, 41, 47, 336, DateTimeKind.Local).AddTicks(9322),
-                            OriginalPrice = 100000m,
-                            PercentShow = 10m,
-                            Quantity = 100,
-                            SalePrice = 0m,
-                            StartDate = new DateTime(2024, 10, 13, 21, 41, 47, 336, DateTimeKind.Local).AddTicks(9321),
-                            Status = "ACTIVE",
-                            SupplierId = new Guid("a053e9fc-7962-4eaa-8377-91c56c85cda6"),
-                            Title = "Voucher sale",
-                            VoucherTypeId = new Guid("3e676315-1a28-4a0b-beb5-eaa5336a108d")
-                        });
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.VoucherCode", b =>
@@ -841,39 +743,6 @@ namespace Vouchee.Data.Migrations
                     b.HasIndex(new[] { "VoucherId" }, "IX_Voucher_VoucherId");
 
                     b.ToTable("VoucherCode");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("5fa2fa86-0211-450b-8aaa-fbf8aabcfd40"),
-                            Code = "123",
-                            Status = "ACTIVE",
-                            VoucherId = new Guid("494b5347-378e-4e2d-9553-6032a42cd8d1")
-                        },
-                        new
-                        {
-                            Id = new Guid("152b1e75-8643-4cbd-a4e3-5d73999fc6d3"),
-                            Code = "123",
-                            OrderDetailId = new Guid("9c79e86d-3c11-422d-9e51-0ef985e87084"),
-                            Status = "SOLD",
-                            VoucherId = new Guid("494b5347-378e-4e2d-9553-6032a42cd8d1")
-                        },
-                        new
-                        {
-                            Id = new Guid("20a45a99-5560-4910-8d80-13f8c217f5e4"),
-                            Code = "123",
-                            OrderDetailId = new Guid("d03c5b75-25b0-4ec8-98b3-9f80fcb9311a"),
-                            Status = "SOLD",
-                            VoucherId = new Guid("494b5347-378e-4e2d-9553-6032a42cd8d1")
-                        },
-                        new
-                        {
-                            Id = new Guid("5a87a8f5-e447-4ec4-9223-491eaffe672d"),
-                            Code = "123",
-                            OrderDetailId = new Guid("d03c5b75-25b0-4ec8-98b3-9f80fcb9311a"),
-                            Status = "SOLD",
-                            VoucherId = new Guid("494b5347-378e-4e2d-9553-6032a42cd8d1")
-                        });
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.VoucherType", b =>
@@ -907,26 +776,6 @@ namespace Vouchee.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("VoucherType");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("3e676315-1a28-4a0b-beb5-eaa5336a108d"),
-                            Status = "ACTIVE",
-                            Title = "FOOD"
-                        },
-                        new
-                        {
-                            Id = new Guid("4eccaac5-ecea-4876-91ae-fb18ad265a91"),
-                            Status = "ACTIVE",
-                            Title = "TRAVEL"
-                        },
-                        new
-                        {
-                            Id = new Guid("c34c676b-ba20-466b-8577-5234c8c60bef"),
-                            Status = "ACTIVE",
-                            Title = "COSMETIC"
-                        });
                 });
 
             modelBuilder.Entity("AddressVoucher", b =>
@@ -974,6 +823,25 @@ namespace Vouchee.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Vouchee.Data.Models.Entities.Cart", b =>
+                {
+                    b.HasOne("Vouchee.Data.Models.Entities.User", "User")
+                        .WithMany("Carts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Vouchee.Data.Models.Entities.Voucher", "Voucher")
+                        .WithMany("Carts")
+                        .HasForeignKey("VoucherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("Voucher");
+                });
+
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Category", b =>
                 {
                     b.HasOne("Vouchee.Data.Models.Entities.VoucherType", "VoucherType")
@@ -981,6 +849,21 @@ namespace Vouchee.Data.Migrations
                         .HasForeignKey("VoucherTypeId");
 
                     b.Navigation("VoucherType");
+                });
+
+            modelBuilder.Entity("Vouchee.Data.Models.Entities.Image", b =>
+                {
+                    b.HasOne("Vouchee.Data.Models.Entities.SubVoucher", "SubVoucher")
+                        .WithMany("Images")
+                        .HasForeignKey("SubVoucherId");
+
+                    b.HasOne("Vouchee.Data.Models.Entities.Voucher", "Voucher")
+                        .WithMany("Images")
+                        .HasForeignKey("VoucherId");
+
+                    b.Navigation("SubVoucher");
+
+                    b.Navigation("Voucher");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Order", b =>
@@ -1019,6 +902,15 @@ namespace Vouchee.Data.Migrations
                     b.Navigation("Voucher");
                 });
 
+            modelBuilder.Entity("Vouchee.Data.Models.Entities.SubVoucher", b =>
+                {
+                    b.HasOne("Vouchee.Data.Models.Entities.Voucher", "Voucher")
+                        .WithMany("SubVouchers")
+                        .HasForeignKey("VoucherId");
+
+                    b.Navigation("Voucher");
+                });
+
             modelBuilder.Entity("Vouchee.Data.Models.Entities.User", b =>
                 {
                     b.HasOne("Vouchee.Data.Models.Entities.Role", "Role")
@@ -1042,17 +934,11 @@ namespace Vouchee.Data.Migrations
                         .WithMany("Vouchers")
                         .HasForeignKey("SupplierId");
 
-                    b.HasOne("Vouchee.Data.Models.Entities.VoucherType", "VoucherType")
-                        .WithMany("Vouchers")
-                        .HasForeignKey("VoucherTypeId");
-
                     b.Navigation("Brand");
 
                     b.Navigation("Seller");
 
                     b.Navigation("Supplier");
-
-                    b.Navigation("VoucherType");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.VoucherCode", b =>
@@ -1097,6 +983,11 @@ namespace Vouchee.Data.Migrations
                     b.Navigation("Users");
                 });
 
+            modelBuilder.Entity("Vouchee.Data.Models.Entities.SubVoucher", b =>
+                {
+                    b.Navigation("Images");
+                });
+
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Supplier", b =>
                 {
                     b.Navigation("Vouchers");
@@ -1104,6 +995,8 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.User", b =>
                 {
+                    b.Navigation("Carts");
+
                     b.Navigation("Orders");
 
                     b.Navigation("Vouchers");
@@ -1111,7 +1004,13 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Voucher", b =>
                 {
+                    b.Navigation("Carts");
+
+                    b.Navigation("Images");
+
                     b.Navigation("OrderDetails");
+
+                    b.Navigation("SubVouchers");
 
                     b.Navigation("VoucherCodes");
                 });
@@ -1119,8 +1018,6 @@ namespace Vouchee.Data.Migrations
             modelBuilder.Entity("Vouchee.Data.Models.Entities.VoucherType", b =>
                 {
                     b.Navigation("Categories");
-
-                    b.Navigation("Vouchers");
                 });
 #pragma warning restore 612, 618
         }

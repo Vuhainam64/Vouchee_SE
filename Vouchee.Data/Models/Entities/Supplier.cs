@@ -26,7 +26,7 @@ namespace Vouchee.Data.Models.Entities
 
         public string? Name { get; set; }
         public string? Contact { get; set; }
-        [Column(TypeName = "decimal")]
+        [Column(TypeName = "decimal(10,5)")]
         public decimal? PercentShow { get; set; }
         public bool IsVerfied { get; set; }
         public string? Image { get; set; }

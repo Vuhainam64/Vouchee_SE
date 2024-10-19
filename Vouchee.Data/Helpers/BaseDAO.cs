@@ -213,7 +213,7 @@ namespace Vouchee.Data.Helpers
                 // Add the entity to the database context
                 await Table.AddAsync(entity);
 
-                // Save changes to the database
+                // Save changes to the databaseCannot insert duplicate key in object 'dbo.Address'. The duplicate key value is (0d968c2d-c4b7-4f53-ad61-27e7c79ec655).
                 var result = await _context.SaveChangesAsync();
 
                 // If the save was successful, return the entity
@@ -227,18 +227,33 @@ namespace Vouchee.Data.Helpers
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
-                throw new Exception("Error adding entity: " + ex.Message);
+                return null;
             }
-        }
-
-        internal void Attach(Address entity)
-        {
-            _context.Entry(entity).State = EntityState.Unchanged;
         }
 
         public void Attach(Category category)
         {
             _context.Attach(category);
+        }
+
+        // Specific Attach method for Address
+        internal void Attach(Address entity)
+        {
+            _context.Address.Attach(entity);
+        }
+
+        public Address GetLocalAddress(decimal lon, decimal lat)
+        {
+            // Check if the address is already being tracked in the context
+            var trackedAddress = _context.Address.Local.FirstOrDefault(a => a.Lon == lon && a.Lat == lat);
+
+            if (trackedAddress != null)
+            {
+                // Not tracked yet, attach it
+                _context.Address.Attach(trackedAddress);
+            }
+
+            return trackedAddress;
         }
     }
 }

@@ -10,5 +10,7 @@ namespace Vouchee.Data.Repositories.IRepos
 {
     public interface IBrandRepository : IBaseRepository<Brand>
     {
+        public void Attach(Address address);
+        public Address GetAddress(decimal lon, decimal lat);
     }
 }

@@ -88,8 +88,8 @@ namespace Vouchee.Data.Repositories.Repos
         {
             try
             {
-                user.RefreshToken = refreshToken;
-                user.RefreshTokenExpirationDate = dateTime;
+                //user.RefreshToken = refreshToken;
+                //user.RefreshTokenExpirationDate = dateTime;
 
                 return _userDAO.UpdateAsync(user).Result;
             }

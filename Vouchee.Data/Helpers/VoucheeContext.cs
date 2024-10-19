@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System.Xml.Linq;
 using Vouchee.Data.Models.Entities;
 
@@ -33,6 +34,7 @@ namespace Vouchee.Data.Helpers
                                     .SetBasePath(Directory.GetCurrentDirectory())
                                     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
                 IConfigurationRoot configuration = builder.Build();
+                optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
                 optionsBuilder.UseSqlServer(configuration.GetConnectionString("PROD"));
                 /*optionsBuilder.UseSqlServer("Server=(local);uid=sa;pwd=12345;database=Vouchee1;TrustServerCertificate=True;");*/
             }
@@ -53,10 +55,10 @@ namespace Vouchee.Data.Helpers
             modelBuilder.Entity<Category>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Brand>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Image>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
-            modelBuilder.Entity<Cart>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            modelBuilder.Entity<Cart>().HasKey(c => new { c.UserId, c.VoucherId });
             modelBuilder.Entity<SubVoucher>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
 
-            modelBuilder.Seed();
+            // modelBuilder.Seed();
 
             base.OnModelCreating(modelBuilder);
         }

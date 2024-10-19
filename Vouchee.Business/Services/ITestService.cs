@@ -10,6 +10,7 @@ namespace Vouchee.Business.Services
 {
     public interface ITestService
     {
+        public Task<Brand> CreateBrand(TestCreateVoucherDTO testCreateVoucherDTO);
         public Task<Voucher> CreateVoucher(TestCreateVoucherDTO createVoucherDTO, Guid voucherTypeId, Guid supplierID);
     }
 }
