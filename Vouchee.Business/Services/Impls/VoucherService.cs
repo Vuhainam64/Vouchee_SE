@@ -199,6 +199,7 @@ namespace Vouchee.Business.Services.Impls
                     .Include(x => x.Supplier)
                     .Include(x => x.Categories)
                     .Include(x => x.Brand)
+                        .ThenInclude(x => x.Addresses)
                     .ProjectTo<GetNearestVoucherDTO>(_mapper.ConfigurationProvider)
                     .ToList(); // Materialize the data
 
@@ -230,7 +231,7 @@ namespace Vouchee.Business.Services.Impls
                                 };
                             })
                             .OrderBy(a => a.Distance) // Sort by closest distance
-                            .FirstOrDefault(); // Get the nearest address
+                            .Take(5);
 
                         if (nearestAddress != null)
                         {
@@ -252,17 +253,16 @@ namespace Vouchee.Business.Services.Impls
                                 supplierName = voucher.supplierName,
                                 quantity = voucher.quantity,
                                 rating = voucher.rating,
-                                addresses = new List<GetAllAddressDTO>
-                                {
-                                    new GetAllAddressDTO
-                                    {
-                                        id = nearestAddress.Address.id,
-                                        name = nearestAddress.Address.name,
-                                        lat = nearestAddress.Address.lat,
-                                        lon = nearestAddress.Address.lon,
-                                        distance = nearestAddress.Distance // Include distance here at the address level
-                                    }
-                                }
+                                addresses = nearestAddress
+                                        .Select(na => new GetAllAddressDTO
+                                        {
+                                            id = na.Address.id,
+                                            name = na.Address.name,
+                                            lat = na.Address.lat,
+                                            lon = na.Address.lon,
+                                            distance = Math.Round(na.Distance, 2) // Round distance to 2 decimal places
+                                        })
+                                        .ToList() // Map to address DTOs and create a list of nearest 5 addresses
                             };
                         }
                         return null;
@@ -416,6 +416,7 @@ namespace Vouchee.Business.Services.Impls
             var voucher = await _voucherRepository.GetByIdAsync(id,
                                     query => query.Include(x => x.VoucherCodes)
                                                     .Include(x => x.Brand)
+                                                        .ThenInclude(x => x.Addresses)
                                                     .Include(x => x.Supplier)
                                                     //.Include(x => x.Addresses)
                                                     .Include(x => x.Categories)
