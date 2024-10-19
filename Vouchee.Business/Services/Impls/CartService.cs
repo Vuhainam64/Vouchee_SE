@@ -71,9 +71,28 @@ namespace Vouchee.Business.Services.Impls
             return await _userRepository.UpdateAsync(userInstance);
         }
 
-        public Task<bool> DecreaseQuantityAsync(Guid voucherId, ThisUserObj thisUserObj)
+        public async Task<bool> DecreaseQuantityAsync(Guid voucherId, ThisUserObj thisUserObj)
         {
-            throw new NotImplementedException();
+            Guid userId = Guid.Parse(thisUserObj.userId);
+
+            // Fetch the current user
+            User? user = await GetCurrentUser(userId);
+
+            // Find the cart item with the specified voucher
+            var cartItem = user.Carts.FirstOrDefault(c => c.VoucherId == voucherId);
+
+            if (cartItem != null)
+            {
+                // Increase the quantity
+                cartItem.Quantity -= 1;
+                cartItem.UpdateBy = userId;
+                cartItem.UpdateDate = DateTime.Now;
+
+                // Update the user with the modified cart
+                return await _userRepository.UpdateAsync(user);
+            }
+
+            throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
         }
 
         public async Task<CartDTO> GetCartsAsync(PagingRequest pagingRequest, CartFilter cartFilter, ThisUserObj thisUserObj)
@@ -103,19 +122,72 @@ namespace Vouchee.Business.Services.Impls
             return cartDTO;
         }
 
-        public Task<bool> IncreaseQuantityAsync(Guid voucherId, ThisUserObj thisUserObj)
+        public async Task<bool> IncreaseQuantityAsync(Guid voucherId, ThisUserObj thisUserObj)
         {
-            throw new NotImplementedException();
+            Guid userId = Guid.Parse(thisUserObj.userId);
+
+            // Fetch the current user
+            User? user = await GetCurrentUser(userId);
+
+            // Find the cart item with the specified voucher
+            var cartItem = user.Carts.FirstOrDefault(c => c.VoucherId == voucherId);
+
+            if (cartItem != null)
+            {
+                // Increase the quantity
+                cartItem.Quantity += 1;
+                cartItem.UpdateBy = userId;
+                cartItem.UpdateDate = DateTime.Now;
+
+                // Update the user with the modified cart
+                return await _userRepository.UpdateAsync(user);
+            }
+
+            throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
         }
 
-        public Task<bool> RemoveItemAsync(Guid voucherId, ThisUserObj thisUserObj)
+
+        public async Task<bool> RemoveItemAsync(Guid voucherId, ThisUserObj thisUserObj)
         {
-            throw new NotImplementedException();
+            Guid userId = Guid.Parse(thisUserObj.userId);
+
+            // Fetch the current user
+            User? user = await GetCurrentUser(userId);
+
+            // Find the cart item with the specified voucher
+            var cartItem = user.Carts.FirstOrDefault(c => c.VoucherId == voucherId);
+
+            if (cartItem != null)
+            {
+                // Remove the item from the cart
+                user.Carts.Remove(cartItem);
+
+                // Update the user with the modified cart
+                return await _userRepository.UpdateAsync(user);
+            }
+
+            throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
         }
 
-        public Task<bool> UpdateQuantityAsync(Guid voucherId, int quantity, ThisUserObj thisUserObj)
+
+        public async Task<bool> UpdateQuantityAsync(Guid voucherId, int quantity, ThisUserObj thisUserObj)
         {
-            throw new NotImplementedException();
+            Guid userId = Guid.Parse(thisUserObj.userId);
+
+            User? user = await GetCurrentUser(userId);
+
+            var cartItem = user.Carts.FirstOrDefault(c => c.VoucherId == voucherId);
+
+            if (cartItem != null)
+            {
+                cartItem.Quantity = quantity;
+                cartItem.UpdateBy = userId; 
+                cartItem.UpdateDate = DateTime.Now;
+
+                return await _userRepository.UpdateAsync(user);
+            }
+
+            throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
         }
 
         private async Task<User> GetCurrentUser(Guid userId)
