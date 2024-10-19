@@ -86,10 +86,10 @@ namespace Vouchee.Data.Migrations
                     b.Property<bool>("IsVerfied")
                         .HasColumnType("bit");
 
-                    b.Property<decimal>("Lat")
+                    b.Property<decimal?>("Lat")
                         .HasColumnType("decimal(38, 20)");
 
-                    b.Property<decimal>("Lon")
+                    b.Property<decimal?>("Lon")
                         .HasColumnType("decimal(38, 20)");
 
                     b.Property<string>("Name")
@@ -163,22 +163,23 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Cart", b =>
                 {
-                    b.Property<Guid?>("UserId")
+                    b.Property<Guid?>("BuyerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("VoucherId")
+                    b.Property<Guid>("VoucherId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CreateBy")
+                    b.Property<Guid>("CreateBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("CreateDate")
+                    b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<int?>("Quantity")
+                    b.Property<int>("Quantity")
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("UpdateBy")
@@ -187,11 +188,11 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime");
 
-                    b.HasKey("UserId", "VoucherId");
+                    b.HasKey("BuyerId", "VoucherId");
 
-                    b.HasIndex(new[] { "UserId" }, "IX_Cart_UserId");
+                    b.HasIndex(new[] { "BuyerId" }, "IX_Cart_BuyerId");
 
-                    b.HasIndex(new[] { "VoucherId" }, "IX_Voucher_UserId");
+                    b.HasIndex(new[] { "VoucherId" }, "IX_Cart_VoucherId");
 
                     b.ToTable("Cart");
                 });
@@ -817,9 +818,9 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Cart", b =>
                 {
-                    b.HasOne("Vouchee.Data.Models.Entities.User", "User")
+                    b.HasOne("Vouchee.Data.Models.Entities.User", "Buyer")
                         .WithMany("Carts")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("BuyerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -829,7 +830,7 @@ namespace Vouchee.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Buyer");
 
                     b.Navigation("Voucher");
                 });

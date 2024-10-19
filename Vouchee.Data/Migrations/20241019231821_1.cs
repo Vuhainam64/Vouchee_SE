@@ -17,8 +17,8 @@ namespace Vouchee.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Lon = table.Column<decimal>(type: "decimal(38,20)", nullable: false),
-                    Lat = table.Column<decimal>(type: "decimal(38,20)", nullable: false),
+                    Lon = table.Column<decimal>(type: "decimal(38,20)", nullable: true),
+                    Lat = table.Column<decimal>(type: "decimal(38,20)", nullable: true),
                     IsVerfied = table.Column<bool>(type: "bit", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: false),
@@ -302,20 +302,20 @@ namespace Vouchee.Data.Migrations
                 columns: table => new
                 {
                     VoucherId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    BuyerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: false),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Cart", x => new { x.UserId, x.VoucherId });
+                    table.PrimaryKey("PK_Cart", x => new { x.BuyerId, x.VoucherId });
                     table.ForeignKey(
-                        name: "FK_Cart_User_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Cart_User_BuyerId",
+                        column: x => x.BuyerId,
                         principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
@@ -508,12 +508,12 @@ namespace Vouchee.Data.Migrations
                 column: "BrandsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Cart_UserId",
+                name: "IX_Cart_BuyerId",
                 table: "Cart",
-                column: "UserId");
+                column: "BuyerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Voucher_UserId",
+                name: "IX_Cart_VoucherId",
                 table: "Cart",
                 column: "VoucherId");
 

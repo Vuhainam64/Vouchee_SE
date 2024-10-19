@@ -29,9 +29,9 @@ namespace Vouchee.Data.Models.Entities
 
         public required string Name { get; set; }
         [Column(TypeName = "decimal(38, 20)")]
-        public decimal Lon { get; set; }
+        public decimal? Lon { get; set; }
         [Column(TypeName = "decimal(38, 20)")]
-        public decimal Lat { get; set; }
+        public decimal? Lat { get; set; }
         public bool IsVerfied { get; set; }
 
         public required string Status { get; set; }
