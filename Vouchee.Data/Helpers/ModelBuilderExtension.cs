@@ -79,7 +79,7 @@ namespace Vouchee.Data.Helpers
                     Email = "voucheeseller@gmail.com",
                     RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.SELLER.ToString())),
                     Name = "SELLER 1",
-                    PercentShow = 80,
+                    //PercentShow = 80,
                     ResponsibilityScore = 100
                 },
                 new User()
@@ -88,7 +88,7 @@ namespace Vouchee.Data.Helpers
                     Email = "sellervouchee2@gmail.com",
                     RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.SELLER.ToString())),
                     Name = "SELLER 2",
-                    PercentShow = 90,
+                    //PercentShow = 90,
                     ResponsibilityScore = 70
                 },
                 new User()
@@ -135,19 +135,19 @@ namespace Vouchee.Data.Helpers
                 {
                     Id = Guid.Parse("58203073-d9c1-41a0-9aac-fd62977c860c"),
                     Status = ObjectStatusEnum.ACTIVE.ToString(),
-                    PercentShow = 70,
+                    //PercentShow = 70,
                 },
                 new Address()
                 {
                     Id = Guid.Parse("7654b4f2-87ad-4146-8116-3e9303cfe84a"),
                     Status = ObjectStatusEnum.ACTIVE.ToString(),
-                    PercentShow = 80,
+                    //PercentShow = 80,
                 },
                 new Address()
                 {
                     Id = Guid.Parse("665dcada-509d-4bef-977b-a3ea097c10ec"),
                     Status = ObjectStatusEnum.ACTIVE.ToString(),
-                    PercentShow = 80,
+                    //PercentShow = 80,
                 }
             );
 

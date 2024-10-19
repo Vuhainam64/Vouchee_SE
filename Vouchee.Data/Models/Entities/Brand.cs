@@ -13,21 +13,22 @@ namespace Vouchee.Data.Models.Entities
     {
         public Brand()
         {
+            Addresses = new HashSet<Address>();
             Vouchers = new HashSet<Voucher>();
         }
 
         [InverseProperty(nameof(Voucher.Brand))]
         public virtual ICollection<Voucher> Vouchers { get; set; }
 
+        [InverseProperty(nameof(Address.Brands))]
+        public virtual ICollection<Address> Addresses { get; set; }
+
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
 
         public string? Name { get; set; }
-        public string? Description { get; set; }
         public string? Image { get; set; }
-        [Column(TypeName = "decimal")]
-        public decimal? PercentShow { get; set; }
         public bool IsVerfied { get; set; }
 
         public string? Status { get; set; }

@@ -28,9 +28,8 @@ namespace Vouchee.Data.Models.Entities
         [Key]
         public Guid Id { get; set; }
 
-        public string? ImageUrl { get; set; }
-        public int? Priority { get; set; }
-        public string? ImageType { get; set; }
+        public string? MediaUrl { get; set; }
+        public string? MediaType { get; set; }
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]

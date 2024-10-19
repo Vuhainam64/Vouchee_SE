@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 using Vouchee.API.Helpers;
 using Vouchee.Business.Models;
@@ -11,6 +12,7 @@ using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
+using Vouchee.Data.Repositories.IRepos;
 
 namespace Vouchee.API.Controllers
 {
@@ -19,14 +21,23 @@ namespace Vouchee.API.Controllers
     [EnableCors("MyAllowSpecificOrigins")]
     public class AddressController : ControllerBase
     {
+        private readonly ISupplierRepository _supplierRepository;
+        private readonly ITestService _testService;
+        private readonly IBrandService _brandService;
         private readonly IAddressService _addressRepository;
         private readonly IUserService _userService;
         private readonly IRoleService _roleService;
 
-        public AddressController(IAddressService addressService, 
+        public AddressController(ISupplierRepository supplierRepository,
+                                IBrandService brandService,
+                                IAddressService addressService, 
                                 IUserService userService, 
-                                IRoleService roleService)
+                                IRoleService roleService,
+                                ITestService testService)
         {
+            _supplierRepository = supplierRepository;
+            _testService = testService;
+            _brandService = brandService;
             _addressRepository = addressService;
             _userService = userService;
             _roleService = roleService;
@@ -49,6 +60,16 @@ namespace Vouchee.API.Controllers
                 code = HttpStatusCode.Forbidden,
                 message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
             });
+        }
+
+        [HttpPost("create_new_address_test")]
+        public async Task<IActionResult> CreateAddressTest([FromBody] IList<TestCreateVoucherDTO> createAddressDTO)
+        {
+            foreach (var brand in createAddressDTO)
+            {
+                var newBrand = await _testService.CreateBrand(brand);
+            }
+            return NoContent();
         }
 
         // READ

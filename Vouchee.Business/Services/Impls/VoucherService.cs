@@ -93,11 +93,11 @@ namespace Vouchee.Business.Services.Impls
                         Image image = new();
 
                         // image.ImageUrl = await _fileUploadService.UploadImageToFirebase(productImage, thisUserObj.userId.ToString(), StoragePathEnum.VOUCHER);
-                        image.ImageUrl = productImage;
+                        image.MediaUrl = productImage;
                         image.Status = ObjectStatusEnum.ACTIVE.ToString();
                         image.CreateBy = Guid.Parse(thisUserObj.userId);
                         image.CreateDate = DateTime.Now;
-                        image.ImageType = "PRODUCT";
+                        image.MediaType = "PRODUCT";
 
                         voucher.Images.Add(image);
                     }
@@ -108,13 +108,13 @@ namespace Vouchee.Business.Services.Impls
                     Image image = new();
 
                     // image.ImageUrl = await _fileUploadService.UploadImageToFirebase(advertisingImage, thisUserObj.userId.ToString(), StoragePathEnum.VOUCHER);
-                    image.ImageUrl = createVoucherDTO.advertisingImageUrl;
+                    image.MediaUrl = createVoucherDTO.advertisingImageUrl;
                     image.Status = ObjectStatusEnum.ACTIVE.ToString();
                     image.CreateBy = Guid.Parse(thisUserObj.userId);
                     image.CreateDate = DateTime.Now;
-                    image.ImageType = "ADVERTISEMENT";
+                    image.MediaType = "ADVERTISEMENT";
 
-                    if (image.ImageUrl != null)
+                    if (image.MediaUrl != null)
                     {
                         voucher.Images.Add(image);
                     }
@@ -125,13 +125,13 @@ namespace Vouchee.Business.Services.Impls
                     Image image = new();
 
                     //image.ImageUrl = await _fileUploadService.UploadVideoToFirebase(createVoucherDTO.videoUrl, thisUserObj.userId.ToString(), StoragePathEnum.VOUCHER);
-                    image.ImageUrl = createVoucherDTO.videoUrl;
+                    image.MediaUrl = createVoucherDTO.videoUrl;
                     image.Status = ObjectStatusEnum.ACTIVE.ToString();
                     image.CreateBy = Guid.Parse(thisUserObj.userId);
                     image.CreateDate = DateTime.Now;
-                    image.ImageType = "VIDEO";
+                    image.MediaType = "VIDEO";
 
-                    if (image.ImageUrl != null)
+                    if (image.MediaUrl != null)
                     {
                         voucher.Images.Add(image);
                     }
@@ -417,7 +417,7 @@ namespace Vouchee.Business.Services.Impls
                                     query => query.Include(x => x.VoucherCodes)
                                                     .Include(x => x.Brand)
                                                     .Include(x => x.Supplier)
-                                                    .Include(x => x.Addresses)
+                                                    //.Include(x => x.Addresses)
                                                     .Include(x => x.Categories)
                                                         .ThenInclude(x => x.VoucherType)
                                                     .Include(x => x.Images)
@@ -642,7 +642,7 @@ namespace Vouchee.Business.Services.Impls
                             var existedVoucher = _mapper.Map<GetNewestVoucherDTO>(voucher);
                             existedVoucher.salePrice = existedVoucher.originalPrice - (existedVoucher.originalPrice * promotion.PercentDiscount / 100);
                             existedVoucher.percentDiscount = promotion.PercentDiscount;
-                            existedVoucher.image = voucher.Images.Count != 0 ? voucher.Images.FirstOrDefault(x => x.ImageType == ImageEnum.ADVERTISEMENT.ToString()).ImageUrl : null;
+                            existedVoucher.image = voucher.Images.Count != 0 ? voucher.Images.FirstOrDefault(x => x.MediaType == ImageEnum.ADVERTISEMENT.ToString()).MediaUrl : null;
                             vouchers.Add(existedVoucher);
                         }
                     }

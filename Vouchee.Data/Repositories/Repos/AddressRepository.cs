@@ -16,7 +16,10 @@ namespace Vouchee.Data.Repositories.Repos
     {
         private readonly BaseDAO<Address> _addressDAO;
 
-        public AddressRepository() => _addressDAO = BaseDAO<Address>.Instance;
+        public AddressRepository() 
+        {
+            _addressDAO = BaseDAO<Address>.Instance;
+        }
 
         public void Attach(Address existedAddress)
         {
@@ -35,6 +38,11 @@ namespace Vouchee.Data.Repositories.Repos
                 LoggerService.Logger(ex.Message);
                 throw new Exception(ex.Message);
             }
+        }
+
+        public Address GetLocalAddress(decimal lon, decimal lat)
+        {
+            return _addressDAO.GetLocalAddress(lon, lat);
         }
     }
 }

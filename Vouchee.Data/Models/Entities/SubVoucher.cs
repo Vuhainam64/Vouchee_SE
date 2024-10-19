@@ -30,9 +30,9 @@ namespace Vouchee.Data.Models.Entities
         public Guid Id { get; set; }
 
         public string? Title { get; set; }
-        [Column(TypeName = "decimal(20,3)")]
+        [Column(TypeName = "decimal(10,5)")]
         public decimal OriginalPrice { get; set; }
-        [Column(TypeName = "decimal(20,3)")]
+        [Column(TypeName = "decimal(10,5)")]
         public decimal SellPrice { get; set; }
         public int? Quantity { get; set; }
 

@@ -21,7 +21,7 @@ namespace Vouchee.Data.Models.Entities
         {
             Images = new HashSet<Image>();
             VoucherCodes = new HashSet<VoucherCode>();
-            Addresses = new HashSet<Address>();
+            //Addresses = new HashSet<Address>();
             OrderDetails = new HashSet<OrderDetail>();
             Promotions = new HashSet<Promotion>();
             Categories = new HashSet<Category>();
@@ -37,14 +37,15 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<VoucherCode> VoucherCodes { get; set; }
         [InverseProperty(nameof(OrderDetail.Voucher))]
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
-        [InverseProperty(nameof(Address.Vouchers))]
-        public virtual ICollection<Address> Addresses { get; set; }
+        //[InverseProperty(nameof(Address.Vouchers))]
+        //public virtual ICollection<Address> Addresses { get; set; }
         [InverseProperty(nameof(Promotion.Vouchers))]
         public virtual ICollection<Promotion> Promotions { get; set; }
         [InverseProperty(nameof(Category.Vouchers))]
         public virtual ICollection<Category> Categories { get; set; }
         [InverseProperty(nameof(Cart.Voucher))]
         public virtual ICollection<Cart> Carts { get; set; }
+
         public Guid? BrandId { get; set; }
         [ForeignKey(nameof(BrandId))]
         [InverseProperty("Vouchers")]
@@ -76,9 +77,9 @@ namespace Vouchee.Data.Models.Entities
 
         public string? Title { get; set; }
         public string? Description { get; set; }
-        [Column(TypeName = "decimal")]
+        [Column(TypeName = "decimal(10,5)")]
         public decimal OriginalPrice { get; set; }
-        [Column(TypeName = "decimal")]
+        [Column(TypeName = "decimal(10,5)")]
         public decimal SellPrice { get; set; }
         //[Column(TypeName = "datetime")]
         //public DateTime StartDate { get; set; }
@@ -89,7 +90,7 @@ namespace Vouchee.Data.Models.Entities
         //public string? Image { get; set; }
         //[Column(TypeName = "decimal")]
         //public decimal? PercentShow { get; set; }
-        [Column(TypeName = "decimal")]
+        [Column(TypeName = "decimal(10,5)")]
         public decimal Rating { get; set; }
 
         public string? Status { get; set; }

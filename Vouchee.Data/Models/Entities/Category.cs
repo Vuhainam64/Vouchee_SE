@@ -32,8 +32,6 @@ namespace Vouchee.Data.Models.Entities
 
         public string? Title { get; set; }
         public string? Image { get; set; }
-        [Column(TypeName = "decimal")]
-        public decimal? PercentShow { get; set; }
 
         public string? Status { get; set; }
         [Column(TypeName = "datetime")]

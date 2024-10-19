@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System.Xml.Linq;
 using Vouchee.Data.Models.Entities;
 
@@ -33,7 +34,8 @@ namespace Vouchee.Data.Helpers
                                     .SetBasePath(Directory.GetCurrentDirectory())
                                     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
                 IConfigurationRoot configuration = builder.Build();
-                optionsBuilder.UseSqlServer(configuration.GetConnectionString("DEV"));
+                optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+                optionsBuilder.UseSqlServer(configuration.GetConnectionString("PROD"));
                 /*optionsBuilder.UseSqlServer("Server=(local);uid=sa;pwd=12345;database=Vouchee1;TrustServerCertificate=True;");*/
             }
         }
