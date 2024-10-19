@@ -43,7 +43,5 @@ namespace Vouchee.Data.Models.Entities
         public Guid? UpdateBy { get; set; }
         public DateTime? VerifiedDate { get; set; }
         public Guid? VerifiedBy { get; set; }
-
-        public string? AddressHash { get; set; }
     }
 }
