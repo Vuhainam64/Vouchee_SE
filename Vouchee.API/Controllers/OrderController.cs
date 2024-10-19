@@ -42,8 +42,8 @@ namespace Vouchee.API.Controllers
 
             if (RoleHelper.IsBuyer(currentUser))
             {
-                var result = await _orderService.CreateOrderAsync(createOrderDTO, currentUser);
-                return Ok(result);
+                // var result = await _orderService.CreateOrderAsync(createOrderDTO, currentUser);
+                return Ok();
             }
 
             return StatusCode((int)HttpStatusCode.Forbidden, new

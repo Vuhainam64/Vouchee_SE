@@ -12,16 +12,16 @@ namespace Vouchee.Business.Models.DTOs
 
     public class CreateOrderDTO : OrderDTO
     {
-        public CreateOrderDTO()
-        {
-            orderDetails = new HashSet<CreateOrderDetailDTO>();
-        }
+        //public CreateOrderDTO()
+        //{
+        //    orderDetails = new HashSet<CreateOrderDetailDTO>();
+        //}
 
         [JsonIgnore] public string status = ObjectStatusEnum.ACTIVE.ToString();
         public DateTime? createDate = DateTime.Now;
-        public Guid promotionId { get; set; }
-        public PaymentTypeEnum paymentType { get; set; }
-        public virtual ICollection<CreateOrderDetailDTO> orderDetails { get; set; }
+        //public Guid promotionId { get; set; }
+        //public PaymentTypeEnum paymentType { get; set; }
+        //public virtual ICollection<CreateOrderDetailDTO> orderDetails { get; set; }
     }
 
     public class UpdateOrderDTO : OrderDTO

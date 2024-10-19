@@ -32,7 +32,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: "MyAllowSpecificOrigins",
                       policy =>
                       {
-                          policy.WithOrigins("https://www.vouchee.shop", "https://vouchee.shop", "https://vouchee.vercel.app/")
+                          policy.WithOrigins("https://www.vouchee.shop", "https://vouchee.shop", "https://vouchee.vercel.app/", "vouchee.shop")
                                 .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
                                 .AllowAnyMethod()
                                 .AllowAnyHeader()

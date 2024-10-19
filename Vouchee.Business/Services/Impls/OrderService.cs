@@ -18,6 +18,7 @@ namespace Vouchee.Business.Services.Impls
 {
     public class OrderService : IOrderService
     {
+        private readonly ICartRepository _cartRepository;
         private readonly IVoucherCodeRepository _voucherCodeRepository;
         private readonly IOrderDetailRepository _orderDetailRepository;
         private readonly IVoucherRepository _voucherRepository;
@@ -28,8 +29,10 @@ namespace Vouchee.Business.Services.Impls
                                 IOrderRepository orderRepository,
                                 IOrderDetailRepository orderDetailRepository,
                                 IVoucherCodeRepository voucherCodeRepository,
+                                ICartRepository cartRepository,
                                 IMapper mapper)
         {
+            _cartRepository = cartRepository;
             _voucherCodeRepository = voucherCodeRepository;
             _orderDetailRepository = orderDetailRepository;
             _voucherRepository = voucherRepository;
@@ -77,42 +80,47 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<Guid?> CreateOrderAsync(CreateOrderDTO createOrderDTO, ThisUserObj thisUserObj)
+        public Task<Guid?> CreateOrderAsync(ThisUserObj thisUserObj)
         {
-            try
-            {
-                var order = _mapper.Map<Order>(createOrderDTO);
-
-                foreach (var orderDetail in order.OrderDetails)
-                {
-                    var voucher = _voucherRepository.GetByIdAsync(orderDetail.VoucherId).Result;
-                    if (voucher == null)
-                    {
-                        throw new NotFoundException($"Không tìm thấy voucher với ID {orderDetail.VoucherId}");
-                    }
-                    if (orderDetail.Quantity > voucher.Quantity)
-                    {
-                        throw new QuantityExcessException($"Voucher {voucher.Id} vượt quá số lượng tồn kho");
-                    }
-
-                    orderDetail.VoucherId = voucher.Id;
-                    orderDetail.CreateBy = Guid.Parse(thisUserObj.userId);
-                    orderDetail.UnitPrice = voucher.OriginalPrice;
-                }
-
-                order.CreateBy = Guid.Parse(thisUserObj.userId);
-                order.TotalPrice = order.OrderDetails.Sum(x => x.FinalPrice);
-
-                var orderId = await _orderRepository.AddAsync(order);
-
-                return orderId;
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new CreateObjectException("Lỗi không xác định khi tạo order");
-            }
+            throw new NotImplementedException();
         }
+
+        //public async Task<Guid?> CreateOrderAsync(CreateOrderDTO createOrderDTO, ThisUserObj thisUserObj)
+        //{
+        //    try
+        //    {
+        //        var order = _mapper.Map<Order>(createOrderDTO);
+
+        //        foreach (var orderDetail in order.OrderDetails)
+        //        {
+        //            var voucher = _voucherRepository.GetByIdAsync(orderDetail.VoucherId).Result;
+        //            if (voucher == null)
+        //            {
+        //                throw new NotFoundException($"Không tìm thấy voucher với ID {orderDetail.VoucherId}");
+        //            }
+        //            if (orderDetail.Quantity > voucher.Quantity)
+        //            {
+        //                throw new QuantityExcessException($"Voucher {voucher.Id} vượt quá số lượng tồn kho");
+        //            }
+
+        //            orderDetail.VoucherId = voucher.Id;
+        //            orderDetail.CreateBy = Guid.Parse(thisUserObj.userId);
+        //            orderDetail.UnitPrice = voucher.OriginalPrice;
+        //        }
+
+        //        order.CreateBy = Guid.Parse(thisUserObj.userId);
+        //        order.TotalPrice = order.OrderDetails.Sum(x => x.FinalPrice);
+
+        //        var orderId = await _orderRepository.AddAsync(order);
+
+        //        return orderId;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        LoggerService.Logger(ex.Message);
+        //        throw new CreateObjectException("Lỗi không xác định khi tạo order");
+        //    }
+        //}
 
         public async Task<bool> DeleteOrderAsync(Guid id)
         {
