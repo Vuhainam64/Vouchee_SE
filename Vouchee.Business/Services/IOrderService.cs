@@ -9,7 +9,8 @@ namespace Vouchee.Business.Services
     public interface IOrderService
     {
         // CREATE
-        public Task<Guid?> CreateOrderAsync(CreateOrderDTO createOrderDTO, ThisUserObj thisUserObj);
+        // public Task<Guid?> CreateOrderAsync(CreateOrderDTO createOrderDTO, ThisUserObj thisUserObj);
+        public Task<Guid?> CreateOrderAsync(ThisUserObj thisUserObj);
 
         // READ
         public Task<GetOrderDTO> GetOrderByIdAsync(Guid id);

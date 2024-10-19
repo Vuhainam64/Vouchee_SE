@@ -138,7 +138,7 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            if (currentUser.roleId.Equals(currentUser.adminRoleId))
+            if (currentUser.roleId.Equals(currentUser.buyerRoleId))
             {
                 var result = await _cartService.RemoveItemAsync(voucherId, currentUser);
                 return Ok(result);
