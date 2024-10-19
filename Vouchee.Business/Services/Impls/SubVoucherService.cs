@@ -51,22 +51,23 @@ namespace Vouchee.Business.Services.Impls
             }
 
             subVoucher.VoucherId = voucherId;
-            subVoucher.CreateBy = Guid.Parse(thisUserObj.userId);
+            subVoucher.CreateBy = thisUserObj.userId;
 
             foreach (var image in createSubVoucherDTO.productImagesUrl)
             {
-                Image newImage = new();
-
-                newImage.CreateBy = Guid.Parse(thisUserObj.userId);
-                newImage.CreateDate = DateTime.Now;
-                newImage.MediaType = "PRODUCT";
-                newImage.Status = ObjectStatusEnum.ACTIVE.ToString();
-                // newImage.ImageUrl = await _fileUploadService.UploadImageToFirebase(image, thisUserObj.userId, StoragePathEnum.VOUCHER);
-                newImage.MediaUrl = image;
+                Media newImage = new()
+                {
+                    CreateBy = thisUserObj.userId,
+                    CreateDate = DateTime.Now,
+                    Type = MediaEnum.PRODUCT.ToString(),
+                    Status = ObjectStatusEnum.ACTIVE.ToString(),
+                    // newImage.ImageUrl = await _fileUploadService.UploadImageToFirebase(image, thisUserObj.userId, StoragePathEnum.VOUCHER);
+                    Url = image
+                };
 
                 if (newImage != null)
                 {
-                    subVoucher.Images.Add(newImage);
+                    subVoucher.Medias.Add(newImage);
                 }
             }
 
@@ -86,7 +87,7 @@ namespace Vouchee.Business.Services.Impls
         public async Task<GetSubVoucherDTO> GetSubVoucherByIdAsync(Guid id)
         {
             SubVoucher subVoucher = await _subVoucherRepository.GetByIdAsync(id,
-                includeProperties: query => query.Include(x => x.Images));
+                includeProperties: query => query.Include(x => x.Medias));
             if (subVoucher != null)
             {
                 GetSubVoucherDTO getSubVoucherDTO = _mapper.Map<GetSubVoucherDTO>(subVoucher);

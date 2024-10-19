@@ -53,14 +53,14 @@ namespace Vouchee.Business.Services.Impls
                 }    
 
                 Category category = _mapper.Map<Category>(createCategoryDTO);
-                category.CreateBy = Guid.Parse(thisUserObj.userId);
+                category.CreateBy = thisUserObj.userId;
                 category.VoucherTypeId = voucherTypeId;
 
                 var categoryId = await _categoryRepository.AddAsync(category);
 
                 if (categoryId != null && createCategoryDTO.image != null)
                 {
-                    category.Image = await _fileUploadService.UploadImageToFirebase(createCategoryDTO.image, thisUserObj.userId, StoragePathEnum.CATEGORY);
+                    category.Image = await _fileUploadService.UploadImageToFirebase(createCategoryDTO.image, thisUserObj.userId.ToString(), StoragePathEnum.CATEGORY);
 
                     if (!await _categoryRepository.UpdateAsync(category)) 
                     {

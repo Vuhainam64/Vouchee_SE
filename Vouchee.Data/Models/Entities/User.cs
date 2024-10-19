@@ -16,16 +16,16 @@ namespace Vouchee.Data.Models.Entities
     {
         public User()
         {
-            Orders = new HashSet<Order>();
-            Vouchers = new HashSet<Voucher>();
-            Carts = new HashSet<Cart>();
+            Orders = [];
+            Vouchers = [];
+            Carts = [];
         }
 
         [InverseProperty(nameof(Order.User))]
         public virtual ICollection<Order> Orders { get; set; }
-        [InverseProperty(nameof(Voucher.Seller))]
+        [InverseProperty(nameof(Voucher.User))]
         public virtual ICollection<Voucher> Vouchers { get; set; }
-        [InverseProperty(nameof(Cart.User))]
+        [InverseProperty(nameof(Cart.Buyer))]
         public virtual ICollection<Cart> Carts { get; set; }
 
         public Guid? RoleId { get; set; }
@@ -37,12 +37,10 @@ namespace Vouchee.Data.Models.Entities
         [Key]
         public Guid Id { get; set; }
 
-        //public string? LastName { get; set; }
-        //public string? FirstName { get; set; }
-        public string? Name { get; set; }
+        public required string Name { get; set; }
         [StringLength(10)]
         public string? PhoneNumber { get; set; }
-        public string? Email { get; set; }
+        public required string Email { get; set; }
         public string? Gender { get; set; }
         public DateOnly? DateOfBirth { get; set; }
         public string? HashPassword { get; set; }
@@ -54,10 +52,10 @@ namespace Vouchee.Data.Models.Entities
         public string? BankAccount { get; set; }
         public int ResponsibilityScore { get; set; }
 
-        public string? Status { get; set; }
+        public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; }
-        public Guid? CreateBy { get; set; }
+        public DateTime CreateDate { get; set; }
+        public Guid CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }

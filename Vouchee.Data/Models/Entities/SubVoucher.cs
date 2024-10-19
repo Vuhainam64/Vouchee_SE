@@ -10,36 +10,37 @@ using System.Threading.Tasks;
 namespace Vouchee.Data.Models.Entities
 {
     [Table("SubVoucher")]
+    [Index(nameof(VoucherId), Name = "IX_SubVoucher_VoucherId")]
     public class SubVoucher
     {
         public SubVoucher()
         {
-            Images = new HashSet<Image>();
+            Medias = [];
         }
 
-        [InverseProperty(nameof(Image.SubVoucher))]
-        public virtual ICollection<Image> Images { get; set; }
+        [InverseProperty(nameof(Media.SubVoucher))]
+        public virtual ICollection<Media> Medias { get; set; }
 
-        public Guid? VoucherId { get; set; }
+        public Guid VoucherId { get; set; }
         [ForeignKey(nameof(VoucherId))]
         [InverseProperty("SubVouchers")]
-        public virtual Voucher? Voucher { get; set; }
+        public required virtual Voucher Voucher { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
 
-        public string? Title { get; set; }
+        public required string Title { get; set; }
         [Column(TypeName = "decimal(10,5)")]
         public decimal OriginalPrice { get; set; }
         [Column(TypeName = "decimal(10,5)")]
         public decimal SellPrice { get; set; }
-        public int? Quantity { get; set; }
+        public int Quantity { get; set; }
 
-        public string? Status { get; set; }
+        public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; }
-        public Guid? CreateBy { get; set; }
+        public DateTime CreateDate { get; set; }
+        public Guid CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }

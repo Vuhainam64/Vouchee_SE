@@ -13,12 +13,8 @@ namespace Vouchee.Data.Models.Entities
     {
         public VoucherType()
         {
-            //Vouchers = new HashSet<Voucher>();
-            Categories = new HashSet<Category>();
+            Categories = [];
         }
-
-        //[InverseProperty(nameof(Voucher.VoucherType))]
-        //public virtual ICollection<Voucher> Vouchers { get; set; }
 
         [InverseProperty(nameof(Category.VoucherType))]
         public virtual ICollection<Category> Categories { get; set; }
@@ -27,13 +23,13 @@ namespace Vouchee.Data.Models.Entities
         [Key]
         public Guid Id { get; set; }
 
-        public string? Title { get; set; }
+        public required string Title { get; set; }
         public string? Image { get; set; }
 
-        public string? Status { get; set; }
+        public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; }
-        public Guid? CreateBy { get; set; }
+        public DateTime CreateDate { get; set; }
+        public Guid CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }

@@ -32,7 +32,7 @@ namespace Vouchee.Business.Services.Impls
             {
                 Address address = _mapper.Map<Address>(createAddressDTO);
 
-                address.CreateBy = Guid.Parse(thisUserObj.userId);
+                address.CreateBy = thisUserObj.userId;
                 address.Status = ObjectStatusEnum.ACTIVE.ToString();
 
                 var addressId = await _addressRepository.AddAsync(address);

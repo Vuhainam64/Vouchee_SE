@@ -22,7 +22,6 @@ namespace Vouchee.API.Controllers
     public class AddressController : ControllerBase
     {
         private readonly ISupplierRepository _supplierRepository;
-        private readonly ITestService _testService;
         private readonly IBrandService _brandService;
         private readonly IAddressService _addressRepository;
         private readonly IUserService _userService;
@@ -32,11 +31,9 @@ namespace Vouchee.API.Controllers
                                 IBrandService brandService,
                                 IAddressService addressService, 
                                 IUserService userService, 
-                                IRoleService roleService,
-                                ITestService testService)
+                                IRoleService roleService)
         {
             _supplierRepository = supplierRepository;
-            _testService = testService;
             _brandService = brandService;
             _addressRepository = addressService;
             _userService = userService;
@@ -60,16 +57,6 @@ namespace Vouchee.API.Controllers
                 code = HttpStatusCode.Forbidden,
                 message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
             });
-        }
-
-        [HttpPost("create_new_address_test")]
-        public async Task<IActionResult> CreateAddressTest([FromBody] IList<TestCreateVoucherDTO> createAddressDTO)
-        {
-            foreach (var brand in createAddressDTO)
-            {
-                var newBrand = await _testService.CreateBrand(brand);
-            }
-            return NoContent();
         }
 
         // READ

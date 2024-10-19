@@ -13,8 +13,8 @@ namespace Vouchee.Data.Models.Entities
     {
         public Brand()
         {
-            Addresses = new HashSet<Address>();
-            Vouchers = new HashSet<Voucher>();
+            Addresses = [];
+            Vouchers = [];
         }
 
         [InverseProperty(nameof(Voucher.Brand))]
@@ -27,14 +27,14 @@ namespace Vouchee.Data.Models.Entities
         [Key]
         public Guid Id { get; set; }
 
-        public string? Name { get; set; }
+        public required string Name { get; set; }
         public string? Image { get; set; }
         public bool IsVerfied { get; set; }
 
-        public string? Status { get; set; }
+        public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; }
-        public Guid? CreateBy { get; set; }
+        public DateTime CreateDate { get; set; }
+        public Guid CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }

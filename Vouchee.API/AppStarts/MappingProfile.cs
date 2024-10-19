@@ -20,7 +20,7 @@ namespace Vouchee.API.AppStarts
                 .ForMember(x => x.brandName, dest => dest.MapFrom(opt => opt.Brand.Name))
                 .ForMember(x => x.brandImage, dest => dest.MapFrom(opt => opt.Brand.Image))
                 .ForMember(x => x.supplierName, dest => dest.MapFrom(opt => opt.Supplier.Name))
-                .ForMember(x => x.sellerName, dest => dest.MapFrom(opt => opt.Seller.Name))
+                .ForMember(x => x.sellerName, dest => dest.MapFrom(opt => opt.User.Name))
                 .ReverseMap();
             CreateMap<GetAllVoucherDTO, VoucherFilter>().ReverseMap();
             CreateMap<Voucher, GetAllVoucherDTO>()
@@ -118,9 +118,9 @@ namespace Vouchee.API.AppStarts
             CreateMap<GetBrandDTO, BrandFilter>().ReverseMap();
 
             // IMAGE
-            CreateMap<Image, CreateImageDTO>().ReverseMap();
-            CreateMap<Image, UpdateImageDTO>().ReverseMap();
-            CreateMap<Image, GetImageDTO>().ReverseMap();
+            CreateMap<Media, CreateImageDTO>().ReverseMap();
+            CreateMap<Media, UpdateImageDTO>().ReverseMap();
+            CreateMap<Media, GetImageDTO>().ReverseMap();
             
 
             //Cart

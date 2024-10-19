@@ -96,11 +96,10 @@ namespace Vouchee.Business.Services.Impls
                     }
 
                     orderDetail.VoucherId = voucher.Id;
-                    orderDetail.CreateBy = Guid.Parse(thisUserObj.userId);
                     orderDetail.UnitPrice = voucher.OriginalPrice;
                 }
 
-                order.CreateBy = Guid.Parse(thisUserObj.userId);
+                order.CreateBy = thisUserObj.userId;
                 order.TotalPrice = order.OrderDetails.Sum(x => x.FinalPrice);
 
                 var orderId = await _orderRepository.AddAsync(order);

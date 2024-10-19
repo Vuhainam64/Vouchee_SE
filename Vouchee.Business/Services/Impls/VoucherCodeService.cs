@@ -53,7 +53,7 @@ namespace Vouchee.Business.Services.Impls
                 VoucherCode voucherCode = _mapper.Map<VoucherCode>(createVoucherCodeDTO);
 
                 voucherCode.Status = VoucherCodeStatusEnum.ACTIVE.ToString();
-                voucherCode.CreateBy = Guid.Parse(thisUserObj.userId);
+                voucherCode.CreateBy = thisUserObj.userId;
 
                 var voucherCodeId = await _voucherCodeRepository.AddAsync(voucherCode);
 

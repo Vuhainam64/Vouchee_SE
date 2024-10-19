@@ -88,7 +88,7 @@ namespace Vouchee.Business.Services.Impls
             try
             {
                 result = _cartRepository.GetTable()
-                            .Where(x => x.User.Id == id)
+                            .Where(x => x.Buyer.Id == id)
                             .ProjectTo<GetCartDTO>(_mapper.ConfigurationProvider);
             }
             catch (Exception ex)

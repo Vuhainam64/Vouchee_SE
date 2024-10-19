@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Constants.Enum.Other
 {
-    public enum ImageEnum
+    public enum MediaEnum
     {
         ADVERTISEMENT,
         PRODUCT,

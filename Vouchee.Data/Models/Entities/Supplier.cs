@@ -14,27 +14,25 @@ namespace Vouchee.Data.Models.Entities
     {
         public Supplier()
         {
-            Vouchers = new HashSet<Voucher>();
+            Vouchers = [];
         }
 
         [InverseProperty(nameof(Voucher.Supplier))]
-        public virtual ICollection<Voucher>? Vouchers { get; set; }
+        public virtual ICollection<Voucher> Vouchers { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
 
-        public string? Name { get; set; }
+        public required string Name { get; set; }
         public string? Contact { get; set; }
-        [Column(TypeName = "decimal(10,5)")]
-        public decimal? PercentShow { get; set; }
         public bool IsVerfied { get; set; }
         public string? Image { get; set; }
 
-        public string? Status { get; set; }
+        public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; }
-        public Guid? CreateBy { get; set; }
+        public DateTime CreateDate { get; set; }
+        public Guid CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }

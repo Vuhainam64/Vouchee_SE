@@ -8,7 +8,7 @@ using Vouchee.Data.Models.Entities;
 
 namespace Vouchee.Data.Repositories.IRepos
 {
-    public interface IImageRepository : IBaseRepository<Image>
+    public interface IImageRepository : IBaseRepository<Media>
     {
     }
 }

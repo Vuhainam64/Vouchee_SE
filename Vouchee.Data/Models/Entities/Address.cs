@@ -13,34 +13,37 @@ namespace Vouchee.Data.Models.Entities
     {
         public Address()
         {
-            //Vouchers = new HashSet<Voucher>();
+            Brands = [];
+            Medias = [];
         }
 
-        //[InverseProperty(nameof(Voucher.Addresses))]
-        //public virtual ICollection<Voucher>? Vouchers { get; set; }
+        [InverseProperty(nameof(Media.Address))]
+        public virtual ICollection<Media> Medias { get; set; }
 
         [InverseProperty(nameof(Brand.Addresses))]
-        public virtual ICollection<Brand>? Brands { get; set; }
+        public virtual ICollection<Brand> Brands { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
 
-        public string? Name { get; set; }
+        public required string Name { get; set; }
         [Column(TypeName = "decimal(38, 20)")]
-        public decimal? Lon { get; set; }
+        public decimal Lon { get; set; }
         [Column(TypeName = "decimal(38, 20)")]
-        public decimal? Lat { get; set; }
+        public decimal Lat { get; set; }
         public bool IsVerfied { get; set; }
 
-        public string? Status { get; set; }
+        public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; }
-        public Guid? CreateBy { get; set; }
+        public DateTime CreateDate { get; set; }
+        public Guid CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
         public DateTime? VerifiedDate { get; set; }
         public Guid? VerifiedBy { get; set; }
+
+        public string? AddressHash { get; set; }
     }
 }

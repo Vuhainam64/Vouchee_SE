@@ -49,7 +49,7 @@ namespace Vouchee.Business.Services.Impls
             {
                 var promotion = _mapper.Map<Promotion>(createPromotionDTO);
 
-                promotion.CreateBy = Guid.Parse(thisUserObj.userId);
+                promotion.CreateBy = thisUserObj.userId;
 
                 var promotionId = _promotionRepository.AddAsync(promotion).Result;
                 
