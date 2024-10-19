@@ -33,10 +33,10 @@ namespace Vouchee.Data.Models.DTOs
 
     public class GetBrandDTO
     {
-        //public GetBrandDTO()
-        //{
-        //    vouchers = new HashSet<GetAllVoucherDTO>();
-        //}
+        public GetBrandDTO()
+        {
+            addresses = new HashSet<GetAddressDTO>();
+        }
 
         public Guid? id { get; set; }
 
@@ -54,6 +54,6 @@ namespace Vouchee.Data.Models.DTOs
         //public DateTime? verifiedDate { get; set; }
         //public Guid? verifiedBy { get; set; }
 
-        // public virtual ICollection<GetAllVoucherDTO> vouchers { get; set; }
+        public virtual ICollection<GetAddressDTO> addresses { get; set; }
     }
 }
