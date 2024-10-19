@@ -14,7 +14,7 @@ namespace Vouchee.Business.Models.DTOs
 {
     public class CreateAddressDTO
     {
-        public string? addressName { get; set; }
+        public string? name { get; set; }
         public decimal? lon { get; set; }
         public decimal? lat { get; set; }
         public decimal? percentShow { get; set; }
@@ -25,7 +25,7 @@ namespace Vouchee.Business.Models.DTOs
     public class UpdateAddressDTO 
     {
         [Column(TypeName = "decimal")]
-        public string? addressName { get; set; }
+        public string? name { get; set; }
         [Column(TypeName = "decimal")]
         public decimal? lon { get; set; }
         [Column(TypeName = "decimal")]
@@ -44,7 +44,7 @@ namespace Vouchee.Business.Models.DTOs
         }
         public decimal distance;
         public Guid? id { get; set; }
-        public string? addressName { get; set; }
+        public string? name { get; set; }
 
         [Column(TypeName = "decimal")]
         public decimal? lon { get; set; }
@@ -56,5 +56,14 @@ namespace Vouchee.Business.Models.DTOs
     public class GetDetailAddressDTO
     {
 
+    }
+
+    public class GetAddressDTO 
+    {
+        public Guid? id { get; set; }
+
+        public string? name { get; set; }
+        public decimal? lon { get; set; }
+        public decimal? lat { get; set; }
     }
 }

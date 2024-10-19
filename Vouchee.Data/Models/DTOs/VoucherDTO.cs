@@ -97,9 +97,10 @@ namespace Vouchee.Business.Models.DTOs
     {
         public GetAllVoucherDTO()
         {
-            addresses = new HashSet<GetAllAddressDTO>();
+            //addresses = new HashSet<GetAllAddressDTO>();
             categories = new HashSet<GetCategoryDTO>();
             images = new HashSet<GetImageDTO>();
+            addresses = new HashSet<GetAllAddressDTO>();
         }
         public Guid? id { get; set; }
 
@@ -131,8 +132,9 @@ namespace Vouchee.Business.Models.DTOs
         //public DateTime? updateDate { get; set; }
         //public Guid? updateBy { get; set; }
 
+        public virtual ICollection<GetAllAddressDTO> addresses { get; set; }
         public virtual ICollection<GetCategoryDTO>? categories { get; set; }
-        public virtual ICollection<GetAllAddressDTO>? addresses { get; set; }
+        //public virtual ICollection<GetAllAddressDTO>? addresses { get; set; }
         public virtual ICollection<GetImageDTO> images { get; set; }
     }
     public class GetBestBuyVoucherDTO
