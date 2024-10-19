@@ -548,25 +548,12 @@ namespace Vouchee.Business.Services.Impls
                                 })
                                 .Where(a => a != null) // Filter out null addresses
                                 .OrderBy(a => a.Distance)  // Sort by the closest distance
-                                .FirstOrDefault(); // Get the nearest address and its distance
+                                .Take(5)  // Take the 5 nearest addresses
+                                .ToList();
 
-                            if (nearestAddress != null)
+                            if (nearestAddress.Any())
                             {
-                                LoggerService.Logger($"Voucher {voucher.id} has nearest address {nearestAddress.Address.id} at {nearestAddress.Distance} km.");
-
-                                // Log possible null values in voucher properties
-                                if (voucher.categories == null)
-                                    LoggerService.Logger($"Voucher {voucher.id}: categories is null.");
-                                if (voucher.images == null || voucher.images.Count == 0)
-                                    LoggerService.Logger($"Voucher {voucher.id}: images is null or empty.");
-                                if (voucher.brandName == null)
-                                    LoggerService.Logger($"Voucher {voucher.id}: brandName is null.");
-                                if (voucher.supplierName == null)
-                                    LoggerService.Logger($"Voucher {voucher.id}: supplierName is null.");
-
-                                // Logging nearest address properties
-                                if (nearestAddress.Address.lat == null || nearestAddress.Address.lon == null)
-                                    LoggerService.Logger($"Nearest address {nearestAddress.Address.id} for voucher {voucher.id}: lat or lon is null.");
+                                LoggerService.Logger($"Voucher {voucher.id} has {nearestAddress.Count} nearest addresses.");
 
                                 // Create the DTO object
                                 var x = new GetAllVoucherDTO
@@ -588,25 +575,24 @@ namespace Vouchee.Business.Services.Impls
                                     supplierName = voucher.supplierName,
                                     quantity = voucher.quantity,
                                     rating = voucher.rating,
-                                    addresses = new List<GetAllAddressDTO>
-                                    {
-                                        new GetAllAddressDTO
+                                    addresses = nearestAddress
+                                        .Select(na => new GetAllAddressDTO
                                         {
-                                            id = nearestAddress.Address.id,
-                                            name = nearestAddress.Address.name,
-                                            lat = nearestAddress.Address.lat,
-                                            lon = nearestAddress.Address.lon,
-                                            distance = Math.Round(nearestAddress.Distance, 2) // Round distance to 2 decimal places
-                                        }
-                                    }
+                                            id = na.Address.id,
+                                            name = na.Address.name,
+                                            lat = na.Address.lat,
+                                            lon = na.Address.lon,
+                                            distance = Math.Round(na.Distance, 2) // Round distance to 2 decimal places
+                                        })
+                                        .ToList() // Map to address DTOs and create a list of nearest 5 addresses
                                 };
 
                                 return x;
                             }
                             else
                             {
-                                // Log when no nearest address is found
-                                LoggerService.Logger($"Voucher {voucher.id} has no nearby address.");
+                                // Log when no nearest addresses are found
+                                LoggerService.Logger($"Voucher {voucher.id} has no nearby addresses.");
                             }
 
                             return null;
