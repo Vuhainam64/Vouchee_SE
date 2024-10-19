@@ -55,28 +55,29 @@ jobs:
       - name: Update and deploy on VM
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }} << 'EOF'
-          set -e  # Dừng ngay khi một lệnh thất bại
-          echo "Pulling the latest Docker image..."
-          docker pull ${{ secrets.DOCKER_USERNAME }}/myimage:1
+            set -e  # Dừng ngay khi một lệnh thất bại
+            echo "Pulling the latest Docker image..."
+            docker pull ${{ secrets.DOCKER_USERNAME }}/myimage:1
       
-          echo "Stopping all running containers..."
-          docker stop $(docker ps -q) || echo "No running containers to stop."
+            echo "Stopping all running containers..."
+            docker stop $(docker ps -q) || echo "No running containers to stop."
       
-          echo "Removing all stopped containers..."
-          docker rm $(docker ps -aq) || echo "No stopped containers to remove."
+            echo "Removing all stopped containers..."
+            docker rm $(docker ps -aq) || echo "No stopped containers to remove."
       
-          echo "Removing old Docker images..."
-          latest_image_id=$(docker images -q ${{ secrets.DOCKER_USERNAME }}/myimage:1)
-          docker images -q | grep -v "$latest_image_id" | xargs -r docker rmi || true
+            echo "Removing old Docker images..."
+            latest_image_id=$(docker images -q ${{ secrets.DOCKER_USERNAME }}/myimage:1)
+            docker images -q | grep -v "$latest_image_id" | xargs -r docker rmi || true
       
-          echo "Starting new container..."
-          docker run -d -p 8080:8080 \
-          -e GOOGLE_APPLICATION_CREDENTIALS="${{ secrets.GG_PATH }}" \
-          -v "${{ secrets.GG_PATH}}:${{ secrets.GG_PATH}}" \
-          --restart unless-stopped ${{ secrets.DOCKER_USERNAME }}/myimage:1
+            echo "Starting new container..."
+            docker run -d -p 8080:8080 \
+            -e GOOGLE_APPLICATION_CREDENTIALS="${{ secrets.GG_PATH }}" \
+            -v "${{ secrets.GG_PATH}}:${{ secrets.GG_PATH}}" \
+            --restart unless-stopped ${{ secrets.DOCKER_USERNAME }}/myimage:1
       
-          echo "Deployment complete."
+            echo "Deployment complete."
           EOF
+
 
 
      
