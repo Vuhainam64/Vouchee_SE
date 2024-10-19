@@ -47,18 +47,7 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Không tìm thầy voucher này");
             }
 
-            User? userInstance = null;
-            IQueryable<User> users = _userRepository.CheckLocal();
-
-            if (users != null && users.Count() != 0)
-            {
-                userInstance = users.FirstOrDefault(x => x.Id == userId);
-            }
-
-            if (userInstance == null)
-            {
-                userInstance = await _userRepository.GetByIdAsync(userId, includeProperties: x => x.Include(x => x.Carts));
-            }
+            User userInstance = await GetCurrentUser(userId);
 
             var haveVoucher = userInstance.Carts.FirstOrDefault(x => x.VoucherId == voucherId);
             if (haveVoucher != null)
@@ -87,23 +76,31 @@ namespace Vouchee.Business.Services.Impls
             throw new NotImplementedException();
         }
 
-        public async Task<DynamicResponseModel<CartDTO>> GetCartsAsync(PagingRequest pagingRequest, CartFilter cartFilter, ThisUserObj thisUserObj)
+        public async Task<CartDTO> GetCartsAsync(PagingRequest pagingRequest, CartFilter cartFilter, ThisUserObj thisUserObj)
         {
-            User? user = await _userRepository.GetByIdAsync(thisUserObj.userId, includeProperties: x => x.Include(x => x.Carts)
-                                                                                                            .ThenInclude(x => x.Voucher));
+            Guid userId = Guid.Parse(thisUserObj.userId);
 
-            GetUserDTO userDTO = _mapper.Map<GetUserDTO>(user);
+            User? user = await GetCurrentUser(userId);
 
-            return new DynamicResponseModel<CartDTO>()
+            CartDTO cartDTO = new()
             {
-                metaData = new MetaData()
-                {
-                    page = pagingRequest.page,
-                    size = pagingRequest.pageSize,
-                    total = user.Carts.Count() // Total vouchers count for metadata
-                },
-                results = null // Return the paged voucher list with nearest address and distance
+                TotalPrice = user.Carts
+                                .Where(c => c.Voucher != null)
+                                .Sum(c => c.Voucher.SellPrice * (c.Quantity ?? 1)),
+                TotalQuantity = user.Carts
+                                .Where(c => c.Quantity != null)
+                                .Sum(c => c.Quantity ?? 0),
             };
+
+            cartDTO.vouchers = user.Carts
+                .Where(c => c.Voucher != null) // Only include carts with vouchers
+                .Select(c => _mapper.Map<VoucherDTO>(c.Voucher)) // Map the Voucher to VoucherDTO
+                .ToList();
+
+            cartDTO.DiscountPrice = 0;
+            cartDTO.FinalPrice = cartDTO.TotalPrice;
+
+            return cartDTO;
         }
 
         public Task<bool> IncreaseQuantityAsync(Guid voucherId, ThisUserObj thisUserObj)
@@ -119,6 +116,25 @@ namespace Vouchee.Business.Services.Impls
         public Task<bool> UpdateQuantityAsync(Guid voucherId, int quantity, ThisUserObj thisUserObj)
         {
             throw new NotImplementedException();
+        }
+
+        private async Task<User> GetCurrentUser(Guid userId)
+        {
+            User? userInstance = null;
+            IQueryable<User> users = _userRepository.CheckLocal();
+
+            if (users != null && users.Count() != 0)
+            {
+                userInstance = users.FirstOrDefault(x => x.Id == userId);
+            }
+
+            if (userInstance == null)
+            {
+                userInstance = await _userRepository.GetByIdAsync(userId, includeProperties: x => x.Include(x => x.Carts)
+                                                                                                    .ThenInclude(x => x.Voucher));
+            }
+
+            return userInstance;
         }
     }
 }

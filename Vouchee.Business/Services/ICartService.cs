@@ -15,7 +15,7 @@ namespace Vouchee.Business.Services
         public Task<bool> AddItemAsync(Guid voucherId, ThisUserObj thisUserObj);
 
         // READ
-        public Task<DynamicResponseModel<CartDTO>> GetCartsAsync(PagingRequest pagingRequest, CartFilter cartFilter, ThisUserObj thisUserObj);
+        public Task<CartDTO> GetCartsAsync(PagingRequest pagingRequest, CartFilter cartFilter, ThisUserObj thisUserObj);
 
         // UPDATE
         public Task<bool> IncreaseQuantityAsync(Guid voucherId, ThisUserObj thisUserObj);
