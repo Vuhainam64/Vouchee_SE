@@ -74,6 +74,10 @@ namespace Vouchee.Data.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("NEWID()");
 
+                    b.Property<string>("AddressHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid?>("CreateBy")
                         .HasColumnType("uniqueidentifier");
 

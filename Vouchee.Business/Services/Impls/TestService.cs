@@ -42,56 +42,109 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
+        //private async Task<Brand> GetCurrentBrand(string title)
+        //{
+        //    Brand? brandInstance = null;
+        //    IQueryable<Brand> brands = _brandRepository.CheckLocal();
+
+        //    if (brands != null && brands.Count() != 0)
+        //    {
+        //        brandInstance = brands.FirstOrDefault(x => x.Name.ToLower() == title.ToLower());
+        //    }
+
+        //    if (brandInstance == null)
+        //    {
+        //        brandInstance = await _brandRepository.GetFirstOrDefaultAsync(x => x.Name.ToLower().Equals(title), includeProperties: x => x.Include(x => x.Addresses));
+        //    }
+
+        //    return brandInstance;
+        //}
+
+        //private async Task<Address> GetCurrentAddress(decimal lon, decimal lat)
+        //{
+        //    Address? addressInstance = null;
+        //    IQueryable<Address> addresses = _addressRepository.CheckLocal();
+        //    Address addressInBrand = _brandRepository.GetAddress(lon, lat);
+
+        //    if (addresses != null && addresses.Count() != 0)
+        //    {
+        //        addressInstance = addresses.FirstOrDefault(x => x.Lon == lon && x.Lat == lat);
+        //    }
+        //    else if (addressInBrand != null)
+        //    {
+        //        addressInstance = addressInBrand;
+        //    }
+
+        //    if (addressInstance == null)
+        //    {
+        //        addressInstance = await _addressRepository.GetFirstOrDefaultAsync(x => x.Lon == lon && x.Lat == lat);
+        //    }
+
+        //    return addressInstance;
+        //}
+
         public async Task<Brand> CreateBrand(TestCreateVoucherDTO testCreateVoucherDTO)
         {
-            Brand brand = new()
-            {
-                //PercentShow = 1,
-                VerifiedDate = DateTime.Now,
-                Status = ObjectStatusEnum.ACTIVE.ToString(),
-                VerifiedBy = Guid.Parse("deee9638-da34-4230-be77-34137aa5fcff"),
-                CreateBy = Guid.Parse("deee9638-da34-4230-be77-34137aa5fcff"),
-                CreateDate = DateTime.Now,
-                //Description = "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of \"de Finibus Bonorum et Malorum\" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, \"Lorem ipsum dolor sit amet..\", comes from a line in section 1.10.32.",
-                Image = "https://firebasestorage.googleapis.com/v0/b/vouchee-504da.appspot.com/o/IMAGE%2FBRAND%2F50819.jpg?alt=media&token=d5d9b951-ec08-409f-a440-bcdc5ed1aa38",
-                IsVerfied = true,
-                Name = testCreateVoucherDTO.title,
-            };
+            var existedBrand = _brandRepository.GetFirstOrDefaultAsync(x => x.Name.ToLower().Equals(testCreateVoucherDTO.title.ToLower()));
 
-            foreach (var address in testCreateVoucherDTO.address)
+            if (existedBrand != null)
             {
-                if (address.lon != null && address.lat != null)
+
+            }
+            else
+            {
+                Brand brand = new()
                 {
-                    var trackedAddress = _brandRepository.GetAddress((decimal)address.lon, (decimal)address.lat);
+                    VerifiedDate = DateTime.Now,
+                    Status = ObjectStatusEnum.ACTIVE.ToString(),
+                    VerifiedBy = Guid.Parse("deee9638-da34-4230-be77-34137aa5fcff"),
+                    CreateBy = Guid.Parse("deee9638-da34-4230-be77-34137aa5fcff"),
+                    CreateDate = DateTime.Now,
+                    Image = "https://firebasestorage.googleapis.com/v0/b/vouchee-504da.appspot.com/o/IMAGE%2FBRAND%2F50819.jpg?alt=media&token=d5d9b951-ec08-409f-a440-bcdc5ed1aa38",
+                    IsVerfied = true,
+                    Name = testCreateVoucherDTO.title,
+                };
 
-                    if (trackedAddress == null)
+                foreach (var address in testCreateVoucherDTO.address)
+                {
+                    Address? addressInstance;
+                    if (address.lon != null && address.lat != null)
                     {
-                        trackedAddress = await _addressRepository.GetFirstOrDefaultAsync(x => x.Lon == address.lon && x.Lat == address.lat);
-                    }
+                        //1. Kiểm tra hiện tại trong _brandRepository có address nào tồn tại chưa, và check nó
+                        addressInstance = _brandRepository.GetAddress((decimal)address.lon, (decimal)address.lat);
 
-                    if (trackedAddress != null)
-                    {
-                        brand.Addresses.Add(trackedAddress);
-                    }
-                    else
-                    {
-                        Address newAddress = new()
+                        //3. Nếu không có thì tìm trong db
+                        if (addressInstance == null)
                         {
-                            Id = Guid.Empty,
-                            Name = address.address_name,
-                            CreateBy = Guid.Parse("deee9638-da34-4230-be77-34137aa5fcff"),
-                            CreateDate = DateTime.Now,
-                            //Image = "https://firebasestorage.googleapis.com/v0/b/vouchee-504da.appspot.com/o/IMAGE%2FBRAND%2F50819.jpg?alt=media&token=d5d9b951-ec08-409f-a440-bcdc5ed1aa38",
-                            Lat = address.lat,
-                            Lon = address.lon,
-                            Status = ObjectStatusEnum.ACTIVE.ToString(),
-                            //PercentShow = 1,
-                        };
-                        brand.Addresses.Add(newAddress);
+                            addressInstance = await _addressRepository.GetFirstOrDefaultAsync(x => x.Lon == address.lon && x.Lat == address.lat, includeProperties: x => x.Include(x => x.Brands));
+                        }
+
+                        //4. Nếu trong db không có thì tạo mới
+                        if (addressInstance == null)
+                        {
+                            Address newAddress = new()
+                            {
+                                Id = Guid.Empty,
+                                Name = address.address_name,
+                                CreateBy = Guid.Parse("deee9638-da34-4230-be77-34137aa5fcff"),
+                                CreateDate = DateTime.Now,
+                                //Image = "https://firebasestorage.googleapis.com/v0/b/vouchee-504da.appspot.com/o/IMAGE%2FBRAND%2F50819.jpg?alt=media&token=d5d9b951-ec08-409f-a440-bcdc5ed1aa38",
+                                Lat = address.lat,
+                                Lon = address.lon,
+                                Status = ObjectStatusEnum.ACTIVE.ToString(),
+                                IsVerfied = true,
+                                VerifiedBy = Guid.Parse("deee9638-da34-4230-be77-34137aa5fcff"),
+                                VerifiedDate = DateTime.Now,
+                                //PercentShow = 1,
+                            };
+
+                            brand.Addresses.Add(newAddress);
+                        }
                     }
                 }
+                return await _brandRepository.Add(brand);
             }
-            return await _brandRepository.Add(brand);
+            return null;
         }
 
         public async Task<Voucher> CreateVoucher(TestCreateVoucherDTO createVoucherDTO, Guid voucherTypeId, Guid supplierID)

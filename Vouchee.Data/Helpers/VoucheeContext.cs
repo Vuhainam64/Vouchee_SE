@@ -35,7 +35,7 @@ namespace Vouchee.Data.Helpers
                                     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
                 IConfigurationRoot configuration = builder.Build();
                 optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-                optionsBuilder.UseSqlServer(configuration.GetConnectionString("PROD"));
+                optionsBuilder.UseSqlServer(configuration.GetConnectionString("DEV"));
                 /*optionsBuilder.UseSqlServer("Server=(local);uid=sa;pwd=12345;database=Vouchee1;TrustServerCertificate=True;");*/
             }
         }

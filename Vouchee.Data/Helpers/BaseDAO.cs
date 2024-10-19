@@ -252,14 +252,9 @@ namespace Vouchee.Data.Helpers
         {
             // Check if the address is already being tracked in the context
             var trackedAddress = _context.Address.Local.FirstOrDefault(a => a.Lon == lon && a.Lat == lat);
-
-            if (trackedAddress != null)
-            {
-                // Not tracked yet, attach it
-                _context.Address.Attach(trackedAddress);
-            }
-
             return trackedAddress;
         }
+
+
     }
 }

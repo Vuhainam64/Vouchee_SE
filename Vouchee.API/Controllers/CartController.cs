@@ -57,14 +57,13 @@ namespace Vouchee.API.Controllers
         // READ
         [HttpGet("get_all_item")]
         [Authorize]
-        public async Task<IActionResult> GetAllItemFromCart([FromQuery] PagingRequest pagingRequest,
-                                                                [FromQuery] CartFilter cartFilter)
+        public async Task<IActionResult> GetAllItemFromCart()
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
             if (currentUser.roleId.Equals(currentUser.buyerRoleId))
             {
-                var result = await _cartService.GetCartsAsync(pagingRequest, cartFilter, currentUser);
+                var result = await _cartService.GetCartsAsync(currentUser);
                 return Ok(result);
             }
 

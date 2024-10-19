@@ -95,7 +95,7 @@ namespace Vouchee.Business.Services.Impls
             throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
         }
 
-        public async Task<CartDTO> GetCartsAsync(PagingRequest pagingRequest, CartFilter cartFilter, ThisUserObj thisUserObj)
+        public async Task<CartDTO> GetCartsAsync(ThisUserObj thisUserObj)
         {
             Guid userId = Guid.Parse(thisUserObj.userId);
 
