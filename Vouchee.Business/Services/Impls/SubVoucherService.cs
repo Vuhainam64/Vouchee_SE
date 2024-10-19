@@ -90,7 +90,7 @@ namespace Vouchee.Business.Services.Impls
             if (subVoucher != null)
             {
                 GetSubVoucherDTO getSubVoucherDTO = _mapper.Map<GetSubVoucherDTO>(subVoucher);
-                getSubVoucherDTO.image = getSubVoucherDTO.images.Count != 0 ? getSubVoucherDTO.images.FirstOrDefault().imageUrl : null;
+                getSubVoucherDTO.image = getSubVoucherDTO.images.Count != 0 ? getSubVoucherDTO.images.FirstOrDefault().mediaUrl : null;
                 return getSubVoucherDTO;
             }
             throw new NotFoundException("Khong tim thay sub voucher");

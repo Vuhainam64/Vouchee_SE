@@ -120,7 +120,9 @@ namespace Vouchee.API.AppStarts
             // IMAGE
             CreateMap<Image, CreateImageDTO>().ReverseMap();
             CreateMap<Image, UpdateImageDTO>().ReverseMap();
-            CreateMap<Image, GetImageDTO>().ReverseMap();
+            CreateMap<Image, GetImageDTO>()
+                .ForMember(des => des.mediaType, src => src.MapFrom(src => EnumMapper<ImageEnum>.MapType(src.MediaType)))
+                .ReverseMap();
             
 
             //Cart

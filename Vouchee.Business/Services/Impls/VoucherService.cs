@@ -239,7 +239,7 @@ namespace Vouchee.Business.Services.Impls
                                 id = voucher.id,
                                 title = voucher.title,
                                 categories = voucher.categories,
-                                image = voucher.images.Count != 0 ? voucher.images.FirstOrDefault(x => x.imageType == ImageEnum.ADVERTISEMENT).imageUrl : null,
+                                image = voucher.images.Count != 0 ? voucher.images.FirstOrDefault(x => x.mediaType == ImageEnum.ADVERTISEMENT).mediaUrl : null,
                                 originalPrice = voucher.originalPrice,
                                 sellPrice = voucher.sellPrice,
                                 salePrice = voucher.salePrice,
@@ -329,7 +329,7 @@ namespace Vouchee.Business.Services.Impls
                             voucher.percentDiscount = availablePromotion.PercentDiscount;
                         }
 
-                        voucher.image = voucher.images.Count != 0 ? voucher.images.FirstOrDefault(x => x.imageType == ImageEnum.ADVERTISEMENT).imageUrl : null;
+                        voucher.image = voucher.images.Count != 0 ? voucher.images.FirstOrDefault(x => x.mediaType == ImageEnum.ADVERTISEMENT).mediaUrl : null;
                     }
                 }
             }
@@ -372,7 +372,7 @@ namespace Vouchee.Business.Services.Impls
             {
                 id = voucher.id,
                 title = voucher.title,
-                image = voucher.image = voucher.images.Count != 0 ? voucher.images.FirstOrDefault(x => x.imageType == ImageEnum.ADVERTISEMENT).imageUrl : null,
+                image = voucher.image = voucher.images.Count != 0 ? voucher.images.FirstOrDefault(x => x.mediaType == ImageEnum.ADVERTISEMENT).mediaUrl : null,
                 originalPrice = voucher.originalPrice,
                 sellPrice = voucher.sellPrice,
                 TotalQuantitySold = orderDetails.First(od => od.VoucherId == voucher.id).TotalQuantitySold,
@@ -439,7 +439,7 @@ namespace Vouchee.Business.Services.Impls
                     voucherDTO.percentDiscount = availablePromotion.PercentDiscount;
                 }
 
-                voucherDTO.image = voucherDTO.images.Count != 0 ? voucherDTO.images.FirstOrDefault(x => x.imageType == ImageEnum.ADVERTISEMENT).imageUrl : null;
+                voucherDTO.image = voucherDTO.images.Count != 0 ? voucherDTO.images.FirstOrDefault(x => x.mediaType == ImageEnum.ADVERTISEMENT).mediaUrl : null;
 
                 return voucherDTO;
             }
@@ -561,7 +561,7 @@ namespace Vouchee.Business.Services.Impls
                                     categories = voucher.categories,
                                     id = voucher.id,
                                     images = voucher.images,
-                                    image = voucher.image = voucher.images.Count != 0 ? voucher.images.FirstOrDefault(x => x.imageType == ImageEnum.ADVERTISEMENT)?.imageUrl : null,
+                                    image = voucher.image = voucher.images.Count != 0 ? voucher.images.FirstOrDefault(x => x.mediaType == ImageEnum.ADVERTISEMENT)?.mediaUrl : null,
                                     originalPrice = voucher.originalPrice,
                                     sellPrice = voucher.sellPrice,
                                     salePrice = voucher.salePrice,
@@ -625,7 +625,7 @@ namespace Vouchee.Business.Services.Impls
                     {
                         voucher.salePrice = voucher.originalPrice - (voucher.originalPrice * availablePromotion.PercentDiscount / 100);
                         voucher.percentDiscount = availablePromotion.PercentDiscount;
-                        voucher.image = voucher.images.Count != 0 ? voucher.images.FirstOrDefault(x => x.imageType == ImageEnum.ADVERTISEMENT).imageUrl : null;
+                        voucher.image = voucher.images.Count != 0 ? voucher.images.FirstOrDefault(x => x.mediaType == ImageEnum.ADVERTISEMENT).mediaUrl : null;
 
                         LoggerService.Logger($"Voucher {voucher.id} has an active promotion with {availablePromotion.PercentDiscount}% discount.");
                     }

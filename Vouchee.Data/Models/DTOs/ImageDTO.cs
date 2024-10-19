@@ -29,7 +29,7 @@ namespace Vouchee.Data.Models.DTOs
     public class GetImageDTO
     {
         public Guid id { get; set; }
-        public string? imageUrl { get; set; }
-        public ImageEnum? imageType { get; set; }
+        public string? mediaUrl { get; set; }
+        public ImageEnum? mediaType { get; set; }
     }
 }
