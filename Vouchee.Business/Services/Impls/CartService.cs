@@ -40,14 +40,21 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<bool> AddItemAsync(Guid voucherId, ThisUserObj thisUserObj)
         {
+
             Guid userId = thisUserObj.userId;
+
+            User userInstance = await GetCurrentUser(userId);
+
+            if (userInstance.Carts.Count() > 5)
+            {
+                throw new ConflictException("Bạn chỉ có thể mua tối đa 5 loại voucher một lúc");
+            }
+
             Voucher existedVoucher = await _voucherRepository.FindAsync(voucherId);
             if (existedVoucher == null)
             {
                 throw new NotFoundException("Không tìm thầy voucher này");
             }
-
-            User userInstance = await GetCurrentUser(userId);
 
             var haveVoucher = userInstance.Carts.FirstOrDefault(x => x.VoucherId == voucherId);
             if (haveVoucher != null)
@@ -133,6 +140,11 @@ namespace Vouchee.Business.Services.Impls
 
             if (cartItem != null)
             {
+                if (cartItem.Quantity > 19)
+                {
+                    throw new ConflictException("Bạn chỉ có thể mua tối đa 20 code mỗi loại voucher");
+                }
+
                 // Increase the quantity
                 cartItem.Quantity += 1;
                 cartItem.UpdateBy = userId;
@@ -171,6 +183,11 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<bool> UpdateQuantityAsync(Guid voucherId, int quantity, ThisUserObj thisUserObj)
         {
+            if (quantity > 20)
+            {
+                throw new ConflictException("Bạn chỉ có thể mua tối đa 20 code mỗi loại voucher");
+            }
+
             Guid userId = thisUserObj.userId;
 
             User? user = await GetCurrentUser(userId);
@@ -179,6 +196,7 @@ namespace Vouchee.Business.Services.Impls
 
             if (cartItem != null)
             {
+
                 cartItem.Quantity = quantity;
                 cartItem.UpdateBy = userId; 
                 cartItem.UpdateDate = DateTime.Now;
