@@ -39,6 +39,7 @@ namespace Vouchee.API.AppStarts
                 .ForMember(x => x.brandImage, dest => dest.MapFrom(opt => opt.Brand.Image))
                 .ReverseMap();
             CreateMap<Voucher, VoucherDTO>();
+            CreateMap<Voucher, CartVoucherDTO>();
 
             // ORDER DETAIL
             CreateMap<OrderDetail, OrderDetailDTO>().ReverseMap();

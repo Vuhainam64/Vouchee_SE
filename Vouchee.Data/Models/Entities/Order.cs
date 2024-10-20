@@ -26,7 +26,7 @@ namespace Vouchee.Data.Models.Entities
         public Guid CreateBy { get; set; }
         [ForeignKey(nameof(CreateBy))]
         [InverseProperty("Orders")]
-        public required virtual User User { get; set; }
+        public virtual User? User { get; set; }
 
         public Guid? PromotionId { get; set; }
         [ForeignKey(nameof(PromotionId))]

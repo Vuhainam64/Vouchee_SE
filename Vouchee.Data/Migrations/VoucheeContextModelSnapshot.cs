@@ -34,7 +34,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasIndex("BrandsId");
 
-                    b.ToTable("AddressBrand");
+                    b.ToTable("AddressBrand", (string)null);
                 });
 
             modelBuilder.Entity("CategoryVoucher", b =>
@@ -49,7 +49,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasIndex("VouchersId");
 
-                    b.ToTable("CategoryVoucher");
+                    b.ToTable("CategoryVoucher", (string)null);
                 });
 
             modelBuilder.Entity("PromotionVoucher", b =>
@@ -64,7 +64,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasIndex("VouchersId");
 
-                    b.ToTable("PromotionVoucher");
+                    b.ToTable("PromotionVoucher", (string)null);
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Address", b =>
@@ -111,7 +111,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Address");
+                    b.ToTable("Address", (string)null);
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Brand", b =>
@@ -155,7 +155,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Brand");
+                    b.ToTable("Brand", (string)null);
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Cart", b =>
@@ -191,7 +191,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasIndex(new[] { "VoucherId" }, "IX_Cart_VoucherId");
 
-                    b.ToTable("Cart");
+                    b.ToTable("Cart", (string)null);
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Category", b =>
@@ -231,7 +231,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasIndex(new[] { "VoucherTypeId" }, "IX_Category_VoucherTypeId");
 
-                    b.ToTable("Category");
+                    b.ToTable("Category", (string)null);
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Media", b =>
@@ -280,7 +280,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasIndex(new[] { "VoucherId" }, "IX_Image_VoucherId");
 
-                    b.ToTable("Media");
+                    b.ToTable("Media", (string)null);
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Order", b =>
@@ -325,7 +325,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasIndex(new[] { "CreateBy" }, "IX_Order_UserId");
 
-                    b.ToTable("Order");
+                    b.ToTable("Order", (string)null);
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.OrderDetail", b =>
@@ -361,7 +361,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasIndex(new[] { "VoucherId" }, "IX_OrderDetail_VoucherId");
 
-                    b.ToTable("OrderDetail");
+                    b.ToTable("OrderDetail", (string)null);
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Promotion", b =>
@@ -424,7 +424,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Promotion");
+                    b.ToTable("Promotion", (string)null);
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Role", b =>
@@ -459,7 +459,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Role");
+                    b.ToTable("Role", (string)null);
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.SubVoucher", b =>
@@ -505,7 +505,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasIndex(new[] { "VoucherId" }, "IX_SubVoucher_VoucherId");
 
-                    b.ToTable("SubVoucher");
+                    b.ToTable("SubVoucher", (string)null);
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Supplier", b =>
@@ -552,7 +552,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Supplier");
+                    b.ToTable("Supplier", (string)null);
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.User", b =>
@@ -627,7 +627,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasIndex(new[] { "RoleId" }, "IX_User_RoleId");
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Voucher", b =>
@@ -686,7 +686,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasIndex(new[] { "SupplierId" }, "IX_Voucher_SupplierId");
 
-                    b.ToTable("Voucher");
+                    b.ToTable("Voucher", (string)null);
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.VoucherCode", b =>
@@ -730,7 +730,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasIndex(new[] { "VoucherId" }, "IX_Voucher_VoucherId");
 
-                    b.ToTable("VoucherCode");
+                    b.ToTable("VoucherCode", (string)null);
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.VoucherType", b =>
@@ -765,7 +765,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("VoucherType");
+                    b.ToTable("VoucherType", (string)null);
                 });
 
             modelBuilder.Entity("AddressBrand", b =>

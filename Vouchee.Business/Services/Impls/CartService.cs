@@ -11,6 +11,7 @@ using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Services.Extensions.Filebase;
 using Vouchee.Data.Helpers;
+using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
@@ -112,14 +113,23 @@ namespace Vouchee.Business.Services.Impls
             {
                 TotalPrice = user.Carts
                                 .Where(c => c.Voucher != null)
-                                .Sum(c => c.Voucher.SellPrice * (c.Quantity)),
+                                .Sum(c => c.Voucher.SellPrice * c.Quantity),
                 TotalQuantity = user.Carts
                                 .Sum(c => c.Quantity),
             };
 
+            // Map CartVoucherDTO including quantity for each voucher in the cart
             cartDTO.vouchers = user.Carts
                 .Where(c => c.Voucher != null) // Only include carts with vouchers
-                .Select(c => _mapper.Map<VoucherDTO>(c.Voucher)) // Map the Voucher to VoucherDTO
+                .Select(c => new CartVoucherDTO
+                {
+                    quantity = c.Quantity, // Set the quantity for each cart item
+                    id = c.Voucher.Id,
+                    title = c.Voucher.Title,
+                    originalPrice = c.Voucher.OriginalPrice,
+                    sellPrice = c.Voucher.SellPrice,
+                    image = c.Voucher.Medias.FirstOrDefault(x => x.Type == MediaEnum.ADVERTISEMENT.ToString()).Url
+                })
                 .ToList();
 
             cartDTO.DiscountPrice = 0;
@@ -127,6 +137,7 @@ namespace Vouchee.Business.Services.Impls
 
             return cartDTO;
         }
+
 
         public async Task<bool> IncreaseQuantityAsync(Guid voucherId, ThisUserObj thisUserObj)
         {
@@ -207,7 +218,7 @@ namespace Vouchee.Business.Services.Impls
             throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
         }
 
-        private async Task<User> GetCurrentUser(Guid userId)
+        public async Task<User> GetCurrentUser(Guid userId)
         {
             User? userInstance = null;
             IQueryable<User> users = _userRepository.CheckLocal();
@@ -220,7 +231,8 @@ namespace Vouchee.Business.Services.Impls
             if (userInstance == null)
             {
                 userInstance = await _userRepository.GetByIdAsync(userId, includeProperties: x => x.Include(x => x.Carts)
-                                                                                                    .ThenInclude(x => x.Voucher));
+                                                                                                    .ThenInclude(x => x.Voucher)
+                                                                                                    .ThenInclude(x => x.Medias));
             }
 
             return userInstance;

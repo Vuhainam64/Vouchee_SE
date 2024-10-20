@@ -26,7 +26,7 @@ namespace Vouchee.Data.Models.Entities
         public Guid OrderId { get; set; }
         [ForeignKey(nameof(OrderId))]
         [InverseProperty("OrderDetails")]
-        public required virtual Order Order { get; set; }
+        public virtual Order? Order { get; set; }
 
         public Guid? VoucherId { get; set; }
         [ForeignKey(nameof(VoucherId))]

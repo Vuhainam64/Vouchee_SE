@@ -36,14 +36,14 @@ namespace Vouchee.API.Controllers
         // CREATE
         [HttpPost("create_order")]
         [Authorize]
-        public async Task<IActionResult> CreateOrder([FromBody] CreateOrderDTO createOrderDTO)
+        public async Task<IActionResult> CreateOrder()
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
             if (RoleHelper.IsBuyer(currentUser))
             {
-                // var result = await _orderService.CreateOrderAsync(createOrderDTO, currentUser);
-                return Ok();
+                var result = await _orderService.CreateOrderAsync(currentUser);
+                return Ok(result);
             }
 
             return StatusCode((int)HttpStatusCode.Forbidden, new

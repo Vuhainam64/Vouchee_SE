@@ -35,7 +35,7 @@ namespace Vouchee.Data.Models.DTOs
     {
         public CartDTO()
         {
-            vouchers = new HashSet<VoucherDTO>();
+            vouchers = new HashSet<CartVoucherDTO>();
         }
 
         public int TotalQuantity { get; set; }
@@ -43,6 +43,6 @@ namespace Vouchee.Data.Models.DTOs
         public decimal DiscountPrice { get; set; }
         public decimal FinalPrice { get; set; }
 
-        public virtual ICollection<VoucherDTO> vouchers { get; set; }
+        public virtual ICollection<CartVoucherDTO> vouchers { get; set; }
     }
 }

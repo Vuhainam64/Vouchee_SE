@@ -310,5 +310,11 @@ namespace Vouchee.Business.Models.DTOs
         public decimal? sellPrice { get; set; }
         public decimal? salePrice { get; set; }
         public decimal? percentDiscount { get; set; }
+        public string? image { get; set; }
+    }
+
+    public class CartVoucherDTO : VoucherDTO
+    {
+        public int quantity { get; set; }
     }
 }

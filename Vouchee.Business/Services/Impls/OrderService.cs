@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
@@ -10,29 +11,35 @@ using Vouchee.Data.Models.Constants.Dictionary;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Constants.Number;
+using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
 using Vouchee.Data.Repositories.IRepos;
+using Vouchee.Data.Repositories.Repos;
 
 namespace Vouchee.Business.Services.Impls
 {
     public class OrderService : IOrderService
     {
-        private readonly ICartRepository _cartRepository;
+        private readonly ICartService _cartService;
+
+        private readonly IUserRepository _userRepository;
         private readonly IVoucherCodeRepository _voucherCodeRepository;
         private readonly IOrderDetailRepository _orderDetailRepository;
         private readonly IVoucherRepository _voucherRepository;
         private readonly IOrderRepository _orderRepository;
         private readonly IMapper _mapper;
 
-        public OrderService(IVoucherRepository voucherRepository,
+        public OrderService(IUserRepository userRepository,
+                                ICartService cartService,
+                                IVoucherRepository voucherRepository,
                                 IOrderRepository orderRepository,
                                 IOrderDetailRepository orderDetailRepository,
                                 IVoucherCodeRepository voucherCodeRepository,
-                                ICartRepository cartRepository,
                                 IMapper mapper)
         {
-            _cartRepository = cartRepository;
+            _userRepository = userRepository;
+            _cartService = cartService;
             _voucherCodeRepository = voucherCodeRepository;
             _orderDetailRepository = orderDetailRepository;
             _voucherRepository = voucherRepository;
@@ -80,9 +87,61 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public Task<Guid?> CreateOrderAsync(ThisUserObj thisUserObj)
+        public async Task<Guid?> CreateOrderAsync(ThisUserObj thisUserObj)
         {
-            throw new NotImplementedException();
+            CartDTO cartDTO = await _cartService.GetCartsAsync(thisUserObj);
+    
+            Order order = new()
+            {
+                PaymentType = "CASH",
+                Status = "PENDING", // Fixed typo from "PENING" to "PENDING"
+                CreateBy = thisUserObj.userId,
+                CreateDate = DateTime.Now,
+                OrderDetails = new List<OrderDetail>() // Assuming OrderDetails is a collection
+            };
+
+            // Loop through the vouchers in the cart and create corresponding OrderDetails
+            foreach (var voucher in cartDTO.vouchers)
+            {
+                order.OrderDetails.Add(new OrderDetail
+                {
+                    VoucherId = voucher.id, // Assuming the voucher has an Id
+                    Quantity = 1, // Set quantity (if applicable)
+                    UnitPrice = (decimal) voucher.sellPrice, // Assuming each voucher has a Price property
+                });
+            }
+
+            order.TotalPrice = order.OrderDetails.Sum(x => x.TotalPrice);
+            order.DiscountValue = 0;
+
+            Guid? orderId = await _orderRepository.AddAsync(order);
+
+            foreach (var cart in GetCurrentUser(thisUserObj.userId).Result.Carts)
+            {
+                await _cartService.RemoveItemAsync(cart.VoucherId, thisUserObj);
+            }
+
+            return orderId;
+        }
+
+        public async Task<User> GetCurrentUser(Guid userId)
+        {
+            User? userInstance = null;
+            IQueryable<User> users = _userRepository.CheckLocal();
+
+            if (users != null && users.Count() != 0)
+            {
+                userInstance = users.FirstOrDefault(x => x.Id == userId);
+            }
+
+            if (userInstance == null)
+            {
+                userInstance = await _userRepository.GetByIdAsync(userId, includeProperties: x => x.Include(x => x.Carts)
+                                                                                                    .ThenInclude(x => x.Voucher)
+                                                                                                    .ThenInclude(x => x.Medias));
+            }
+
+            return userInstance;
         }
 
         //public async Task<Guid?> CreateOrderAsync(CreateOrderDTO createOrderDTO, ThisUserObj thisUserObj)
