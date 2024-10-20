@@ -39,13 +39,13 @@ namespace Vouchee.Business.Services.Impls
             try
             {
                 var voucherType = _mapper.Map<VoucherType>(createVoucherTypeDTO);
-                voucherType.CreateBy = Guid.Parse(thisUserObj.userId);
+                voucherType.CreateBy = thisUserObj.userId;
 
                 var voucherTypeId = await _voucherTypeRepository.AddAsync(voucherType);
                 
                 if (voucherTypeId != null && createVoucherTypeDTO.image != null)
                 {
-                    voucherType.Image = await _fileUploadService.UploadImageToFirebase(createVoucherTypeDTO.image, thisUserObj.userId, StoragePathEnum.VOUCHER_TYPE);
+                    voucherType.Image = await _fileUploadService.UploadImageToFirebase(createVoucherTypeDTO.image, thisUserObj.userId.ToString(), StoragePathEnum.VOUCHER_TYPE);
 
                     if (!await _voucherTypeRepository.UpdateAsync(voucherType))
                     {

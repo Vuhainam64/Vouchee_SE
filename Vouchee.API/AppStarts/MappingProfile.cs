@@ -123,10 +123,10 @@ namespace Vouchee.API.AppStarts
             CreateMap<GetBrandDTO, BrandFilter>().ReverseMap();
 
             // IMAGE
-            CreateMap<Image, CreateImageDTO>().ReverseMap();
-            CreateMap<Image, UpdateImageDTO>().ReverseMap();
-            CreateMap<Image, GetImageDTO>()
-                .ForMember(des => des.mediaType, src => src.MapFrom(src => EnumMapper<ImageEnum>.MapType(src.MediaType)))
+            CreateMap<Media, CreateMediaDTO>().ReverseMap();
+            CreateMap<Media, UpdateMediaDTO>().ReverseMap();
+            CreateMap<Media, GetMediaDTO>()
+                .ForMember(des => des.type, src => src.MapFrom(src => EnumMapper<MediaEnum>.MapType(src.Type)))
                 .ReverseMap();
             
 

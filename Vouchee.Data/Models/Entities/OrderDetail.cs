@@ -17,16 +17,16 @@ namespace Vouchee.Data.Models.Entities
     {
         public OrderDetail()
         {
-            VoucherCodes = new HashSet<VoucherCode>();
+            VoucherCodes = [];
         }
 
         [InverseProperty(nameof(VoucherCode.OrderDetail))]
         public virtual ICollection<VoucherCode> VoucherCodes { get; set; }
 
-        public Guid? OrderId { get; set; }
+        public Guid OrderId { get; set; }
         [ForeignKey(nameof(OrderId))]
         [InverseProperty("OrderDetails")]
-        public virtual Order? Order { get; set; }
+        public required virtual Order Order { get; set; }
 
         public Guid? VoucherId { get; set; }
         [ForeignKey(nameof(VoucherId))]
@@ -53,13 +53,5 @@ namespace Vouchee.Data.Models.Entities
         [Column(TypeName = "decimal(10,5)")]
         public decimal FinalPrice => TotalPrice - DiscountPrice;
         public int Quantity { get; set; }
-
-        public string? Status { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; }
-        public Guid? CreateBy { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime? UpdateDate { get; set; }
-        public Guid? UpdateBy { get; set; }
     }
 }

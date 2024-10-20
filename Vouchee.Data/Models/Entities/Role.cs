@@ -14,7 +14,7 @@ namespace Vouchee.Data.Models.Entities
     {
         public Role() 
         {
-            Users = new HashSet<User>();
+            Users = [];
         }
 
         [InverseProperty(nameof(User.Role))]
@@ -24,13 +24,13 @@ namespace Vouchee.Data.Models.Entities
         [Key]
         public Guid Id { get; set; }
 
-        public string? Name { get; set; }
+        public required string Name { get; set; }
         public string? Description { get; set; }
 
-        public string? Status { get; set; }
+        public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; }
-        public Guid? CreateBy { get; set; }
+        public DateTime CreateDate { get; set; }
+        public Guid CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }

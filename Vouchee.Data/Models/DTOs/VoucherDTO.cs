@@ -99,7 +99,7 @@ namespace Vouchee.Business.Models.DTOs
         {
             //addresses = new HashSet<GetAllAddressDTO>();
             categories = new HashSet<GetCategoryDTO>();
-            images = new HashSet<GetImageDTO>();
+            medias = new HashSet<GetMediaDTO>();
             addresses = new HashSet<GetAllAddressDTO>();
         }
         public Guid? id { get; set; }
@@ -135,7 +135,7 @@ namespace Vouchee.Business.Models.DTOs
         public virtual ICollection<GetAllAddressDTO> addresses { get; set; }
         public virtual ICollection<GetCategoryDTO>? categories { get; set; }
         //public virtual ICollection<GetAllAddressDTO>? addresses { get; set; }
-        public virtual ICollection<GetImageDTO> images { get; set; }
+        public virtual ICollection<GetMediaDTO> medias { get; set; }
     }
     public class GetBestBuyVoucherDTO
     {
@@ -143,7 +143,7 @@ namespace Vouchee.Business.Models.DTOs
         {
             // addresses = new HashSet<GetAllAddressDTO>();
             categories = new HashSet<GetCategoryDTO>();
-            images = new HashSet<GetImageDTO>();
+            medias = new HashSet<GetMediaDTO>();
         }
         public Guid? id { get; set; }
 
@@ -176,7 +176,7 @@ namespace Vouchee.Business.Models.DTOs
         //public Guid? updateBy { get; set; }
         public decimal? TotalQuantitySold { get; set; }
         public virtual ICollection<GetCategoryDTO>? categories { get; set; }
-        public virtual ICollection<GetImageDTO>? images { get; set; }
+        public virtual ICollection<GetMediaDTO>? medias { get; set; }
     }
     public class GetNearestVoucherDTO
     {
@@ -184,7 +184,7 @@ namespace Vouchee.Business.Models.DTOs
         {
             addresses = new HashSet<GetAllAddressDTO>();
             categories = new HashSet<GetCategoryDTO>();
-            images = new HashSet<GetImageDTO>();
+            medias = new HashSet<GetMediaDTO>();
         }
         public Guid? id { get; set; }
 
@@ -220,7 +220,7 @@ namespace Vouchee.Business.Models.DTOs
         public virtual ICollection<GetAllAddressDTO>? addresses { get; set; }
         //public Brand brand { get; set; }
         //public string? imageBrand { get; set; }
-        public virtual ICollection<GetImageDTO>? images { get; set; }
+        public virtual ICollection<GetMediaDTO>? medias { get; set; }
     }
     public class GetDetailVoucherDTO
     {
@@ -229,7 +229,7 @@ namespace Vouchee.Business.Models.DTOs
             voucherCodes = new HashSet<GetVoucherCodeDTO>();
             addresses = new HashSet<GetAllAddressDTO>();
             categories = new HashSet<GetCategoryDTO>();
-            images = new HashSet<GetImageDTO>();
+            medias = new HashSet<GetMediaDTO>();
         }
 
         public Guid? id { get; set; }
@@ -265,7 +265,7 @@ namespace Vouchee.Business.Models.DTOs
         public virtual ICollection<GetAllAddressDTO>? addresses { get; set; }
         public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
         public virtual ICollection<GetCategoryDTO> categories { get; set; }
-        public virtual ICollection<GetImageDTO> images { get; set; }
+        public virtual ICollection<GetMediaDTO> medias { get; set; }
     }
 
     public class GetNewestVoucherDTO
@@ -273,7 +273,7 @@ namespace Vouchee.Business.Models.DTOs
         public GetNewestVoucherDTO()
         {
             categories = new HashSet<GetCategoryDTO>();
-            images = new HashSet<GetImageDTO>();
+            medias = new HashSet<GetMediaDTO>();
         }
 
         public Guid? id { get; set; }
@@ -297,7 +297,7 @@ namespace Vouchee.Business.Models.DTOs
 
         public DateTime? createDate { get; set; }
 
-        public virtual ICollection<GetImageDTO> images { get; set; }
+        public virtual ICollection<GetMediaDTO> medias { get; set; }
         public virtual ICollection<GetCategoryDTO>? categories { get; set; }
     }
 

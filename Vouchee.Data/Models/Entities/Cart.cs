@@ -10,26 +10,26 @@ using System.Threading.Tasks;
 namespace Vouchee.Data.Models.Entities
 {
     [Table("Cart")]
-    [Index(nameof(UserId), Name = "IX_Cart_UserId")]
-    [Index(nameof(VoucherId), Name = "IX_Voucher_UserId")]
+    [Index(nameof(BuyerId), Name = "IX_Cart_BuyerId")]
+    [Index(nameof(VoucherId), Name = "IX_Cart_VoucherId")]
     public partial class Cart
     {
-        public Guid? VoucherId { get; set; }
+        public Guid VoucherId { get; set; }
         [ForeignKey(nameof(VoucherId))]
         [InverseProperty("Carts")]
         public virtual Voucher? Voucher { get; set; }
 
-        public Guid? UserId { get; set; }
-        [ForeignKey(nameof(UserId))]
+        public Guid? BuyerId { get; set; }
+        [ForeignKey(nameof(BuyerId))]
         [InverseProperty("Carts")]
-        public virtual User? User { get; set; }
+        public virtual User? Buyer { get; set; }
 
-        public int? Quantity { get; set; }
+        public int Quantity { get; set; }
 
-        public string? Status { get; set; }
+        public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; }
-        public Guid? CreateBy { get; set; }
+        public DateTime CreateDate { get; set; }
+        public Guid CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }

@@ -40,7 +40,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<bool> AddItemAsync(Guid voucherId, ThisUserObj thisUserObj)
         {
-            Guid userId = Guid.Parse(thisUserObj.userId);
+            Guid userId = thisUserObj.userId;
             Voucher existedVoucher = await _voucherRepository.FindAsync(voucherId);
             if (existedVoucher == null)
             {
@@ -53,7 +53,7 @@ namespace Vouchee.Business.Services.Impls
             if (haveVoucher != null)
             {
                 haveVoucher.Quantity += 1;
-                haveVoucher.UpdateBy = Guid.Parse(thisUserObj.userId);
+                haveVoucher.UpdateBy = thisUserObj.userId;
                 haveVoucher.UpdateDate = DateTime.Now;
             }
             else
@@ -61,7 +61,7 @@ namespace Vouchee.Business.Services.Impls
                 userInstance.Carts.Add(new()
                 {
                     VoucherId = voucherId,
-                    CreateBy = Guid.Parse(thisUserObj.userId),
+                    CreateBy = thisUserObj.userId,
                     CreateDate = DateTime.Now,
                     Quantity = 1,
                     Status = ObjectStatusEnum.ACTIVE.ToString()
@@ -73,7 +73,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<bool> DecreaseQuantityAsync(Guid voucherId, ThisUserObj thisUserObj)
         {
-            Guid userId = Guid.Parse(thisUserObj.userId);
+            Guid userId = thisUserObj.userId;   
 
             // Fetch the current user
             User? user = await GetCurrentUser(userId);
@@ -95,9 +95,9 @@ namespace Vouchee.Business.Services.Impls
             throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
         }
 
-        public async Task<CartDTO> GetCartsAsync(PagingRequest pagingRequest, CartFilter cartFilter, ThisUserObj thisUserObj)
+        public async Task<CartDTO> GetCartsAsync(ThisUserObj thisUserObj)
         {
-            Guid userId = Guid.Parse(thisUserObj.userId);
+            Guid userId = thisUserObj.userId;
 
             User? user = await GetCurrentUser(userId);
 
@@ -105,10 +105,9 @@ namespace Vouchee.Business.Services.Impls
             {
                 TotalPrice = user.Carts
                                 .Where(c => c.Voucher != null)
-                                .Sum(c => c.Voucher.SellPrice * (c.Quantity ?? 1)),
+                                .Sum(c => c.Voucher.SellPrice * (c.Quantity)),
                 TotalQuantity = user.Carts
-                                .Where(c => c.Quantity != null)
-                                .Sum(c => c.Quantity ?? 0),
+                                .Sum(c => c.Quantity),
             };
 
             cartDTO.vouchers = user.Carts
@@ -124,7 +123,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<bool> IncreaseQuantityAsync(Guid voucherId, ThisUserObj thisUserObj)
         {
-            Guid userId = Guid.Parse(thisUserObj.userId);
+            Guid userId = thisUserObj.userId;
 
             // Fetch the current user
             User? user = await GetCurrentUser(userId);
@@ -149,7 +148,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<bool> RemoveItemAsync(Guid voucherId, ThisUserObj thisUserObj)
         {
-            Guid userId = Guid.Parse(thisUserObj.userId);
+            Guid userId = thisUserObj.userId;
 
             // Fetch the current user
             User? user = await GetCurrentUser(userId);
@@ -172,7 +171,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<bool> UpdateQuantityAsync(Guid voucherId, int quantity, ThisUserObj thisUserObj)
         {
-            Guid userId = Guid.Parse(thisUserObj.userId);
+            Guid userId = thisUserObj.userId;
 
             User? user = await GetCurrentUser(userId);
 

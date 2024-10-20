@@ -33,7 +33,7 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj thisUserObj = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            var result = await _fileUploadService.UploadImageToFirebase(file, thisUserObj.userId, StoragePathEnum.OTHER);
+            var result = await _fileUploadService.UploadImageToFirebase(file, thisUserObj.userId.ToString(), StoragePathEnum.OTHER);
             return Ok(result);
         }
 
@@ -43,7 +43,7 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj thisUserObj = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            var result = await _fileUploadService.UploadVideoToFirebase(file, thisUserObj.userId, StoragePathEnum.OTHER);
+            var result = await _fileUploadService.UploadVideoToFirebase(file, thisUserObj.userId.ToString(), StoragePathEnum.OTHER);
             return Ok(result);
         }
 
@@ -53,7 +53,7 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj thisUserObj = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            var result = await _fileUploadService.UploadFileToFirebase(file, thisUserObj.userId, StoragePathEnum.OTHER);
+            var result = await _fileUploadService.UploadFileToFirebase(file, thisUserObj.userId.ToString(), StoragePathEnum.OTHER);
             return Ok(result);
         }
     }

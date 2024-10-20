@@ -8,15 +8,14 @@ namespace Vouchee.Business.Models
 {
     public class ThisUserObj
     {
-        public string? userId { get; set; }
+        public Guid userId { get; set; }
         public string? email { get; set; }
-        public string? roleId { get; set; }
+        public Guid roleId { get; set; }
         public string? roleName { get; set; }
         public string? fullName { get; set; }
-        //public string? buyerId { get; set; }
-        public string? adminRoleId { get; set; }
-        public string? sellerRoleId { get; set; }
-        public string? buyerRoleId { get; set; }
-        public string? staffRoleId { get; set; }
+        public Guid adminRoleId { get; set; }
+        public Guid? sellerRoleId { get; set; }
+        public Guid buyerRoleId { get; set; }
+        public Guid? staffRoleId { get; set; }
     }
 }

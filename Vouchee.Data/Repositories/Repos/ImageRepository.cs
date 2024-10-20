@@ -9,7 +9,7 @@ using Vouchee.Data.Repositories.IRepos;
 
 namespace Vouchee.Data.Repositories.Repos
 {
-    public class ImageRepository : BaseRepository<Image>, IImageRepository
+    public class ImageRepository : BaseRepository<Media>, IImageRepository
     {
     }
 }

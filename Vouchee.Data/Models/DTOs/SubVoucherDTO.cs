@@ -46,7 +46,7 @@ namespace Vouchee.Data.Models.DTOs
 
         public GetSubVoucherDTO()
         {
-            images = new HashSet<GetImageDTO>();
+            images = new HashSet<GetMediaDTO>();
         }
 
         public Guid id { get; set; }
@@ -58,6 +58,6 @@ namespace Vouchee.Data.Models.DTOs
         public int? quantity { get; set; }
         public string? image { get; set; }
 
-        public virtual ICollection<GetImageDTO>? images { get; set; }
+        public virtual ICollection<GetMediaDTO>? images { get; set; }
     }
 }

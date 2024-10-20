@@ -87,9 +87,6 @@ namespace Vouchee.API.AppStarts
             // ORDER DETAIL
             services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
 
-            // TEST
-            services.AddScoped<ITestService, TestService>();
-
             // SUB VOUCHER
             services.AddScoped<ISubVoucherService, SubVoucherService>();
             services.AddScoped<ISubVoucherRepository, SubVoucherRepository>();

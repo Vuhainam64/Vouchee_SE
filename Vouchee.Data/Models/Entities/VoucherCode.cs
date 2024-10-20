@@ -14,10 +14,10 @@ namespace Vouchee.Data.Models.Entities
     [Index(nameof(OrderDetailId), Name = "IX_Voucher_OrderDetailId")]
     public partial class VoucherCode
     {
-        public Guid? VoucherId { get; set; }
+        public Guid VoucherId { get; set; }
         [ForeignKey(nameof(VoucherId))]
         [InverseProperty("VoucherCodes")]
-        public virtual Voucher? Voucher { get; set; }
+        public required virtual Voucher Voucher { get; set; }
 
         public Guid? OrderDetailId { get; set; }
         [ForeignKey(nameof(OrderDetailId))]
@@ -31,10 +31,10 @@ namespace Vouchee.Data.Models.Entities
         public string? Code { get; set; }
         public string? Image { get; set; }
 
-        public string? Status { get; set; }
+        public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; }
-        public Guid? CreateBy { get; set; }
+        public DateTime CreateDate { get; set; }
+        public Guid CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }

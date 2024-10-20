@@ -19,17 +19,15 @@ namespace Vouchee.API.Helpers
             var checkUser = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber);
             if (checkUser == null)
             {
-                currentUser.userId = "";
+                currentUser.userId = Guid.Empty;
                 currentUser.email = "";
-                //currentUser.buyerId = "";
                 currentUser.roleName = "";
                 currentUser.fullName = "";
             }
             else
             {
-                currentUser.userId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
+                currentUser.userId = Guid.Parse(httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value);
                 currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
-                //currentUser.buyerId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GroupSid).Value;
                 currentUser.roleName = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
                 currentUser.fullName = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Actor).Value;
             }
@@ -39,33 +37,38 @@ namespace Vouchee.API.Helpers
 
             if (user == null)
             {
-                currentUser.roleId = "";
+                currentUser.roleId = Guid.Empty;
             }
             else
             {
-                currentUser.roleId = user.roleId.ToString();
-
+                if (user.roleId != null)
+                {
+                    currentUser.roleId = user.roleId ?? Guid.Empty;
+                }
             }
 
             if (roleList != null)
             {
                 foreach (var role in roleList)
                 {
-                    if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(0)))
+                    if (role.name != null)
                     {
-                        currentUser.adminRoleId = role.id.ToString();
-                    }
-                    if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(1)))
-                    {
-                        currentUser.sellerRoleId = role.id.ToString();
-                    }
-                    if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(2)))
-                    {
-                        currentUser.buyerRoleId = role.id.ToString();
-                    }
-                    if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(3)))
-                    {
-                        currentUser.staffRoleId = role.id.ToString();
+                        if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(0)))
+                        {
+                            currentUser.adminRoleId = role.id ?? Guid.Empty;
+                        }
+                        if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(1)))
+                        {
+                            currentUser.sellerRoleId = role.id ?? Guid.Empty;
+                        }
+                        if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(2)))
+                        {
+                            currentUser.buyerRoleId = role.id ?? Guid.Empty;
+                        }
+                        if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(3)))
+                        {
+                            currentUser.staffRoleId = role.id ?? Guid.Empty;
+                        }
                     }
                 }
             }

@@ -11,25 +11,25 @@ using Vouchee.Data.Models.Constants.Enum.Other;
 
 namespace Vouchee.Data.Models.DTOs
 {
-    public class CreateImageDTO
+    public class CreateMediaDTO
     {
         public Guid? id { get; set; }
 
-        public string? imageUrl { get; set; }
+        public string? url { get; set; }
 
         public ObjectStatusEnum status = ObjectStatusEnum.ACTIVE;
         public DateTime? CreateDate = DateTime.Now;
     }
 
-    public class UpdateImageDTO
+    public class UpdateMediaDTO
     {
 
     }
 
-    public class GetImageDTO
+    public class GetMediaDTO
     {
         public Guid id { get; set; }
-        public string? mediaUrl { get; set; }
-        public ImageEnum? mediaType { get; set; }
+        public string? url { get; set; }
+        public MediaEnum? type { get; set; }
     }
 }

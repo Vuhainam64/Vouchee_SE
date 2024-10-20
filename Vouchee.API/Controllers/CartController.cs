@@ -64,7 +64,7 @@ namespace Vouchee.API.Controllers
 
             if (currentUser.roleId.Equals(currentUser.buyerRoleId))
             {
-                var result = await _cartService.GetCartsAsync(pagingRequest, cartFilter, currentUser);
+                var result = await _cartService.GetCartsAsync(currentUser);
                 return Ok(result);
             }
 

@@ -14,9 +14,9 @@ namespace Vouchee.Data.Models.Entities
     {
         public Promotion()
         {
-            Vouchers = new HashSet<Voucher>();
-            Orders = new HashSet<Order>();
-            OrderDetails = new HashSet<OrderDetail>();
+            Vouchers = [];
+            Orders = [];
+            OrderDetails = [];
         }
 
         [InverseProperty(nameof(Voucher.Promotions))]
@@ -30,13 +30,13 @@ namespace Vouchee.Data.Models.Entities
         [Key]
         public Guid Id { get; set; }
 
-        public string? Name { get; set; }
+        public required string Name { get; set; }
         public string? Description { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public int? Quantity { get; set; }
         public string? Code { get; set; }
-        public string? Type { get; set; }
+        public required string Type { get; set; }
         public string? Policy { get; set; }
         public string? Image { get; set; }
         [Column(TypeName = "decimal(10,5)")]
@@ -44,10 +44,10 @@ namespace Vouchee.Data.Models.Entities
         [Column(TypeName = "decimal(10,5)")]
         public decimal? MoneyDiscount { get; set; }
 
-        public string? Status { get; set; }
+        public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; }
-        public Guid? CreateBy { get; set; }
+        public required DateTime CreateDate { get; set; }
+        public required Guid CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }

@@ -40,13 +40,13 @@ namespace Vouchee.Business.Services.Impls
         public async Task<Guid?> CreateBrandAsync(CreateBrandDTO createBrandDTO, ThisUserObj thisUserObj)
         {
             var brand = _mapper.Map<Brand>(createBrandDTO);
-            brand.CreateBy = Guid.Parse(thisUserObj.userId);
+            brand.CreateBy = thisUserObj.userId;
 
             var brandId = await _brandRepository.AddAsync(brand);
 
             if (brandId != null && createBrandDTO.image != null)
             {
-                brand.Image = await _fileUploadService.UploadImageToFirebase(createBrandDTO.image, thisUserObj.userId, StoragePathEnum.BRAND);
+                brand.Image = await _fileUploadService.UploadImageToFirebase(createBrandDTO.image, thisUserObj.userId.ToString(), StoragePathEnum.BRAND);
 
                 await _brandRepository.UpdateAsync(brand);
             }
