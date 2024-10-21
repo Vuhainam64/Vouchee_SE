@@ -58,25 +58,29 @@ namespace Vouchee.Business.Services.Impls
             }
 
             var haveVoucher = userInstance.Carts.FirstOrDefault(x => x.VoucherId == voucherId);
-            if (haveVoucher != null)
-            {
-                haveVoucher.Quantity += 1;
-                haveVoucher.UpdateBy = thisUserObj.userId;
-                haveVoucher.UpdateDate = DateTime.Now;
-            }
-            else
-            {
-                userInstance.Carts.Add(new()
+                if (haveVoucher != null)
                 {
-                    VoucherId = voucherId,
-                    CreateBy = thisUserObj.userId,
-                    CreateDate = DateTime.Now,
-                    Quantity = 1,
-                    Status = ObjectStatusEnum.ACTIVE.ToString()
-                });
-            }
+                    haveVoucher.Quantity += 1;
+                    haveVoucher.UpdateBy = thisUserObj.userId;
+                    haveVoucher.UpdateDate = DateTime.Now;
+                }
+                else
+                {
+                    userInstance.Carts.Add(new()
+                    {
+                        VoucherId = voucherId,
+                        CreateBy = thisUserObj.userId,
+                        CreateDate = DateTime.Now,
+                        Quantity = 1,
+                        Status = ObjectStatusEnum.ACTIVE.ToString()
+                    });
+                }
 
-            return await _userRepository.UpdateAsync(userInstance);
+            var result = await _userRepository.UpdateAsync(userInstance);
+
+            var user = GetCurrentUser(thisUserObj.userId);
+
+            return result;
         }
 
         public async Task<bool> DecreaseQuantityAsync(Guid voucherId, ThisUserObj thisUserObj)
@@ -120,7 +124,6 @@ namespace Vouchee.Business.Services.Impls
 
             // Map CartVoucherDTO including quantity for each voucher in the cart
             cartDTO.vouchers = user.Carts
-                .Where(c => c.Voucher != null) // Only include carts with vouchers
                 .Select(c => new CartVoucherDTO
                 {
                     quantity = c.Quantity, // Set the quantity for each cart item
@@ -221,18 +224,21 @@ namespace Vouchee.Business.Services.Impls
         public async Task<User> GetCurrentUser(Guid userId)
         {
             User? userInstance = null;
+
+            // Check local data first
             IQueryable<User> users = _userRepository.CheckLocal();
 
-            if (users != null && users.Count() != 0)
+            if (users != null && users.Any())
             {
                 userInstance = users.FirstOrDefault(x => x.Id == userId);
             }
 
-            if (userInstance == null)
+            // If not found locally, load from database with vouchers
+            if (userInstance == null || !userInstance.Carts.Any(cart => cart.Voucher != null))
             {
                 userInstance = await _userRepository.GetByIdAsync(userId, includeProperties: x => x.Include(x => x.Carts)
-                                                                                                    .ThenInclude(x => x.Voucher)
-                                                                                                    .ThenInclude(x => x.Medias));
+                                                                                                   .ThenInclude(x => x.Voucher)
+                                                                                                   .ThenInclude(x => x.Medias));
             }
 
             return userInstance;

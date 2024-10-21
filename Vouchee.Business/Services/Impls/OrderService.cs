@@ -106,7 +106,7 @@ namespace Vouchee.Business.Services.Impls
                 order.OrderDetails.Add(new OrderDetail
                 {
                     VoucherId = voucher.id, // Assuming the voucher has an Id
-                    Quantity = 1, // Set quantity (if applicable)
+                    Quantity = voucher.quantity, // Set quantity (if applicable)
                     UnitPrice = (decimal) voucher.sellPrice, // Assuming each voucher has a Price property
                 });
             }
@@ -116,9 +116,14 @@ namespace Vouchee.Business.Services.Impls
 
             Guid? orderId = await _orderRepository.AddAsync(order);
 
-            foreach (var cart in GetCurrentUser(thisUserObj.userId).Result.Carts)
+            foreach (var voucher in cartDTO.vouchers)
             {
-                await _cartService.RemoveItemAsync(cart.VoucherId, thisUserObj);
+                await _cartService.RemoveItemAsync((Guid)voucher.id, thisUserObj);
+
+                Voucher voucherInstance = GetCurrentUser(thisUserObj.userId).Result.Carts.FirstOrDefault(x => x.VoucherId == voucher.id).Voucher;
+                voucherInstance.Quantity -= voucher.quantity;
+
+                await _voucherRepository.UpdateAsync(voucherInstance);
             }
 
             return orderId;
@@ -226,20 +231,35 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<IList<GetOrderDTO>> GetOrdersAsync()
+        public async Task<DynamicResponseModel<GetOrderDTO>> GetOrdersAsync(PagingRequest pagingRequest, OrderFilter orderFilter, ThisUserObj? thisUserObj)
         {
-            IQueryable<GetOrderDTO> result;
-            try
+            (int, IQueryable<GetOrderDTO>) result;
+
+            if (thisUserObj != null && thisUserObj.roleId.Equals(thisUserObj.buyerRoleId))
+            {
+                result = _orderRepository.GetTable().Where(x => x.CreateBy.Equals(thisUserObj.userId))
+                            .ProjectTo<GetOrderDTO>(_mapper.ConfigurationProvider)
+                            .DynamicFilter(_mapper.Map<GetOrderDTO>(orderFilter))
+                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+            }
+            else
             {
                 result = _orderRepository.GetTable()
-                            .ProjectTo<GetOrderDTO>(_mapper.ConfigurationProvider);
+                            .ProjectTo<GetOrderDTO>(_mapper.ConfigurationProvider)
+                            .DynamicFilter(_mapper.Map<GetOrderDTO>(orderFilter))
+                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
             }
-            catch (Exception ex)
+
+            return new DynamicResponseModel<GetOrderDTO>()
             {
-                LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải voucher");
-            }
-            return result.ToList();
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = result.Item2.ToList() // Return the paged voucher list with nearest address and distance
+            };
         }
 
         public async Task<bool> UpdateOrderAsync(Guid id, UpdateOrderDTO updateOrderDTO, ThisUserObj thisUserObj)
