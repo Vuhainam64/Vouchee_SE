@@ -20,6 +20,6 @@ namespace Vouchee.Data.Repositories.IRepos
         public Task<User> LoginWithEmail(LoginByEmailDTO loginByEmailDTO);
 
         // UPDATE
-        public Task<bool> StoreRefreshToken(User user, string refreshToken, DateTime dateTime);
+        // public Task<bool> StoreRefreshToken(User user, string refreshToken, DateTime dateTime);
     }
 }

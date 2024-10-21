@@ -25,6 +25,7 @@ namespace Vouchee.Data.Helpers.Base
                                     Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null);
         IQueryable<TEntity> GetTable(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null);
         void Attach(TEntity entity);
+        void Detach(TEntity entity);
         public IQueryable<TEntity> CheckLocal();
     }
 }

@@ -26,6 +26,9 @@ namespace Vouchee.Data.Repositories.Repos
                 User user = await _userDAO.GetFirstOrDefaultAsync(
                                         filter: x => x.Email.ToLower().Equals(email.ToLower()),
                                         includeProperties: query => query.Include(x => x.Role)
+                                                                         .Include(x => x.Carts)
+                                                                            .ThenInclude(x => x.Voucher)
+                                                                                .ThenInclude(x => x.Medias)
                                     );
                 if (user != null)
                 {
@@ -84,20 +87,20 @@ namespace Vouchee.Data.Repositories.Repos
             }
         }
 
-        public async Task<bool> StoreRefreshToken(User user, string refreshToken, DateTime dateTime)
-        {
-            try
-            {
-                //user.RefreshToken = refreshToken;
-                //user.RefreshTokenExpirationDate = dateTime;
+        //public async Task<bool> StoreRefreshToken(User user, string refreshToken, DateTime dateTime)
+        //{
+        //    try
+        //    {
+        //        //user.RefreshToken = refreshToken;
+        //        //user.RefreshTokenExpirationDate = dateTime;
 
-                return _userDAO.UpdateAsync(user).Result;
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new Exception(ex.Message);
-            }
-        }
+        //        return _userDAO.UpdateAsync(user).Result;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        LoggerService.Logger(ex.Message);
+        //        throw new Exception(ex.Message);
+        //    }
+        //}
     }
 }

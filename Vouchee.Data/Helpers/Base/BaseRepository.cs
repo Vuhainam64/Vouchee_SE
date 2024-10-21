@@ -39,5 +39,7 @@ namespace Vouchee.Data.Helpers.Base
         public void Attach(TEntity entity) => _dao.Attach(entity);
 
         public IQueryable<TEntity> CheckLocal() => _dao.CheckLocal();
+
+        public void Detach(TEntity entity) => _dao.Detach(entity);
     }
 }

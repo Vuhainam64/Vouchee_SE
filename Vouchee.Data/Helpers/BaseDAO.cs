@@ -72,19 +72,16 @@ namespace Vouchee.Data.Helpers
         {
             try
             {
-                Table.Update(entity);
-                if (await _context.SaveChangesAsync() > 0)
-                {
-                    return true;
-                }
-                return false;
+                _context.Update(entity);
+                return await _context.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
-                throw new Exception(ex.Message);
+                throw new Exception("Error  or updating entity", ex);
             }
         }
+
 
         public async Task<bool> DeleteAsync(TEntity entity)
         {
@@ -231,6 +228,11 @@ namespace Vouchee.Data.Helpers
         public void Attach(TEntity entity)
         {
             _context.Attach(entity);
+        }
+
+        public void Detach(TEntity entity)
+        {
+            _context.Entry(entity).State = EntityState.Detached;
         }
 
         public IQueryable<TEntity> CheckLocal()
