@@ -18,7 +18,7 @@ namespace Vouchee.Data.Helpers.Base
         Task<bool> DeleteAsync(TEntity entity);
         Task<TEntity> FindAsync(Guid id);
         Task<TEntity?> GetByIdAsync(object id,
-                                    Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null);
+                                    Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> includeProperties = null);
         Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> filter,
                                     Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null);
         Task<IEnumerable<TEntity>?> GetWhereAsync(Expression<Func<TEntity, bool>> filter,

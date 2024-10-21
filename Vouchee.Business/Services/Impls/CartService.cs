@@ -25,151 +25,160 @@ namespace Vouchee.Business.Services.Impls
     {
         private readonly IVoucherRepository _voucherRepository;
         private readonly IUserRepository _userRepository;
-        private readonly ICartRepository _cartRepository;
         private readonly IMapper _mapper;
 
         public CartService(IVoucherRepository voucherRepository,
                             IUserRepository userRepository, 
-                            ICartRepository cartRepository, 
                             IMapper mapper)
         {
             _voucherRepository = voucherRepository;
             _userRepository = userRepository;
-            _cartRepository = cartRepository;
             _mapper = mapper;
-        }
-
-        public async Task<bool> AddItemAsync(Guid voucherId, ThisUserObj thisUserObj)
-        {
-
-            Guid userId = thisUserObj.userId;
-
-            User userInstance = await GetCurrentUser(userId);
-
-            if (userInstance.Carts.Count() > 5)
-            {
-                throw new ConflictException("Bạn chỉ có thể mua tối đa 5 loại voucher một lúc");
-            }
-
-            Voucher existedVoucher = await _voucherRepository.GetByIdAsync(voucherId, includeProperties: x => x.Include(x => x.Medias)
-                                                                                                                .Include(x => x.Supplier)
-                                                                                                                .Include(x => x.Brand)
-                                                                                                                .Include(x => x.Seller));
-            if (existedVoucher == null)
-            {
-                throw new NotFoundException("Không tìm thầy voucher này");
-            }
-
-            var haveVoucher = userInstance.Carts.FirstOrDefault(x => x.VoucherId == voucherId);
-            if (haveVoucher != null)
-            {
-                haveVoucher.Quantity += 1;
-                haveVoucher.UpdateBy = thisUserObj.userId;
-                haveVoucher.UpdateDate = DateTime.Now;
-            }
-            else
-            {
-                userInstance.Carts.Add(new()
-                {
-                    VoucherId = voucherId,
-                    CreateBy = thisUserObj.userId,
-                    CreateDate = DateTime.Now,
-                    Quantity = 1,
-                    Status = ObjectStatusEnum.ACTIVE.ToString(),
-                    Voucher = existedVoucher
-                });
-            }
-
-            var result = await _userRepository.UpdateAsync(userInstance);
-
-            return result;
-        }
-
-        public async Task<bool> DecreaseQuantityAsync(Guid voucherId, ThisUserObj thisUserObj)
-        {
-            Guid userId = thisUserObj.userId;   
-
-            // Fetch the current user
-            User? user = await GetCurrentUser(userId);
-
-            // Find the cart item with the specified voucher
-            var cartItem = user.Carts.FirstOrDefault(c => c.VoucherId == voucherId);
-
-            if (cartItem != null)
-            {
-                // Increase the quantity
-                cartItem.Quantity -= 1;
-                cartItem.UpdateBy = userId;
-                cartItem.UpdateDate = DateTime.Now;
-
-                // Update the user with the modified cart
-                return await _userRepository.UpdateAsync(user);
-            }
-
-            throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
         }
 
         public async Task<CartDTO> GetCartsAsync(ThisUserObj thisUserObj)
         {
-            Guid userId = thisUserObj.userId;
+            var currentUser = _userRepository.CheckLocal().FirstOrDefault(x => x.Id == thisUserObj.userId);
 
-            User? user = await GetCurrentUser(userId);
-
-            CartDTO cartDTO = new()
+            if (currentUser == null)
             {
-                TotalPrice = user.Carts
-                                .Where(c => c.Voucher != null)
-                                .Sum(c => c.Voucher.SellPrice * c.Quantity),
-                TotalQuantity = user.Carts
-                                .Sum(c => c.Quantity),
-            };
+                var user = await _userRepository.GetByIdAsync(thisUserObj.userId, includeProperties: x => x.Include(x => x.Carts)
+                                                                                            .ThenInclude(x => x.Voucher)
+                                                                                                .ThenInclude(x => x.Medias));
 
-            // Map CartVoucherDTO including quantity for each voucher in the cart
-            cartDTO.vouchers = user.Carts
-                .Select(c => new CartVoucherDTO
+                CartDTO cartDTO = new();
+
+                foreach (var cartItem in user.Carts)
                 {
-                    quantity = c.Quantity, // Set the quantity for each cart item
-                    id = c.Voucher.Id,
-                    title = c.Voucher.Title,
-                    originalPrice = c.Voucher.OriginalPrice,
-                    sellPrice = c.Voucher.SellPrice,
-                    productImage = c.Voucher.Medias.FirstOrDefault(x => x.Type == MediaEnum.ADVERTISEMENT.ToString()).Url,
-                    medias = _mapper.Map<IList<GetMediaDTO>>(c.Voucher.Medias),
-                })
-                .ToList();
+                    var currentVoucher = cartItem.Voucher;
+                    if (currentVoucher.Seller == null && (currentUser == null || currentUser.Carts.FirstOrDefault(x => x.Voucher.SellerID == currentVoucher.SellerID) == null))
+                    {
+                        currentVoucher = await _voucherRepository.GetByIdAsync(cartItem.VoucherId, includeProperties: x => x.Include(x => x.Seller));
+                    }
 
-            cartDTO.DiscountPrice = 0;
-            cartDTO.FinalPrice = cartDTO.TotalPrice;
+                    var sellerCart = cartDTO.sellers.FirstOrDefault(s => s.id == currentVoucher.SellerID);
+                    if (sellerCart == null)
+                    {
+                        sellerCart = new SellerCartDTO
+                        {
+                            id = currentVoucher.SellerID,
+                            name = currentVoucher.Seller.Name,
+                            image = currentVoucher.Seller.Image,
+                            vouchers = new List<CartVoucherDTO>()
+                        };
+                        cartDTO.sellers.Add(sellerCart);
+                    }
 
-            return cartDTO;
+                    sellerCart.vouchers.Add(new CartVoucherDTO
+                    {
+                        id = cartItem.Voucher.Id,
+                        originalPrice = cartItem.Voucher.OriginalPrice,
+                        sellPrice = cartItem.Voucher.SellPrice,
+                        title = cartItem.Voucher.Title,
+                        quantity = cartItem.Quantity,
+                        productImage = _mapper.Map<IList<GetMediaDTO>>(cartItem.Voucher.Medias).FirstOrDefault(x => x.type == MediaEnum.ADVERTISEMENT)?.url
+                    });
+                }
+
+                return cartDTO;
+            }
+
+            return null;
         }
 
+        public async Task<bool> AddItemAsync(Guid voucherId, ThisUserObj thisUserObj)
+        {
+            var existedVoucher = await _voucherRepository.GetByIdAsync(voucherId, includeProperties: x => x.Include(x => x.Seller));
+
+            return false;
+            //Guid userId = thisUserObj.userId;
+
+            //User userInstance = await GetCurrentUser(userId);
+
+            //if (userInstance.Carts.Count() > 5)
+            //{
+            //    throw new ConflictException("Bạn chỉ có thể mua tối đa 5 loại voucher một lúc");
+            //}
+
+            //var haveVoucher = userInstance.Carts.FirstOrDefault(x => x.VoucherId == voucherId);
+            //if (haveVoucher != null)
+            //{
+            //    haveVoucher.Quantity += 1;
+            //    haveVoucher.UpdateBy = thisUserObj.userId;
+            //    haveVoucher.UpdateDate = DateTime.Now;
+            //}
+            //else
+            //{
+            //    Voucher existedVoucher = await _voucherRepository.GetByIdAsync(voucherId, includeProperties: x => x.Include(x => x.Medias)
+            //                                                                                                            .Include(x => x.Seller));
+
+            //    if (existedVoucher == null)
+            //    {
+            //        throw new NotFoundException("Không tìm thầy voucher này");
+            //    }
+
+            //    userInstance.Carts.Add(new()
+            //    {
+            //        VoucherId = voucherId,
+            //        CreateBy = thisUserObj.userId,
+            //        CreateDate = DateTime.Now,
+            //        Quantity = 1,
+            //        Status = ObjectStatusEnum.ACTIVE.ToString(),
+            //        Voucher = existedVoucher,
+            //        Buyer = userInstance
+            //    });
+            //}
+
+            //var result = await _userRepository.UpdateAsync(userInstance);
+
+            //return result;
+        }
+
+        public async Task<bool> DecreaseQuantityAsync(Guid voucherId, ThisUserObj thisUserObj)
+        {
+            //Guid userId = thisUserObj.userId;   
+
+            //// Fetch the current user
+            //User? user = await GetCurrentUser(userId);
+
+            //// Find the cart item with the specified voucher
+            //var cartItem = user.Carts.FirstOrDefault(c => c.VoucherId == voucherId);
+
+            //if (cartItem != null)
+            //{
+            //    // Increase the quantity
+            //    cartItem.Quantity -= 1;
+            //    cartItem.UpdateBy = userId;
+            //    cartItem.UpdateDate = DateTime.Now;
+
+            //    // Update the user with the modified cart
+            //    return await _userRepository.UpdateAsync(user);
+            //}
+
+            throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
+        }
 
         public async Task<bool> IncreaseQuantityAsync(Guid voucherId, ThisUserObj thisUserObj)
         {
-            Guid userId = thisUserObj.userId;
+            //Guid userId = thisUserObj.userId;
 
-            // Fetch the current user
-            User? user = await GetCurrentUser(userId);
+            //User? user = await GetCurrentUser(userId);
 
-            // Find the cart item with the specified voucher
-            var cartItem = user.Carts.FirstOrDefault(c => c.VoucherId == voucherId);
+            //var cartItem = user.Carts.FirstOrDefault(c => c.VoucherId == voucherId);
 
-            if (cartItem != null)
-            {
-                if (cartItem.Quantity > 19)
-                {
-                    throw new ConflictException("Bạn chỉ có thể mua tối đa 20 code mỗi loại voucher");
-                }
+            //if (cartItem != null)
+            //{
+            //    if (cartItem.Quantity > 19)
+            //    {
+            //        throw new ConflictException("Bạn chỉ có thể mua tối đa 20 code mỗi loại voucher");
+            //    }
 
-                // Increase the quantity
-                cartItem.Quantity += 1;
-                cartItem.UpdateBy = userId;
-                cartItem.UpdateDate = DateTime.Now;
+            //    cartItem.Quantity += 1;
+            //    cartItem.UpdateBy = userId;
+            //    cartItem.UpdateDate = DateTime.Now;
 
-                // Update the user with the modified cart
-                return await _userRepository.UpdateAsync(user);
-            }
+            //    return await _userRepository.UpdateAsync(user);
+            //}
 
             throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
         }
@@ -177,22 +186,18 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<bool> RemoveItemAsync(Guid voucherId, ThisUserObj thisUserObj)
         {
-            Guid userId = thisUserObj.userId;
+            //Guid userId = thisUserObj.userId;
 
-            // Fetch the current user
-            User? user = await GetCurrentUser(userId);
+            //User? user = await GetCurrentUser(userId);
 
-            // Find the cart item with the specified voucher
-            var cartItem = user.Carts.FirstOrDefault(c => c.VoucherId == voucherId);
+            //var cartItem = user.Carts.FirstOrDefault(c => c.VoucherId == voucherId);
 
-            if (cartItem != null)
-            {
-                // Remove the item from the cart
-                user.Carts.Remove(cartItem);
+            //if (cartItem != null)
+            //{
+            //    user.Carts.Remove(cartItem);
 
-                // Update the user with the modified cart
-                return await _userRepository.UpdateAsync(user);
-            }
+            //    return await _userRepository.UpdateAsync(user);
+            //}
 
             throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
         }
@@ -200,51 +205,58 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<bool> UpdateQuantityAsync(Guid voucherId, int quantity, ThisUserObj thisUserObj)
         {
-            if (quantity > 20)
-            {
-                throw new ConflictException("Bạn chỉ có thể mua tối đa 20 code mỗi loại voucher");
-            }
+            //if (quantity > 20)
+            //{
+            //    throw new ConflictException("Bạn chỉ có thể mua tối đa 20 code mỗi loại voucher");
+            //}
 
-            Guid userId = thisUserObj.userId;
+            //Guid userId = thisUserObj.userId;
 
-            User? user = await GetCurrentUser(userId);
+            //User? user = await GetCurrentUser(userId);
 
-            var cartItem = user.Carts.FirstOrDefault(c => c.VoucherId == voucherId);
+            //var cartItem = user.Carts.FirstOrDefault(c => c.VoucherId == voucherId);
 
-            if (cartItem != null)
-            {
+            //if (cartItem != null)
+            //{
 
-                cartItem.Quantity = quantity;
-                cartItem.UpdateBy = userId; 
-                cartItem.UpdateDate = DateTime.Now;
+            //    cartItem.Quantity = quantity;
+            //    cartItem.UpdateBy = userId; 
+            //    cartItem.UpdateDate = DateTime.Now;
 
-                return await _userRepository.UpdateAsync(user);
-            }
+            //    return await _userRepository.UpdateAsync(user);
+            //}
 
             throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
         }
 
         public async Task<User> GetCurrentUser(Guid userId)
         {
-            User? userInstance = null;
+            //IQueryable<User> users = _userRepository.CheckLocal();
 
-            // Check local data first
-            IQueryable<User> users = _userRepository.CheckLocal();
+            //if (users != null && users.Any())
+            //{
+            //    userInstance = users.FirstOrDefault(x => x.Id == userId);
+            //}
 
-            if (users != null && users.Any())
-            {
-                userInstance = users.FirstOrDefault(x => x.Id == userId);
-            }
+            //if (userInstance == null)
+            //{
+            //    userInstance = await _userRepository.GetByIdAsync(userId, includeProperties: x => x.Include(x => x.Carts)
+            //                                                                                            .ThenInclude(x => x.Voucher)
+            //                                                                                            .ThenInclude(x => x.Medias)
+            //    );
+            //}
 
-            // If not found locally, load from database with vouchers
-            if (userInstance == null || !userInstance.Carts.Any(cart => cart.Voucher != null))
-            {
-                userInstance = await _userRepository.GetByIdAsync(userId, includeProperties: x => x.Include(x => x.Carts)
-                                                                                                                   .ThenInclude(x => x.Voucher)
-                                                                                                                   .ThenInclude(x => x.Medias));
-            }
+            //foreach (var cartItem in userInstance.Carts)
+            //{
+            //    var voucher = cartItem.Voucher;
 
-            return userInstance;
+            //    if (voucher.Seller == null && users.FirstOrDefault(x => x.Id == voucher.SellerID) == null)
+            //    {
+            //        voucher.Seller = await _userRepository.GetByIdAsync(voucher.SellerID);
+            //    }
+            //}
+
+            return null;
         }
     }
 }

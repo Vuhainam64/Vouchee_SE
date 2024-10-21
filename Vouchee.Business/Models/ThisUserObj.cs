@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Vouchee.Data.Models.DTOs;
 
 namespace Vouchee.Business.Models
 {
@@ -17,5 +18,6 @@ namespace Vouchee.Business.Models
         public Guid? sellerRoleId { get; set; }
         public Guid buyerRoleId { get; set; }
         public Guid? staffRoleId { get; set; }
+        public CartDTO? cartDTO { get; set; }
     }
 }

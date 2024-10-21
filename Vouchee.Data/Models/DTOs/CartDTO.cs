@@ -35,13 +35,27 @@ namespace Vouchee.Data.Models.DTOs
     {
         public CartDTO()
         {
+            sellers = [];
+        }
+
+        public int totalQuantity { get; set; }
+        public decimal totalPrice { get; set; }
+        public decimal discountPrice { get; set; }
+        public decimal finalPrice { get; set; }
+
+        public virtual ICollection<SellerCartDTO> sellers { get; set; }
+    }
+
+    public class SellerCartDTO
+    {
+        public SellerCartDTO()
+        {
             vouchers = [];
         }
 
-        public int TotalQuantity { get; set; }
-        public decimal TotalPrice { get; set; }
-        public decimal DiscountPrice { get; set; }
-        public decimal FinalPrice { get; set; }
+        public Guid? id { get; set; }
+        public string? name { get; set; }
+        public string? image { get; set; }
 
         public virtual ICollection<CartVoucherDTO> vouchers { get; set; }
     }

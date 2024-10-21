@@ -40,7 +40,7 @@ namespace Vouchee.API.AppStarts
                 .ReverseMap();
             CreateMap<Voucher, VoucherDTO>();
             CreateMap<Voucher, CartVoucherDTO>()
-                .ForMember(x => x.sellerName, dest => dest.MapFrom(opt => opt.Seller.Name))
+                //.ForMember(x => x.sellerName, dest => dest.MapFrom(opt => opt.Seller.Name))
                 .ReverseMap();
 
             // ORDER DETAIL

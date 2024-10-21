@@ -4,12 +4,12 @@ using Vouchee.Business.Models;
 using Vouchee.Business.Services;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Business.Services.Impls;
+using Vouchee.Data.Models.DTOs;
 
 namespace Vouchee.API.Helpers
 {
     internal static class GetCurrentUserInfo
     {
-
         internal static async Task<ThisUserObj> GetThisUserInfo(HttpContext httpContext, 
                                                                     IUserService _userService,
                                                                     IRoleService _roleService)

@@ -20,20 +20,20 @@ namespace Vouchee.Data.Helpers.Base
 
         public Task<bool> DeleteAsync(TEntity entity) => _dao.DeleteAsync(entity);
 
-        public Task<TEntity?> GetByIdAsync(object id, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null) =>
+        public Task<TEntity?> GetByIdAsync(object id, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties) =>
             _dao.GetByIdAsync(id, includeProperties);
 
-        public IQueryable<TEntity> GetTable(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null) =>
+        public IQueryable<TEntity> GetTable(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties) =>
             _dao.GetTable(includeProperties);
 
         public Task<TEntity> FindAsync(Guid id) => _dao.FindAsync(id);
 
         public Task<TEntity> Add(TEntity entity) => _dao.Add(entity);
 
-        public Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> filter, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null)
+        public Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> filter, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties)
             => _dao.GetFirstOrDefaultAsync(filter, includeProperties);
 
-        public Task<IEnumerable<TEntity>?> GetWhereAsync(Expression<Func<TEntity, bool>> filter, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null)
+        public Task<IEnumerable<TEntity>?> GetWhereAsync(Expression<Func<TEntity, bool>> filter, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties)
             => _dao.GetWhereAsync(filter, includeProperties);
 
         public void Attach(TEntity entity) => _dao.Attach(entity);

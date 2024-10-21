@@ -72,10 +72,12 @@ namespace Vouchee.Data.Helpers
         {
             try
             {
-                _context.Entry(entity).CurrentValues.SetValues(entity);
                 Table.Update(entity);
-                await _context.SaveChangesAsync();
-                return true;
+                if (await _context.SaveChangesAsync() > 0)
+                {
+                    return true;
+                }
+                return false;
             }
             catch (Exception ex)
             {
@@ -158,7 +160,7 @@ namespace Vouchee.Data.Helpers
                     query = includeProperties(query);
                 }
 
-                return await query.AsNoTracking().FirstOrDefaultAsync(e => EF.Property<object>(e, "Id").Equals(id));
+                return await query.FirstOrDefaultAsync(e => EF.Property<object>(e, "Id").Equals(id));
             }
             catch (Exception ex)
             {

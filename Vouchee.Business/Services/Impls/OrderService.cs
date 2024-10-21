@@ -89,44 +89,46 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<Guid?> CreateOrderAsync(ThisUserObj thisUserObj)
         {
-            CartDTO cartDTO = await _cartService.GetCartsAsync(thisUserObj);
+            return null;
+
+            //CartDTO cartDTO = await _cartService.GetCartsAsync(thisUserObj);
     
-            Order order = new()
-            {
-                PaymentType = "CASH",
-                Status = "PENDING", // Fixed typo from "PENING" to "PENDING"
-                CreateBy = thisUserObj.userId,
-                CreateDate = DateTime.Now,
-                OrderDetails = new List<OrderDetail>() // Assuming OrderDetails is a collection
-            };
+            //Order order = new()
+            //{
+            //    PaymentType = "CASH",
+            //    Status = "PENDING", // Fixed typo from "PENING" to "PENDING"
+            //    CreateBy = thisUserObj.userId,
+            //    CreateDate = DateTime.Now,
+            //    OrderDetails = new List<OrderDetail>() // Assuming OrderDetails is a collection
+            //};
 
-            // Loop through the vouchers in the cart and create corresponding OrderDetails
-            foreach (var voucher in cartDTO.vouchers)
-            {
-                order.OrderDetails.Add(new OrderDetail
-                {
-                    VoucherId = voucher.id, // Assuming the voucher has an Id
-                    Quantity = voucher.quantity, // Set quantity (if applicable)
-                    UnitPrice = (decimal) voucher.sellPrice, // Assuming each voucher has a Price property
-                });
-            }
+            //// Loop through the vouchers in the cart and create corresponding OrderDetails
+            //foreach (var voucher in cartDTO.sellers)
+            //{
+            //    order.OrderDetails.Add(new OrderDetail
+            //    {
+            //        VoucherId = voucher.id, // Assuming the voucher has an Id
+            //        Quantity = voucher.quantity, // Set quantity (if applicable)
+            //        UnitPrice = (decimal) voucher.sellPrice, // Assuming each voucher has a Price property
+            //    });
+            //}
 
-            order.TotalPrice = order.OrderDetails.Sum(x => x.TotalPrice);
-            order.DiscountValue = 0;
+            //order.TotalPrice = order.OrderDetails.Sum(x => x.TotalPrice);
+            //order.DiscountValue = 0;
 
-            Guid? orderId = await _orderRepository.AddAsync(order);
+            //Guid? orderId = await _orderRepository.AddAsync(order);
 
-            foreach (var voucher in cartDTO.vouchers)
-            {
-                await _cartService.RemoveItemAsync((Guid)voucher.id, thisUserObj);
+            //foreach (var voucher in cartDTO.sellers)
+            //{
+            //    await _cartService.RemoveItemAsync((Guid)voucher.id, thisUserObj);
 
-                Voucher voucherInstance = GetCurrentUser(thisUserObj.userId).Result.Carts.FirstOrDefault(x => x.VoucherId == voucher.id).Voucher;
-                voucherInstance.Quantity -= voucher.quantity;
+            //    Voucher voucherInstance = GetCurrentUser(thisUserObj.userId).Result.Carts.FirstOrDefault(x => x.VoucherId == voucher.id).Voucher;
+            //    voucherInstance.Quantity -= voucher.quantity;
 
-                await _voucherRepository.UpdateAsync(voucherInstance);
-            }
+            //    await _voucherRepository.UpdateAsync(voucherInstance);
+            //}
 
-            return orderId;
+            //return orderId;
         }
 
         public async Task<User> GetCurrentUser(Guid userId)

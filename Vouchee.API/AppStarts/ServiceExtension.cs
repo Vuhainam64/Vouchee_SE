@@ -96,7 +96,6 @@ namespace Vouchee.API.AppStarts
 
             // CART
             services.AddScoped<ICartService, CartService>();
-            services.AddScoped<ICartRepository, CartRepository>();
         }
 
         public static void AddSwaggerServices(this IServiceCollection services, IConfiguration configuration)
