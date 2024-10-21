@@ -51,34 +51,36 @@ namespace Vouchee.Business.Services.Impls
                 throw new ConflictException("Bạn chỉ có thể mua tối đa 5 loại voucher một lúc");
             }
 
-            Voucher existedVoucher = await _voucherRepository.FindAsync(voucherId);
+            Voucher existedVoucher = await _voucherRepository.GetByIdAsync(voucherId, includeProperties: x => x.Include(x => x.Medias)
+                                                                                                                .Include(x => x.Supplier)
+                                                                                                                .Include(x => x.Brand)
+                                                                                                                .Include(x => x.Seller));
             if (existedVoucher == null)
             {
                 throw new NotFoundException("Không tìm thầy voucher này");
             }
 
             var haveVoucher = userInstance.Carts.FirstOrDefault(x => x.VoucherId == voucherId);
-                if (haveVoucher != null)
+            if (haveVoucher != null)
+            {
+                haveVoucher.Quantity += 1;
+                haveVoucher.UpdateBy = thisUserObj.userId;
+                haveVoucher.UpdateDate = DateTime.Now;
+            }
+            else
+            {
+                userInstance.Carts.Add(new()
                 {
-                    haveVoucher.Quantity += 1;
-                    haveVoucher.UpdateBy = thisUserObj.userId;
-                    haveVoucher.UpdateDate = DateTime.Now;
-                }
-                else
-                {
-                    userInstance.Carts.Add(new()
-                    {
-                        VoucherId = voucherId,
-                        CreateBy = thisUserObj.userId,
-                        CreateDate = DateTime.Now,
-                        Quantity = 1,
-                        Status = ObjectStatusEnum.ACTIVE.ToString()
-                    });
-                }
+                    VoucherId = voucherId,
+                    CreateBy = thisUserObj.userId,
+                    CreateDate = DateTime.Now,
+                    Quantity = 1,
+                    Status = ObjectStatusEnum.ACTIVE.ToString(),
+                    Voucher = existedVoucher
+                });
+            }
 
             var result = await _userRepository.UpdateAsync(userInstance);
-
-            var user = GetCurrentUser(thisUserObj.userId);
 
             return result;
         }
@@ -131,7 +133,8 @@ namespace Vouchee.Business.Services.Impls
                     title = c.Voucher.Title,
                     originalPrice = c.Voucher.OriginalPrice,
                     sellPrice = c.Voucher.SellPrice,
-                    image = c.Voucher.Medias.FirstOrDefault(x => x.Type == MediaEnum.ADVERTISEMENT.ToString()).Url
+                    productImage = c.Voucher.Medias.FirstOrDefault(x => x.Type == MediaEnum.ADVERTISEMENT.ToString()).Url,
+                    medias = _mapper.Map<IList<GetMediaDTO>>(c.Voucher.Medias),
                 })
                 .ToList();
 
@@ -237,8 +240,8 @@ namespace Vouchee.Business.Services.Impls
             if (userInstance == null || !userInstance.Carts.Any(cart => cart.Voucher != null))
             {
                 userInstance = await _userRepository.GetByIdAsync(userId, includeProperties: x => x.Include(x => x.Carts)
-                                                                                                   .ThenInclude(x => x.Voucher)
-                                                                                                   .ThenInclude(x => x.Medias));
+                                                                                                                   .ThenInclude(x => x.Voucher)
+                                                                                                                   .ThenInclude(x => x.Medias));
             }
 
             return userInstance;

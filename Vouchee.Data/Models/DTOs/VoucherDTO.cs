@@ -303,14 +303,23 @@ namespace Vouchee.Business.Models.DTOs
 
     public class VoucherDTO
     {
+        public VoucherDTO()
+        {
+            medias = [];
+        }
+
+
         public Guid? id { get; set; }
 
         public string? title { get; set; }
         public decimal? originalPrice { get; set; }
         public decimal? sellPrice { get; set; }
         public decimal? salePrice { get; set; }
+        public string? productImage { get; set; }
         public decimal? percentDiscount { get; set; }
-        public string? image { get; set; }
+        public string? sellerName { get; set; }
+        public string? sellerImage { get; set; }
+        public virtual ICollection<GetMediaDTO> medias { get; set; }
     }
 
     public class CartVoucherDTO : VoucherDTO
