@@ -27,6 +27,8 @@ namespace Vouchee.Business.Services.Impls
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
 
+        private User? _currentUser;
+
         public CartService(IVoucherRepository voucherRepository,
                             IUserRepository userRepository, 
                             IMapper mapper)
@@ -38,57 +40,92 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<CartDTO> GetCartsAsync(ThisUserObj thisUserObj)
         {
-            var currentUser = _userRepository.CheckLocal().FirstOrDefault(x => x.Id == thisUserObj.userId);
-
-            if (currentUser == null)
+            if (_currentUser == null)
             {
-                var user = await _userRepository.GetByIdAsync(thisUserObj.userId, includeProperties: x => x.Include(x => x.Carts)
+                _currentUser = await _userRepository.GetByIdAsync(thisUserObj.userId, includeProperties: x => x.Include(x => x.Carts)
                                                                                             .ThenInclude(x => x.Voucher)
                                                                                                 .ThenInclude(x => x.Medias));
 
                 CartDTO cartDTO = new();
 
-                foreach (var cartItem in user.Carts)
+                foreach (var cartItem in _currentUser.Carts)
                 {
                     var currentVoucher = cartItem.Voucher;
-                    if (currentVoucher.Seller == null && (currentUser == null || currentUser.Carts.FirstOrDefault(x => x.Voucher.SellerID == currentVoucher.SellerID) == null))
-                    {
-                        currentVoucher = await _voucherRepository.GetByIdAsync(cartItem.VoucherId, includeProperties: x => x.Include(x => x.Seller));
-                    }
 
-                    var sellerCart = cartDTO.sellers.FirstOrDefault(s => s.id == currentVoucher.SellerID);
-                    if (sellerCart == null)
+                    if (currentVoucher != null)
                     {
-                        sellerCart = new SellerCartDTO
+                        if (currentVoucher.Seller == null)
                         {
-                            id = currentVoucher.SellerID,
-                            name = currentVoucher.Seller.Name,
-                            image = currentVoucher.Seller.Image,
-                            vouchers = new List<CartVoucherDTO>()
-                        };
-                        cartDTO.sellers.Add(sellerCart);
-                    }
+                            currentVoucher = await _voucherRepository.GetByIdAsync(cartItem.VoucherId, includeProperties: x => x.Include(x => x.Seller));
+                        }
 
-                    sellerCart.vouchers.Add(new CartVoucherDTO
-                    {
-                        id = cartItem.Voucher.Id,
-                        originalPrice = cartItem.Voucher.OriginalPrice,
-                        sellPrice = cartItem.Voucher.SellPrice,
-                        title = cartItem.Voucher.Title,
-                        quantity = cartItem.Quantity,
-                        productImage = _mapper.Map<IList<GetMediaDTO>>(cartItem.Voucher.Medias).FirstOrDefault(x => x.type == MediaEnum.ADVERTISEMENT)?.url
-                    });
+                        var sellerCart = cartDTO.sellers.FirstOrDefault(s => s.id == currentVoucher?.SellerID);
+                        if (sellerCart == null)
+                        {
+                            sellerCart = new SellerCartDTO
+                            {
+                                id = currentVoucher?.SellerID,
+                                name = currentVoucher?.Seller?.Name,
+                                image = currentVoucher?.Seller?.Image,
+                                vouchers = new List<CartVoucherDTO>()
+                            };
+                            cartDTO.sellers.Add(sellerCart);
+                        }
+
+                        sellerCart.vouchers.Add(new CartVoucherDTO
+                        {
+                            id = cartItem.Voucher?.Id,
+                            originalPrice = cartItem.Voucher?.OriginalPrice,
+                            sellPrice = cartItem.Voucher?.SellPrice,
+                            title = cartItem.Voucher?.Title,
+                            quantity = cartItem.Quantity,
+                            productImage = _mapper.Map<IList<GetMediaDTO>>(cartItem.Voucher?.Medias).FirstOrDefault(x => x.type == MediaEnum.ADVERTISEMENT)?.url
+                        });
+                    }
                 }
 
                 return cartDTO;
             }
-
+               
             return null;
         }
 
         public async Task<bool> AddItemAsync(Guid voucherId, ThisUserObj thisUserObj)
         {
-            var existedVoucher = await _voucherRepository.GetByIdAsync(voucherId, includeProperties: x => x.Include(x => x.Seller));
+            CartDTO cartDTO = await GetCartsAsync(thisUserObj);
+            var carts = _currentUser?.Carts.ToList();
+            if (carts != null && carts.Count != 0)
+            {
+                // Voucher exist in cart already
+                var cartVoucher = carts.FirstOrDefault(x => x.VoucherId == voucherId);
+                if (cartVoucher != null)
+                {
+                    cartVoucher.Quantity += 1;
+                    cartVoucher.UpdateBy = thisUserObj.userId;
+                    cartVoucher.UpdateDate = DateTime.Now;
+
+                    return await _userRepository.UpdateAsync(_currentUser);
+                }
+                else
+                {
+                    var existedVoucher = await _voucherRepository.GetByIdAsync(voucherId, includeProperties: x => x.Include(x => x.Medias));
+
+                    if (existedVoucher == null)
+                    {
+                        throw new NotFoundException("Không tìm thấy voucher này");
+                    }
+
+                    carts.Add(new()
+                    {
+                        CreateBy = thisUserObj.userId,
+                        CreateDate = DateTime.Now,
+                        Quantity = 1,
+                        Voucher = existedVoucher
+                    });
+
+                    return await _userRepository.UpdateAsync(_currentUser);
+                }
+            }
 
             return false;
             //Guid userId = thisUserObj.userId;

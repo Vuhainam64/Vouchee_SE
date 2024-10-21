@@ -69,23 +69,15 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<GetUserDTO> GetUserByEmailAsync(string email)
         {
-            try
+            var user = await _userRepository.GetUserByEmail(email);
+            if (user != null)
             {
-                var user = await _userRepository.GetUserByEmail(email);
-                if (user != null)
-                {
-                    GetUserDTO userDTO = _mapper.Map<GetUserDTO>(user);
-                    return userDTO;
-                }
-                else
-                {
-                    throw new NotFoundException($"Không tìm thấy user với email {email}");
-                }
+                GetUserDTO userDTO = _mapper.Map<GetUserDTO>(user);
+                return userDTO;
             }
-            catch (Exception ex)
+            else
             {
-                LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải user");
+                throw new NotFoundException($"Không tìm thấy user với email {email}");
             }
         }
 
