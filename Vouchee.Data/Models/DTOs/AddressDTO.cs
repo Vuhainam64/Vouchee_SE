@@ -22,7 +22,7 @@ namespace Vouchee.Business.Models.DTOs
         public DateTime? createDate = DateTime.Now;
     }
 
-    public class UpdateAddressDTO 
+    public class UpdateAddressDTO
     {
         [Column(TypeName = "decimal")]
         public string? name { get; set; }
@@ -58,12 +58,30 @@ namespace Vouchee.Business.Models.DTOs
 
     }
 
-    public class GetAddressDTO 
+    public class GetAddressDTO
     {
         public Guid? id { get; set; }
 
         public string? name { get; set; }
         public decimal? lon { get; set; }
         public decimal? lat { get; set; }
+    }
+
+    public class GetAddressBrandDTO
+    {
+        public GetAddressBrandDTO()
+        {
+            brands = [];
+        }
+
+        public Guid? id { get; set; }
+
+        public string? name { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? lon { get; set; }
+        [Column(TypeName = "decimal")]
+        public decimal? lat { get; set; }
+
+        public virtual ICollection<GetBradnAdressDTO> brands { get; set; }
     }
 }

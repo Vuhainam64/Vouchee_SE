@@ -8,6 +8,7 @@ using Vouchee.Data.Helpers;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Constants.Number;
+using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
 using Vouchee.Data.Repositories.IRepos;
@@ -90,20 +91,24 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<IList<GetAllAddressDTO>> GetAddressesAsync()
+        public async Task<DynamicResponseModel<GetAddressBrandDTO>> GetAddressesAsync(PagingRequest pagingRequest, AddressFilter addressFilter)
         {
-            IQueryable<GetAllAddressDTO> result;
-            try
+            (int, IQueryable<GetAddressBrandDTO>) result;
+            result = _addressRepository.GetTable()
+                        .ProjectTo<GetAddressBrandDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetAddressBrandDTO>(addressFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            return new DynamicResponseModel<GetAddressBrandDTO>()
             {
-                result = _addressRepository.GetTable()
-                            .ProjectTo<GetAllAddressDTO>(_mapper.ConfigurationProvider);
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải address");
-            }
-            return result.ToList();
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = result.Item2.ToList() // Return the paged voucher list with nearest address and distance
+            };
         }
 
         public async Task<bool> UpdateAddressAsync(Guid id, UpdateAddressDTO updateAddressDTO)

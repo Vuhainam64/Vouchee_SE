@@ -61,9 +61,10 @@ namespace Vouchee.API.Controllers
 
         // READ
         [HttpGet("get_all_address")]
-        public async Task<IActionResult> GetAddresses()
+        public async Task<IActionResult> GetAddresses([FromQuery] PagingRequest pagingRequest,
+                                                        [FromQuery] AddressFilter addressFilter)
         {
-            var result = await _addressRepository.GetAddressesAsync();
+            var result = await _addressRepository.GetAddressesAsync(pagingRequest, addressFilter);
             return Ok(result);
         }
 

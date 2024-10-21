@@ -12,7 +12,7 @@ namespace Vouchee.Business.Services
 
         // READ
         public Task<GetAllAddressDTO> GetAddressByIdAsync(Guid id);
-        public Task<IList<GetAllAddressDTO>> GetAddressesAsync();
+        public Task<DynamicResponseModel<GetAddressBrandDTO>> GetAddressesAsync(PagingRequest pagingRequest, AddressFilter addressFilter);
 
         // UPDATE
         public Task<bool> UpdateAddressAsync(Guid id, UpdateAddressDTO updateAddressDTO);

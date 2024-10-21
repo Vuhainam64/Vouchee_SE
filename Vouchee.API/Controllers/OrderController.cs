@@ -55,11 +55,28 @@ namespace Vouchee.API.Controllers
 
         // READ
         [HttpGet("get_all_order")]
-        [Authorize]
-        public async Task<IActionResult> GetOrders()
+        public async Task<IActionResult> GetOrders([FromQuery] PagingRequest pagingRequest, [FromQuery] OrderFilter orderFilter)
         {
-            var result = await _orderService.GetOrdersAsync();
+            var result = await _orderService.GetOrdersAsync(pagingRequest, orderFilter, null);
             return Ok(result);
+        }
+
+        [HttpGet("get_buyer_order")]
+        public async Task<IActionResult> GetBuyerOrders([FromQuery] PagingRequest pagingRequest, [FromQuery] OrderFilter orderFilter)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+
+            if (RoleHelper.IsBuyer(currentUser))
+            {
+                var result = await _orderService.GetOrdersAsync(pagingRequest, orderFilter, currentUser);
+                return Ok(result);
+            }
+
+            return StatusCode((int)HttpStatusCode.Forbidden, new
+            {
+                code = HttpStatusCode.Forbidden,
+                message = "Chỉ có người mua mới có thể thực hiện chức năng này"
+            });
         }
 
         [HttpGet("get_order/{id}")]

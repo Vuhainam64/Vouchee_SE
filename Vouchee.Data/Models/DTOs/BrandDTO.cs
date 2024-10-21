@@ -56,4 +56,12 @@ namespace Vouchee.Data.Models.DTOs
 
         public virtual ICollection<GetAddressDTO> addresses { get; set; }
     }
+
+    public class GetBradnAdressDTO
+    {
+        public Guid? id { get; set; }
+
+        public string? image { get; set; }
+        public string? name { get; set; }
+    }
 }
