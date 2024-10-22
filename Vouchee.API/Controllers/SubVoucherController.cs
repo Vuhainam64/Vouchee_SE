@@ -13,19 +13,19 @@ using Vouchee.Data.Models.Filters;
 namespace Vouchee.API.Controllers
 {
     [ApiController]
-    [Route("api/subVoucher")]
+    [Route("api/modal")]
     [EnableCors("MyAllowSpecificOrigins")]
-    public class SubVoucherController : ControllerBase
+    public class ModalController : ControllerBase
     {
-        private readonly ISubVoucherService _subVoucherService;
+        private readonly IModalService _modalService;
         private readonly IUserService _userService;
         private readonly IRoleService _roleService;
 
-        public SubVoucherController(ISubVoucherService subVoucherService, 
+        public ModalController(IModalService modalService, 
                                         IUserService userService, 
                                         IRoleService roleService)
         {
-            _subVoucherService = subVoucherService;
+            _modalService = modalService;
             _userService = userService;
             _roleService = roleService;
         }
@@ -33,14 +33,14 @@ namespace Vouchee.API.Controllers
         // CREATE
         [HttpPost("create_sub_voucher")]
         [Authorize]
-        public async Task<IActionResult> CreateSubVoucher(Guid voucherId, [FromBody] CreateSubVoucherDTO createSubVoucherDTO)
+        public async Task<IActionResult> CreateModal(Guid voucherId, [FromBody] CreateModalDTO createModalDTO)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
             //SELLER
             if (currentUser.roleId.Equals(currentUser.sellerRoleId))
             {
-                var result = await _subVoucherService.CreateSubVoucherAsync(voucherId, createSubVoucherDTO, currentUser);
+                var result = await _modalService.CreateModalAsync(voucherId, createModalDTO, currentUser);
                 return Ok(result);
             }
 
@@ -53,10 +53,10 @@ namespace Vouchee.API.Controllers
 
         // READ
         [HttpGet("get_all_sub_voucher")]
-        public async Task<IActionResult> GetSubVouchers([FromQuery] PagingRequest pagingRequest,
-                                                            [FromQuery] SubVoucherFilter subVoucherFilter)
+        public async Task<IActionResult> GetModals([FromQuery] PagingRequest pagingRequest,
+                                                            [FromQuery] ModalFilter modalFilter)
         {
-            var result = await _subVoucherService.GetSubVouchersAsync(pagingRequest, subVoucherFilter);
+            var result = await _modalService.GetModalsAsync(pagingRequest, modalFilter);
             return Ok(result);
         }
 
@@ -64,15 +64,15 @@ namespace Vouchee.API.Controllers
         [HttpGet("get_sub_voucher/{id}")]
         public async Task<IActionResult> GetVoucherCodeById(Guid id)
         {
-            var subVoucher = await _subVoucherService.GetSubVoucherByIdAsync(id);
-            return Ok(subVoucher);
+            var modal = await _modalService.GetModalByIdAsync(id);
+            return Ok(modal);
         }
 
         // UPDATE
         [HttpPut("update_sub_voucher/{id}")]
-        public async Task<IActionResult> UpdateVoucherCode(Guid id, [FromBody] UpdateSubVoucherDTO updateSubVoucherDTO)
+        public async Task<IActionResult> UpdateVoucherCode(Guid id, [FromBody] UpdateModalDTO updateModalDTO)
         {
-            var result = await _subVoucherService.UpdateSubVoucherAsync(id, updateSubVoucherDTO);
+            var result = await _modalService.UpdateModalAsync(id, updateModalDTO);
             return Ok(result);
         }
 
@@ -80,7 +80,7 @@ namespace Vouchee.API.Controllers
         [HttpDelete("delete_sub_voucher/{id}")]
         public async Task<IActionResult> DeleteVoucherCode(Guid id)
         {
-            var result = await _subVoucherService.DeleteSubVoucherAsync(id);
+            var result = await _modalService.DeleteModalAsync(id);
             return Ok(result);
         }
     }

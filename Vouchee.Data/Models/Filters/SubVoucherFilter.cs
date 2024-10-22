@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Filters
 {
-    public class SubVoucherFilter
+    public class ModalFilter
     {
         public string? title { get; set; }
     }

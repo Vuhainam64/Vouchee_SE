@@ -9,19 +9,19 @@ using Vouchee.Data.Models.Filters;
 
 namespace Vouchee.Business.Services
 {
-    public interface ISubVoucherService
+    public interface IModalService
     {
         // CREATE
-        public Task<Guid?> CreateSubVoucherAsync(Guid voucherId, CreateSubVoucherDTO createSubVoucherDTO, ThisUserObj thisUserObj);
+        public Task<Guid?> CreateModalAsync(Guid voucherId, CreateModalDTO createModalDTO, ThisUserObj thisUserObj);
 
         // READ
-        public Task<GetSubVoucherDTO> GetSubVoucherByIdAsync(Guid id);
-        public Task<DynamicResponseModel<GetSubVoucherDTO>> GetSubVouchersAsync(PagingRequest pagingRequest, SubVoucherFilter subVoucherFilter);
+        public Task<GetModalDTO> GetModalByIdAsync(Guid id);
+        public Task<DynamicResponseModel<GetModalDTO>> GetModalsAsync(PagingRequest pagingRequest, ModalFilter modalFilter);
 
         // UPDATE
-        public Task<bool> UpdateSubVoucherAsync(Guid id, UpdateSubVoucherDTO updateSubVoucherDTO);
+        public Task<bool> UpdateModalAsync(Guid id, UpdateModalDTO updateModalDTO);
 
         // DELETE
-        public Task<bool> DeleteSubVoucherAsync(Guid id);
+        public Task<bool> DeleteModalAsync(Guid id);
     }
 }

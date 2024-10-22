@@ -22,26 +22,26 @@ using Vouchee.Data.Repositories.Repos;
 
 namespace Vouchee.Business.Services.Impls
 {
-    public class SubVoucherService : ISubVoucherService
+    public class ModalService : IModalService
     {
         private readonly IVoucherRepository _voucherRepository;
         private readonly IFileUploadService _fileUploadService;
-        private readonly ISubVoucherRepository _subVoucherRepository;
+        private readonly IModalRepository _modalRepository;
         private readonly IMapper _mapper;
-        public SubVoucherService(IVoucherRepository voucherRepository,
+        public ModalService(IVoucherRepository voucherRepository,
                                     IFileUploadService fileUploadService,
-                                    ISubVoucherRepository subVoucherRepository, 
+                                    IModalRepository modalRepository, 
                                     IMapper mapper)
         {
             _voucherRepository = voucherRepository;
             _fileUploadService = fileUploadService;
-            _subVoucherRepository = subVoucherRepository;
+            _modalRepository = modalRepository;
             _mapper = mapper;
         }
 
-        public async Task<Guid?> CreateSubVoucherAsync(Guid voucherId, CreateSubVoucherDTO createSubVoucherDTO, ThisUserObj thisUserObj)
+        public async Task<Guid?> CreateModalAsync(Guid voucherId, CreateModalDTO createModalDTO, ThisUserObj thisUserObj)
         {
-            SubVoucher subVoucher = _mapper.Map<SubVoucher>(createSubVoucherDTO);
+            Modal modal = _mapper.Map<Modal>(createModalDTO);
 
             var existVoucher = await _voucherRepository.FindAsync(voucherId);
             
@@ -50,10 +50,10 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Không tìm thấy voucher với id");
             }
 
-            subVoucher.VoucherId = voucherId;
-            subVoucher.CreateBy = thisUserObj.userId;
+            modal.VoucherId = voucherId;
+            modal.CreateBy = thisUserObj.userId;
 
-            foreach (var image in createSubVoucherDTO.productImagesUrl)
+            foreach (var image in createModalDTO.productImagesUrl)
             {
                 Media newImage = new()
                 {
@@ -67,45 +67,45 @@ namespace Vouchee.Business.Services.Impls
 
                 if (newImage != null)
                 {
-                    subVoucher.Medias.Add(newImage);
+                    modal.Medias.Add(newImage);
                 }
             }
 
-            return await _subVoucherRepository.AddAsync(subVoucher);
+            return await _modalRepository.AddAsync(modal);
         }
 
-        public async Task<bool> DeleteSubVoucherAsync(Guid id)
+        public async Task<bool> DeleteModalAsync(Guid id)
         {
-            SubVoucher subVoucher = await _subVoucherRepository.FindAsync(id);
-            if (subVoucher != null)
+            Modal modal = await _modalRepository.FindAsync(id);
+            if (modal != null)
             {
-                return await _subVoucherRepository.DeleteAsync(subVoucher);
+                return await _modalRepository.DeleteAsync(modal);
             }
             return false;
         }
 
-        public async Task<GetSubVoucherDTO> GetSubVoucherByIdAsync(Guid id)
+        public async Task<GetModalDTO> GetModalByIdAsync(Guid id)
         {
-            SubVoucher subVoucher = await _subVoucherRepository.GetByIdAsync(id,
+            Modal modal = await _modalRepository.GetByIdAsync(id,
                 includeProperties: query => query.Include(x => x.Medias));
-            if (subVoucher != null)
+            if (modal != null)
             {
-                GetSubVoucherDTO getSubVoucherDTO = _mapper.Map<GetSubVoucherDTO>(subVoucher);
-                getSubVoucherDTO.image = getSubVoucherDTO.images.Count != 0 ? getSubVoucherDTO.images.FirstOrDefault().url : null;
-                return getSubVoucherDTO;
+                GetModalDTO getModalDTO = _mapper.Map<GetModalDTO>(modal);
+                getModalDTO.image = getModalDTO.images.Count != 0 ? getModalDTO.images.FirstOrDefault().url : null;
+                return getModalDTO;
             }
             throw new NotFoundException("Khong tim thay sub voucher");
         }
 
-        public async Task<DynamicResponseModel<GetSubVoucherDTO>> GetSubVouchersAsync(PagingRequest pagingRequest, SubVoucherFilter subVoucherFilter)
+        public async Task<DynamicResponseModel<GetModalDTO>> GetModalsAsync(PagingRequest pagingRequest, ModalFilter modalFilter)
         {
 
-            (int, IQueryable<GetSubVoucherDTO>) result;
+            (int, IQueryable<GetModalDTO>) result;
             try
             {
-                result = _subVoucherRepository.GetTable()
-                            .ProjectTo<GetSubVoucherDTO>(_mapper.ConfigurationProvider)
-                            .DynamicFilter(_mapper.Map<GetSubVoucherDTO>(subVoucherFilter))
+                result = _modalRepository.GetTable()
+                            .ProjectTo<GetModalDTO>(_mapper.ConfigurationProvider)
+                            .DynamicFilter(_mapper.Map<GetModalDTO>(modalFilter))
                             .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
             }
             catch (Exception ex)
@@ -113,7 +113,7 @@ namespace Vouchee.Business.Services.Impls
                 LoggerService.Logger(ex.Message);
                 throw new LoadException("Lỗi không xác định khi tải sub voucher");
             }
-            return new DynamicResponseModel<GetSubVoucherDTO>()
+            return new DynamicResponseModel<GetModalDTO>()
             {
                 metaData = new MetaData()
                 {
@@ -125,7 +125,7 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public Task<bool> UpdateSubVoucherAsync(Guid id, UpdateSubVoucherDTO updateSubVoucherDTO)
+        public Task<bool> UpdateModalAsync(Guid id, UpdateModalDTO updateModalDTO)
         {
             throw new NotImplementedException();
         }

@@ -10,22 +10,17 @@ using System.Threading.Tasks;
 namespace Vouchee.Data.Models.Entities
 {
     [Table("Media")]
-    [Index(nameof(VoucherId), Name = "IX_Image_VoucherId")]
-    [Index(nameof(SubVoucherId), Name = "IX_Image_SubVoucherId")]
+    [Index(nameof(ModalId), Name = "IX_Image_ModalId")]
+    [Index(nameof(AddressId), Name = "IX_Image_AddressId")]
     public class Media
     {
-        public Guid? VoucherId { get; set; }
-        [ForeignKey(nameof(VoucherId))]
+        public Guid? ModalId { get; set; }
+        [ForeignKey(nameof(ModalId))]
         [InverseProperty("Medias")]
-        public virtual Voucher? Voucher { get; set; }
-
-        public Guid? SubVoucherId { get; set; }
-        [ForeignKey(nameof(SubVoucherId))]
-        [InverseProperty("Medias")]
-        public virtual SubVoucher? SubVoucher { get; set; }
+        public virtual Modal? Modal { get; set; }
 
         public Guid? AddressId { get; set; }
-        [ForeignKey(nameof(SubVoucherId))]
+        [ForeignKey(nameof(ModalId))]
         [InverseProperty("Medias")]
         public virtual Address? Address { get; set; }
 

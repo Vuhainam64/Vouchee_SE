@@ -26,13 +26,13 @@ namespace Vouchee.Data.Repositories.Repos
                 User user = await _userDAO.GetFirstOrDefaultAsync(
                     filter: x => x.Email.ToLower().Equals(email.ToLower()),
                     includeProperties: query => query
-                        .Include(x => x.Role) // Include the Role of the User
-                        .Include(x => x.Carts) // Include Carts related to the User
-                            .ThenInclude(cart => cart.Voucher) // Include Voucher for each Cart
-                                .ThenInclude(voucher => voucher.Medias) // Include Medias for each Voucher
-                        .Include(x => x.Carts) // Re-include Carts to allow for further ThenIncludes
-                            .ThenInclude(cart => cart.Voucher) // Re-include Voucher for each Cart to include Seller
-                                .ThenInclude(voucher => voucher.Seller) // Include Seller for each Voucher
+                        .Include(x => x.Role)
+                        .Include(x => x.Carts)
+                            .ThenInclude(cart => cart.Modal) 
+                                .ThenInclude(voucher => voucher.Medias) 
+                        .Include(x => x.Carts)
+                            .ThenInclude(cart => cart.Modal) 
+                                .ThenInclude(voucher => voucher.Voucher.Seller)
                 );
                 if (user != null)
                 {

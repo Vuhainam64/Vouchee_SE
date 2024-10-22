@@ -47,32 +47,32 @@ namespace Vouchee.Business.Services.Impls
 
             foreach (var cartItem in _currentUser.Carts)
             {
-                var currentVoucher = cartItem.Voucher;
+                var currentVoucher = cartItem.Modal;
 
                 if (currentVoucher != null)
                 {
-                    var sellerCart = cartDTO.sellers.FirstOrDefault(s => s.id == currentVoucher?.SellerID);
-                    if (sellerCart == null)
-                    {
-                        sellerCart = new SellerCartDTO
-                        {
-                            id = currentVoucher?.SellerID,
-                            name = currentVoucher?.Seller?.Name,
-                            image = currentVoucher?.Seller?.Image,
-                            vouchers = new List<CartVoucherDTO>()
-                        };
-                        cartDTO.sellers.Add(sellerCart);
-                    }
+                    //var sellerCart = cartDTO.sellers.FirstOrDefault(s => s.id == currentVoucher?.SellerID);
+                    //if (sellerCart == null)
+                    //{
+                    //    sellerCart = new SellerCartDTO
+                    //    {
+                    //        //id = currentVoucher?.SellerID,
+                    //        //name = currentVoucher?.Seller?.Name,
+                    //        //image = currentVoucher?.Seller?.Image,
+                    //        vouchers = new List<CartVoucherDTO>()
+                    //    };
+                    //    cartDTO.sellers.Add(sellerCart);
+                    //}
 
-                    sellerCart.vouchers.Add(new CartVoucherDTO
-                    {
-                        id = cartItem.Voucher?.Id,
-                        originalPrice = cartItem.Voucher?.OriginalPrice,
-                        sellPrice = cartItem.Voucher?.SellPrice,
-                        title = cartItem.Voucher?.Title,
-                        quantity = cartItem.Quantity,
-                        productImage = _mapper.Map<IList<GetMediaDTO>>(cartItem.Voucher?.Medias).FirstOrDefault(x => x.type == MediaEnum.ADVERTISEMENT)?.url
-                    });
+                    //sellerCart.vouchers.Add(new CartVoucherDTO
+                    //{
+                    //    id = cartItem.Modal?.Id,
+                    //    //originalPrice = cartItem.Voucher?.OriginalPrice,
+                    //    //sellPrice = cartItem.Voucher?.SellPrice,
+                    //    title = cartItem.Modal?.Name,
+                    //    quantity = cartItem.Quantity,
+                    //    productImage = _mapper.Map<IList<GetMediaDTO>>(cartItem.Modal?.Medias).FirstOrDefault(x => x.type == MediaEnum.ADVERTISEMENT)?.url
+                    //});
                 }
             }
 
@@ -86,7 +86,7 @@ namespace Vouchee.Business.Services.Impls
             if (_currentUser.Carts != null && _currentUser.Carts.Count != 0)
             {
                 // Voucher exist in cart already
-                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.VoucherId == voucherId);
+                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.ModalId == voucherId);
                 if (cartVoucher != null)
                 {
                     if (cartVoucher.Quantity >= 20)
@@ -104,20 +104,20 @@ namespace Vouchee.Business.Services.Impls
                 }
                 else
                 {
-                    var existedVoucher = await _voucherRepository.GetByIdAsync(voucherId, includeProperties: x => x.Include(x => x.Medias));
+                    //var existedVoucher = await _voucherRepository.GetByIdAsync(voucherId, includeProperties: x => x.Include(x => x.Medias));
 
-                    if (existedVoucher == null)
-                    {
-                        throw new NotFoundException("Không tìm thấy voucher này");
-                    }
+                    //if (existedVoucher == null)
+                    //{
+                    //    throw new NotFoundException("Không tìm thấy voucher này");
+                    //}
 
-                    _currentUser.Carts.Add(new()
-                    {
-                        CreateBy = thisUserObj.userId,
-                        CreateDate = DateTime.Now,
-                        Quantity = 1,
-                        Voucher = existedVoucher,
-                    });
+                    //_currentUser.Carts.Add(new()
+                    //{
+                    //    CreateBy = thisUserObj.userId,
+                    //    CreateDate = DateTime.Now,
+                    //    Quantity = 1,
+                    //    Modal = existedVoucher,
+                    //});
 
                     return await _userRepository.UpdateAsync(_currentUser);
                 }
@@ -174,7 +174,7 @@ namespace Vouchee.Business.Services.Impls
             if (_currentUser.Carts != null && _currentUser.Carts.Count != 0)
             {
                 // Voucher exist in cart already
-                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.VoucherId == voucherId);
+                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.ModalId == voucherId);
                 if (cartVoucher == null)
                 {
                     throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
@@ -224,7 +224,7 @@ namespace Vouchee.Business.Services.Impls
             if (_currentUser.Carts != null && _currentUser.Carts.Count != 0)
             {
                 // Voucher exist in cart already
-                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.VoucherId == voucherId);
+                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.ModalId == voucherId);
                 if (cartVoucher == null)
                 {
                     throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
@@ -275,7 +275,7 @@ namespace Vouchee.Business.Services.Impls
             if (_currentUser.Carts != null && _currentUser.Carts.Count != 0)
             {
                 // Voucher exist in cart already
-                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.VoucherId == voucherId);
+                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.ModalId == voucherId);
                 if (cartVoucher == null) 
                 {
                     throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
@@ -321,7 +321,7 @@ namespace Vouchee.Business.Services.Impls
             if (_currentUser.Carts != null && _currentUser.Carts.Count != 0)
             {
                 // Voucher exist in cart already
-                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.VoucherId == voucherId);
+                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.ModalId == voucherId);
                 if (cartVoucher == null)
                 {
                     throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");

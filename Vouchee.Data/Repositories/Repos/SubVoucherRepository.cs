@@ -9,7 +9,7 @@ using Vouchee.Data.Repositories.IRepos;
 
 namespace Vouchee.Data.Repositories.Repos
 {
-    public class SubVoucherRepository : BaseRepository<SubVoucher>, ISubVoucherRepository
+    public class ModalRepository : BaseRepository<Modal>, IModalRepository
     {
     }
 }

@@ -26,8 +26,7 @@ namespace Vouchee.Data.Migrations
                     UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     VerifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    VerifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    AddressHash = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    VerifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -265,9 +264,6 @@ namespace Vouchee.Data.Migrations
                     SellerID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OriginalPrice = table.Column<decimal>(type: "decimal(10,5)", nullable: false),
-                    SellPrice = table.Column<decimal>(type: "decimal(10,5)", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
                     Rating = table.Column<decimal>(type: "decimal(10,5)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: false),
@@ -298,36 +294,6 @@ namespace Vouchee.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Cart",
-                columns: table => new
-                {
-                    VoucherId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BuyerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: false),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Cart", x => new { x.BuyerId, x.VoucherId });
-                    table.ForeignKey(
-                        name: "FK_Cart_User_BuyerId",
-                        column: x => x.BuyerId,
-                        principalTable: "User",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
-                    table.ForeignKey(
-                        name: "FK_Cart_Voucher_VoucherId",
-                        column: x => x.VoucherId,
-                        principalTable: "Voucher",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "CategoryVoucher",
                 columns: table => new
                 {
@@ -346,6 +312,34 @@ namespace Vouchee.Data.Migrations
                     table.ForeignKey(
                         name: "FK_CategoryVoucher_Voucher_VouchersId",
                         column: x => x.VouchersId,
+                        principalTable: "Voucher",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Modal",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
+                    VoucherId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OriginalPrice = table.Column<decimal>(type: "decimal(10,5)", nullable: false),
+                    SellPrice = table.Column<decimal>(type: "decimal(10,5)", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Index = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: false),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Modal", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Modal_Voucher_VoucherId",
+                        column: x => x.VoucherId,
                         principalTable: "Voucher",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -409,15 +403,44 @@ namespace Vouchee.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SubVoucher",
+                name: "Cart",
+                columns: table => new
+                {
+                    ModalId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BuyerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: false),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Cart", x => new { x.BuyerId, x.ModalId });
+                    table.ForeignKey(
+                        name: "FK_Cart_Modal_ModalId",
+                        column: x => x.ModalId,
+                        principalTable: "Modal",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Cart_User_BuyerId",
+                        column: x => x.BuyerId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Media",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    VoucherId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    OriginalPrice = table.Column<decimal>(type: "decimal(10,5)", nullable: false),
-                    SellPrice = table.Column<decimal>(type: "decimal(10,5)", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    VoucherId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModalId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    AddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: false),
                     CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -426,13 +449,22 @@ namespace Vouchee.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SubVoucher", x => x.Id);
+                    table.PrimaryKey("PK_Media", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SubVoucher_Voucher_VoucherId",
+                        name: "FK_Media_Address_ModalId",
+                        column: x => x.ModalId,
+                        principalTable: "Address",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Media_Modal_ModalId",
+                        column: x => x.ModalId,
+                        principalTable: "Modal",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Media_Voucher_VoucherId",
                         column: x => x.VoucherId,
                         principalTable: "Voucher",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -466,42 +498,6 @@ namespace Vouchee.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Media",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    VoucherId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SubVoucherId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    AddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: false),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Media", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Media_Address_SubVoucherId",
-                        column: x => x.SubVoucherId,
-                        principalTable: "Address",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Media_SubVoucher_SubVoucherId",
-                        column: x => x.SubVoucherId,
-                        principalTable: "SubVoucher",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Media_Voucher_VoucherId",
-                        column: x => x.VoucherId,
-                        principalTable: "Voucher",
-                        principalColumn: "Id");
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_AddressBrand_BrandsId",
                 table: "AddressBrand",
@@ -513,9 +509,9 @@ namespace Vouchee.Data.Migrations
                 column: "BuyerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Cart_VoucherId",
+                name: "IX_Cart_ModalId",
                 table: "Cart",
-                column: "VoucherId");
+                column: "ModalId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Category_VoucherTypeId",
@@ -528,13 +524,23 @@ namespace Vouchee.Data.Migrations
                 column: "VouchersId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Image_SubVoucherId",
+                name: "IX_Image_AddressId",
                 table: "Media",
-                column: "SubVoucherId");
+                column: "AddressId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Image_ModalId",
+                table: "Media",
+                column: "ModalId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Image_VoucherId",
                 table: "Media",
+                column: "VoucherId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Modal_VoucherId",
+                table: "Modal",
                 column: "VoucherId");
 
             migrationBuilder.CreateIndex(
@@ -566,11 +572,6 @@ namespace Vouchee.Data.Migrations
                 name: "IX_PromotionVoucher_VouchersId",
                 table: "PromotionVoucher",
                 column: "VouchersId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SubVoucher_VoucherId",
-                table: "SubVoucher",
-                column: "VoucherId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_User_RoleId",
@@ -631,7 +632,7 @@ namespace Vouchee.Data.Migrations
                 name: "Address");
 
             migrationBuilder.DropTable(
-                name: "SubVoucher");
+                name: "Modal");
 
             migrationBuilder.DropTable(
                 name: "OrderDetail");

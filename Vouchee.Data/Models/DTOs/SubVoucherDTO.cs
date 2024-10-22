@@ -11,7 +11,7 @@ using Vouchee.Data.Models.Entities;
 
 namespace Vouchee.Data.Models.DTOs
 {
-    public class CreateSubVoucherDTO
+    public class CreateModalDTO
     {
         [Required(ErrorMessage = "Title is required")]
         [StringLength(100, ErrorMessage = "Title cannot exceed 100 characters")]
@@ -36,15 +36,15 @@ namespace Vouchee.Data.Models.DTOs
         public DateTime createDate = DateTime.Now;
     }
 
-    public class UpdateSubVoucherDTO : CreateSubVoucherDTO
+    public class UpdateModalDTO : CreateModalDTO
     {
 
     }
 
-    public class GetSubVoucherDTO
+    public class GetModalDTO
     {
 
-        public GetSubVoucherDTO()
+        public GetModalDTO()
         {
             images = new HashSet<GetMediaDTO>();
         }

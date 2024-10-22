@@ -99,7 +99,7 @@ namespace Vouchee.Business.Services.Impls
                             Type = MediaEnum.PRODUCT.ToString(),
                         };
 
-                        voucher.Medias.Add(image);
+                        //voucher.Medias.Add(image);
                     }
                 }
 
@@ -114,10 +114,10 @@ namespace Vouchee.Business.Services.Impls
                         Type = MediaEnum.ADVERTISEMENT.ToString()
                     };
 
-                    if (image.Url != null)
-                    {
-                        voucher.Medias.Add(image);
-                    }
+                    //if (image.Url != null)
+                    //{
+                    //    voucher.Medias.Add(image);
+                    //}
                 }
 
                 if (createVoucherDTO.videoUrl != null)
@@ -131,19 +131,19 @@ namespace Vouchee.Business.Services.Impls
                         Type = MediaEnum.VIDEO.ToString()
                     };
 
-                    if (image.Url != null)
-                    {
-                        voucher.Medias.Add(image);
-                    }
+                    //if (image.Url != null)
+                    //{
+                    //    voucher.Medias.Add(image);
+                    //}
                 }
 
-                if (createVoucherDTO.subVouchers != null && createVoucherDTO.subVouchers.Count != 0)
+                if (createVoucherDTO.modals != null && createVoucherDTO.modals.Count != 0)
                 {
-                    foreach (var subVoucher in createVoucherDTO.subVouchers)
+                    foreach (var modal in createVoucherDTO.modals)
                     {
-                        SubVoucher newSubVoucher = _mapper.Map<SubVoucher>(subVoucher);
-                        newSubVoucher.CreateBy = thisUserObj.userId;
-                        voucher.SubVouchers.Add(newSubVoucher);
+                        Modal newModal = _mapper.Map<Modal>(modal);
+                        newModal.CreateBy = thisUserObj.userId;
+                        voucher.Modals.Add(newModal);
                     }
                 }
 
@@ -195,7 +195,7 @@ namespace Vouchee.Business.Services.Impls
 
                 // Retrieve all vouchers and map to DTO
                 var vouchers = _voucherRepository.GetTable()
-                    .Include(x => x.Medias)
+                    //.Include(x => x.Medias)
                     .Include(x => x.Supplier)
                     .Include(x => x.Categories)
                     .Include(x => x.Brand)
@@ -303,7 +303,7 @@ namespace Vouchee.Business.Services.Impls
             try
             {
                 result = _voucherRepository.GetTable()
-                                            .Include(x => x.Medias)
+                                            //.Include(x => x.Medias)
                                             .Include(x => x.Supplier)
                                             .Include(x => x.Categories)
                                             .Include(x => x.Brand)
@@ -360,7 +360,7 @@ namespace Vouchee.Business.Services.Impls
 
             // Join the vouchers and return with sorted totalQuantitySold
             voucher = _voucherRepository.GetTable()
-                .Include(x => x.Medias)
+                //.Include(x => x.Medias)
                 .Include(x => x.Supplier)
                 .Include(x => x.Categories)
                 .Include(x => x.Brand)
@@ -421,7 +421,7 @@ namespace Vouchee.Business.Services.Impls
                                                     //.Include(x => x.Addresses)
                                                     .Include(x => x.Categories)
                                                         .ThenInclude(x => x.VoucherType)
-                                                    .Include(x => x.Medias)
+                                                    //.Include(x => x.Medias)
                                                     //.Include(x => x.VoucherType)
                                                     .Include(x => x.Seller));
 
@@ -484,7 +484,7 @@ namespace Vouchee.Business.Services.Impls
             try
             {
                 decimal R = 6371; // Earth's radius in kilometers
-                result.Item2 = _voucherRepository.GetTable(includeProperties: x => x.Include(x => x.Medias)
+                result.Item2 = _voucherRepository.GetTable(includeProperties: x => x/*.Include(x => x.Medias)*/
                                                                                     .Include(x => x.Supplier)
                                                                                     .Include(x => x.Categories)
                                                                                     .Include(x => x.Brand)
@@ -670,8 +670,8 @@ namespace Vouchee.Business.Services.Impls
                                                                     .ThenInclude(v => v.Categories) // Include categories of the vouchers
                                                                 .Include(x => x.Vouchers)
                                                                     .ThenInclude(v => v.Brand) // Include the brand of the vouchers
-                                                                .Include(x => x.Vouchers)
-                                                                    .ThenInclude(x => x.Medias)
+                                                                //.Include(x => x.Vouchers)
+                                                                //    .ThenInclude(x => x.Medias)
                                                                 .Include(x => x.Vouchers)
                                                                     .ThenInclude(x => x.Supplier)
                                                                 .ToList()
@@ -688,8 +688,8 @@ namespace Vouchee.Business.Services.Impls
                             var existedVoucher = _mapper.Map<GetNewestVoucherDTO>(voucher);
                             existedVoucher.salePrice = existedVoucher.originalPrice - (existedVoucher.originalPrice * promotion.PercentDiscount / 100);
                             existedVoucher.percentDiscount = promotion.PercentDiscount;
-                            existedVoucher.image = voucher.Medias.Count != 0 ? voucher.Medias.FirstOrDefault(x => x.Type == MediaEnum.ADVERTISEMENT.ToString()).Url : null;
-                            vouchers.Add(existedVoucher);
+                            //existedVoucher.image = voucher.Medias.Count != 0 ? voucher.Medias.FirstOrDefault(x => x.Type == MediaEnum.ADVERTISEMENT.ToString()).Url : null;
+                            //vouchers.Add(existedVoucher);
                         }
                     }
                 }

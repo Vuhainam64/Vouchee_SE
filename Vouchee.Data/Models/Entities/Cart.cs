@@ -11,13 +11,13 @@ namespace Vouchee.Data.Models.Entities
 {
     [Table("Cart")]
     [Index(nameof(BuyerId), Name = "IX_Cart_BuyerId")]
-    [Index(nameof(VoucherId), Name = "IX_Cart_VoucherId")]
+    [Index(nameof(ModalId), Name = "IX_Cart_ModalId")]
     public partial class Cart
     {
-        public Guid VoucherId { get; set; }
-        [ForeignKey(nameof(VoucherId))]
+        public Guid ModalId { get; set; }
+        [ForeignKey(nameof(ModalId))]
         [InverseProperty("Carts")]
-        public virtual Voucher? Voucher { get; set; }
+        public virtual Modal? Modal { get; set; }
 
         public Guid? BuyerId { get; set; }
         [ForeignKey(nameof(BuyerId))]

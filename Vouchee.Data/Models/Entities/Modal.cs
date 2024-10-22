@@ -9,21 +9,24 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Entities
 {
-    [Table("SubVoucher")]
-    [Index(nameof(VoucherId), Name = "IX_SubVoucher_VoucherId")]
-    public class SubVoucher
+    [Table("Modal")]
+    [Index(nameof(VoucherId), Name = "IX_Modal_VoucherId")]
+    public class Modal
     {
-        public SubVoucher()
+        public Modal()
         {
             Medias = [];
+            Carts = [];
         }
 
-        [InverseProperty(nameof(Media.SubVoucher))]
+        [InverseProperty(nameof(Cart.Modal))]
+        public virtual ICollection<Cart> Carts { get; set; }
+        [InverseProperty(nameof(Media.Modal))]
         public virtual ICollection<Media> Medias { get; set; }
 
         public Guid VoucherId { get; set; }
         [ForeignKey(nameof(VoucherId))]
-        [InverseProperty("SubVouchers")]
+        [InverseProperty("Modals")]
         public required virtual Voucher Voucher { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -36,6 +39,7 @@ namespace Vouchee.Data.Models.Entities
         [Column(TypeName = "decimal(10,5)")]
         public decimal SellPrice { get; set; }
         public int Quantity { get; set; }
+        public int Index { get; set; }
 
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]

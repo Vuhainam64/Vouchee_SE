@@ -57,8 +57,8 @@ namespace Vouchee.Data.Helpers
             modelBuilder.Entity<Category>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Brand>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Media>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
-            modelBuilder.Entity<Cart>().HasKey(c => new { c.BuyerId, c.VoucherId });
-            modelBuilder.Entity<SubVoucher>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            modelBuilder.Entity<Cart>().HasKey(c => new { c.BuyerId, c.ModalId });
+            modelBuilder.Entity<Modal>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
 
             // modelBuilder.Seed();
 

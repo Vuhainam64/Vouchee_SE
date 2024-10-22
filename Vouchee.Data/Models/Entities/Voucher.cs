@@ -18,19 +18,15 @@ namespace Vouchee.Data.Models.Entities
     {
         public Voucher()
         {
-            Medias = [];
             VoucherCodes = [];
             OrderDetails = [];
             Promotions = [];
             Categories = [];
-            Carts = [];
-            SubVouchers = [];
+            Modals = [];
         }
 
-        [InverseProperty(nameof(SubVoucher.Voucher))]
-        public virtual ICollection<SubVoucher> SubVouchers { get; set; }
-        [InverseProperty(nameof(Media.Voucher))]
-        public virtual ICollection<Media> Medias { get; set; }
+        [InverseProperty(nameof(Modal.Voucher))]
+        public virtual ICollection<Modal> Modals { get; set; }
         [InverseProperty(nameof(VoucherCode.Voucher))]
         public virtual ICollection<VoucherCode> VoucherCodes { get; set; }
         [InverseProperty(nameof(OrderDetail.Voucher))]
@@ -39,8 +35,6 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<Promotion> Promotions { get; set; }
         [InverseProperty(nameof(Category.Vouchers))]
         public virtual ICollection<Category> Categories { get; set; }
-        [InverseProperty(nameof(Cart.Voucher))]
-        public virtual ICollection<Cart> Carts { get; set; }
 
         public Guid BrandId { get; set; }
         [ForeignKey(nameof(BrandId))]
@@ -63,11 +57,6 @@ namespace Vouchee.Data.Models.Entities
 
         public required string Title { get; set; }
         public string? Description { get; set; }
-        [Column(TypeName = "decimal(10,5)")]
-        public decimal OriginalPrice { get; set; }
-        [Column(TypeName = "decimal(10,5)")]
-        public decimal SellPrice { get; set; }
-        public int Quantity { get; set; }
         [Column(TypeName = "decimal(10,5)")]
         public decimal Rating { get; set; }
 

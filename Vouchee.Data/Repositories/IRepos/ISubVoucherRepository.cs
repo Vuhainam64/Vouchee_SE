@@ -8,7 +8,7 @@ using Vouchee.Data.Models.Entities;
 
 namespace Vouchee.Data.Repositories.IRepos
 {
-    public interface ISubVoucherRepository : IBaseRepository<SubVoucher>
+    public interface IModalRepository : IBaseRepository<Modal>
     {
     }
 }

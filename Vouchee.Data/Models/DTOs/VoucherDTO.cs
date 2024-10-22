@@ -19,7 +19,7 @@ namespace Vouchee.Business.Models.DTOs
     {
         public CreateVoucherDTO()
         {
-            subVouchers = new HashSet<CreateSubVoucherDTO>();
+            modals = new HashSet<CreateModalDTO>();
         }
 
         [Required(ErrorMessage = "Brand is required.")]
@@ -69,7 +69,7 @@ namespace Vouchee.Business.Models.DTOs
 
         public DateTime? createDate = DateTime.Now;
 
-        public virtual ICollection<CreateSubVoucherDTO> subVouchers { get; set; }
+        public virtual ICollection<CreateModalDTO> modals { get; set; }
     }
 
     public class UpdateVoucherDTO

@@ -88,8 +88,8 @@ namespace Vouchee.API.AppStarts
             services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
 
             // SUB VOUCHER
-            services.AddScoped<ISubVoucherService, SubVoucherService>();
-            services.AddScoped<ISubVoucherRepository, SubVoucherRepository>();
+            services.AddScoped<IModalService, ModalService>();
+            services.AddScoped<IModalRepository, ModalRepository>();
 
             // IMAGE
             services.AddScoped<IImageRepository, ImageRepository>();
