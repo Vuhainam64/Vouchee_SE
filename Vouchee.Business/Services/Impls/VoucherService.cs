@@ -86,9 +86,11 @@ namespace Vouchee.Business.Services.Impls
 
                 voucher.SellerID = thisUserObj.userId;
 
-                if (createVoucherDTO.productImageUrl != null && createVoucherDTO.productImageUrl.Count != 0)
+                // VOUCHER IMAGE
+                if (createVoucherDTO.images != null && createVoucherDTO.images.Count != 0)
                 {
-                    foreach (var productImage in createVoucherDTO.productImageUrl)
+                    int index = 0;
+                    foreach (var productImage in createVoucherDTO.images)
                     {
                         Media image = new()
                         {
@@ -96,57 +98,53 @@ namespace Vouchee.Business.Services.Impls
                             Status = ObjectStatusEnum.ACTIVE.ToString(),
                             CreateBy = thisUserObj.userId,
                             CreateDate = DateTime.Now,
-                            Type = MediaEnum.PRODUCT.ToString(),
+                            Type = MediaEnum.VOUCHER.ToString(),
+                            Index = index++
                         };
 
-                        //voucher.Medias.Add(image);
+                        voucher.Medias.Add(image);
                     }
                 }
 
-                if (createVoucherDTO.advertisingImageUrl != null)
+                // VIDEO
+                if (createVoucherDTO.videoUrl != null && createVoucherDTO.videoUrl != "")
                 {
-                    Media image = new()
-                    {
-                        Url = createVoucherDTO.advertisingImageUrl,
-                        Status = ObjectStatusEnum.ACTIVE.ToString(),
-                        CreateBy = thisUserObj.userId,
-                        CreateDate = DateTime.Now,
-                        Type = MediaEnum.ADVERTISEMENT.ToString()
-                    };
-
-                    //if (image.Url != null)
-                    //{
-                    //    voucher.Medias.Add(image);
-                    //}
-                }
-
-                if (createVoucherDTO.videoUrl != null)
-                {
-                    Media image = new()
+                    Media video = new()
                     {
                         Url = createVoucherDTO.videoUrl,
                         Status = ObjectStatusEnum.ACTIVE.ToString(),
                         CreateBy = thisUserObj.userId,
                         CreateDate = DateTime.Now,
-                        Type = MediaEnum.VIDEO.ToString()
+                        Type = MediaEnum.VIDEO.ToString(),
                     };
 
-                    //if (image.Url != null)
-                    //{
-                    //    voucher.Medias.Add(image);
-                    //}
+                    voucher.Medias.Add(video);
                 }
 
-                if (createVoucherDTO.modals != null && createVoucherDTO.modals.Count != 0)
+                // MODAL 
+
+                if (voucher.Modals != null && voucher.Modals.Count != 0)
                 {
                     foreach (var modal in createVoucherDTO.modals)
                     {
-                        Modal newModal = _mapper.Map<Modal>(modal);
-                        newModal.CreateBy = thisUserObj.userId;
-                        voucher.Modals.Add(newModal);
+                        Media image = new()
+                        {
+                            Url = modal.productImagesUrl,
+                            Status = ObjectStatusEnum.ACTIVE.ToString(),
+                            CreateBy = thisUserObj.userId,
+                            CreateDate = DateTime.Now,
+                            Type = MediaEnum.MODAL.ToString(),
+                        };
+                        voucher.Medias.Add(image);
+                    }
+
+                    int index = 0;
+                    foreach (var m in voucher.Modals)
+                    {
+                        m.Index = index++;
                     }
                 }
-
+               
                 var voucherId = await _voucherRepository.AddAsync(voucher);
 
                 return voucherId;
@@ -240,7 +238,7 @@ namespace Vouchee.Business.Services.Impls
                                 id = voucher.id,
                                 title = voucher.title,
                                 categories = voucher.categories,
-                                image = voucher.medias.Count != 0 ? voucher.medias.FirstOrDefault(x => x.type == MediaEnum.ADVERTISEMENT).url : null,
+                                image = voucher.medias.Count != 0 ? voucher.medias.FirstOrDefault(x => x.type == MediaEnum.VOUCHER).url : null,
                                 originalPrice = voucher.originalPrice,
                                 sellPrice = voucher.sellPrice,
                                 salePrice = voucher.salePrice,
@@ -329,7 +327,7 @@ namespace Vouchee.Business.Services.Impls
                             voucher.percentDiscount = availablePromotion.PercentDiscount;
                         }
 
-                        voucher.image = voucher.medias.Count != 0 ? voucher.medias.FirstOrDefault(x => x.type == MediaEnum.ADVERTISEMENT).url : null;
+                        voucher.image = voucher.medias.Count != 0 ? voucher.medias.FirstOrDefault(x => x.type == MediaEnum.VOUCHER).url : null;
                     }
                 }
             }
@@ -372,9 +370,9 @@ namespace Vouchee.Business.Services.Impls
             {
                 id = voucher.id,
                 title = voucher.title,
-                image = voucher.image = voucher.medias.Count != 0 ? voucher.medias.FirstOrDefault(x => x.type == MediaEnum.ADVERTISEMENT).url : null,
-                originalPrice = voucher.originalPrice,
-                sellPrice = voucher.sellPrice,
+                image = voucher.image = voucher.medias.Count != 0 ? voucher.medias.FirstOrDefault(x => x.type == MediaEnum.VOUCHER).url : null,
+                //originalPrice = voucher.originalPrice,
+                //sellPrice = voucher.sellPrice,
                 TotalQuantitySold = orderDetails.First(od => od.VoucherId == voucher.id).TotalQuantitySold,
                 categories = voucher.categories,
                 brandId = voucher.brandId,
@@ -418,16 +416,19 @@ namespace Vouchee.Business.Services.Impls
                                                     .Include(x => x.Brand)
                                                         .ThenInclude(x => x.Addresses)
                                                     .Include(x => x.Supplier)
-                                                    //.Include(x => x.Addresses)
                                                     .Include(x => x.Categories)
                                                         .ThenInclude(x => x.VoucherType)
-                                                    //.Include(x => x.Medias)
-                                                    //.Include(x => x.VoucherType)
-                                                    .Include(x => x.Seller));
+                                                    .Include(x => x.Seller)
+                                                    .Include(x => x.Modals));
 
             if (voucher != null)
             {
                 GetDetailVoucherDTO voucherDTO = _mapper.Map<GetDetailVoucherDTO>(voucher);
+
+                voucherDTO.image = voucherDTO.medias.Count != 0 ? voucherDTO.medias.FirstOrDefault(x => x.type == MediaEnum.VOUCHER).url : null;
+                voucherDTO.quantity = voucher.Modals.Sum(x => x.Stock);
+                voucherDTO.originalPrice = voucher.Modals.FirstOrDefault(x => x.Index == 0).OriginalPrice;
+                voucherDTO.sellPrice = voucher.Modals.FirstOrDefault(x => x.Index == 0).SellPrice;
 
                 var currentDate = DateTime.Now;
                 var promotions = _voucherRepository.GetByIdAsync(voucherDTO.id, includeProperties: query => query.Include(x => x.Promotions)).Result.Promotions;
@@ -439,9 +440,6 @@ namespace Vouchee.Business.Services.Impls
                     voucherDTO.salePrice = voucherDTO.originalPrice - (voucherDTO.originalPrice * availablePromotion.PercentDiscount / 100);
                     voucherDTO.percentDiscount = availablePromotion.PercentDiscount;
                 }
-
-
-                voucherDTO.image = voucherDTO.medias.Count != 0 ? voucherDTO.medias.FirstOrDefault(x => x.type == MediaEnum.ADVERTISEMENT).url : null;
 
                 return voucherDTO;
             }
@@ -563,15 +561,15 @@ namespace Vouchee.Business.Services.Impls
                                     categories = voucher.categories,
                                     id = voucher.id,
                                     medias = voucher.medias,
-                                    image = voucher.image = voucher.medias.Count != 0 ? voucher.medias.FirstOrDefault(x => x.type == MediaEnum.ADVERTISEMENT)?.url : null,
-                                    originalPrice = voucher.originalPrice,
-                                    sellPrice = voucher.sellPrice,
-                                    salePrice = voucher.salePrice,
+                                    image = voucher.image = voucher.medias.Count != 0 ? voucher.medias.FirstOrDefault(x => x.type == MediaEnum.VOUCHER)?.url : null,
+                                    //originalPrice = voucher.originalPrice,
+                                    //sellPrice = voucher.sellPrice,
+                                    //salePrice = voucher.salePrice,
                                     title = voucher.title,
                                     brandId = voucher.id,
                                     brandName = voucher.brandName,
                                     brandImage = voucher.brandImage,
-                                    percentDiscount = voucher.percentDiscount,
+                                    //percentDiscount = voucher.percentDiscount,
                                     supplierId = voucher.supplierId,
                                     supplierImage = voucher.supplierImage,
                                     supplierName = voucher.supplierName,
@@ -625,9 +623,9 @@ namespace Vouchee.Business.Services.Impls
 
                     if (availablePromotion != null)
                     {
-                        voucher.salePrice = voucher.originalPrice - (voucher.originalPrice * availablePromotion.PercentDiscount / 100);
-                        voucher.percentDiscount = availablePromotion.PercentDiscount;
-                        voucher.image = voucher.medias.Count != 0 ? voucher.medias.FirstOrDefault(x => x.type == MediaEnum.ADVERTISEMENT).url : null;
+                        //voucher.salePrice = voucher.originalPrice - (voucher.originalPrice * availablePromotion.PercentDiscount / 100);
+                        //voucher.percentDiscount = availablePromotion.PercentDiscount;
+                        voucher.image = voucher.medias.Count != 0 ? voucher.medias.FirstOrDefault(x => x.type == MediaEnum.VOUCHER).url : null;
                         LoggerService.Logger($"Voucher {voucher.id} has an active promotion with {availablePromotion.PercentDiscount}% discount.");
                     }
                 }

@@ -38,7 +38,7 @@ namespace Vouchee.Data.Models.Entities
         public decimal OriginalPrice { get; set; }
         [Column(TypeName = "decimal(10,5)")]
         public decimal SellPrice { get; set; }
-        public int Quantity { get; set; }
+        public int Stock { get; set; }
         public int Index { get; set; }
 
         public required string Status { get; set; }

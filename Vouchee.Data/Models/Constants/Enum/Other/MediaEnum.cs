@@ -8,8 +8,8 @@ namespace Vouchee.Data.Models.Constants.Enum.Other
 {
     public enum MediaEnum
     {
-        ADVERTISEMENT,
-        PRODUCT,
-        VIDEO
+        VOUCHER,
+        VIDEO,
+        MODAL
     }
 }

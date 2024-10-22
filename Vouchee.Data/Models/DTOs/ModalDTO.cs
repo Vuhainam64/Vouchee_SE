@@ -25,13 +25,11 @@ namespace Vouchee.Data.Models.DTOs
         [Range(0.01, double.MaxValue, ErrorMessage = "Sell price must be greater than zero")]
         public decimal sellPrice { get; set; }
 
-        [Range(0, int.MaxValue, ErrorMessage = "Quantity must be a non-negative value")]
-        public int? quantity { get; set; }
+        [Range(0, 1000000, ErrorMessage = "Quantity must < 1000000")]
+        public int? stock { get; set; }
 
         public VoucherStatusEnum status { get; set; }
-
-        //public IList<IFormFile>? productImages { get; set; }
-        public IList<string>? productImagesUrl { get; set; }
+        public string? productImagesUrl { get; set; }
 
         public DateTime createDate = DateTime.Now;
     }

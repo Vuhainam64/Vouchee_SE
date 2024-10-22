@@ -31,7 +31,7 @@ namespace Vouchee.API.Controllers
         }
 
         // CREATE
-        [HttpPost("create_sub_voucher")]
+        [HttpPost("create_modal")]
         [Authorize]
         public async Task<IActionResult> CreateModal(Guid voucherId, [FromBody] CreateModalDTO createModalDTO)
         {
@@ -52,7 +52,7 @@ namespace Vouchee.API.Controllers
         }
 
         // READ
-        [HttpGet("get_all_sub_voucher")]
+        [HttpGet("get_all_modal")]
         public async Task<IActionResult> GetModals([FromQuery] PagingRequest pagingRequest,
                                                             [FromQuery] ModalFilter modalFilter)
         {
@@ -61,7 +61,7 @@ namespace Vouchee.API.Controllers
         }
 
         // GET BY ID
-        [HttpGet("get_sub_voucher/{id}")]
+        [HttpGet("get_modal/{id}")]
         public async Task<IActionResult> GetVoucherCodeById(Guid id)
         {
             var modal = await _modalService.GetModalByIdAsync(id);
@@ -69,7 +69,7 @@ namespace Vouchee.API.Controllers
         }
 
         // UPDATE
-        [HttpPut("update_sub_voucher/{id}")]
+        [HttpPut("update_modal/{id}")]
         public async Task<IActionResult> UpdateVoucherCode(Guid id, [FromBody] UpdateModalDTO updateModalDTO)
         {
             var result = await _modalService.UpdateModalAsync(id, updateModalDTO);
@@ -77,7 +77,7 @@ namespace Vouchee.API.Controllers
         }
 
         // DELETE
-        [HttpDelete("delete_sub_voucher/{id}")]
+        [HttpDelete("delete_modal/{id}")]
         public async Task<IActionResult> DeleteVoucherCode(Guid id)
         {
             var result = await _modalService.DeleteModalAsync(id);

@@ -39,35 +39,12 @@ namespace Vouchee.Business.Models.DTOs
         [StringLength(2000, ErrorMessage = "Description cannot exceed 2000 characters.")]
         public string? description { get; set; }
 
-        [Required(ErrorMessage = "Original Price is required.")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0.")]
-        public decimal originalPrice { get; set; }
-
-        [Required(ErrorMessage = "Sell Price is required.")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0.")]
-        public decimal sellPrice { get; set; }
-
-        [Required(ErrorMessage = "Quantity is required.")]
-        [Range(0, int.MaxValue, ErrorMessage = "Quantity must be non-negative.")]
-        public int quantity { get; set; }
-
-        //public IList<IFormFile>? productImage { get; set; }
-
-        //public IList<IFormFile>? advertisingImage { get; set; }
-
-        //public IFormFile? video { get; set; }
-
-        public IList<string>? productImageUrl { get; set; }
-
-        //public IList<string>? advertisingImageUrl { get; set; }
-        public string? advertisingImageUrl { get; set; }
+        public IList<string>? images { get; set; }
 
         public string? videoUrl { get; set; }
 
-        [Required(ErrorMessage = "Status is required.")]
-        public VoucherStatusEnum status { get; set; }
-
         public DateTime? createDate = DateTime.Now;
+        public string? status = ObjectStatusEnum.ACTIVE.ToString();
 
         public virtual ICollection<CreateModalDTO> modals { get; set; }
     }
@@ -97,24 +74,17 @@ namespace Vouchee.Business.Models.DTOs
     {
         public GetAllVoucherDTO()
         {
-            //addresses = new HashSet<GetAllAddressDTO>();
-            categories = new HashSet<GetCategoryDTO>();
-            medias = new HashSet<GetMediaDTO>();
-            addresses = new HashSet<GetAllAddressDTO>();
+            categories = [];
+            medias = [];
+            addresses = [];
+            modals = [];
         }
+
         public Guid? id { get; set; }
 
         public string? title { get; set; }
-        //public string? description { get; set; }
+        public string? description { get; set; }
         public string? image { get; set; }
-        public decimal? originalPrice { get; set; }
-        public decimal? sellPrice { get; set; }
-        public decimal? salePrice { get; set; }
-        public decimal? percentDiscount { get; set; }
-        //public DateTime? starDate { get; set; }
-        //public DateTime? endDate { get; set; }
-        //public string? policy { get; set; }
-        //public int? quantity { get; set; }
         public Guid? brandId { get; set; }
         public string? brandName { get; set; }
         public string? brandImage { get; set; }
@@ -123,18 +93,10 @@ namespace Vouchee.Business.Models.DTOs
         public string? supplierImage { get; set; }
         public int? quantity { get; set; }
         public decimal? rating { get; set; }
-        //public Guid? voucherTypeId { get; set; }
-        //public string? voucherTypeName { get; set; }
-
-        //public string? status { get; set; }
-        //public DateTime? createDate { get; set; }
-        //public Guid? createBy { get; set; }
-        //public DateTime? updateDate { get; set; }
-        //public Guid? updateBy { get; set; }
 
         public virtual ICollection<GetAllAddressDTO> addresses { get; set; }
         public virtual ICollection<GetCategoryDTO>? categories { get; set; }
-        //public virtual ICollection<GetAllAddressDTO>? addresses { get; set; }
+        public virtual ICollection<GetModalDTO>? modals { get; set; }
         public virtual ICollection<GetMediaDTO> medias { get; set; }
     }
     public class GetBestBuyVoucherDTO
@@ -226,10 +188,11 @@ namespace Vouchee.Business.Models.DTOs
     {
         public GetDetailVoucherDTO()
         {
-            voucherCodes = new HashSet<GetVoucherCodeDTO>();
-            addresses = new HashSet<GetAllAddressDTO>();
-            categories = new HashSet<GetCategoryDTO>();
-            medias = new HashSet<GetMediaDTO>();
+            voucherCodes = [];
+            addresses = [];
+            categories = [];
+            medias = [];
+            modals = [];
         }
 
         public Guid? id { get; set; }
@@ -241,9 +204,6 @@ namespace Vouchee.Business.Models.DTOs
         public decimal? sellPrice { get; set; }
         public decimal? salePrice { get; set; }
         public decimal? percentDiscount { get; set; }
-        //public DateTime? startDate { get; set; }
-        //public DateTime? endDate { get; set; }
-        //public string? policy { get; set; }
         public int? quantity { get; set; }
         public decimal? rating { get; set; }
 
@@ -253,19 +213,14 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? supplierId { get; set; }
         public string? supplierName { get; set; }
         public string? supplierImage { get; set; }
-        //public Guid? voucherTypeId { get; set; }
-        //public string? voucherTypeName { get; set; }
         public Guid? createBy { get; set; }
         public string? sellerName { get; set; }
 
-        //public decimal? salePrice { get; set; }
-        //public decimal? percenDiscount { get; set; }
-
-
-        public virtual ICollection<GetAllAddressDTO>? addresses { get; set; }
         public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
+        public virtual ICollection<GetModalDTO>? modals { get; set; }
         public virtual ICollection<GetCategoryDTO> categories { get; set; }
         public virtual ICollection<GetMediaDTO> medias { get; set; }
+        public virtual ICollection<GetAllAddressDTO>? addresses { get; set; }
     }
 
     public class GetNewestVoucherDTO

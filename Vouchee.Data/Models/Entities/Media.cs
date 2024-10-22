@@ -10,10 +10,16 @@ using System.Threading.Tasks;
 namespace Vouchee.Data.Models.Entities
 {
     [Table("Media")]
+    [Index(nameof(VoucherId), Name = "IX_Image_VoucherId")]
     [Index(nameof(ModalId), Name = "IX_Image_ModalId")]
     [Index(nameof(AddressId), Name = "IX_Image_AddressId")]
     public class Media
     {
+        public Guid? VoucherId { get; set; }
+        [ForeignKey(nameof(VoucherId))]
+        [InverseProperty("Medias")]
+        public virtual Voucher? Voucher { get; set; }
+
         public Guid? ModalId { get; set; }
         [ForeignKey(nameof(ModalId))]
         [InverseProperty("Medias")]
@@ -30,6 +36,7 @@ namespace Vouchee.Data.Models.Entities
 
         public required string Url { get; set; }
         public required string Type { get; set; }
+        public int Index { get; set; }
 
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]

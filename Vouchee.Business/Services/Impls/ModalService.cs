@@ -59,10 +59,10 @@ namespace Vouchee.Business.Services.Impls
                 {
                     CreateBy = thisUserObj.userId,
                     CreateDate = DateTime.Now,
-                    Type = MediaEnum.PRODUCT.ToString(),
+                    Type = MediaEnum.VOUCHER.ToString(),
                     Status = ObjectStatusEnum.ACTIVE.ToString(),
                     // newImage.ImageUrl = await _fileUploadService.UploadImageToFirebase(image, thisUserObj.userId, StoragePathEnum.VOUCHER);
-                    Url = image
+                    Url = image.ToString()
                 };
 
                 if (newImage != null)
