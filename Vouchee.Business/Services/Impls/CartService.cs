@@ -89,11 +89,18 @@ namespace Vouchee.Business.Services.Impls
                 var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.VoucherId == voucherId);
                 if (cartVoucher != null)
                 {
-                    cartVoucher.Quantity += 1;
-                    cartVoucher.UpdateBy = thisUserObj.userId;
-                    cartVoucher.UpdateDate = DateTime.Now;
+                    if (cartVoucher.Quantity >= 20)
+                    {
+                        throw new ConflictException("Quantity đã vượt quá 20");
+                    }
+                    else
+                    {
+                        cartVoucher.Quantity += 1;
+                        cartVoucher.UpdateBy = thisUserObj.userId;
+                        cartVoucher.UpdateDate = DateTime.Now;
 
-                    return await _userRepository.UpdateAsync(_currentUser);
+                        return await _userRepository.UpdateAsync(_currentUser);
+                    }
                 }
                 else
                 {
@@ -162,6 +169,32 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<bool> DecreaseQuantityAsync(Guid voucherId, ThisUserObj thisUserObj)
         {
+            await GetCartsAsync(thisUserObj);
+
+            if (_currentUser.Carts != null && _currentUser.Carts.Count != 0)
+            {
+                // Voucher exist in cart already
+                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.VoucherId == voucherId);
+                if (cartVoucher == null)
+                {
+                    throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
+                }
+                cartVoucher.Quantity -= 1;
+
+                if (cartVoucher.Quantity <= 0)
+                {
+                    _currentUser.Carts.Remove(cartVoucher);
+                }
+                else
+                {
+                    cartVoucher.UpdateBy = thisUserObj.userId;
+                    cartVoucher.UpdateDate = DateTime.Now;
+                }
+
+                return await _userRepository.UpdateAsync(_currentUser);
+            }
+
+            return false;
             //Guid userId = thisUserObj.userId;   
 
             //// Fetch the current user
@@ -181,11 +214,36 @@ namespace Vouchee.Business.Services.Impls
             //    return await _userRepository.UpdateAsync(user);
             //}
 
-            throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
+            // throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
         }
 
         public async Task<bool> IncreaseQuantityAsync(Guid voucherId, ThisUserObj thisUserObj)
         {
+            await GetCartsAsync(thisUserObj);
+
+            if (_currentUser.Carts != null && _currentUser.Carts.Count != 0)
+            {
+                // Voucher exist in cart already
+                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.VoucherId == voucherId);
+                if (cartVoucher == null)
+                {
+                    throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
+                }
+                else if (cartVoucher.Quantity >= 20)
+                {
+                    throw new ConflictException($"Voucher {voucherId} không thể vượt quá 20");
+                }
+                else
+                {
+                    cartVoucher.Quantity += 1;
+                    cartVoucher.UpdateBy = thisUserObj.userId;
+                    cartVoucher.UpdateDate = DateTime.Now;
+
+                    return await _userRepository.UpdateAsync(_currentUser);
+                }
+            }
+
+            return false;
             //Guid userId = thisUserObj.userId;
 
             //User? user = await GetCurrentUser(userId);
@@ -206,12 +264,32 @@ namespace Vouchee.Business.Services.Impls
             //    return await _userRepository.UpdateAsync(user);
             //}
 
-            throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
+            // throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
         }
 
 
         public async Task<bool> RemoveItemAsync(Guid voucherId, ThisUserObj thisUserObj)
         {
+            await GetCartsAsync(thisUserObj);
+
+            if (_currentUser.Carts != null && _currentUser.Carts.Count != 0)
+            {
+                // Voucher exist in cart already
+                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.VoucherId == voucherId);
+                if (cartVoucher == null) 
+                {
+                    throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
+                }
+                if (cartVoucher.Quantity >= 20)
+                {
+                    throw new ConflictException($"Voucher {voucherId} không thể vượt quá 20");
+                }
+                _currentUser.Carts.Remove(cartVoucher);
+                return await _userRepository.UpdateAsync(_currentUser);
+            }
+
+            return false;
+
             //Guid userId = thisUserObj.userId;
 
             //User? user = await GetCurrentUser(userId);
@@ -224,17 +302,43 @@ namespace Vouchee.Business.Services.Impls
 
             //    return await _userRepository.UpdateAsync(user);
             //}
-
-            throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
         }
 
 
         public async Task<bool> UpdateQuantityAsync(Guid voucherId, int quantity, ThisUserObj thisUserObj)
         {
-            //if (quantity > 20)
-            //{
-            //    throw new ConflictException("Bạn chỉ có thể mua tối đa 20 code mỗi loại voucher");
-            //}
+            if (quantity <= 0)
+            {
+                throw new ConflictException("Số lượng không hợp lệ");
+            }
+            if (quantity >= 20)
+            {
+                throw new ConflictException("Bạn chỉ có thể mua tối đa 20 code mỗi loại voucher");
+            }
+
+            await GetCartsAsync(thisUserObj);
+
+            if (_currentUser.Carts != null && _currentUser.Carts.Count != 0)
+            {
+                // Voucher exist in cart already
+                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.VoucherId == voucherId);
+                if (cartVoucher == null)
+                {
+                    throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
+                }
+                if (cartVoucher.Quantity >= 20)
+                {
+                    throw new ConflictException($"Voucher {voucherId} không thể vượt quá 20");
+                }
+                cartVoucher.Quantity = quantity;
+                cartVoucher.UpdateBy = thisUserObj.userId;
+                cartVoucher.UpdateDate = DateTime.Now;
+
+                return await _userRepository.UpdateAsync(_currentUser);
+            }
+
+            return false;
+
 
             //Guid userId = thisUserObj.userId;
 
@@ -252,37 +356,37 @@ namespace Vouchee.Business.Services.Impls
             //    return await _userRepository.UpdateAsync(user);
             //}
 
-            throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
+            // throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
         }
 
-        public async Task<User> GetCurrentUser(Guid userId)
-        {
-            //IQueryable<User> users = _userRepository.CheckLocal();
+        //public async Task<User> GetCurrentUser(Guid userId)
+        //{
+        //    IQueryable<User> users = _userRepository.CheckLocal();
 
-            //if (users != null && users.Any())
-            //{
-            //    userInstance = users.FirstOrDefault(x => x.Id == userId);
-            //}
+        //    if (users != null && users.Any())
+        //    {
+        //        userInstance = users.FirstOrDefault(x => x.Id == userId);
+        //    }
 
-            //if (userInstance == null)
-            //{
-            //    userInstance = await _userRepository.GetByIdAsync(userId, includeProperties: x => x.Include(x => x.Carts)
-            //                                                                                            .ThenInclude(x => x.Voucher)
-            //                                                                                            .ThenInclude(x => x.Medias)
-            //    );
-            //}
+        //    if (userInstance == null)
+        //    {
+        //        userInstance = await _userRepository.GetByIdAsync(userId, includeProperties: x => x.Include(x => x.Carts)
+        //                                                                                                .ThenInclude(x => x.Voucher)
+        //                                                                                                .ThenInclude(x => x.Medias)
+        //        );
+        //    }
 
-            //foreach (var cartItem in userInstance.Carts)
-            //{
-            //    var voucher = cartItem.Voucher;
+        //    foreach (var cartItem in userInstance.Carts)
+        //    {
+        //        var voucher = cartItem.Voucher;
 
-            //    if (voucher.Seller == null && users.FirstOrDefault(x => x.Id == voucher.SellerID) == null)
-            //    {
-            //        voucher.Seller = await _userRepository.GetByIdAsync(voucher.SellerID);
-            //    }
-            //}
+        //        if (voucher.Seller == null && users.FirstOrDefault(x => x.Id == voucher.SellerID) == null)
+        //        {
+        //            voucher.Seller = await _userRepository.GetByIdAsync(voucher.SellerID);
+        //        }
+        //    }
 
-            return null;
-        }
+        //    return null;
+        //}
     }
 }
