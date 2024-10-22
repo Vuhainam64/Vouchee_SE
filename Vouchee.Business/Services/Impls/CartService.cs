@@ -179,14 +179,14 @@ namespace Vouchee.Business.Services.Impls
                 {
                     throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
                 }
-                cartVoucher.Quantity -= 1;
 
-                if (cartVoucher.Quantity <= 0)
+                if (cartVoucher.Quantity <= 1)
                 {
                     _currentUser.Carts.Remove(cartVoucher);
                 }
                 else
                 {
+                    cartVoucher.Quantity -= 1;
                     cartVoucher.UpdateBy = thisUserObj.userId;
                     cartVoucher.UpdateDate = DateTime.Now;
                 }

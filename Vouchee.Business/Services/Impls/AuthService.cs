@@ -88,6 +88,8 @@ namespace Vouchee.Business.Services.Impls
                 response.image = imageUrl;
                 response.phoneNumber = phoneNumber;
                 response.name = userRecord.DisplayName;
+                response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.BUYER.ToString());
+                response.roleName = RoleEnum.BUYER.ToString();
                 response = await GenerateTokenAsync(response, RoleEnum.BUYER.ToString());
             }
             else
