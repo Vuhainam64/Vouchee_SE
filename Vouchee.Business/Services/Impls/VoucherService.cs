@@ -57,103 +57,95 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<Guid?> CreateVoucherAsync(CreateVoucherDTO createVoucherDTO, ThisUserObj thisUserObj)
         {
-            try
+            Voucher voucher = _mapper.Map<Voucher>(createVoucherDTO);
+
+            foreach (var categoryId in createVoucherDTO.categoryId)
             {
-                Voucher voucher = _mapper.Map<Voucher>(createVoucherDTO);
-
-                foreach (var categoryId in createVoucherDTO.categoryId)
+                var existedCategory = await _categoryRepository.FindAsync(categoryId);
+                if (existedCategory == null)
                 {
-                    var existedCategory = await _categoryRepository.FindAsync(categoryId);
-                    if (existedCategory == null)
+                    throw new NotFoundException($"Không thấy category với id {categoryId}");
+                }
+                _voucherRepository.Attach(existedCategory);
+                voucher.Categories.Add(existedCategory);
+            }
+
+            var existedBrand = await _brandReposiroty.FindAsync((Guid)createVoucherDTO.brandId);
+            if (existedBrand == null)
+            {
+                throw new NotFoundException($"Không tìm thấy brand với id {createVoucherDTO.brandId}");
+            }
+
+            var existedSupplier = await _supplierRepository.FindAsync((Guid)createVoucherDTO.supplierId);
+            if (existedSupplier == null)
+            {
+                throw new NotFoundException($"Không tìm thấy supplier với id {createVoucherDTO.supplierId}");
+            }
+
+            voucher.SellerID = thisUserObj.userId;
+
+            // VOUCHER IMAGE
+            if (createVoucherDTO.images != null && createVoucherDTO.images.Count != 0)
+            {
+                int index = 0;
+                foreach (var productImage in createVoucherDTO.images)
+                {
+                    Media image = new()
                     {
-                        throw new NotFoundException($"Không thấy category với id {categoryId}");
-                    }
-                    _voucherRepository.Attach(existedCategory);
-                    voucher.Categories.Add(existedCategory);
-                }
-
-                var existedBrand = await _brandReposiroty.FindAsync((Guid)createVoucherDTO.brandId);
-                if (existedBrand == null)
-                {
-                    throw new NotFoundException($"Không tìm thấy brand với id {createVoucherDTO.brandId}");
-                }
-
-                var existedSupplier = await _supplierRepository.FindAsync((Guid)createVoucherDTO.supplierId);
-                if (existedSupplier == null)
-                {
-                    throw new NotFoundException($"Không tìm thấy supplier với id {createVoucherDTO.supplierId}");
-                }
-
-                voucher.SellerID = thisUserObj.userId;
-
-                // VOUCHER IMAGE
-                if (createVoucherDTO.images != null && createVoucherDTO.images.Count != 0)
-                {
-                    int index = 0;
-                    foreach (var productImage in createVoucherDTO.images)
-                    {
-                        Media image = new()
-                        {
-                            Url = productImage,
-                            Status = ObjectStatusEnum.ACTIVE.ToString(),
-                            CreateBy = thisUserObj.userId,
-                            CreateDate = DateTime.Now,
-                            Type = MediaEnum.VOUCHER.ToString(),
-                            Index = index++
-                        };
-
-                        voucher.Medias.Add(image);
-                    }
-                }
-
-                // VIDEO
-                if (createVoucherDTO.videoUrl != null && createVoucherDTO.videoUrl != "")
-                {
-                    Media video = new()
-                    {
-                        Url = createVoucherDTO.videoUrl,
+                        Url = productImage,
                         Status = ObjectStatusEnum.ACTIVE.ToString(),
                         CreateBy = thisUserObj.userId,
                         CreateDate = DateTime.Now,
-                        Type = MediaEnum.VIDEO.ToString(),
+                        Type = MediaEnum.VOUCHER.ToString(),
+                        Index = index++
                     };
 
-                    voucher.Medias.Add(video);
+                    voucher.Medias.Add(image);
                 }
-
-                // MODAL 
-
-                if (voucher.Modals != null && voucher.Modals.Count != 0)
-                {
-                    foreach (var modal in createVoucherDTO.modals)
-                    {
-                        Media image = new()
-                        {
-                            Url = modal.productImagesUrl,
-                            Status = ObjectStatusEnum.ACTIVE.ToString(),
-                            CreateBy = thisUserObj.userId,
-                            CreateDate = DateTime.Now,
-                            Type = MediaEnum.MODAL.ToString(),
-                        };
-                        voucher.Medias.Add(image);
-                    }
-
-                    int index = 0;
-                    foreach (var m in voucher.Modals)
-                    {
-                        m.Index = index++;
-                    }
-                }
-               
-                var voucherId = await _voucherRepository.AddAsync(voucher);
-
-                return voucherId;
             }
-            catch (Exception ex)
+
+            // VIDEO
+            if (createVoucherDTO.videoUrl != null && createVoucherDTO.videoUrl != "")
             {
-                LoggerService.Logger(ex.Message);
-                throw new CreateObjectException("Lỗi không xác định khi tạo voucher");
+                Media video = new()
+                {
+                    Url = createVoucherDTO.videoUrl,
+                    Status = ObjectStatusEnum.ACTIVE.ToString(),
+                    CreateBy = thisUserObj.userId,
+                    CreateDate = DateTime.Now,
+                    Type = MediaEnum.VIDEO.ToString(),
+                };
+
+                voucher.Medias.Add(video);
             }
+
+            // MODAL 
+
+            if (voucher.Modals != null && voucher.Modals.Count != 0)
+            {
+                foreach (var modal in createVoucherDTO.modals)
+                {
+                    Media image = new()
+                    {
+                        Url = modal.productImagesUrl,
+                        Status = ObjectStatusEnum.ACTIVE.ToString(),
+                        CreateBy = thisUserObj.userId,
+                        CreateDate = DateTime.Now,
+                        Type = MediaEnum.MODAL.ToString(),
+                    };
+                    voucher.Medias.Add(image);
+                }
+
+                int index = 0;
+                foreach (var m in voucher.Modals)
+                {
+                    m.Index = index++;
+                }
+            }
+               
+            var voucherId = await _voucherRepository.AddAsync(voucher);
+
+            return voucherId;
         }
 
         public async Task<bool> DeleteVoucherAsync(Guid id)
