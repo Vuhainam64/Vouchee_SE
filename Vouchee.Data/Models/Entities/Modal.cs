@@ -15,7 +15,6 @@ namespace Vouchee.Data.Models.Entities
     {
         public Modal()
         {
-            Medias = [];
             Carts = [];
             VoucherCodes = [];
             OrderDetails = [];
@@ -23,8 +22,6 @@ namespace Vouchee.Data.Models.Entities
 
         [InverseProperty(nameof(Cart.Modal))]
         public virtual ICollection<Cart> Carts { get; set; }
-        [InverseProperty(nameof(Media.Modal))]
-        public virtual ICollection<Media> Medias { get; set; }
         [InverseProperty(nameof(VoucherCode.Modal))]
         public virtual ICollection<VoucherCode> VoucherCodes { get; set; }
         [InverseProperty(nameof(OrderDetail.Modal))]
@@ -45,6 +42,7 @@ namespace Vouchee.Data.Models.Entities
         [Column(TypeName = "decimal(10,5)")]
         public decimal SellPrice { get; set; }
         public int Index { get; set; }
+        public string? Image { get; set; }
 
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]

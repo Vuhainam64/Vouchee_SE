@@ -53,24 +53,6 @@ namespace Vouchee.Business.Services.Impls
             modal.VoucherId = voucherId;
             modal.CreateBy = thisUserObj.userId;
 
-            foreach (var image in createModalDTO.productImagesUrl)
-            {
-                Media newImage = new()
-                {
-                    CreateBy = thisUserObj.userId,
-                    CreateDate = DateTime.Now,
-                    Type = MediaEnum.VOUCHER.ToString(),
-                    Status = ObjectStatusEnum.ACTIVE.ToString(),
-                    // newImage.ImageUrl = await _fileUploadService.UploadImageToFirebase(image, thisUserObj.userId, StoragePathEnum.VOUCHER);
-                    Url = image.ToString()
-                };
-
-                if (newImage != null)
-                {
-                    modal.Medias.Add(newImage);
-                }
-            }
-
             return await _modalRepository.AddAsync(modal);
         }
 
@@ -86,12 +68,10 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<GetModalDTO> GetModalByIdAsync(Guid id)
         {
-            Modal modal = await _modalRepository.GetByIdAsync(id,
-                includeProperties: query => query.Include(x => x.Medias));
+            Modal modal = await _modalRepository.GetByIdAsync(id);
             if (modal != null)
             {
                 GetModalDTO getModalDTO = _mapper.Map<GetModalDTO>(modal);
-                getModalDTO.image = getModalDTO.images.Count != 0 ? getModalDTO.images.FirstOrDefault().url : null;
                 return getModalDTO;
             }
             throw new NotFoundException("Khong tim thay sub voucher");

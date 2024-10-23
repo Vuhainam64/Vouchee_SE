@@ -25,23 +25,14 @@ namespace Vouchee.API.AppStarts
                 .ReverseMap();
             CreateMap<GetAllVoucherDTO, VoucherFilter>().ReverseMap();
             CreateMap<Voucher, GetAllVoucherDTO>()
-                .ForMember(dest => dest.addresses, opt => opt.MapFrom(src => src.Brand.Addresses))
-                .ReverseMap();
-            CreateMap<Voucher, GetBestBuyVoucherDTO>()
                 .ForMember(x => x.brandName, dest => dest.MapFrom(opt => opt.Brand.Name))
                 .ForMember(x => x.brandImage, dest => dest.MapFrom(opt => opt.Brand.Image))
-                .ReverseMap(); 
-            CreateMap<Voucher, GetNearestVoucherDTO>()
+                .ForMember(x => x.supplierName, dest => dest.MapFrom(opt => opt.Supplier.Name))
+                .ForMember(x => x.sellerName, dest => dest.MapFrom(opt => opt.Seller.Name))
                 .ForMember(dest => dest.addresses, opt => opt.MapFrom(src => src.Brand.Addresses))
                 .ReverseMap();
-            CreateMap<Voucher, GetNewestVoucherDTO>()
-                .ForMember(x => x.brandName, dest => dest.MapFrom(opt => opt.Brand.Name))
-                .ForMember(x => x.brandImage, dest => dest.MapFrom(opt => opt.Brand.Image))
-                .ReverseMap();
+            CreateMap<Voucher, GetBestBuyVoucherDTO>();
             CreateMap<Voucher, VoucherDTO>();
-            CreateMap<Voucher, CartModalDTO>()
-                //.ForMember(x => x.sellerName, dest => dest.MapFrom(opt => opt.Seller.Name))
-                .ReverseMap();
 
             // ORDER DETAIL
             CreateMap<OrderDetail, OrderDetailDTO>().ReverseMap();
@@ -132,11 +123,8 @@ namespace Vouchee.API.AppStarts
             // IMAGE
             CreateMap<Media, CreateMediaDTO>().ReverseMap();
             CreateMap<Media, UpdateMediaDTO>().ReverseMap();
-            CreateMap<Media, GetMediaDTO>()
-                .ForMember(des => des.type, src => src.MapFrom(src => EnumMapper<MediaEnum>.MapType(src.Type)))
-                .ReverseMap();
-            
-
+            CreateMap<Media, GetMediaDTO>().ReverseMap();
+           
             //Cart
             CreateMap<Cart,CartDTO>().ReverseMap();
 

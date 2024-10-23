@@ -6,10 +6,7 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Constants.Enum.Other
 {
-    public enum MediaEnum
-    {
-        VOUCHER,
-        VIDEO,
-        MODAL
-    }
+    //public enum MediaEnum
+    //{
+    //}
 }

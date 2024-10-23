@@ -30,6 +30,5 @@ namespace Vouchee.Data.Models.DTOs
     {
         public Guid id { get; set; }
         public string? url { get; set; }
-        public MediaEnum? type { get; set; }
     }
 }

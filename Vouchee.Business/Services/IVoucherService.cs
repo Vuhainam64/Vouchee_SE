@@ -18,11 +18,11 @@ namespace Vouchee.Business.Services
                                                                             decimal lon,
                                                                             decimal lat,
                                                                             List<Guid>? categoryIds);
-        public Task<IList<GetNewestVoucherDTO>> GetNewestVouchers();
+        public Task<IList<GetVoucherDTO>> GetNewestVouchers();
         //public Task<IList<GetAllVoucherDTO>> GetBestSoldVouchers();
-        public Task<IList<GetNearestVoucherDTO>> GetNearestVouchers(decimal lon, decimal lat);
+        public Task<IList<GetAllVoucherDTO>> GetNearestVouchers(decimal lon, decimal lat);
         public Task<IList<GetBestBuyVoucherDTO>> GetTopSaleVouchers();
-        public Task<IList<GetNewestVoucherDTO>> GetSalestVouchers();
+        public Task<IList<GetVoucherDTO>> GetSalestVouchers();
 
         // UPDATE
         public Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO);

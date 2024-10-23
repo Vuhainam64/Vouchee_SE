@@ -14,11 +14,7 @@ namespace Vouchee.Data.Models.Entities
         public Address()
         {
             Brands = [];
-            Medias = [];
         }
-
-        [InverseProperty(nameof(Media.Address))]
-        public virtual ICollection<Media> Medias { get; set; }
 
         [InverseProperty(nameof(Brand.Addresses))]
         public virtual ICollection<Brand> Brands { get; set; }
