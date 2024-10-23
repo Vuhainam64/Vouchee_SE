@@ -38,15 +38,23 @@ namespace Vouchee.API.Controllers
         // CREATE
         [HttpPost("create_voucher_code")]
         [Authorize]
-        public async Task<IActionResult> CreateVoucherCode(Guid voucherId, [FromForm] CreateVoucherCodeDTO createVoucherCodeDTO)
+        public async Task<IActionResult> CreateVoucherCode(Guid modalId, [FromBody] IList<CreateVoucherCodeDTO> createVoucherCodeDTOs)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
+            List<Guid> voucherCodeIds = [];
             //SELLER
             if (currentUser.roleId.Equals(currentUser.sellerRoleId))
             {
-                var result = await _voucherCodeService.CreateVoucherCodeAsync(voucherId, createVoucherCodeDTO, currentUser);
-                return Ok(result);
+                foreach (var voucherCode in createVoucherCodeDTOs)
+                {
+                    var result = await _voucherCodeService.CreateVoucherCodeAsync(modalId, voucherCode, currentUser);
+                    if (result != Guid.Empty)
+                    {
+                        voucherCodeIds.Add((Guid)result);
+                    }
+                }
+                return Ok(voucherCodeIds);
             }
 
             return StatusCode((int)HttpStatusCode.Forbidden, new

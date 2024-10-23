@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,47 +25,59 @@ namespace Vouchee.Business.Services.Impls
 {
     public class VoucherCodeService : IVoucherCodeService
     {
+        private readonly IModalRepository _modalRepository;
         private readonly IFileUploadService _fileUploadService;
         private readonly IVoucherCodeRepository _voucherCodeRepository;
         private readonly IVoucherRepository _voucherRepository;
         private readonly IMapper _mapper;
 
-        public VoucherCodeService(IVoucherCodeRepository voucherCodeRepository, 
+        public VoucherCodeService(IModalRepository modalRepository,
+                                    IVoucherCodeRepository voucherCodeRepository, 
                                     IVoucherRepository voucherRepository, 
                                     IFileUploadService fileUploadService,
                                     IMapper mapper)
         {
+            _modalRepository = modalRepository;
             _fileUploadService = fileUploadService;
             _voucherCodeRepository = voucherCodeRepository;
             _voucherRepository = voucherRepository;
             _mapper = mapper;
         }
 
-        public async Task<Guid?> CreateVoucherCodeAsync(Guid voucherId, CreateVoucherCodeDTO createVoucherCodeDTO, ThisUserObj thisUserObj)
+        public async Task<Guid?> CreateVoucherCodeAsync(Guid modalId, CreateVoucherCodeDTO createVoucherCodeDTO, ThisUserObj thisUserObj)
         {
             try
             {
-                var existedVoucher = await _voucherRepository.FindAsync(voucherId);
-                if (existedVoucher == null)
+                Modal? modal = null;
+                var vouchers = _voucherRepository.CheckLocal();
+
+                foreach (var voucher in vouchers)
                 {
-                    throw new NotFoundException($"Không tìm thấy voucher với id {voucherId}");
+                    if (voucher.Modals != null && voucher.Modals.Count != 0)
+                    {
+                        modal = voucher.Modals.FirstOrDefault(x => x.Id == modalId);
+                    }
+                }
+
+                if (modal == null)
+                {
+                    modal = await _modalRepository.FindAsync(modalId);
+                }
+
+                if (modal == null)
+                {
+                    throw new NotFoundException($"Không tìm thấy voucher với id {modalId}");
                 }
 
                 VoucherCode voucherCode = _mapper.Map<VoucherCode>(createVoucherCodeDTO);
 
+                voucherCode.ModalId = modal.Id;
                 voucherCode.Status = VoucherCodeStatusEnum.ACTIVE.ToString();
                 voucherCode.CreateBy = thisUserObj.userId;
 
                 var voucherCodeId = await _voucherCodeRepository.AddAsync(voucherCode);
 
-                if (createVoucherCodeDTO.image != null && voucherCodeId != null)
-                {
-                    voucherCode.Image = await _fileUploadService.UploadImageToFirebase(createVoucherCodeDTO.image, thisUserObj.userId.ToString(), StoragePathEnum.VOUCHER_CODE);
-
-                    await _voucherCodeRepository.UpdateAsync(voucherCode);
-                }
-
-                return voucherId;
+                return voucherCodeId;
             }
             catch (Exception ex)
             {

@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Vouchee.Business.Models.DTOs;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Entities;
 
@@ -57,5 +58,15 @@ namespace Vouchee.Data.Models.DTOs
         public string? image { get; set; }
 
         public virtual ICollection<GetMediaDTO>? images { get; set; }
+    }
+
+    public class GetDetailModalDTO : GetModalDTO
+    {
+        public GetDetailModalDTO()
+        {
+            voucherCodes = [];
+        }
+
+        public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
     }
 }

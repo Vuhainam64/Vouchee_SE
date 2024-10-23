@@ -8,12 +8,12 @@ namespace Vouchee.Business.Models.DTOs
 {
     public class VoucherCodeDTO
     {
-        public string? code { get; set; }
+        public string? code { get; set; } = null;
     }
 
     public class CreateVoucherCodeDTO : VoucherCodeDTO
     {
-        public IFormFile? image { get; set; }
+        public string? image { get; set; } = null;
         public DateTime? createDate = DateTime.Now;
     }
 
@@ -28,7 +28,7 @@ namespace Vouchee.Business.Models.DTOs
     {
         public Guid id { get; set; }
 
-        public Guid? voucherId { get; set; }
+        public Guid? modalId { get; set; }
         public Guid? orderDetailId { get; set; }
 
         public string? image { get; set; }

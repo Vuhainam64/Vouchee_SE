@@ -75,9 +75,8 @@ namespace Vouchee.Business.Models.DTOs
         public GetAllVoucherDTO()
         {
             categories = [];
-            medias = [];
             addresses = [];
-            modals = [];
+            medias = [];
         }
 
         public Guid? id { get; set; }
@@ -96,7 +95,6 @@ namespace Vouchee.Business.Models.DTOs
 
         public virtual ICollection<GetAllAddressDTO> addresses { get; set; }
         public virtual ICollection<GetCategoryDTO>? categories { get; set; }
-        public virtual ICollection<GetModalDTO>? modals { get; set; }
         public virtual ICollection<GetMediaDTO> medias { get; set; }
     }
     public class GetBestBuyVoucherDTO
@@ -188,7 +186,6 @@ namespace Vouchee.Business.Models.DTOs
     {
         public GetDetailVoucherDTO()
         {
-            voucherCodes = [];
             addresses = [];
             categories = [];
             medias = [];
@@ -216,8 +213,7 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? createBy { get; set; }
         public string? sellerName { get; set; }
 
-        public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
-        public virtual ICollection<GetModalDTO>? modals { get; set; }
+        public virtual ICollection<GetDetailModalDTO>? modals { get; set; }
         public virtual ICollection<GetCategoryDTO> categories { get; set; }
         public virtual ICollection<GetMediaDTO> medias { get; set; }
         public virtual ICollection<GetAllAddressDTO>? addresses { get; set; }

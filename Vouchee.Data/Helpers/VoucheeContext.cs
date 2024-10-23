@@ -38,7 +38,6 @@ namespace Vouchee.Data.Helpers
                 IConfigurationRoot configuration = builder.Build();
                 optionsBuilder.EnableSensitiveDataLogging();
                 optionsBuilder.UseSqlServer(configuration.GetConnectionString("PROD"));
-                /*optionsBuilder.UseSqlServer("Server=(local);uid=sa;pwd=12345;database=Vouchee1;TrustServerCertificate=True;");*/
             }
         }
 

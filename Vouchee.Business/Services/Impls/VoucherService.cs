@@ -418,14 +418,15 @@ namespace Vouchee.Business.Services.Impls
                                                     .Include(x => x.Categories)
                                                         .ThenInclude(x => x.VoucherType)
                                                     .Include(x => x.Seller)
-                                                    .Include(x => x.Modals));
+                                                    .Include(x => x.Modals)
+                                                        .ThenInclude(x => x.VoucherCodes));
 
             if (voucher != null)
             {
                 GetDetailVoucherDTO voucherDTO = _mapper.Map<GetDetailVoucherDTO>(voucher);
 
                 voucherDTO.image = voucherDTO.medias.Count != 0 ? voucherDTO.medias.FirstOrDefault(x => x.type == MediaEnum.VOUCHER).url : null;
-                voucherDTO.quantity = voucher.Modals.Sum(x => x.Stock);
+                //voucherDTO.quantity = voucher.Modals.Sum(x => x.Stock);
                 voucherDTO.originalPrice = voucher.Modals.FirstOrDefault(x => x.Index == 0).OriginalPrice;
                 voucherDTO.sellPrice = voucher.Modals.FirstOrDefault(x => x.Index == 0).SellPrice;
 
@@ -481,9 +482,10 @@ namespace Vouchee.Business.Services.Impls
             try
             {
                 decimal R = 6371; // Earth's radius in kilometers
-                result.Item2 = _voucherRepository.GetTable(includeProperties: x => x/*.Include(x => x.Medias)*/
-                                                                                    .Include(x => x.Supplier)
+                result.Item2 = _voucherRepository.GetTable(includeProperties: x => x.Include(x => x.Supplier)
                                                                                     .Include(x => x.Categories)
+                                                                                    .Include(x => x.Modals)
+                                                                                        .Include(x => x.Medias)
                                                                                     .Include(x => x.Brand)
                                                                                         .ThenInclude(x => x.Addresses))
                     .ProjectTo<GetAllVoucherDTO>(_mapper.ConfigurationProvider)

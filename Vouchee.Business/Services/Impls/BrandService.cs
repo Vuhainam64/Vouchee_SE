@@ -111,17 +111,9 @@ namespace Vouchee.Business.Services.Impls
         public async Task<IList<GetBrandDTO>> GetBrandsbynameAsync(string name)
         {
             IQueryable<GetBrandDTO> result;
-            try
-            {
-                result = _brandRepository.GetTable()
-                            .Where(b => b.Name.Equals(name))
-                            .ProjectTo<GetBrandDTO>(_mapper.ConfigurationProvider);
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải brand");
-            }
+            result = _brandRepository.GetTable()
+                        .Where(b => b.Name.ToLower().Contains(name.ToLower()))
+                        .ProjectTo<GetBrandDTO>(_mapper.ConfigurationProvider);
             return result.ToList();
         }
 
