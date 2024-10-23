@@ -157,7 +157,7 @@ namespace Vouchee.Business.Services.Impls
 
                 // Retrieve all vouchers and map to DTO
                 var vouchers = _voucherRepository.GetTable()
-                    //.Include(x => x.Medias)
+                    .Include(x => x.Medias)
                     .Include(x => x.Supplier)
                     .Include(x => x.Categories)
                     .Include(x => x.Brand)
@@ -203,9 +203,8 @@ namespace Vouchee.Business.Services.Impls
                                 title = voucher.title,
                                 categories = voucher.categories,
                                 image = voucher.modals.FirstOrDefault(x => x.index == 0).image,
-                                originalPrice = voucher.originalPrice,
-                                sellPrice = voucher.sellPrice,
-                                salePrice = voucher.salePrice,
+                                originalPrice = voucher.modals.FirstOrDefault(x => x.index == 0).originalPrice,
+                                sellPrice = voucher.modals.FirstOrDefault(x => x.index == 0).sellPrice,
                                 brandId = voucher.brandId,
                                 brandImage = voucher.brandImage,
                                 brandName = voucher.brandName,
@@ -264,7 +263,7 @@ namespace Vouchee.Business.Services.Impls
             try
             {
                 result = _voucherRepository.GetTable()
-                                            //.Include(x => x.Medias)
+                                            .Include(x => x.Medias)
                                             .Include(x => x.Supplier)
                                             .Include(x => x.Categories)
                                             .Include(x => x.Brand)
@@ -279,6 +278,10 @@ namespace Vouchee.Business.Services.Impls
 
                     foreach (var voucher in getNewestVoucherDTOs)
                     {
+                        voucher.originalPrice = voucher.modals.FirstOrDefault(x => x.index == 0).originalPrice;
+                        voucher.sellPrice = voucher.modals.FirstOrDefault(x => x.index == 0).sellPrice;
+                        voucher.image = voucher.modals.FirstOrDefault(x => x.index == 0).image;
+
                         var currentDate = DateTime.Now;
                         var promotions = _voucherRepository.GetByIdAsync(voucher.id, includeProperties: query => query.Include(x => x.Promotions)).Result.Promotions;
 
@@ -289,8 +292,6 @@ namespace Vouchee.Business.Services.Impls
                             voucher.salePrice = voucher.originalPrice - (voucher.originalPrice * availablePromotion.PercentDiscount / 100);
                             voucher.percentDiscount = availablePromotion.PercentDiscount;
                         }
-
-                        voucher.image = voucher.modals.FirstOrDefault(x => x.index == 0).image;
                     }
                 }
             }
@@ -321,7 +322,7 @@ namespace Vouchee.Business.Services.Impls
 
             // Join the vouchers and return with sorted totalQuantitySold
             voucher = _voucherRepository.GetTable()
-                //.Include(x => x.Medias)
+                .Include(x => x.Medias)
                 .Include(x => x.Supplier)
                 .Include(x => x.Categories)
                 .Include(x => x.Brand)
@@ -334,8 +335,8 @@ namespace Vouchee.Business.Services.Impls
                 id = voucher.id,
                 title = voucher.title,
                 image = voucher.modals.FirstOrDefault(x => x.index == 0).image,
-                //originalPrice = voucher.originalPrice,
-                //sellPrice = voucher.sellPrice,
+                originalPrice = voucher.modals.FirstOrDefault(x => x.index == 0).originalPrice,
+                sellPrice = voucher.modals.FirstOrDefault(x => x.index == 0).sellPrice,
                 TotalQuantitySold = orderDetails.First(od => od.VoucherId == voucher.id).TotalQuantitySold,
                 categories = voucher.categories,
                 brandId = voucher.brandId,
@@ -645,10 +646,12 @@ namespace Vouchee.Business.Services.Impls
                                                                     .ThenInclude(v => v.Categories) // Include categories of the vouchers
                                                                 .Include(x => x.Vouchers)
                                                                     .ThenInclude(v => v.Brand) // Include the brand of the vouchers
-                                                                //.Include(x => x.Vouchers)
-                                                                //    .ThenInclude(x => x.Medias)
+                                                                .Include(x => x.Vouchers)
+                                                                    .ThenInclude(x => x.Medias)
                                                                 .Include(x => x.Vouchers)
                                                                     .ThenInclude(x => x.Supplier)
+                                                                .Include(x => x.Vouchers)
+                                                                    .ThenInclude(x => x.Modals)
                                                                 .ToList()
                                                                 .Where(x => x.StartDate <= currenDate && currenDate <= x.EndDate)
                                                                 .ToList();
@@ -661,10 +664,13 @@ namespace Vouchee.Business.Services.Impls
                         foreach (var voucher in promotion.Vouchers)
                         {
                             var existedVoucher = _mapper.Map<GetNewestVoucherDTO>(voucher);
+
+                            existedVoucher.sellPrice = existedVoucher.modals.FirstOrDefault(x => x.index == 0).sellPrice;
+                            existedVoucher.originalPrice = existedVoucher.modals.FirstOrDefault(x => x.index == 0).originalPrice;
                             existedVoucher.salePrice = existedVoucher.originalPrice - (existedVoucher.originalPrice * promotion.PercentDiscount / 100);
                             existedVoucher.percentDiscount = promotion.PercentDiscount;
-                            //existedVoucher.image = voucher.Medias.Count != 0 ? voucher.Medias.FirstOrDefault(x => x.Type == MediaEnum.ADVERTISEMENT.ToString()).Url : null;
-                            //vouchers.Add(existedVoucher);
+                            existedVoucher.image = voucher.Medias.Count != 0 ? voucher.Medias.FirstOrDefault(x => x.Index == 0).Url : null;
+                            vouchers.Add(existedVoucher);
                         }
                     }
                 }
