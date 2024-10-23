@@ -40,6 +40,11 @@ namespace Vouchee.Data.Models.DTOs
 
     public class GetModalDTO
     {
+        public GetModalDTO()
+        {
+            voucherCodes = [];
+        }
+
         public Guid id { get; set; }
         public Guid? voucherId { get; set; }
 
@@ -49,6 +54,8 @@ namespace Vouchee.Data.Models.DTOs
         public int? quantity { get; set; }
         public string? image { get; set; }
         public int index { get; set; }
+
+        public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
     }
 
     public class GetDetailModalDTO : GetModalDTO
