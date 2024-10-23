@@ -57,7 +57,7 @@ namespace Vouchee.Data.Models.DTOs
         public virtual ICollection<GetAddressDTO> addresses { get; set; }
     }
 
-    public class GetBradnAdressDTO
+    public class GetBrandAddressDTO
     {
         public Guid? id { get; set; }
 

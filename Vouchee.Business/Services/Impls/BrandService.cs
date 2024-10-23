@@ -108,12 +108,12 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<IList<GetBrandDTO>> GetBrandsbynameAsync(string name)
+        public async Task<IList<GetBrandAddressDTO>> GetBrandsbynameAsync(string name)
         {
-            IQueryable<GetBrandDTO> result;
+            IQueryable<GetBrandAddressDTO> result;
             result = _brandRepository.GetTable()
                         .Where(b => b.Name.ToLower().Contains(name.ToLower()))
-                        .ProjectTo<GetBrandDTO>(_mapper.ConfigurationProvider);
+                        .ProjectTo<GetBrandAddressDTO>(_mapper.ConfigurationProvider);
             return result.ToList();
         }
 

@@ -82,6 +82,6 @@ namespace Vouchee.Business.Models.DTOs
         [Column(TypeName = "decimal")]
         public decimal? lat { get; set; }
 
-        public virtual ICollection<GetBradnAdressDTO> brands { get; set; }
+        public virtual ICollection<GetBrandAddressDTO> brands { get; set; }
     }
 }
