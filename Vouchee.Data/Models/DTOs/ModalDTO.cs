@@ -26,8 +26,7 @@ namespace Vouchee.Data.Models.DTOs
         [Range(0.01, double.MaxValue, ErrorMessage = "Sell price must be greater than zero")]
         public decimal sellPrice { get; set; }
 
-        [Range(0, 1000000, ErrorMessage = "Quantity must < 1000000")]
-        public int? stock { get; set; }
+        public string? image { get; set; }
 
         public VoucherStatusEnum status { get; set; }
         public string? productImagesUrl { get; set; }
@@ -42,12 +41,6 @@ namespace Vouchee.Data.Models.DTOs
 
     public class GetModalDTO
     {
-
-        public GetModalDTO()
-        {
-            images = new HashSet<GetMediaDTO>();
-        }
-
         public Guid id { get; set; }
         public Guid? voucherId { get; set; }
 
@@ -56,8 +49,7 @@ namespace Vouchee.Data.Models.DTOs
         public decimal? sellPrice { get; set; }
         public int? quantity { get; set; }
         public string? image { get; set; }
-
-        public virtual ICollection<GetMediaDTO>? images { get; set; }
+        public int index { get; set; }
     }
 
     public class GetDetailModalDTO : GetModalDTO

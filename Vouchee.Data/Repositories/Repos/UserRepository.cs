@@ -29,7 +29,6 @@ namespace Vouchee.Data.Repositories.Repos
                         .Include(x => x.Role)
                         .Include(x => x.Carts)
                             .ThenInclude(cart => cart.Modal) 
-                                .ThenInclude(voucher => voucher.Medias) 
                         .Include(x => x.Carts)
                             .ThenInclude(cart => cart.Modal) 
                                 .ThenInclude(voucher => voucher.Voucher.Seller)

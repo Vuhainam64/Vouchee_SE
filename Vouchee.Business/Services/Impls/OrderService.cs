@@ -144,8 +144,7 @@ namespace Vouchee.Business.Services.Impls
             if (userInstance == null)
             {
                 userInstance = await _userRepository.GetByIdAsync(userId, includeProperties: x => x.Include(x => x.Carts)
-                                                                                                    .ThenInclude(x => x.Modal)
-                                                                                                    .ThenInclude(x => x.Medias));
+                                                                                                    .ThenInclude(x => x.Modal));
             }
 
             return userInstance;
