@@ -109,10 +109,9 @@ namespace Vouchee.Business.Services.Impls
                         Url = image,
                         CreateBy = thisUserObj.userId,
                         CreateDate = DateTime.Now,
-                        Index = 0,
+                        Index = index++,
                     };
                     voucher.Medias.Add(media);
-                    index++;
                 }
             }
                
