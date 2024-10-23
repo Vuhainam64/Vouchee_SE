@@ -49,10 +49,6 @@ namespace Vouchee.Business.Models.DTOs
         public decimal? finalPrice { get; set; }
 
         public string? status { get; set; }
-        public DateTime? createDate { get; set; }
-        public Guid? createBy { get; set; }
-        public DateTime? updateDate { get; set; }
-        public Guid? updateBy { get; set; }
 
         public virtual ICollection<GetOrderDetailDTO>? orderDetails { get; set; }
     }

@@ -41,7 +41,7 @@ namespace Vouchee.Data.Models.DTOs
         public int totalQuantity { get; set; }
         public decimal totalPrice { get; set; }
         public decimal discountPrice { get; set; }
-        public decimal finalPrice { get; set; }
+        public decimal finalPrice => totalPrice - discountPrice;
 
         public virtual ICollection<SellerCartDTO> sellers { get; set; }
     }

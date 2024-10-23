@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -68,8 +69,13 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<GetModalDTO> GetModalByIdAsync(Guid id)
         {
-            Modal modal = await _modalRepository.GetByIdAsync(id);
-            throw new NotFoundException("Khong tim thay sub voucher");
+            Modal modal = await _modalRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.VoucherCodes)
+                                                                                                .ThenInclude(x => x.OrderDetail));
+
+            if (modal == null)
+               throw new NotFoundException("Khong tim thay sub voucher");
+
+            return _mapper.Map<GetModalDTO>(modal);
         }
 
         public async Task<DynamicResponseModel<GetModalDTO>> GetModalsAsync(PagingRequest pagingRequest, ModalFilter modalFilter)
@@ -78,7 +84,7 @@ namespace Vouchee.Business.Services.Impls
             (int, IQueryable<GetModalDTO>) result;
             try
             {
-                result = _modalRepository.GetTable()
+                result = _modalRepository.GetTable(includeProperties: x => x.Include(x => x.VoucherCodes).ThenInclude(x => x.OrderDetail))
                             .ProjectTo<GetModalDTO>(_mapper.ConfigurationProvider)
                             .DynamicFilter(_mapper.Map<GetModalDTO>(modalFilter))
                             .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);

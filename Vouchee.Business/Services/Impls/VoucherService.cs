@@ -390,7 +390,6 @@ namespace Vouchee.Business.Services.Impls
                 GetDetailVoucherDTO voucherDTO = _mapper.Map<GetDetailVoucherDTO>(voucher);
 
                 voucherDTO.image = voucher.Modals.FirstOrDefault(x => x.Index == 0).Image;
-                //voucherDTO.quantity = voucher.Modals.Sum(x => x.Stock);
                 voucherDTO.originalPrice = voucher.Modals.FirstOrDefault(x => x.Index == 0).OriginalPrice;
                 voucherDTO.sellPrice = voucher.Modals.FirstOrDefault(x => x.Index == 0).SellPrice;
 
