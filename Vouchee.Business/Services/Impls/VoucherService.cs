@@ -84,58 +84,35 @@ namespace Vouchee.Business.Services.Impls
 
             voucher.SellerID = thisUserObj.userId;
 
-            // VOUCHER IMAGE
-            if (createVoucherDTO.images != null && createVoucherDTO.images.Count != 0)
-            {
-                int index = 0;
-                foreach (var productImage in createVoucherDTO.images)
-                {
-                    Media image = new()
-                    {
-                        Url = productImage,
-                        Status = ObjectStatusEnum.ACTIVE.ToString(),
-                        CreateBy = thisUserObj.userId,
-                        CreateDate = DateTime.Now,
-                    };
-
-                    voucher.Medias.Add(image);
-                }
-            }
-
-            // VIDEO
-            if (createVoucherDTO.videoUrl != null && createVoucherDTO.videoUrl != "")
-            {
-                Media video = new()
-                {
-                    Url = createVoucherDTO.videoUrl,
-                    Status = ObjectStatusEnum.ACTIVE.ToString(),
-                    CreateBy = thisUserObj.userId,
-                    CreateDate = DateTime.Now,
-                };
-
-                voucher.Medias.Add(video);
-            }
-
             // MODAL 
 
             if (voucher.Modals != null && voucher.Modals.Count != 0)
             {
-                foreach (var modal in createVoucherDTO.modals)
-                {
-                    Media image = new()
-                    {
-                        Url = modal.productImagesUrl,
-                        Status = ObjectStatusEnum.ACTIVE.ToString(),
-                        CreateBy = thisUserObj.userId,
-                        CreateDate = DateTime.Now,
-                    };
-                    voucher.Medias.Add(image);
-                }
-
                 int index = 0;
                 foreach (var m in voucher.Modals)
                 {
-                    m.Index = index++;
+                    m.CreateBy = thisUserObj.userId;
+                    m.Index = index;
+                    index++;
+                }
+            }
+
+            // IMAGE
+            if (createVoucherDTO.images?.Count != 0)
+            {
+                int index = 0;
+                foreach (var image in createVoucherDTO.images)
+                {
+                    Media media = new()
+                    {
+                        Status = ObjectStatusEnum.ACTIVE.ToString(),
+                        Url = image,
+                        CreateBy = thisUserObj.userId,
+                        CreateDate = DateTime.Now,
+                        Index = 0,
+                    };
+                    voucher.Medias.Add(media);
+                    index++;
                 }
             }
                

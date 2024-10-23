@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Vouchee.Data.Models.Entities
 {
     [Table("Media")]
-    [Index(nameof(VoucherId), Name = "IX_Image_VoucherId")]
+    [Index(nameof(VoucherId), Name = "IX_Media_VoucherId")]
     public class Media
     {
         public Guid? VoucherId { get; set; }
@@ -23,6 +23,7 @@ namespace Vouchee.Data.Models.Entities
         public Guid Id { get; set; }
 
         public required string Url { get; set; }
+        public int Index { get; set; }
 
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]
