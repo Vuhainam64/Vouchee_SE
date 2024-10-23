@@ -41,10 +41,10 @@ namespace Vouchee.Business.Models.DTOs
 
         public IList<string>? images { get; set; }
 
-        public string? videoUrl { get; set; }
+        public string? video { get; set; }
 
         public DateTime? createDate = DateTime.Now;
-        public string? status = ObjectStatusEnum.ACTIVE.ToString();
+        public VoucherStatusEnum status { get; set; }
 
         public virtual ICollection<CreateModalDTO> modals { get; set; }
     }

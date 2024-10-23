@@ -237,9 +237,6 @@ namespace Vouchee.Data.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("NEWID()");
 
-                    b.Property<Guid?>("AddressId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("CreateBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -249,14 +246,7 @@ namespace Vouchee.Data.Migrations
                     b.Property<int>("Index")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("ModalId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -275,11 +265,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "AddressId" }, "IX_Image_AddressId");
-
-                    b.HasIndex(new[] { "ModalId" }, "IX_Image_ModalId");
-
-                    b.HasIndex(new[] { "VoucherId" }, "IX_Image_VoucherId");
+                    b.HasIndex(new[] { "VoucherId" }, "IX_Media_VoucherId");
 
                     b.ToTable("Media");
                 });
@@ -296,6 +282,9 @@ namespace Vouchee.Data.Migrations
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Index")
                         .HasColumnType("int");
@@ -670,6 +659,9 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime");
 
+                    b.Property<string>("Video")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex(new[] { "BrandId" }, "IX_Voucher_BrandId");
@@ -837,21 +829,9 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Media", b =>
                 {
-                    b.HasOne("Vouchee.Data.Models.Entities.Address", "Address")
-                        .WithMany("Medias")
-                        .HasForeignKey("ModalId");
-
-                    b.HasOne("Vouchee.Data.Models.Entities.Modal", "Modal")
-                        .WithMany("Medias")
-                        .HasForeignKey("ModalId");
-
                     b.HasOne("Vouchee.Data.Models.Entities.Voucher", "Voucher")
                         .WithMany("Medias")
                         .HasForeignKey("VoucherId");
-
-                    b.Navigation("Address");
-
-                    b.Navigation("Modal");
 
                     b.Navigation("Voucher");
                 });
@@ -960,11 +940,6 @@ namespace Vouchee.Data.Migrations
                     b.Navigation("OrderDetail");
                 });
 
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.Address", b =>
-                {
-                    b.Navigation("Medias");
-                });
-
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Brand", b =>
                 {
                     b.Navigation("Vouchers");
@@ -973,8 +948,6 @@ namespace Vouchee.Data.Migrations
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Modal", b =>
                 {
                     b.Navigation("Carts");
-
-                    b.Navigation("Medias");
 
                     b.Navigation("OrderDetails");
 

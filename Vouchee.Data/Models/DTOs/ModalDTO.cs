@@ -29,7 +29,6 @@ namespace Vouchee.Data.Models.DTOs
         public string? image { get; set; }
 
         public VoucherStatusEnum status { get; set; }
-        public string? productImagesUrl { get; set; }
 
         public DateTime createDate = DateTime.Now;
     }
