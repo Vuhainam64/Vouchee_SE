@@ -183,11 +183,14 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? brandId { get; set; }
         public string? brandName { get; set; }
         public string? brandImage { get; set; }
+
         public Guid? supplierId { get; set; }
         public string? supplierName { get; set; }
         public string? supplierImage { get; set; }
+
         public Guid? createBy { get; set; }
         public string? sellerName { get; set; }
+        public string? sellerImage { get; set; }
 
         public virtual ICollection<GetDetailModalDTO>? modals { get; set; }
         public virtual ICollection<GetCategoryDTO> categories { get; set; }
@@ -235,7 +238,7 @@ namespace Vouchee.Business.Models.DTOs
         public decimal? originalPrice { get; set; }
         public decimal? sellPrice { get; set; }
         public decimal? salePrice { get; set; }
-        public string? productImage { get; set; }
+        public string? image { get; set; }
         public decimal? percentDiscount { get; set; }
     }
 

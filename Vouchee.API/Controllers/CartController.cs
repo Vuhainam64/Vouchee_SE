@@ -35,15 +35,15 @@ namespace Vouchee.API.Controllers
         }
 
         // CREATE
-        [HttpPost("add_item/{voucherId}")]
+        [HttpPost("add_item/{modalId}")]
         [Authorize]
-        public async Task<IActionResult> AddItem(Guid voucherId)
+        public async Task<IActionResult> AddItem(Guid modalId)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
             if (currentUser.roleId.Equals(currentUser.buyerRoleId) )
             {
-                var result = await _cartService.AddItemAsync(voucherId, currentUser);
+                var result = await _cartService.AddItemAsync(modalId, currentUser);
                 return Ok(result);
             }
 

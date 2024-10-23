@@ -57,6 +57,11 @@ namespace Vouchee.Business.Services.Impls
                     throw new NotFoundException("Không tìm thấy order detail");
                 }
 
+                if (voucherCodeList.voucherCodeIds.Count() != existedOrderDetail.Quantity)
+                {
+                    throw new ConflictException($"Khách hàng đã đặt {existedOrderDetail.Quantity} voucher, bạn sẽ bị trừ điểm uy tín nếu không cung cấp đủ voucher");
+                }
+
                 foreach (var voucherCodeId in voucherCodeList.voucherCodeIds)
                 {
                     var existedVoucherCode = await _voucherCodeRepository.FindAsync(voucherCodeId);
@@ -71,12 +76,14 @@ namespace Vouchee.Business.Services.Impls
                     }
 
                     existedOrderDetail.VoucherCodes.Add(existedVoucherCode);
+
+                    existedVoucherCode.Status = "ASSIGNED";
+                    await _voucherCodeRepository.UpdateAsync(existedVoucherCode);
                 }
 
-                if (!await _orderDetailRepository.UpdateAsync(existedOrderDetail))
-                {
-                    throw new UpdateObjectException("Lỗi không xác định khi cập nhật dữ liệu");
-                }
+                existedOrderDetail.Status = "DONE";
+                await _orderDetailRepository.UpdateAsync(existedOrderDetail);
+
 
                 return true;
             }
@@ -89,46 +96,50 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<Guid?> CreateOrderAsync(ThisUserObj thisUserObj)
         {
-            return null;
+            CartDTO cartDTO = await _cartService.GetCartsAsync(thisUserObj);
 
-            //CartDTO cartDTO = await _cartService.GetCartsAsync(thisUserObj);
-    
-            //Order order = new()
-            //{
-            //    PaymentType = "CASH",
-            //    Status = "PENDING", // Fixed typo from "PENING" to "PENDING"
-            //    CreateBy = thisUserObj.userId,
-            //    CreateDate = DateTime.Now,
-            //    OrderDetails = new List<OrderDetail>() // Assuming OrderDetails is a collection
-            //};
+            Order order = new()
+            {
+                PaymentType = "MOMO",
+                Status = "PENDING", // Fixed typo from "PENING" to "PENDING"
+                CreateBy = thisUserObj.userId,
+                CreateDate = DateTime.Now,
+                OrderDetails = new List<OrderDetail>() // Assuming OrderDetails is a collection
+            };
 
-            //// Loop through the vouchers in the cart and create corresponding OrderDetails
-            //foreach (var voucher in cartDTO.sellers)
-            //{
-            //    order.OrderDetails.Add(new OrderDetail
-            //    {
-            //        VoucherId = voucher.id, // Assuming the voucher has an Id
-            //        Quantity = voucher.quantity, // Set quantity (if applicable)
-            //        UnitPrice = (decimal) voucher.sellPrice, // Assuming each voucher has a Price property
-            //    });
-            //}
+            foreach (var seller in cartDTO.sellers)
+            {
+                foreach (var modal in seller.modals)
+                {
+                    order.OrderDetails.Add(new OrderDetail
+                    {
+                        ModalId = modal.id,
+                        Quantity = modal.quantity,
+                        UnitPrice = (decimal) modal.sellPrice,
+                        Status = OrderStatusEnum.PENDING.ToString(),
+                        CreateDate = DateTime.Now,
+                        CreateBy = thisUserObj.userId
+                    });
+                }
+            }
 
-            //order.TotalPrice = order.OrderDetails.Sum(x => x.TotalPrice);
-            //order.DiscountValue = 0;
+            order.TotalPrice = order.OrderDetails.Sum(x => x.TotalPrice);
+            order.DiscountValue = 0;
 
-            //Guid? orderId = await _orderRepository.AddAsync(order);
+            Guid? orderId = await _orderRepository.AddAsync(order);
 
-            //foreach (var voucher in cartDTO.sellers)
-            //{
-            //    await _cartService.RemoveItemAsync((Guid)voucher.id, thisUserObj);
+            if (orderId != Guid.Empty)
+            {
+                foreach (var seller in cartDTO.sellers)
+                {
+                    foreach (var x in seller.modals)
+                    {
+                        await _cartService.RemoveItemAsync((Guid)x.id, thisUserObj);
+                    }
+                }
+            }
 
-            //    Voucher voucherInstance = GetCurrentUser(thisUserObj.userId).Result.Carts.FirstOrDefault(x => x.VoucherId == voucher.id).Voucher;
-            //    voucherInstance.Quantity -= voucher.quantity;
-
-            //    await _voucherRepository.UpdateAsync(voucherInstance);
-            //}
-
-            //return orderId;
+            return orderId;
         }
 
         public async Task<User> GetCurrentUser(Guid userId)
@@ -214,7 +225,7 @@ namespace Vouchee.Business.Services.Impls
         {
             try
             {
-                var order = await _orderRepository.GetByIdAsync(id);
+                var order = await _orderRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.OrderDetails).ThenInclude(x => x.VoucherCodes));
                 if (order != null)
                 {
                     var orderDTO = _mapper.Map<GetOrderDTO>(order);

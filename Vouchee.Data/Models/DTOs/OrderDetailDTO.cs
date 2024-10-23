@@ -9,18 +9,11 @@ namespace Vouchee.Business.Models.DTOs
 {
     public class OrderDetailDTO
     {
-        public Guid? voucherId { get; set; }
-        [Range(1, int.MaxValue, ErrorMessage = "Số lượng phải lớn hơn 0")]
-        public int quantity { get; set; }
+        public int? quantity { get; set; }
     }
 
     public class CreateOrderDetailDTO : OrderDetailDTO
     {
-        //[JsonIgnore] public decimal UnitPrice { get; set; }
-        //[JsonIgnore] public decimal DiscountValue { get; set; } = 0;
-        //[JsonIgnore] public decimal TotalPrice { get; set; }
-        //public decimal DiscountPrice => TotalPrice * DiscountValue / 100;
-        //public decimal FinalPrice => TotalPrice - DiscountPrice;
         public Guid promotionId { get; set; }
         public string status = OrderStatusEnum.PENDING.ToString();
         public DateTime? createDate = DateTime.Now;
@@ -44,6 +37,7 @@ namespace Vouchee.Business.Models.DTOs
 
         public Guid? id { get; set; }
         public Guid? orderId { get; set; }
+        public Guid? modalId { get; set; }
 
         public decimal? unitPrice { get; set; }
         public decimal? discountValue { get; set; }
@@ -52,10 +46,6 @@ namespace Vouchee.Business.Models.DTOs
         public decimal? finalPrice { get; set; }
 
         public string? status { get; set; }
-        public DateTime? createDate { get; set; }
-        public Guid? createBy { get; set; }
-        public DateTime? updateDate { get; set; }
-        public Guid? updateBy { get; set; }
 
         public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
     }

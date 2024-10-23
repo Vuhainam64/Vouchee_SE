@@ -382,14 +382,14 @@ namespace Vouchee.Business.Services.Impls
                                                         .ThenInclude(x => x.VoucherType)
                                                     .Include(x => x.Seller)
                                                     .Include(x => x.Modals)
-                                                        .ThenInclude(x => x.VoucherCodes));
+                                                        .ThenInclude(x => x.VoucherCodes)
+                                                    .Include(x => x.Medias));
 
             if (voucher != null)
             {
                 GetDetailVoucherDTO voucherDTO = _mapper.Map<GetDetailVoucherDTO>(voucher);
 
                 voucherDTO.image = voucher.Modals.FirstOrDefault(x => x.Index == 0).Image;
-                //voucherDTO.quantity = voucher.Modals.Sum(x => x.Stock);
                 voucherDTO.originalPrice = voucher.Modals.FirstOrDefault(x => x.Index == 0).OriginalPrice;
                 voucherDTO.sellPrice = voucher.Modals.FirstOrDefault(x => x.Index == 0).SellPrice;
 
@@ -403,6 +403,13 @@ namespace Vouchee.Business.Services.Impls
                     voucherDTO.salePrice = voucherDTO.originalPrice - (voucherDTO.originalPrice * availablePromotion.PercentDiscount / 100);
                     voucherDTO.percentDiscount = availablePromotion.PercentDiscount;
                 }
+
+                foreach (var modal in voucherDTO.modals)
+                {
+                    modal.quantity = modal.voucherCodes.Where(x => x.status == ObjectStatusEnum.ACTIVE.ToString()).Count();
+                }
+
+                voucherDTO.quantity = voucherDTO.modals.Sum(x => x.quantity);
 
                 return voucherDTO;
             }
@@ -522,6 +529,7 @@ namespace Vouchee.Business.Services.Impls
                                 // Create the DTO object
                                 var x = new GetAllVoucherDTO
                                 {
+                                    description = voucher.description,
                                     categories = voucher.categories,
                                     id = voucher.id,
                                     modals = voucher.modals,
@@ -590,6 +598,13 @@ namespace Vouchee.Business.Services.Impls
                         voucher.image = voucher.modals.Count != 0 ? voucher.modals.FirstOrDefault(x => x.index == 0).image : null;
                         LoggerService.Logger($"Voucher {voucher.id} has an active promotion with {availablePromotion.PercentDiscount}% discount.");
                     }
+
+                    foreach (var modal in voucher.modals)
+                    {
+                        modal.quantity = modal.voucherCodes.Where(x => x.status == ObjectStatusEnum.ACTIVE.ToString()).Count();
+                    }
+
+                    voucher.quantity = voucher.modals.Sum(x => x.quantity);
                 }
 
                 // Apply pagination

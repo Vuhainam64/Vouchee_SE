@@ -53,5 +53,13 @@ namespace Vouchee.Data.Models.Entities
         [Column(TypeName = "decimal(10,5)")]
         public decimal FinalPrice => TotalPrice - DiscountPrice;
         public int Quantity { get; set; }
+
+        public required string Status { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime CreateDate { get; set; }
+        public Guid? CreateBy { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime? UpdateDate { get; set; }
+        public Guid? UpdateBy { get; set; }
     }
 }

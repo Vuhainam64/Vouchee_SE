@@ -40,7 +40,12 @@ namespace Vouchee.Data.Models.DTOs
 
     public class GetModalDTO
     {
-        public Guid id { get; set; }
+        public GetModalDTO()
+        {
+            voucherCodes = [];
+        }
+
+        public Guid? id { get; set; }
         public Guid? voucherId { get; set; }
 
         public string? title { get; set; }
@@ -48,7 +53,9 @@ namespace Vouchee.Data.Models.DTOs
         public decimal? sellPrice { get; set; }
         public int? quantity { get; set; }
         public string? image { get; set; }
-        public int index { get; set; }
+        public int? index { get; set; }
+
+        public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
     }
 
     public class GetDetailModalDTO : GetModalDTO
