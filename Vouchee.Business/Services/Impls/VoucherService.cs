@@ -345,7 +345,7 @@ namespace Vouchee.Business.Services.Impls
 
             // Get all vouchers and their total quantity sold
             var orderDetails = _orderDetailRepository.GetTable()
-                .GroupBy(od => od.VoucherId)
+                .GroupBy(od => od.ModalId)
                 .Select(group => new
                 {
                     VoucherId = group.Key,
@@ -412,8 +412,7 @@ namespace Vouchee.Business.Services.Impls
         public async Task<GetDetailVoucherDTO> GetVoucherByIdAsync(Guid id)
         {
             var voucher = await _voucherRepository.GetByIdAsync(id,
-                                    query => query.Include(x => x.VoucherCodes)
-                                                    .Include(x => x.Brand)
+                                    query => query.Include(x => x.Brand)
                                                         .ThenInclude(x => x.Addresses)
                                                     .Include(x => x.Supplier)
                                                     .Include(x => x.Categories)

@@ -65,7 +65,7 @@ namespace Vouchee.Business.Services.Impls
                         throw new NotFoundException($"Không tìm thấy voucher code với id {voucherCodeId}");
                     }
                     // check code này có phải là voucher đang đặt không
-                    if (existedOrderDetail.VoucherId != existedVoucherCode.VoucherId)
+                    if (existedOrderDetail.ModalId != existedVoucherCode.ModalId)
                     {
                         throw new ConflictException("Voucher code này không thuộc voucher đang đặt");
                     }

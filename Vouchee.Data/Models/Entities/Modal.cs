@@ -17,12 +17,18 @@ namespace Vouchee.Data.Models.Entities
         {
             Medias = [];
             Carts = [];
+            VoucherCodes = [];
+            OrderDetails = [];
         }
 
         [InverseProperty(nameof(Cart.Modal))]
         public virtual ICollection<Cart> Carts { get; set; }
         [InverseProperty(nameof(Media.Modal))]
         public virtual ICollection<Media> Medias { get; set; }
+        [InverseProperty(nameof(VoucherCode.Modal))]
+        public virtual ICollection<VoucherCode> VoucherCodes { get; set; }
+        [InverseProperty(nameof(OrderDetail.Modal))]
+        public virtual ICollection<OrderDetail> OrderDetails { get; set; }
 
         public Guid VoucherId { get; set; }
         [ForeignKey(nameof(VoucherId))]

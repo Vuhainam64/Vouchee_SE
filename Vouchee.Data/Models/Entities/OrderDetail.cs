@@ -11,7 +11,7 @@ namespace Vouchee.Data.Models.Entities
 {
     [Table("OrderDetail")]
     [Index(nameof(OrderId), Name = "IX_OrderDetail_OrderId")]
-    [Index(nameof(VoucherId), Name = "IX_OrderDetail_VoucherId")]
+    [Index(nameof(ModalId), Name = "IX_OrderDetail_ModalId")]
     [Index(nameof(PromotionId), Name = "IX_OrderDetail_PromotionId")]
     public partial class OrderDetail
     {
@@ -28,10 +28,10 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty("OrderDetails")]
         public virtual Order? Order { get; set; }
 
-        public Guid? VoucherId { get; set; }
-        [ForeignKey(nameof(VoucherId))]
+        public Guid? ModalId { get; set; }
+        [ForeignKey(nameof(ModalId))]
         [InverseProperty("OrderDetails")]
-        public virtual Voucher? Voucher { get; set; }
+        public virtual Modal? Modal { get; set; }
 
         public Guid? PromotionId { get; set; }
         [ForeignKey(nameof(PromotionId))]

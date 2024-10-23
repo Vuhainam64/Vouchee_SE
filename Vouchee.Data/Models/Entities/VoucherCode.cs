@@ -10,14 +10,14 @@ using System.Threading.Tasks;
 namespace Vouchee.Data.Models.Entities
 {
     [Table("VoucherCode")]
-    [Index(nameof(VoucherId), Name = "IX_Voucher_VoucherId")]
+    [Index(nameof(ModalId), Name = "IX_Voucher_ModalId")]
     [Index(nameof(OrderDetailId), Name = "IX_Voucher_OrderDetailId")]
     public partial class VoucherCode
     {
-        public Guid VoucherId { get; set; }
-        [ForeignKey(nameof(VoucherId))]
+        public Guid ModalId { get; set; }
+        [ForeignKey(nameof(ModalId))]
         [InverseProperty("VoucherCodes")]
-        public required virtual Voucher Voucher { get; set; }
+        public required virtual Modal Modal { get; set; }
 
         public Guid? OrderDetailId { get; set; }
         [ForeignKey(nameof(OrderDetailId))]

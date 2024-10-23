@@ -268,7 +268,7 @@ namespace Vouchee.Business.Models.DTOs
         public decimal? percentDiscount { get; set; }
     }
 
-    public class CartVoucherDTO : VoucherDTO
+    public class CartModalDTO : VoucherDTO
     {
         public int quantity { get; set; }
     }

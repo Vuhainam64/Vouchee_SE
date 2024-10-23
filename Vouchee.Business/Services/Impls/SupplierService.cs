@@ -79,7 +79,7 @@ namespace Vouchee.Business.Services.Impls
                 // Fetch suppliers and include their vouchers and order details
                 suppliers = _supplierRepository.GetTable()
                     .Include(s => s.Vouchers)
-                        .ThenInclude(v => v.OrderDetails) // Include order details to calculate sold quantities
+                        //.ThenInclude(v => v.OrderDetails) // Include order details to calculate sold quantities
                     .ToList();
 
                 // Calculate the total sold vouchers for each supplier and map it to BestSuppleriDTO
@@ -89,9 +89,9 @@ namespace Vouchee.Business.Services.Impls
                         id = supplier.Id,
                         name = supplier.Name,
                         image = supplier.Image,
-                        soldVoucher = supplier.Vouchers
-                            .SelectMany(v => v.OrderDetails)  // Get all order details across all vouchers
-                            .Sum(od => od.Quantity)           // Sum up the sold quantities (assuming Quantity field exists)
+                        //soldVoucher = supplier.Vouchers
+                            //.SelectMany(v => v.OrderDetails)  // Get all order details across all vouchers
+                            //.Sum(od => od.Quantity)           // Sum up the sold quantities (assuming Quantity field exists)
                     })
                     .OrderByDescending(s => s.soldVoucher) // Order by sold voucher quantity in descending order
                     .ToList();

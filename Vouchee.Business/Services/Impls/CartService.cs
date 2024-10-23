@@ -51,28 +51,7 @@ namespace Vouchee.Business.Services.Impls
 
                 if (currentVoucher != null)
                 {
-                    //var sellerCart = cartDTO.sellers.FirstOrDefault(s => s.id == currentVoucher?.SellerID);
-                    //if (sellerCart == null)
-                    //{
-                    //    sellerCart = new SellerCartDTO
-                    //    {
-                    //        //id = currentVoucher?.SellerID,
-                    //        //name = currentVoucher?.Seller?.Name,
-                    //        //image = currentVoucher?.Seller?.Image,
-                    //        vouchers = new List<CartVoucherDTO>()
-                    //    };
-                    //    cartDTO.sellers.Add(sellerCart);
-                    //}
-
-                    //sellerCart.vouchers.Add(new CartVoucherDTO
-                    //{
-                    //    id = cartItem.Modal?.Id,
-                    //    //originalPrice = cartItem.Voucher?.OriginalPrice,
-                    //    //sellPrice = cartItem.Voucher?.SellPrice,
-                    //    title = cartItem.Modal?.Name,
-                    //    quantity = cartItem.Quantity,
-                    //    productImage = _mapper.Map<IList<GetMediaDTO>>(cartItem.Modal?.Medias).FirstOrDefault(x => x.type == MediaEnum.ADVERTISEMENT)?.url
-                    //});
+                    
                 }
             }
 
