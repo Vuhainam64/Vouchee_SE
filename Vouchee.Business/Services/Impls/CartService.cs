@@ -24,16 +24,19 @@ namespace Vouchee.Business.Services.Impls
 {
     public class CartService : ICartService
     {
+        private readonly IModalRepository _modalRepository;
         private readonly IVoucherRepository _voucherRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
 
         private User? _currentUser;
 
-        public CartService(IVoucherRepository voucherRepository,
+        public CartService(IModalRepository modalRepository,
+                            IVoucherRepository voucherRepository,
                             IUserRepository userRepository, 
                             IMapper mapper)
         {
+            _modalRepository = modalRepository;
             _voucherRepository = voucherRepository;
             _userRepository = userRepository;
             _mapper = mapper;
@@ -47,116 +50,91 @@ namespace Vouchee.Business.Services.Impls
 
             foreach (var cartItem in _currentUser.Carts)
             {
-                var currentVoucher = cartItem.Modal;
+                var currentModal = cartItem.Modal;
 
-                if (currentVoucher != null)
+                if (currentModal != null)
                 {
-                    
+                    var sellerCart = cartDTO.sellers.FirstOrDefault(s => s.id == currentModal.Voucher.SellerID);
+                    if (sellerCart == null)
+                    {
+                        sellerCart = new SellerCartDTO
+                        {
+                            id = currentModal?.Voucher.SellerID,
+                            name = currentModal?.Voucher.Seller.Name,
+                            image = currentModal.Voucher.Seller.Image,
+                            modals = new List<CartModalDTO>()
+                        };
+                        cartDTO.sellers.Add(sellerCart);
+                    }
+
+                    sellerCart.modals.Add(new CartModalDTO
+                    {
+                        id = cartItem.Modal?.Id,
+                        originalPrice = cartItem.Modal?.OriginalPrice,
+                        sellPrice = cartItem.Modal?.SellPrice,
+                        title = cartItem.Modal?.Title,
+                        quantity = cartItem.Quantity,
+                        image = cartItem.Modal?.Image
+                    });
                 }
             }
 
             return cartDTO;
         }
 
-        public async Task<bool> AddItemAsync(Guid voucherId, ThisUserObj thisUserObj)
+        public async Task<bool> AddItemAsync(Guid modalId, ThisUserObj thisUserObj)
         {
             await GetCartsAsync(thisUserObj);
 
-            if (_currentUser.Carts != null && _currentUser.Carts.Count != 0)
+            // Voucher exist in cart already
+            var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.ModalId == modalId);
+            if (cartVoucher != null)
             {
-                // Voucher exist in cart already
-                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.ModalId == voucherId);
-                if (cartVoucher != null)
+                if (cartVoucher.Quantity >= 20)
                 {
-                    if (cartVoucher.Quantity >= 20)
-                    {
-                        throw new ConflictException("Quantity đã vượt quá 20");
-                    }
-                    else
-                    {
-                        cartVoucher.Quantity += 1;
-                        cartVoucher.UpdateBy = thisUserObj.userId;
-                        cartVoucher.UpdateDate = DateTime.Now;
-
-                        return await _userRepository.UpdateAsync(_currentUser);
-                    }
+                    throw new ConflictException("Quantity đã vượt quá 20");
                 }
                 else
                 {
-                    //var existedVoucher = await _voucherRepository.GetByIdAsync(voucherId, includeProperties: x => x.Include(x => x.Medias));
-
-                    //if (existedVoucher == null)
-                    //{
-                    //    throw new NotFoundException("Không tìm thấy voucher này");
-                    //}
-
-                    //_currentUser.Carts.Add(new()
-                    //{
-                    //    CreateBy = thisUserObj.userId,
-                    //    CreateDate = DateTime.Now,
-                    //    Quantity = 1,
-                    //    Modal = existedVoucher,
-                    //});
+                    cartVoucher.Quantity += 1;
+                    cartVoucher.UpdateBy = thisUserObj.userId;
+                    cartVoucher.UpdateDate = DateTime.Now;
 
                     return await _userRepository.UpdateAsync(_currentUser);
                 }
             }
+            else
+            {
+                var existedModal = await _modalRepository.FindAsync(modalId);
 
-            return false;
-            //Guid userId = thisUserObj.userId;
+                if (existedModal == null)
+                {
+                    throw new NotFoundException("Không tìm thấy modal này");
+                }
 
-            //User userInstance = await GetCurrentUser(userId);
+                _currentUser.Carts.Add(new()
+                {
+                    CreateBy = thisUserObj.userId,
+                    CreateDate = DateTime.Now,
+                    Quantity = 1,
+                    Modal = existedModal,
+                });
 
-            //if (userInstance.Carts.Count() > 5)
-            //{
-            //    throw new ConflictException("Bạn chỉ có thể mua tối đa 5 loại voucher một lúc");
-            //}
-
-            //var haveVoucher = userInstance.Carts.FirstOrDefault(x => x.VoucherId == voucherId);
-            //if (haveVoucher != null)
-            //{
-            //    haveVoucher.Quantity += 1;
-            //    haveVoucher.UpdateBy = thisUserObj.userId;
-            //    haveVoucher.UpdateDate = DateTime.Now;
-            //}
-            //else
-            //{
-            //    Voucher existedVoucher = await _voucherRepository.GetByIdAsync(voucherId, includeProperties: x => x.Include(x => x.Medias)
-            //                                                                                                            .Include(x => x.Seller));
-
-            //    if (existedVoucher == null)
-            //    {
-            //        throw new NotFoundException("Không tìm thầy voucher này");
-            //    }
-
-            //    userInstance.Carts.Add(new()
-            //    {
-            //        VoucherId = voucherId,
-            //        CreateBy = thisUserObj.userId,
-            //        CreateDate = DateTime.Now,
-            //        Quantity = 1,
-            //        Status = ObjectStatusEnum.ACTIVE.ToString(),
-            //        Voucher = existedVoucher,
-            //        Buyer = userInstance
-            //    });
-            //}
-
-            //var result = await _userRepository.UpdateAsync(userInstance);
-
-            //return result;
+                return await _userRepository.UpdateAsync(_currentUser);
+            }
         }
 
-        public async Task<bool> DecreaseQuantityAsync(Guid voucherId, ThisUserObj thisUserObj)
+        public async Task<bool> DecreaseQuantityAsync(Guid modalId, ThisUserObj thisUserObj)
         {
             await GetCartsAsync(thisUserObj);
 
             if (_currentUser.Carts != null && _currentUser.Carts.Count != 0)
             {
                 // Voucher exist in cart already
-                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.ModalId == voucherId);
+                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.ModalId == modalId);
                 if (cartVoucher == null)
                 {
-                    throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
+                    throw new NotFoundException($"Không thấy voucher {modalId} trong cart");
                 }
 
                 if (cartVoucher.Quantity <= 1)
@@ -196,21 +174,21 @@ namespace Vouchee.Business.Services.Impls
             // throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
         }
 
-        public async Task<bool> IncreaseQuantityAsync(Guid voucherId, ThisUserObj thisUserObj)
+        public async Task<bool> IncreaseQuantityAsync(Guid modalId, ThisUserObj thisUserObj)
         {
             await GetCartsAsync(thisUserObj);
 
             if (_currentUser.Carts != null && _currentUser.Carts.Count != 0)
             {
                 // Voucher exist in cart already
-                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.ModalId == voucherId);
+                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.ModalId == modalId);
                 if (cartVoucher == null)
                 {
-                    throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
+                    throw new NotFoundException($"Không thấy voucher {modalId} trong cart");
                 }
                 else if (cartVoucher.Quantity >= 20)
                 {
-                    throw new ConflictException($"Voucher {voucherId} không thể vượt quá 20");
+                    throw new ConflictException($"Voucher {modalId} không thể vượt quá 20");
                 }
                 else
                 {
@@ -247,21 +225,21 @@ namespace Vouchee.Business.Services.Impls
         }
 
 
-        public async Task<bool> RemoveItemAsync(Guid voucherId, ThisUserObj thisUserObj)
+        public async Task<bool> RemoveItemAsync(Guid modalId, ThisUserObj thisUserObj)
         {
             await GetCartsAsync(thisUserObj);
 
             if (_currentUser.Carts != null && _currentUser.Carts.Count != 0)
             {
                 // Voucher exist in cart already
-                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.ModalId == voucherId);
+                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.ModalId == modalId);
                 if (cartVoucher == null) 
                 {
-                    throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
+                    throw new NotFoundException($"Không thấy voucher {modalId} trong cart");
                 }
                 if (cartVoucher.Quantity >= 20)
                 {
-                    throw new ConflictException($"Voucher {voucherId} không thể vượt quá 20");
+                    throw new ConflictException($"Voucher {modalId} không thể vượt quá 20");
                 }
                 _currentUser.Carts.Remove(cartVoucher);
                 return await _userRepository.UpdateAsync(_currentUser);
@@ -284,7 +262,7 @@ namespace Vouchee.Business.Services.Impls
         }
 
 
-        public async Task<bool> UpdateQuantityAsync(Guid voucherId, int quantity, ThisUserObj thisUserObj)
+        public async Task<bool> UpdateQuantityAsync(Guid modalId, int quantity, ThisUserObj thisUserObj)
         {
             if (quantity <= 0)
             {
@@ -300,14 +278,14 @@ namespace Vouchee.Business.Services.Impls
             if (_currentUser.Carts != null && _currentUser.Carts.Count != 0)
             {
                 // Voucher exist in cart already
-                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.ModalId == voucherId);
+                var cartVoucher = _currentUser.Carts.FirstOrDefault(x => x.ModalId == modalId);
                 if (cartVoucher == null)
                 {
-                    throw new NotFoundException($"Không thấy voucher {voucherId} trong cart");
+                    throw new NotFoundException($"Không thấy voucher {modalId} trong cart");
                 }
                 if (cartVoucher.Quantity >= 20)
                 {
-                    throw new ConflictException($"Voucher {voucherId} không thể vượt quá 20");
+                    throw new ConflictException($"Voucher {modalId} không thể vượt quá 20");
                 }
                 cartVoucher.Quantity = quantity;
                 cartVoucher.UpdateBy = thisUserObj.userId;

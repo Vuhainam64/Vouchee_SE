@@ -235,7 +235,7 @@ namespace Vouchee.Business.Models.DTOs
         public decimal? originalPrice { get; set; }
         public decimal? sellPrice { get; set; }
         public decimal? salePrice { get; set; }
-        public string? productImage { get; set; }
+        public string? image { get; set; }
         public decimal? percentDiscount { get; set; }
     }
 
