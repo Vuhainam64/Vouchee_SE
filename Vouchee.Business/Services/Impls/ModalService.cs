@@ -74,7 +74,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<DynamicResponseModel<GetModalDTO>> GetModalsAsync(PagingRequest pagingRequest, ModalFilter modalFilter)
         {
-
+            List<GetModalDTO> list;
             (int, IQueryable<GetModalDTO>) result;
             try
             {
@@ -82,6 +82,13 @@ namespace Vouchee.Business.Services.Impls
                             .ProjectTo<GetModalDTO>(_mapper.ConfigurationProvider)
                             .DynamicFilter(_mapper.Map<GetModalDTO>(modalFilter))
                             .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+                list = result.Item2.ToList();
+
+                foreach (var modal in list)
+                {
+                    modal.quantity = modal.voucherCodes.Where(x => x.status == ObjectStatusEnum.ACTIVE.ToString()).Count();
+                }
             }
             catch (Exception ex)
             {
@@ -96,7 +103,7 @@ namespace Vouchee.Business.Services.Impls
                     size = pagingRequest.pageSize,
                     total = result.Item1 // Total vouchers count for metadata
                 },
-                results = result.Item2.ToList() // Return the paged voucher list with nearest address and distance
+                results = list// Return the paged voucher list with nearest address and distance
             };
         }
 
