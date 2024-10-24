@@ -36,7 +36,7 @@ namespace Vouchee.Business.Models.DTOs
         public string? title { get; set; }
 
         [Required(ErrorMessage = "Description is required.")]
-        [StringLength(2000, ErrorMessage = "Description cannot exceed 2000 characters.")]
+        [StringLength(10000, ErrorMessage = "Description cannot exceed 10000 characters.")]
         public string? description { get; set; }
 
         public IList<string>? images { get; set; }
