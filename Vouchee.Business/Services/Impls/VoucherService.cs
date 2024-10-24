@@ -199,6 +199,7 @@ namespace Vouchee.Business.Services.Impls
                         {
                             return new GetNearestVoucherDTO
                             {
+                                video = voucher.video,
                                 id = voucher.id,
                                 title = voucher.title,
                                 categories = voucher.categories,
@@ -332,6 +333,7 @@ namespace Vouchee.Business.Services.Impls
             // Attach the total quantity sold to each voucher and sort the result
             var result = voucher.ToList().Select(voucher => new GetBestBuyVoucherDTO
             {
+                video = voucher.video,
                 id = voucher.id,
                 title = voucher.title,
                 image = voucher.modals.FirstOrDefault(x => x.index == 0).image,
@@ -530,6 +532,7 @@ namespace Vouchee.Business.Services.Impls
                                 // Create the DTO object
                                 var x = new GetAllVoucherDTO
                                 {
+                                    video = voucher.video,
                                     description = voucher.description,
                                     categories = voucher.categories,
                                     id = voucher.id,
