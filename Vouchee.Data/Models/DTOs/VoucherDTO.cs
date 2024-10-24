@@ -96,6 +96,7 @@ namespace Vouchee.Business.Models.DTOs
         public string? supplierImage { get; set; }
         public int? quantity { get; set; }
         public decimal? rating { get; set; }
+        public string? video { get; set; }
 
         public virtual ICollection<GetAllAddressDTO> addresses { get; set; }
         public virtual ICollection<GetCategoryDTO>? categories { get; set; }
@@ -124,7 +125,9 @@ namespace Vouchee.Business.Models.DTOs
         public string? supplierImage { get; set; }
         public int? quantity { get; set; }
         public decimal? rating { get; set; }
+        public string? video { get; set; }
         public decimal? TotalQuantitySold { get; set; }
+
         public virtual ICollection<GetCategoryDTO>? categories { get; set; }
         public virtual ICollection<GetModalDTO>? modals { get; set; }
     }
@@ -153,6 +156,7 @@ namespace Vouchee.Business.Models.DTOs
         public string? supplierImage { get; set; }
         public int? quantity { get; set; }
         public decimal? rating { get; set; }
+        public string? video { get; set; }
 
         public virtual ICollection<GetCategoryDTO>? categories { get; set; }
         public virtual ICollection<GetAllAddressDTO>? addresses { get; set; }
@@ -179,6 +183,7 @@ namespace Vouchee.Business.Models.DTOs
         public decimal? percentDiscount { get; set; }
         public int? quantity { get; set; }
         public decimal? rating { get; set; }
+        public string? video { get; set; }
 
         public Guid? brandId { get; set; }
         public string? brandName { get; set; }
@@ -191,6 +196,7 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? createBy { get; set; }
         public string? sellerName { get; set; }
         public string? sellerImage { get; set; }
+
 
         public virtual ICollection<GetDetailModalDTO>? modals { get; set; }
         public virtual ICollection<GetCategoryDTO> categories { get; set; }
@@ -223,6 +229,7 @@ namespace Vouchee.Business.Models.DTOs
         public string? supplierImage { get; set; }
         public int? quantity { get; set; }
         public decimal? rating { get; set; }
+        public string? video { get; set; }
 
         public DateTime? createDate { get; set; }
 
