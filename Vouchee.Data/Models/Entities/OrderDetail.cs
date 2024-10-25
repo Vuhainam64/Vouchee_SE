@@ -42,15 +42,15 @@ namespace Vouchee.Data.Models.Entities
         [Key]
         public Guid Id { get; set; }
 
-        [Column(TypeName = "decimal(10,5)")]
+        [Column(TypeName = "decimal(18,5)")]
         public decimal UnitPrice { get; set; }
-        [Column(TypeName = "decimal(10,5)")]
+        [Column(TypeName = "decimal(18,5)")]
         public decimal DiscountValue { get; set; } = 0;
-        [Column(TypeName = "decimal(10,5)")]
+        [Column(TypeName = "decimal(18,5)")]
         public decimal TotalPrice => UnitPrice * Quantity;
-        [Column(TypeName = "decimal(10,5)")]
+        [Column(TypeName = "decimal(18,5)")]
         public decimal DiscountPrice => TotalPrice * DiscountValue * 100;
-        [Column(TypeName = "decimal(10,5)")]
+        [Column(TypeName = "decimal(18,5)")]
         public decimal FinalPrice => TotalPrice - DiscountPrice;
         public int Quantity { get; set; }
 

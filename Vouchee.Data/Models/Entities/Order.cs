@@ -38,13 +38,13 @@ namespace Vouchee.Data.Models.Entities
         public Guid Id { get; set; }
 
         public required string PaymentType { get; set; }
-        [Column(TypeName = "decimal(10,5)")]
+        [Column(TypeName = "decimal(18,5)")]
         public decimal DiscountValue { get; set; } = 0;
-        [Column(TypeName = "decimal(10,5)")]
+        [Column(TypeName = "decimal(18,5)")]
         public decimal TotalPrice { get; set; }
-        [Column(TypeName = "decimal(10,5)")]
+        [Column(TypeName = "decimal(18,5)")]
         public decimal DiscountPrice => TotalPrice * DiscountValue;
-        [Column(TypeName = "decimal(10,5)")]
+        [Column(TypeName = "decimal(18,5)")]
         public decimal FinalPrice => TotalPrice - DiscountPrice;
 
         public required string Status { get; set; }
