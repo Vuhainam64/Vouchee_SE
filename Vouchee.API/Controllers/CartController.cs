@@ -41,17 +41,8 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            if (currentUser.roleId.Equals(currentUser.buyerRoleId) )
-            {
-                var result = await _cartService.AddItemAsync(modalId, currentUser);
-                return Ok(result);
-            }
-
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                code = HttpStatusCode.Forbidden,
-                message = "Chỉ có người mua hàng mới có thể thực hiện chức năng này"
-            });
+            var result = await _cartService.AddItemAsync(modalId, currentUser);
+            return Ok(result);
         }
 
         // READ
@@ -61,17 +52,8 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            if (currentUser.roleId.Equals(currentUser.buyerRoleId))
-            {
-                var result = await _cartService.GetCartsAsync(currentUser);
-                return Ok(result);
-            }
-
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                code = HttpStatusCode.Forbidden,
-                message = "Chỉ có người mua hàng mới có thể thực hiện chức năng này"
-            });
+            var result = await _cartService.GetCartsAsync(currentUser);
+            return Ok(result);
         }
 
         // UPDATE
@@ -81,17 +63,8 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            if (currentUser.roleId.Equals(currentUser.buyerRoleId))
-            {
-                var result = await _cartService.IncreaseQuantityAsync(voucherId, currentUser);
-                return Ok(result);
-            }
-
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                code = HttpStatusCode.Forbidden,
-                message = "Chỉ có người mua hàng mới có thể thực hiện chức năng này"
-            });
+            var result = await _cartService.IncreaseQuantityAsync(voucherId, currentUser);
+            return Ok(result);
         }
 
         [HttpPut("decrease_quantity/{voucherId}")]
@@ -99,17 +72,8 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            if (currentUser.roleId.Equals(currentUser.buyerRoleId))
-            {
-                var result = await _cartService.DecreaseQuantityAsync(voucherId, currentUser);
-                return Ok(result);
-            }
-
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                code = HttpStatusCode.Forbidden,
-                message = "Chỉ có người mua hàng mới có thể thực hiện chức năng này"
-            });
+            var result = await _cartService.DecreaseQuantityAsync(voucherId, currentUser);
+            return Ok(result);
         }
 
         [HttpPut("update_quantity/{voucherId}")]
@@ -117,17 +81,8 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            if (currentUser.roleId.Equals(currentUser.buyerRoleId))
-            {
-                var result = await _cartService.UpdateQuantityAsync(voucherId, quantity, currentUser);
-                return Ok(result);
-            }
-
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                code = HttpStatusCode.Forbidden,
-                message = "Chỉ có người mua hàng mới có thể thực hiện chức năng này"
-            });
+            var result = await _cartService.UpdateQuantityAsync(voucherId, quantity, currentUser);
+            return Ok(result);
         }
 
         // DELETE
@@ -137,17 +92,8 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            if (currentUser.roleId.Equals(currentUser.buyerRoleId))
-            {
-                var result = await _cartService.RemoveItemAsync(voucherId, currentUser);
-                return Ok(result);
-            }
-
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                code = HttpStatusCode.Forbidden,
-                message = "Chỉ có người mua hàng mới có thể thực hiện chức năng này"
-            });
+            var result = await _cartService.RemoveItemAsync(voucherId, currentUser);
+            return Ok(result);
         }
     }
 }
