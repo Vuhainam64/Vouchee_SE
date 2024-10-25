@@ -43,25 +43,16 @@ namespace Vouchee.API.Controllers
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
             List<Guid> voucherCodeIds = [];
-            //SELLER
-            if (currentUser.roleId.Equals(currentUser.sellerRoleId))
-            {
-                foreach (var voucherCode in createVoucherCodeDTOs)
-                {
-                    var result = await _voucherCodeService.CreateVoucherCodeAsync(modalId, voucherCode, currentUser);
-                    if (result != Guid.Empty)
-                    {
-                        voucherCodeIds.Add((Guid)result);
-                    }
-                }
-                return Ok(voucherCodeIds);
-            }
 
-            return StatusCode((int)HttpStatusCode.Forbidden, new
+            foreach (var voucherCode in createVoucherCodeDTOs)
             {
-                code = HttpStatusCode.Forbidden,
-                message = "Chỉ có nhà bán hàng mới có thể thực hiện chức năng này"
-            });
+                var result = await _voucherCodeService.CreateVoucherCodeAsync(modalId, voucherCode, currentUser);
+                if (result != Guid.Empty)
+                {
+                    voucherCodeIds.Add((Guid)result);
+                }
+            }
+            return Ok(voucherCodeIds);
         }
 
         // READ

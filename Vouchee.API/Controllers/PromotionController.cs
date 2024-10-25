@@ -42,17 +42,8 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            if (IsSeller(currentUser))
-            {
-                var result = await _promotionService.CreatePromotionAsync(createPromotionDTO, currentUser);
-                return Ok(result);
-            }
-
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                code = HttpStatusCode.Forbidden,
-                message = "Chỉ có nhà bán hàng mới có thể thực hiện chức năng này"
-            });
+            var result = await _promotionService.CreatePromotionAsync(createPromotionDTO, currentUser);
+            return Ok(result);
         }
 
         // READ
@@ -71,6 +62,7 @@ namespace Vouchee.API.Controllers
             var result = await _promotionService.GetActivePromotion(pagingRequest, promotionFilter);
             return Ok(result);
         }
+
         [HttpGet("get_promotion_by_id/{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetPromotionById(Guid id)
@@ -94,17 +86,8 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            if (IsSeller(currentUser))
-            {
-                var result = await _promotionService.UpdatePromotionAsync(id, updatePromotionDTO, currentUser);
-                return Ok(result);
-            }
-
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                Code = HttpStatusCode.Forbidden,
-                Message = "Chỉ có nhà bán hàng mới có thể thực hiện chức năng này"
-            });
+            var result = await _promotionService.UpdatePromotionAsync(id, updatePromotionDTO, currentUser);
+            return Ok(result);
         }
 
         // DELETE
@@ -114,17 +97,8 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            if (IsSeller(currentUser))
-            {
-                var result = await _promotionService.DeletePromotionAsync(id, currentUser);
-                return Ok(result);
-            }
-
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                Code = HttpStatusCode.Forbidden,
-                Message = "Chỉ có nhà bán hàng mới có thể thực hiện chức năng này"
-            });
+            var result = await _promotionService.DeletePromotionAsync(id, currentUser);
+            return Ok(result);
         }
     }
 }
