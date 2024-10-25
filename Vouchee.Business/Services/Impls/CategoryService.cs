@@ -45,7 +45,7 @@ namespace Vouchee.Business.Services.Impls
         {
             try
             {
-                var existedVoucherType = await _voucherTypeRepository.FindAsync(voucherTypeId);
+                var existedVoucherType = await _voucherTypeRepository.FindAsync(voucherTypeId, false);
 
                 if (existedVoucherType == null)
                 {
@@ -81,7 +81,7 @@ namespace Vouchee.Business.Services.Impls
         {
             try
             {
-                var existedCategory = await _categoryRepository.FindAsync(id);
+                var existedCategory = await _categoryRepository.FindAsync(id, false);
 
                 if (existedCategory == null)
                 {

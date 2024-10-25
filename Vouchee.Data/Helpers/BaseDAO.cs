@@ -167,10 +167,11 @@ namespace Vouchee.Data.Helpers
         }
 
 
-        public async Task<TEntity?> FindAsync(Guid id)
+        public async Task<TEntity?> FindAsync(Guid id, bool trackChanges = true)
         {
             try
             {
+                var query = trackChanges ? Table : Table.AsNoTracking();
                 return await Table.FindAsync(id);
             }
             catch (Exception ex)

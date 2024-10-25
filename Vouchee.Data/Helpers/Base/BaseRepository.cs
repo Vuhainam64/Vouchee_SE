@@ -26,7 +26,7 @@ namespace Vouchee.Data.Helpers.Base
         public IQueryable<TEntity> GetTable(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties) =>
             _dao.GetTable(includeProperties);
 
-        public Task<TEntity> FindAsync(Guid id) => _dao.FindAsync(id);
+        public Task<TEntity> FindAsync(Guid id, bool trackChanges) => _dao.FindAsync(id, trackChanges);
 
         public Task<TEntity> Add(TEntity entity) => _dao.Add(entity);
 

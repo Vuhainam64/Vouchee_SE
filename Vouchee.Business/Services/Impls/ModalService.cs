@@ -44,7 +44,7 @@ namespace Vouchee.Business.Services.Impls
         {
             Modal modal = _mapper.Map<Modal>(createModalDTO);
 
-            var existVoucher = await _voucherRepository.FindAsync(voucherId);
+            var existVoucher = await _voucherRepository.FindAsync(voucherId, false);
             
             if (existVoucher == null)
             {
@@ -59,7 +59,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<bool> DeleteModalAsync(Guid id)
         {
-            Modal modal = await _modalRepository.FindAsync(id);
+            Modal modal = await _modalRepository.FindAsync(id, false);
             if (modal != null)
             {
                 return await _modalRepository.DeleteAsync(modal);
