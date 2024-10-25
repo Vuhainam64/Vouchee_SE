@@ -15,8 +15,7 @@ namespace Vouchee.Business.Models
         public string? roleName { get; set; }
         public string? fullName { get; set; }
         public Guid adminRoleId { get; set; }
-        public Guid? sellerRoleId { get; set; }
-        public Guid buyerRoleId { get; set; }
+        public Guid? userRoleId { get; set; }
         public Guid? staffRoleId { get; set; }
         public CartDTO? cartDTO { get; set; }
     }
