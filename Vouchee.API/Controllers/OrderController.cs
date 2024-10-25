@@ -40,17 +40,9 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            if (RoleHelper.IsBuyer(currentUser))
-            {
-                var result = await _orderService.CreateOrderAsync(currentUser);
-                return Ok(result);
-            }
+            var result = await _orderService.CreateOrderAsync(currentUser);
+            return Ok(result);
 
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                code = HttpStatusCode.Forbidden,
-                message = "Chỉ có người mua mới có thể thực hiện chức năng này"
-            });
         }
 
         // READ
@@ -66,17 +58,8 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            if (RoleHelper.IsBuyer(currentUser))
-            {
-                var result = await _orderService.GetOrdersAsync(pagingRequest, orderFilter, currentUser);
-                return Ok(result);
-            }
-
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                code = HttpStatusCode.Forbidden,
-                message = "Chỉ có người mua mới có thể thực hiện chức năng này"
-            });
+            var result = await _orderService.GetOrdersAsync(pagingRequest, orderFilter, currentUser);
+            return Ok(result);
         }
 
         [HttpGet("get_order/{id}")]
@@ -94,18 +77,8 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            if (RoleHelper.IsSeller(currentUser)
-                    || RoleHelper.IsBuyer(currentUser))
-            {
-                var result = await _orderService.UpdateOrderAsync(id, updateOrderDTO, currentUser);
-                return Ok(result);
-            }
-
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                code = HttpStatusCode.Forbidden,
-                message = "Chỉ có nhà bán hàng hoặc người mua mới có thể thực hiện chức năng này"
-            });
+            var result = await _orderService.UpdateOrderAsync(id, updateOrderDTO, currentUser);
+            return Ok(result);
         }
 
         // Assign Voucher Code
@@ -115,17 +88,8 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            if (RoleHelper.IsSeller(currentUser))
-            {
-                var result = await _orderService.AssignCodeToOrderAsync(orderDetailId, voucherCodeList);
-                return Ok(result);
-            }
-
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                code = HttpStatusCode.Forbidden,
-                message = "Chỉ có nhà bán hàng mới có thể thực hiện chức năng này"
-            });
+            var result = await _orderService.AssignCodeToOrderAsync(orderDetailId, voucherCodeList);
+            return Ok(result);
         }
 
         // DELETE
