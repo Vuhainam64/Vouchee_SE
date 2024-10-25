@@ -63,7 +63,7 @@ namespace Vouchee.Business.Services.Impls
             // trường hợp người dùng mới, mặc định là buyer
             if (useDTO == null)
             {
-                Guid roleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.BUYER.ToString()));
+                Guid roleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.USER.ToString()));
 
                 User newBuyer = new()
                 {
@@ -88,9 +88,9 @@ namespace Vouchee.Business.Services.Impls
                 response.image = imageUrl;
                 response.phoneNumber = phoneNumber;
                 response.name = userRecord.DisplayName;
-                response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.BUYER.ToString());
-                response.roleName = RoleEnum.BUYER.ToString();
-                response = await GenerateTokenAsync(response, RoleEnum.BUYER.ToString());
+                response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.USER.ToString());
+                response.roleName = RoleEnum.USER.ToString();
+                response = await GenerateTokenAsync(response, RoleEnum.USER.ToString());
             }
             else
             {
@@ -132,15 +132,10 @@ namespace Vouchee.Business.Services.Impls
                     response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.ADMIN.ToString());
                     response.roleName = RoleEnum.ADMIN.ToString();
                 }
-                else if (user.RoleId.Equals(Guid.Parse("2D80393A-3A3D-495D-8DD7-F9261F85CC8F")))
-                {
-                    response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.SELLER.ToString());
-                    response.roleName = RoleEnum.SELLER.ToString();
-                }
                 else
                 {
-                    response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.BUYER.ToString());
-                    response.roleName = RoleEnum.BUYER.ToString();
+                    response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.USER.ToString());
+                    response.roleName = RoleEnum.USER.ToString();
                 }
 
                 // Generate tokens and update response with token details and expiration times
@@ -171,9 +166,9 @@ namespace Vouchee.Business.Services.Impls
                 response.id = user.Id.ToString();
                 response.email = user.Email.ToString();
                 response.name = user.Name.ToString();
-                response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.BUYER.ToString());
-                response.roleName = RoleEnum.BUYER.ToString();
-                response = await GenerateTokenAsync(response, RoleEnum.BUYER.ToString());
+                response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.USER.ToString());
+                response.roleName = RoleEnum.USER.ToString();
+                response = await GenerateTokenAsync(response, RoleEnum.USER.ToString());
             }
 
             return response;
@@ -189,9 +184,9 @@ namespace Vouchee.Business.Services.Impls
                 response.id = newUser.Id.ToString();
                 response.email = newUser.Email;
                 response.name = newUser.Name;
-                response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.BUYER.ToString());
-                response.roleName = RoleEnum.BUYER.ToString();
-                response = await GenerateTokenAsync(response, RoleEnum.BUYER.ToString());
+                response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.USER.ToString());
+                response.roleName = RoleEnum.USER.ToString();
+                response = await GenerateTokenAsync(response, RoleEnum.USER.ToString());
             }
 
             return response;

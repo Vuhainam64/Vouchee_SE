@@ -9,8 +9,7 @@ namespace Vouchee.Data.Models.Constants.Enum.Other
     public enum RoleEnum
     {
         ADMIN,
-        SELLER,
-        BUYER,
+        USER,
         STAFF
     }
 }
