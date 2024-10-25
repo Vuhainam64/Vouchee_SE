@@ -38,17 +38,8 @@ namespace Vouchee.API.Controllers
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
             //SELLER
-            if (currentUser.roleId.Equals(currentUser.sellerRoleId))
-            {
-                var result = await _modalService.CreateModalAsync(voucherId, createModalDTO, currentUser);
-                return Ok(result);
-            }
-
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                code = HttpStatusCode.Forbidden,
-                message = "Chỉ có nhà bán hàng mới có thể thực hiện chức năng này"
-            });
+            var result = await _modalService.CreateModalAsync(voucherId, createModalDTO, currentUser);
+            return Ok(result);
         }
 
         // READ
