@@ -31,10 +31,6 @@ namespace Vouchee.API.Controllers
             _roleService = roleService;
         }
 
-        // Helper method to check if the current user is a seller
-        private bool IsSeller(ThisUserObj currentUser) =>
-            currentUser.roleId.Equals(currentUser.sellerRoleId);
-
         // CREATE
         [HttpPost("create_promotion")]
         [Authorize]

@@ -59,13 +59,9 @@ namespace Vouchee.API.Helpers
                         }
                         if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(1)))
                         {
-                            currentUser.sellerRoleId = role.id ?? Guid.Empty;
+                            currentUser.userRoleId = role.id ?? Guid.Empty;
                         }
                         if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(2)))
-                        {
-                            currentUser.buyerRoleId = role.id ?? Guid.Empty;
-                        }
-                        if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(3)))
                         {
                             currentUser.staffRoleId = role.id ?? Guid.Empty;
                         }

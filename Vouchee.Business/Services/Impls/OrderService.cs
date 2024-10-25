@@ -247,20 +247,10 @@ namespace Vouchee.Business.Services.Impls
         {
             (int, IQueryable<GetOrderDTO>) result;
 
-            if (thisUserObj != null && thisUserObj.roleId.Equals(thisUserObj.buyerRoleId))
-            {
-                result = _orderRepository.GetTable().Where(x => x.CreateBy.Equals(thisUserObj.userId))
-                            .ProjectTo<GetOrderDTO>(_mapper.ConfigurationProvider)
-                            .DynamicFilter(_mapper.Map<GetOrderDTO>(orderFilter))
-                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
-            }
-            else
-            {
-                result = _orderRepository.GetTable()
-                            .ProjectTo<GetOrderDTO>(_mapper.ConfigurationProvider)
-                            .DynamicFilter(_mapper.Map<GetOrderDTO>(orderFilter))
-                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
-            }
+            result = _orderRepository.GetTable().Where(x => x.CreateBy.Equals(thisUserObj.userId))
+                        .ProjectTo<GetOrderDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetOrderDTO>(orderFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
             return new DynamicResponseModel<GetOrderDTO>()
             {
