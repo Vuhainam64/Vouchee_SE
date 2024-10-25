@@ -37,9 +37,9 @@ namespace Vouchee.Data.Models.Entities
         public Guid Id { get; set; }
 
         public required string Title { get; set; }
-        [Column(TypeName = "decimal(10,5)")]
+        [Column(TypeName = "decimal(18,5)")]
         public decimal OriginalPrice { get; set; }
-        [Column(TypeName = "decimal(10,5)")]
+        [Column(TypeName = "decimal(18,5)")]
         public decimal SellPrice { get; set; }
         public int Index { get; set; }
         public string? Image { get; set; }
