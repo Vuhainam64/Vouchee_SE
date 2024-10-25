@@ -61,22 +61,23 @@ namespace Vouchee.Business.Services.Impls
 
             foreach (var categoryId in createVoucherDTO.categoryId)
             {
-                var existedCategory = await _categoryRepository.FindAsync(categoryId);
+                var existedCategory = await _categoryRepository.FindAsync(categoryId, false);
                 if (existedCategory == null)
                 {
                     throw new NotFoundException($"Không thấy category với id {categoryId}");
                 }
+
                 _voucherRepository.Attach(existedCategory);
                 voucher.Categories.Add(existedCategory);
             }
 
-            var existedBrand = await _brandReposiroty.FindAsync((Guid)createVoucherDTO.brandId);
+            var existedBrand = await _brandReposiroty.FindAsync((Guid)createVoucherDTO.brandId, false);
             if (existedBrand == null)
             {
                 throw new NotFoundException($"Không tìm thấy brand với id {createVoucherDTO.brandId}");
             }
 
-            var existedSupplier = await _supplierRepository.FindAsync((Guid)createVoucherDTO.supplierId);
+            var existedSupplier = await _supplierRepository.FindAsync((Guid)createVoucherDTO.supplierId, false);
             if (existedSupplier == null)
             {
                 throw new NotFoundException($"Không tìm thấy supplier với id {createVoucherDTO.supplierId}");

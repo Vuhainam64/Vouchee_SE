@@ -61,7 +61,7 @@ namespace Vouchee.Business.Services.Impls
 
                 if (modal == null)
                 {
-                    modal = await _modalRepository.FindAsync(modalId);
+                    modal = await _modalRepository.FindAsync(modalId, false);
                 }
 
                 if (modal == null)
@@ -90,7 +90,7 @@ namespace Vouchee.Business.Services.Impls
         {
             try
             {
-                var existedVoucherCode = await _voucherCodeRepository.FindAsync(id);
+                var existedVoucherCode = await _voucherCodeRepository.FindAsync(id, false);
                 if (existedVoucherCode == null)
                 {
                     throw new NotFoundException($"Không tìm thấy voucher code với id {id}");
@@ -156,7 +156,7 @@ namespace Vouchee.Business.Services.Impls
         {
             try
             {
-                var existedVoucherCode = await _voucherCodeRepository.FindAsync(id);
+                var existedVoucherCode = await _voucherCodeRepository.FindAsync(id, false);
 
                 if (existedVoucherCode == null)
                 {

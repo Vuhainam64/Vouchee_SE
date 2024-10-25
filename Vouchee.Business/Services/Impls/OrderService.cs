@@ -51,7 +51,7 @@ namespace Vouchee.Business.Services.Impls
         {
             try
             {
-                var existedOrderDetail = await _orderDetailRepository.FindAsync(orderDetailId);
+                var existedOrderDetail = await _orderDetailRepository.FindAsync(orderDetailId, false);
                 if (existedOrderDetail == null)
                 {
                     throw new NotFoundException("Không tìm thấy order detail");
@@ -64,7 +64,7 @@ namespace Vouchee.Business.Services.Impls
 
                 foreach (var voucherCodeId in voucherCodeList.voucherCodeIds)
                 {
-                    var existedVoucherCode = await _voucherCodeRepository.FindAsync(voucherCodeId);
+                    var existedVoucherCode = await _voucherCodeRepository.FindAsync(voucherCodeId, false);
                     if (existedVoucherCode == null)
                     {
                         throw new NotFoundException($"Không tìm thấy voucher code với id {voucherCodeId}");
