@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Business.Models
 {
-    public class ResponseMessage
+    public class ResponseMessage<T>
     {
-        public int code { get; set; }
-        public string message { get; set; }
+        public string? message { get; set; }
+        public bool? result { get; set; }
+        public T? value { get; set; }
     }
 }

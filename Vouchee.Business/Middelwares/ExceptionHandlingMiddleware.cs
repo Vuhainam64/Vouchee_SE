@@ -32,7 +32,7 @@ namespace Vouchee.Business.Middelwares
             var errorMessageObject = new ErrorResponse
             {
                 message = ex.Message,
-                code = "401"
+                code = "500"
             };
             var statusCode = (int)HttpStatusCode.InternalServerError;
             switch (ex)

@@ -55,7 +55,7 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<Guid?> CreateVoucherAsync(CreateVoucherDTO createVoucherDTO, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<dynamic>> CreateVoucherAsync(CreateVoucherDTO createVoucherDTO, ThisUserObj thisUserObj)
         {
             Voucher voucher = _mapper.Map<Voucher>(createVoucherDTO);
 
@@ -118,7 +118,12 @@ namespace Vouchee.Business.Services.Impls
                
             var voucherId = await _voucherRepository.AddAsync(voucher);
 
-            return voucherId;
+            return new ResponseMessage<dynamic>()
+            {
+                message = "Tạo voucher thành công",
+                result = true,
+                value = voucherId
+            };
         }
 
         public async Task<bool> DeleteVoucherAsync(Guid id)
