@@ -44,6 +44,7 @@ namespace Vouchee.API.AppStarts
             CreateMap<Voucher, CartModalDTO>()
                 //.ForMember(x => x.sellerName, dest => dest.MapFrom(opt => opt.Seller.Name))
                 .ReverseMap();
+            CreateMap<VoucherFilter, GetNewestVoucherDTO>().ReverseMap();
 
             // ORDER DETAIL
             CreateMap<OrderDetail, OrderDetailDTO>().ReverseMap();

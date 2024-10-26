@@ -692,7 +692,7 @@ namespace Vouchee.Business.Services.Impls
             return null;
         }
 
-        public async Task<DynamicResponseModel<GetNewestVoucherDTO>> GetVoucherBySellerId(Guid sellerId, PagingRequest pagingRequest)
+        public async Task<DynamicResponseModel<GetNewestVoucherDTO>> GetVoucherBySellerId(Guid sellerId, PagingRequest pagingRequest, VoucherFilter voucherFilter)
         {
             var existedSeller = await _userRepository.FindAsync(sellerId, false);
 
@@ -704,7 +704,40 @@ namespace Vouchee.Business.Services.Impls
             (int, IQueryable<GetNewestVoucherDTO>) result;
             result = _voucherRepository.GetTable().Where(x => x.SellerID == sellerId)
                                                     .ProjectTo<GetNewestVoucherDTO>(_mapper.ConfigurationProvider)
+                                                    .DynamicFilter(_mapper.Map<GetNewestVoucherDTO>(voucherFilter))
                                                     .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            var vouchers = result.Item2.ToList();
+
+            if (vouchers != null && vouchers.Count() != 0)
+            {
+
+                foreach (var voucher in vouchers)
+                {
+                    voucher.originalPrice = voucher.modals.FirstOrDefault(x => x.index == 0).originalPrice;
+                    voucher.sellPrice = voucher.modals.FirstOrDefault(x => x.index == 0).sellPrice;
+                    voucher.image = voucher.modals.FirstOrDefault(x => x.index == 0).image;
+
+                    var currentDate = DateTime.Now;
+                    var promotions = _voucherRepository.GetByIdAsync(voucher.id, includeProperties: query => query.Include(x => x.Promotions)).Result.Promotions;
+
+                    var availablePromotion = promotions.FirstOrDefault(promotion => promotion.StartDate <= currentDate && promotion.EndDate >= currentDate);
+
+                    if (availablePromotion != null)
+                    {
+                        voucher.salePrice = voucher.originalPrice - (voucher.originalPrice * availablePromotion.PercentDiscount / 100);
+                        voucher.percentDiscount = availablePromotion.PercentDiscount;
+                    }
+
+                    foreach (var modal in voucher.modals)
+                    {
+                        modal.quantity = modal.voucherCodes.Where(x => x.status == ObjectStatusEnum.ACTIVE.ToString()).Count();
+                    }
+
+                    voucher.quantity = voucher.modals.Sum(x => x.quantity);
+                }
+            }
+
             return new DynamicResponseModel<GetNewestVoucherDTO>()
             {
                 metaData = new MetaData()
@@ -713,7 +746,7 @@ namespace Vouchee.Business.Services.Impls
                     size = pagingRequest.pageSize,
                     total = result.Item1 // Total vouchers count for metadata
                 },
-                results = result.Item2.ToList() // Return the paged voucher list with nearest address and distance
+                results = vouchers // Return the paged voucher list with nearest address and distance
             };
         }
     }

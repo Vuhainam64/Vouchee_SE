@@ -92,9 +92,11 @@ namespace Vouchee.API.Controllers
         }
 
         [HttpGet("get_voucher_by_seller_id/{sellerId}")]
-        public async Task<IActionResult> GetVoucherById(Guid sellerId, [FromQuery] PagingRequest pagingRequest)
+        public async Task<IActionResult> GetVoucherById(Guid sellerId, 
+                                                            [FromQuery] PagingRequest pagingRequest,
+                                                            [FromQuery] VoucherFilter voucherFilter)
         {
-            var voucher = await _voucherService.GetVoucherBySellerId(sellerId, pagingRequest);
+            var voucher = await _voucherService.GetVoucherBySellerId(sellerId, pagingRequest, voucherFilter);
             return Ok(voucher);
         }
 
