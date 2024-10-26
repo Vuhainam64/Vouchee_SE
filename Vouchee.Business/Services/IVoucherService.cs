@@ -23,6 +23,7 @@ namespace Vouchee.Business.Services
         public Task<IList<GetNearestVoucherDTO>> GetNearestVouchers(decimal lon, decimal lat);
         public Task<IList<GetBestBuyVoucherDTO>> GetTopSaleVouchers();
         public Task<IList<GetNewestVoucherDTO>> GetSalestVouchers();
+        public Task<DynamicResponseModel<GetNewestVoucherDTO>> GetVoucherBySellerId(Guid sellerId, PagingRequest pagingRequest);
 
         // UPDATE
         public Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO);

@@ -18,6 +18,7 @@ namespace Vouchee.Business.Middelwares
 
             var response = new ErrorResponse()
             {
+                result = false,
                 code = "401",
                 message = "Tài khoản chưa được cấp quyền"
             };

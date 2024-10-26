@@ -31,6 +31,7 @@ namespace Vouchee.Business.Middelwares
         {
             var errorMessageObject = new ErrorResponse
             {
+                result = false,
                 message = ex.Message,
                 code = "500"
             };

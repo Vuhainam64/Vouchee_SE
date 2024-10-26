@@ -24,6 +24,7 @@ namespace Vouchee.Business.Services.Impls
 {
     public class VoucherService : IVoucherService
     {
+        private readonly IUserRepository _userRepository;
         private readonly IImageRepository _imageRepository;
         private readonly ISupplierRepository _supplierRepository;
         private readonly IBrandRepository _brandReposiroty;
@@ -34,7 +35,8 @@ namespace Vouchee.Business.Services.Impls
         private readonly IOrderDetailRepository _orderDetailRepository;
         private readonly IMapper _mapper;
 
-        public VoucherService(IImageRepository imageRepository,
+        public VoucherService(IUserRepository userRepository,
+                                IImageRepository imageRepository,
                                 ISupplierRepository supplierRepository,
                                 IBrandRepository brandRepository,
                                 IPromotionRepository promotionRepository,
@@ -44,6 +46,7 @@ namespace Vouchee.Business.Services.Impls
                                 IOrderDetailRepository orderDetailRepository,
                                 IMapper mapper)
         {
+            _userRepository = userRepository;
             _imageRepository = imageRepository;
             _supplierRepository = supplierRepository;
             _brandReposiroty = brandRepository;
@@ -687,6 +690,31 @@ namespace Vouchee.Business.Services.Impls
             }
 
             return null;
+        }
+
+        public async Task<DynamicResponseModel<GetNewestVoucherDTO>> GetVoucherBySellerId(Guid sellerId, PagingRequest pagingRequest)
+        {
+            var existedSeller = await _userRepository.FindAsync(sellerId, false);
+
+            if (existedSeller == null)
+            {
+                throw new NotFoundException("Không tìm thấy seller này");
+            }
+
+            (int, IQueryable<GetNewestVoucherDTO>) result;
+            result = _voucherRepository.GetTable().Where(x => x.SellerID == sellerId)
+                                                    .ProjectTo<GetNewestVoucherDTO>(_mapper.ConfigurationProvider)
+                                                    .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+            return new DynamicResponseModel<GetNewestVoucherDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = result.Item2.ToList() // Return the paged voucher list with nearest address and distance
+            };
         }
     }
 }

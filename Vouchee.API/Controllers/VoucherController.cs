@@ -91,6 +91,13 @@ namespace Vouchee.API.Controllers
             return Ok(voucher);
         }
 
+        [HttpGet("get_voucher_by_seller_id/{sellerId}")]
+        public async Task<IActionResult> GetVoucherById(Guid sellerId, [FromQuery] PagingRequest pagingRequest)
+        {
+            var voucher = await _voucherService.GetVoucherBySellerId(sellerId, pagingRequest);
+            return Ok(voucher);
+        }
+
         // UPDATE
         [HttpPut("update_voucher/{id}")]
         public async Task<IActionResult> UpdateVoucher(Guid id, [FromBody] UpdateVoucherDTO voucherDTO)
