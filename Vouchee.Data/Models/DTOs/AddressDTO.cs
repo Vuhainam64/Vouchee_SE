@@ -35,53 +35,32 @@ namespace Vouchee.Business.Models.DTOs
         public DateTime? updateDate = DateTime.Now;
     }
 
-    public class GetAllAddressDTO
+    public class AddressDTO
     {
-        public GetAllAddressDTO()
-        {
-            // vouchers = new HashSet<GetAllVoucherDTO>();
-            // addresses = new HashSet<GetAddressDTO>();
-        }
+        public Guid? id { get; set; }
+
+        public string? name { get; set; }
+        public decimal? lon { get; set; }
+        public decimal? lat { get; set; }
+    }
+
+    public class GetAddressDTO : AddressDTO
+    {
+
+    }
+
+    public class GetDistanceAddressDTO : AddressDTO
+    {
         public decimal distance;
-        public Guid? id { get; set; }
-        public string? name { get; set; }
-
-        [Column(TypeName = "decimal")]
-        public decimal? lon { get; set; }
-        [Column(TypeName = "decimal")]
-        public decimal? lat { get; set; }
     }
 
-
-    public class GetDetailAddressDTO
+    public class GetDetailAddressDTO : AddressDTO
     {
-
-    }
-
-    public class GetAddressDTO
-    {
-        public Guid? id { get; set; }
-
-        public string? name { get; set; }
-        public decimal? lon { get; set; }
-        public decimal? lat { get; set; }
-    }
-
-    public class GetAddressBrandDTO
-    {
-        public GetAddressBrandDTO()
+        public GetDetailAddressDTO()
         {
             brands = [];
         }
 
-        public Guid? id { get; set; }
-
-        public string? name { get; set; }
-        [Column(TypeName = "decimal")]
-        public decimal? lon { get; set; }
-        [Column(TypeName = "decimal")]
-        public decimal? lat { get; set; }
-
-        public virtual ICollection<GetBrandAddressDTO> brands { get; set; }
+        public virtual ICollection<GetBrandDTO> brands { get; set; }
     }
 }

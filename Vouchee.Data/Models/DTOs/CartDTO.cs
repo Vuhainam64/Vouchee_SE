@@ -57,6 +57,6 @@ namespace Vouchee.Data.Models.DTOs
         public string? name { get; set; }
         public string? image { get; set; }
 
-        public virtual ICollection<CartModalDTO> modals { get; set; }
+        public virtual ICollection<CartVoucherDTO> modals { get; set; }
     }
 }

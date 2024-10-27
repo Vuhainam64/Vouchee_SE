@@ -130,7 +130,7 @@ namespace Vouchee.Data.Models.DTOs
     {
         public GetDetailPromotionDTO()
         {
-            vouchers = new HashSet<GetNewestVoucherDTO>();
+            vouchers = [];
         }
 
         public Guid? id { get; set; }
@@ -150,6 +150,6 @@ namespace Vouchee.Data.Models.DTOs
         public DateTime? createDate { get; set; }
         public Guid? createBy { get; set; }
 
-        public virtual ICollection<GetNewestVoucherDTO>? vouchers { get; set; }
+        public virtual ICollection<GetDetailVoucherDTO>? vouchers { get; set; }
     }
 }

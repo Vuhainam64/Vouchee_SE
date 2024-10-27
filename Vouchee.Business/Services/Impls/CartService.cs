@@ -62,12 +62,12 @@ namespace Vouchee.Business.Services.Impls
                             id = currentModal?.Voucher.SellerID,
                             name = currentModal?.Voucher.Seller.Name,
                             image = currentModal.Voucher.Seller.Image,
-                            modals = new List<CartModalDTO>()
+                            modals = new List<CartVoucherDTO>()
                         };
                         cartDTO.sellers.Add(sellerCart);
                     }
 
-                    sellerCart.modals.Add(new CartModalDTO
+                    sellerCart.modals.Add(new CartVoucherDTO
                     {
                         id = cartItem.Modal?.Id,
                         originalPrice = cartItem.Modal?.OriginalPrice,

@@ -11,8 +11,8 @@ namespace Vouchee.Business.Services
         public Task<Guid?> CreateAddressAsync(CreateAddressDTO createAddressDTO, ThisUserObj thisUserObj);
 
         // READ
-        public Task<GetAllAddressDTO> GetAddressByIdAsync(Guid id);
-        public Task<DynamicResponseModel<GetAddressBrandDTO>> GetAddressesAsync(PagingRequest pagingRequest, AddressFilter addressFilter);
+        public Task<GetDetailAddressDTO> GetAddressByIdAsync(Guid id);
+        public Task<DynamicResponseModel<GetDetailAddressDTO>> GetAddressesAsync(PagingRequest pagingRequest, AddressFilter addressFilter);
 
         // UPDATE
         public Task<bool> UpdateAddressAsync(Guid id, UpdateAddressDTO updateAddressDTO);

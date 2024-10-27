@@ -10,9 +10,6 @@ namespace Vouchee.Data.Models.Filters
 {
     public class VoucherFilter
     {
-        public string? name { get; set; }
-        public decimal? price { get; set; }
-        public Guid? supplierId { get; set; }
-        public Guid? brandId { get; set; }
+        public string? title { get; set; }
     }
 }

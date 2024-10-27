@@ -60,14 +60,14 @@ namespace Vouchee.Business.Services.Impls
             throw new NotImplementedException();
         }
 
-        public async Task<GetBrandDTO> GetBrandByIdAsync(Guid id)
+        public async Task<GetDetalBrandDTO> GetBrandByIdAsync(Guid id)
         {
             try
             {
                 var brand = await _brandRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Addresses));
                 if (brand != null)
                 {
-                    var brandDTO = _mapper.Map<GetBrandDTO>(brand);
+                    var brandDTO = _mapper.Map<GetDetalBrandDTO>(brand);
                     return brandDTO;
                 }
                 else
@@ -82,14 +82,14 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<DynamicResponseModel<GetBrandDTO>> GetBrandsAsync(PagingRequest pagingRequest, BrandFilter brandFilter)
+        public async Task<DynamicResponseModel<GetDetalBrandDTO>> GetBrandsAsync(PagingRequest pagingRequest, BrandFilter brandFilter)
         {
-            (int, IQueryable<GetBrandDTO>) result;
+            (int, IQueryable<GetDetalBrandDTO>) result;
             try
             {
                 result = _brandRepository.GetTable()
-                            .ProjectTo<GetBrandDTO>(_mapper.ConfigurationProvider)
-                            .DynamicFilter(_mapper.Map<GetBrandDTO>(brandFilter))
+                            .ProjectTo<GetDetalBrandDTO>(_mapper.ConfigurationProvider)
+                            .DynamicFilter(_mapper.Map<GetDetalBrandDTO>(brandFilter))
                             .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
             }
             catch (Exception ex)
@@ -97,7 +97,7 @@ namespace Vouchee.Business.Services.Impls
                 LoggerService.Logger(ex.Message);
                 throw new LoadException("Lỗi không xác định khi tải brand");
             }
-            return new DynamicResponseModel<GetBrandDTO>()
+            return new DynamicResponseModel<GetDetalBrandDTO>()
             {
                 metaData = new MetaData()
                 {
@@ -109,12 +109,12 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<IList<GetBrandAddressDTO>> GetBrandsbynameAsync(string name)
+        public async Task<IList<GetBrandDTO>> GetBrandsbynameAsync(string name)
         {
-            IQueryable<GetBrandAddressDTO> result;
+            IQueryable<GetBrandDTO> result;
             result = _brandRepository.GetTable()
                         .Where(b => b.Name.ToLower().Contains(name.ToLower()))
-                        .ProjectTo<GetBrandAddressDTO>(_mapper.ConfigurationProvider);
+                        .ProjectTo<GetBrandDTO>(_mapper.ConfigurationProvider);
             return result.ToList();
         }
 

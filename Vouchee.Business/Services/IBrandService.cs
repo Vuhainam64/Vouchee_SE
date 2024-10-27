@@ -17,9 +17,9 @@ namespace Vouchee.Business.Services
         public Task<Guid?> CreateBrandAsync(CreateBrandDTO createBrandDTO, ThisUserObj thisUserObj);
 
         // READ
-        public Task<GetBrandDTO> GetBrandByIdAsync(Guid id);
-        public Task<DynamicResponseModel<GetBrandDTO>> GetBrandsAsync(PagingRequest pagingRequest, BrandFilter brandFilter);
-        public Task<IList<GetBrandAddressDTO>> GetBrandsbynameAsync(string name);
+        public Task<GetDetalBrandDTO> GetBrandByIdAsync(Guid id);
+        public Task<DynamicResponseModel<GetDetalBrandDTO>> GetBrandsAsync(PagingRequest pagingRequest, BrandFilter brandFilter);
+        public Task<IList<GetBrandDTO>> GetBrandsbynameAsync(string name);
 
         // UPDATE
         public Task<bool> UpdateBrandAsync(Guid id, UpdateBrandDTO updateBrandDTO);

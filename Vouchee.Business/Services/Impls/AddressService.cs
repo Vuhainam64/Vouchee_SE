@@ -69,14 +69,14 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<GetAllAddressDTO> GetAddressByIdAsync(Guid id)
+        public async Task<GetDetailAddressDTO> GetAddressByIdAsync(Guid id)
         {
             try
             {
                 var address = await _addressRepository.GetByIdAsync(id);
                 if (address != null)
                 {
-                    GetAllAddressDTO addressDTO = _mapper.Map<GetAllAddressDTO>(address);
+                    GetDetailAddressDTO addressDTO = _mapper.Map<GetDetailAddressDTO>(address);
                     return addressDTO;
                 }
                 else
@@ -91,15 +91,15 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<DynamicResponseModel<GetAddressBrandDTO>> GetAddressesAsync(PagingRequest pagingRequest, AddressFilter addressFilter)
+        public async Task<DynamicResponseModel<GetDetailAddressDTO>> GetAddressesAsync(PagingRequest pagingRequest, AddressFilter addressFilter)
         {
-            (int, IQueryable<GetAddressBrandDTO>) result;
+            (int, IQueryable<GetDetailAddressDTO>) result;
             result = _addressRepository.GetTable()
-                        .ProjectTo<GetAddressBrandDTO>(_mapper.ConfigurationProvider)
-                        .DynamicFilter(_mapper.Map<GetAddressBrandDTO>(addressFilter))
+                        .ProjectTo<GetDetailAddressDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetDetailAddressDTO>(addressFilter))
                         .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
-            return new DynamicResponseModel<GetAddressBrandDTO>()
+            return new DynamicResponseModel<GetDetailAddressDTO>()
             {
                 metaData = new MetaData()
                 {

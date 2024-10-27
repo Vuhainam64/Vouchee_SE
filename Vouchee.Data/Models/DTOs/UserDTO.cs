@@ -42,9 +42,9 @@ namespace Vouchee.Business.Models.DTOs
     {
         public GetUserDTO()
         {
-            orders = new HashSet<GetOrderDTO>();
-            vouchers = new HashSet<GetNewestVoucherDTO>();
-            carts = new HashSet<CartDTO>();
+            orders = [];
+            vouchers = [];
+            carts = [];
         }
 
         public Guid? id { get; set; }
@@ -57,7 +57,7 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? updateBy { get; set; }
 
         public virtual ICollection<CartDTO> carts { get; set; }
-        public virtual ICollection<GetNewestVoucherDTO> vouchers { get; set; }
+        public virtual ICollection<GetDetailVoucherDTO> vouchers { get; set; }
         public virtual ICollection<GetOrderDTO>? orders { get; set; }
     }
 

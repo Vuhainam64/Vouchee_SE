@@ -31,37 +31,26 @@ namespace Vouchee.Data.Models.DTOs
 
     }
 
-    public class GetBrandDTO
+    public class BrandDTO 
     {
-        public GetBrandDTO()
-        {
-            addresses = new HashSet<GetAddressDTO>();
-        }
-
         public Guid? id { get; set; }
 
         public string? image { get; set; }
         public string? name { get; set; }
-        //public bool? isVerfied { get; set; }
+    }
 
-        //public string? status { get; set; }
-        //[Column(TypeName = "datetime")]
-        //public DateTime? createDate { get; set; }
-        //public Guid? createBy { get; set; }
-        //[Column(TypeName = "datetime")]
-        //public DateTime? updateDate { get; set; }
-        //public Guid? updateBy { get; set; }
-        //public DateTime? verifiedDate { get; set; }
-        //public Guid? verifiedBy { get; set; }
+    public class GetDetalBrandDTO : BrandDTO
+    {
+        public GetDetalBrandDTO()
+        {
+            addresses = [];
+        }
 
         public virtual ICollection<GetAddressDTO> addresses { get; set; }
     }
 
-    public class GetBrandAddressDTO
+    public class GetBrandDTO : BrandDTO
     {
-        public Guid? id { get; set; }
 
-        public string? image { get; set; }
-        public string? name { get; set; }
     }
 }

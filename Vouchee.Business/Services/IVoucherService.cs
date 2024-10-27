@@ -13,17 +13,16 @@ namespace Vouchee.Business.Services
 
         // READ
         public Task<GetDetailVoucherDTO> GetVoucherByIdAsync(Guid id);
-        public Task<DynamicResponseModel<GetAllVoucherDTO>> GetVouchersAsync(PagingRequest pagingRequest,
-                                                                            VoucherFilter voucherFiler,
-                                                                            decimal lon,
-                                                                            decimal lat,
-                                                                            List<Guid>? categoryIds);
-        public Task<IList<GetNewestVoucherDTO>> GetNewestVouchers();
-        //public Task<IList<GetAllVoucherDTO>> GetBestSoldVouchers();
-        public Task<IList<GetNearestVoucherDTO>> GetNearestVouchers(decimal lon, decimal lat);
-        public Task<IList<GetBestBuyVoucherDTO>> GetTopSaleVouchers();
-        public Task<IList<GetNewestVoucherDTO>> GetSalestVouchers();
-        public Task<DynamicResponseModel<GetNewestVoucherDTO>> GetVoucherBySellerId(Guid sellerId, PagingRequest pagingRequest, VoucherFilter voucherFilter);
+        public Task<DynamicResponseModel<GetDetailVoucherDTO>> GetVouchersAsync(PagingRequest pagingRequest,
+                                                                                    VoucherFilter voucherFiler,
+                                                                                    decimal lon,
+                                                                                    decimal lat,
+                                                                                    List<Guid>? categoryIds);
+        public Task<IList<GetVoucherDTO>> GetNewestVouchers();
+        public Task<IList<GetDetailVoucherDTO>> GetNearestVouchers(decimal lon, decimal lat);
+        public Task<IList<GetBestSoldVoucherDTO>> GetTopSaleVouchers();
+        public Task<IList<GetVoucherDTO>> GetSalestVouchers();
+        public Task<DynamicResponseModel<GetVoucherDTO>> GetVoucherBySellerId(Guid sellerId, PagingRequest pagingRequest, VoucherFilter voucherFilter);
 
         // UPDATE
         public Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO);
