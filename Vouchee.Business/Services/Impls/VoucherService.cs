@@ -10,6 +10,7 @@ using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Services.Extensions.Filebase;
+using Vouchee.Business.Utils;
 using Vouchee.Data.Helpers;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
@@ -450,187 +451,62 @@ namespace Vouchee.Business.Services.Impls
         }
 
         public async Task<DynamicResponseModel<GetDetailVoucherDTO>> GetVouchersAsync(PagingRequest pagingRequest,
-                                                                            VoucherFilter voucherFilter,
-                                                                            decimal lon,
-                                                                            decimal lat,
-                                                                            List<Guid>? categoryID)
+                                                                                         VoucherFilter voucherFilter,
+                                                                                         decimal lon,
+                                                                                         decimal lat,
+                                                                                         List<Guid>? categoryID)
         {
             (int, IQueryable<GetDetailVoucherDTO>) result;
             try
             {
-                decimal R = 6371; // Earth's radius in kilometers
                 result.Item2 = _voucherRepository.GetTable(includeProperties: x => x.Include(x => x.Supplier)
-                                                                                    .Include(x => x.Categories)
-                                                                                    .Include(x => x.Modals)
-                                                                                        .Include(x => x.Medias)
-                                                                                    .Include(x => x.Brand)
-                                                                                        .ThenInclude(x => x.Addresses))
-                    .ProjectTo<GetDetailVoucherDTO>(_mapper.ConfigurationProvider)
-                    .DynamicFilter(_mapper.Map<GetDetailVoucherDTO>(voucherFilter));
+                                    .Include(x => x.Categories)
+                                    .Include(x => x.Modals)
+                                        .ThenInclude(x => x.VoucherCodes)
+                                    .Include(x => x.Medias)
+                                    .Include(x => x.Brand)
+                                        .ThenInclude(x => x.Addresses))
+                  .ProjectTo<GetDetailVoucherDTO>(_mapper.ConfigurationProvider)
+                  .Where(x =>
+                        (string.IsNullOrEmpty(voucherFilter.title) || x.title.ToLower().Contains(voucherFilter.title.ToLower())) 
+                        && (categoryID == null || !categoryID.Any() || x.categories.Any(c => categoryID.Contains(c.id.Value))))
+                  .AsEnumerable() 
+                  .Select(v =>
+                  {
+                      v.addresses = v.addresses?
+                          .Where(a => a.lon.HasValue && a.lat.HasValue) // Filter addresses with lat/lon
+                          .Select(a =>
+                          {
+                              a.distance = DistanceHelper.CalculateDistance(lat, lon, a.lat.Value, a.lon.Value);
+                              return a;
+                          })
+                          .OrderBy(d => d.distance) 
+                          .Take(pagingRequest.pageSize != 0 ? pagingRequest.pageSize : 10);
 
-                if (categoryID != null && categoryID.Count > 0)
+                      return v; 
+                  })
+                  .Take(pagingRequest.page != 0 ? pagingRequest.page : 5)
+                  .AsQueryable();
+
+                var result2 = result.Item2.ToList();
+
+                foreach (var voucher in result2)
                 {
-                    // Filter vouchers by the provided categoryID list
-                    result.Item2 = result.Item2
-                        .Where(v => v.categories.Any(c => categoryID.Contains((Guid)c.id)));
+                    voucher.image = voucher.medias.FirstOrDefault(x => x.index == 0)?.url;
+                    voucher.originalPrice = voucher.modals.FirstOrDefault(x => x.index == 0)?.originalPrice;
+                    voucher.sellPrice = voucher.modals.FirstOrDefault(x => x.index == 0)?.sellPrice;
+                    voucher.quantity = voucher.modals.Sum(modal => modal.voucherCodes?.Count);
                 }
 
-                IList<GetDetailVoucherDTO?> vouchers = new List<GetDetailVoucherDTO>();
-
-                if (lon != 0 && lat != 0)
+                return new DynamicResponseModel<GetDetailVoucherDTO>
                 {
-                    decimal ToRadians(decimal value) => (decimal)(Math.PI / 180) * value;
-
-                    vouchers = result.Item2.ToList()
-                        .Select(voucher =>
-                        {
-                            // Create intermediate variables for logging
-                            var voucherId = voucher.id;
-                            var addresses = voucher.addresses;
-
-                            if (addresses == null || !addresses.Any())
-                            {
-                                LoggerService.Logger($"Voucher {voucherId} has no addresses.");
-                                return null; // Skip this voucher if no addresses are available
-                            }
-
-                            var nearestAddress = addresses
-                                .Where(a => a.lat.HasValue && a.lon.HasValue)
-                                .Select(a =>
-                                {
-                                    decimal? addressLat = a.lat;
-                                    decimal? addressLon = a.lon;
-
-                                    if (!addressLat.HasValue || !addressLon.HasValue)
-                                    {
-                                        LoggerService.Logger($"Address {a.id} has invalid latitude or longitude.");
-                                        return null;
-                                    }
-
-                                    decimal dLat = ToRadians(lat - (decimal)addressLat);
-                                    decimal dLon = ToRadians(lon - (decimal)addressLon);
-                                    decimal lat1 = ToRadians(lat);
-                                    decimal lat2 = ToRadians((decimal)addressLat);
-
-                                    decimal aVal = (decimal)(Math.Sin((double)dLat / 2) * Math.Sin((double)dLat / 2) +
-                                                             Math.Cos((double)lat1) * Math.Cos((double)lat2) *
-                                                             Math.Sin((double)dLon / 2) * Math.Sin((double)dLon / 2));
-
-                                    decimal c = 2 * (decimal)Math.Atan2(Math.Sqrt((double)aVal), Math.Sqrt(1 - (double)aVal));
-
-                                    decimal distance = R * c;
-
-                                    LoggerService.Logger($"Address {a.id} has distance {distance} km from the user.");
-
-                                    return new { Address = a, Distance = distance };
-                                })
-                                .Where(a => a != null) // Filter out null addresses
-                                .OrderBy(a => a.Distance)  // Sort by the closest distance
-                                .Take(5)  // Take the 5 nearest addresses
-                                .ToList();
-
-                            if (nearestAddress.Any())
-                            {
-                                LoggerService.Logger($"Voucher {voucher.id} has {nearestAddress.Count} nearest addresses.");
-
-                                // Create the DTO object
-                                var x = new GetDetailVoucherDTO
-                                {
-                                    createDate = voucher.createDate,
-                                    video = voucher.video,
-                                    description = voucher.description,
-                                    categories = voucher.categories,
-                                    id = voucher.id,
-                                    modals = voucher.modals,
-                                    image = voucher.modals.FirstOrDefault(x => x.index == 0).image,
-                                    originalPrice = voucher.modals.FirstOrDefault(x => x.index == 0).originalPrice,
-                                    sellPrice = voucher.modals.FirstOrDefault(x => x.index == 0).sellPrice,
-                                    title = voucher.title,
-                                    brandId = voucher.id,
-                                    brandName = voucher.brandName,
-                                    brandImage = voucher.brandImage,
-                                    supplierId = voucher.supplierId,
-                                    supplierImage = voucher.supplierImage,
-                                    supplierName = voucher.supplierName,
-                                    quantity = voucher.quantity,
-                                    rating = voucher.rating,
-                                    addresses = nearestAddress
-                                        .Select(na => new GetDistanceAddressDTO
-                                        {
-                                            id = na.Address.id,
-                                            name = na.Address.name,
-                                            lat = na.Address.lat,
-                                            lon = na.Address.lon,
-                                            distance = Math.Round(na.Distance, 2) // Round distance to 2 decimal places
-                                        })
-                                        .ToList() // Map to address DTOs and create a list of nearest 5 addresses
-                                };
-
-                                return x;
-                            }
-                            else
-                            {
-                                // Log when no nearest addresses are found
-                                LoggerService.Logger($"Voucher {voucher.id} has no nearby addresses.");
-                            }
-
-                            return null;
-
-                        })
-                        .Where(v => v != null) // Filter out vouchers without nearby addresses
-                        .Take(10) // Limit to the 10 nearest vouchers
-                        .ToList();
-                }
-
-                var vouchersList = vouchers.Count != 0 ? vouchers : result.Item2.ToList();  // Materialize the query into a list
-
-                // Check for available promotions
-                foreach (var voucher in vouchersList)
-                {
-                    var currentDate = DateTime.Now;
-                    LoggerService.Logger($"Checking promotions for voucher {voucher.id}.");
-
-                    var promotions = await _voucherRepository.GetByIdAsync(voucher.id, includeProperties: query => query.Include(x => x.Promotions));
-
-                    if (promotions == null || promotions.Promotions == null)
-                    {
-                        LoggerService.Logger($"Voucher {voucher.id} has no promotions.");
-                        continue;
-                    }
-
-                    var availablePromotion = promotions.Promotions.FirstOrDefault(promotion => promotion.StartDate <= currentDate && promotion.EndDate >= currentDate);
-
-                    if (availablePromotion != null)
-                    {
-                        voucher.salePrice = voucher.originalPrice - (voucher.originalPrice * availablePromotion.PercentDiscount / 100);
-                        voucher.percentDiscount = availablePromotion.PercentDiscount;
-                        voucher.image = voucher.modals.Count != 0 ? voucher.modals.FirstOrDefault(x => x.index == 0).image : null;
-                        LoggerService.Logger($"Voucher {voucher.id} has an active promotion with {availablePromotion.PercentDiscount}% discount.");
-                    }
-
-                    foreach (var modal in voucher.modals)
-                    {
-                        modal.quantity = modal.voucherCodes.Where(x => x.status == ObjectStatusEnum.ACTIVE.ToString()).Count();
-                    }
-
-                    voucher.quantity = voucher.modals.Sum(x => x.quantity);
-                }
-
-                // Apply pagination
-                var pagedVouchers = vouchersList
-                    .Skip((pagingRequest.page - 1) * pagingRequest.pageSize)
-                    .Take(pagingRequest.pageSize)
-                    .ToList();
-
-                return new DynamicResponseModel<GetDetailVoucherDTO>()
-                {
-                    metaData = new MetaData()
+                    metaData = new MetaData
                     {
                         page = pagingRequest.page,
                         size = pagingRequest.pageSize,
-                        total = vouchersList.Count() // Total vouchers count for metadata
+                        total = result.Item2.Count()
                     },
-                    results = pagedVouchers // Return the paged voucher list with nearest address and distance
+                    results = result2
                 };
             }
             catch (Exception ex)
@@ -638,10 +514,7 @@ namespace Vouchee.Business.Services.Impls
                 LoggerService.Logger($"Error: {ex.Message}, StackTrace: {ex.StackTrace}");
                 throw new LoadException("An unexpected error occurred while loading vouchers.");
             }
-
-            return null;
         }
-
 
         public async Task<IList<GetVoucherDTO>> GetSalestVouchers()
         {

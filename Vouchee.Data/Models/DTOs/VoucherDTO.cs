@@ -121,7 +121,7 @@ namespace Vouchee.Business.Models.DTOs
             addresses = [];
         }
 
-        public virtual ICollection<GetDistanceAddressDTO> addresses { get; set; }
+        public virtual IEnumerable<GetDistanceAddressDTO>? addresses { get; set; }
     }
 
     public class GetBestSoldVoucherDTO : VoucherDTO
