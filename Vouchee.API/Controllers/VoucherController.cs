@@ -6,6 +6,7 @@ using System.Net;
 using Vouchee.API.Helpers;
 using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
+using Vouchee.Business.Models.ViewModels;
 using Vouchee.Business.Services;
 using Vouchee.Business.Services.Impls;
 using Vouchee.Data.Models.Constants.Enum.Sort;
@@ -46,40 +47,39 @@ namespace Vouchee.API.Controllers
         [HttpGet("get_all_voucher")]
         public async Task<IActionResult> GetAllVouchers([FromQuery] PagingRequest pagingRequest, 
                                                             [FromQuery] VoucherFilter voucherFiler, 
-                                                            [Required] decimal lon, 
-                                                            [Required] decimal lat, 
                                                             [FromQuery] List<Guid>? categoryIDs)
         {
-            var result = await _voucherService.GetVouchersAsync(pagingRequest, voucherFiler, lon, lat, categoryIDs);
+            var result = await _voucherService.GetVoucherAsync(pagingRequest, voucherFiler, categoryIDs);
             return Ok(result);
         }
 
         [HttpGet("get_newest_vouchers")]
-        public async Task<IActionResult> GetNewestVouchers()
+        public async Task<IActionResult> GetNewestVouchers([FromQuery] int numberOfVoucher)
         {
-            var result = await _voucherService.GetNewestVouchers();
+            var result = await _voucherService.GetNewestVouchers(numberOfVoucher);
             return Ok(result);
         }
 
         [HttpGet("get_best_sold_vouchers")]
-        public async Task<IActionResult> GetBestSoldVouchers()
+        public async Task<IActionResult> GetBestSoldVouchers([FromQuery] int numberOfVoucher)
         {
-            var result = await _voucherService.GetTopSaleVouchers();
+            var result = await _voucherService.GetTopSaleVouchers(numberOfVoucher);
             return Ok(result);
         }
 
         [HttpGet("get_nearest_vouchers")]
-        public async Task<IActionResult> GetNearestVouchers([FromQuery] decimal lon,
-                                                                [FromQuery] decimal lat)
+        public async Task<IActionResult> GetNearestVouchers([FromQuery] DistanceFilter distanceFilter,
+                                                                [FromQuery] VoucherFilter voucherFilter,
+                                                                IList<Guid>? categoryIds)
         {
-            var result = await _voucherService.GetNearestVouchers(lon, lat);
+            var result = await _voucherService.GetDetailVouchersAsync(distanceFilter, voucherFilter, categoryIds);
             return Ok(result);
         }
 
         [HttpGet("get_salest_vouchers")]
-        public async Task<IActionResult> GetSalestVouchers()
+        public async Task<IActionResult> GetSalestVouchers([FromQuery] int numberOfVoucher)
         {
-            var result = await _voucherService.GetSalestVouchers();
+            var result = await _voucherService.GetSalestVouchers(numberOfVoucher);
             return Ok(result);
         }
 
@@ -92,11 +92,12 @@ namespace Vouchee.API.Controllers
         }
 
         [HttpGet("get_voucher_by_seller_id/{sellerId}")]
-        public async Task<IActionResult> GetVoucherById(Guid sellerId, 
+        public async Task<IActionResult> GetVoucherById([FromQuery] Guid sellerId, 
                                                             [FromQuery] PagingRequest pagingRequest,
-                                                            [FromQuery] VoucherFilter voucherFilter)
+                                                            [FromQuery] VoucherFilter voucherFilter,
+                                                            [FromQuery] IList<Guid>? categoryIds)
         {
-            var voucher = await _voucherService.GetVoucherBySellerId(sellerId, pagingRequest, voucherFilter);
+            var voucher = await _voucherService.GetVoucherBySellerId(sellerId, pagingRequest, voucherFilter, categoryIds);
             return Ok(voucher);
         }
 
