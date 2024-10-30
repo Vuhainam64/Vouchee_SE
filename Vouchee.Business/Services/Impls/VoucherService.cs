@@ -158,20 +158,33 @@ namespace Vouchee.Business.Services.Impls
         public async Task<IList<GetVoucherDTO>> GetNewestVouchers(int numberOfVoucher)
         {
             DateTime currentDate = DateTime.Now;
-            IList<GetVoucherDTO> result;
-            result = await _voucherRepository.GetTable()
-                                        .Include(x => x.Medias)
-                                        .Include(x => x.Categories)
-                                        .Include(x => x.Brand)
-                                        .Include(x => x.Promotions.Where(x => x.StartDate <= currentDate && currentDate <= x.EndDate))
-                                        .Include(x => x.Modals)
-                                            .ThenInclude(x => x.VoucherCodes)
-                                        .OrderByDescending(x => x.CreateDate)
-                                        .Take(numberOfVoucher != 0 ? numberOfVoucher : 10)
-                                        .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
-                                        .ToListAsync();
-            return result;
+
+            // Fetch data from the repository
+            var result = await  _voucherRepository.GetTable()
+                                .Include(x => x.Medias)
+                                .Include(x => x.Categories)
+                                .Include(x => x.Brand)
+                                .Include(x => x.Promotions.Where(p => p.StartDate <= currentDate && currentDate <= p.EndDate))
+                                .Include(x => x.Modals)
+                                    .ThenInclude(m => m.VoucherCodes.Where(vc => vc.Status == "ACTIVE"))
+                                .OrderByDescending(v => v.CreateDate)
+                                .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider).ToListAsync();
+
+            //var result = _voucherRepository.GetTable()
+            //        .Include(x => x.Medias)
+            //        .Include(x => x.Categories)
+            //        .Include(x => x.Brand)
+            //        .Include(x => x.Promotions.Where(p => p.StartDate <= currentDate && currentDate <= p.EndDate))
+            //        .Include(x => x.Modals)
+            //            .ThenInclude(m => m.VoucherCodes.Where(vc => vc.Status == "ACTIVE"))
+            //        .OrderByDescending(v => v.CreateDate)
+            //        .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
+            //        .Where(x => x.stock > 0);
+            // chỗ này sai khi query stock trực tiếp dưới db
+
+            return result.Where(x => x.stock > 0).ToList();
         }
+
 
         public async Task<IList<GetBestSoldVoucherDTO>> GetTopSaleVouchers(int numberOfVoucher)
         {
