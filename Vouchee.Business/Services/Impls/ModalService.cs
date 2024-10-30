@@ -90,11 +90,6 @@ namespace Vouchee.Business.Services.Impls
                             .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
                 list = result.Item2.ToList();
-
-                foreach (var modal in list)
-                {
-                    modal.quantity = modal.voucherCodes.Where(x => x.status == ObjectStatusEnum.ACTIVE.ToString()).Count();
-                }
             }
             catch (Exception ex)
             {

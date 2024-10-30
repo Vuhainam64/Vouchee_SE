@@ -136,34 +136,36 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<GetDetailPromotionDTO> GetPromotionByIdAsync(Guid id)
         {
-            var promotion = await _promotionRepository.GetByIdAsync(id, includeProperties: query =>
-                query.Include(x => x.Vouchers) // Include Vouchers
-                     .ThenInclude(v => v.Brand) // Include Brand inside Vouchers
-                     .Include(x => x.Vouchers)  // Include Vouchers again
-                     .ThenInclude(v => v.Categories) // Include Categories inside Vouchers
-            );
+            //var promotion = await _promotionRepository.GetByIdAsync(id, includeProperties: query =>
+            //    query.Include(x => x.Vouchers) // Include Vouchers
+            //         .ThenInclude(v => v.Brand) // Include Brand inside Vouchers
+            //         .Include(x => x.Vouchers)  // Include Vouchers again
+            //         .ThenInclude(v => v.Categories) // Include Categories inside Vouchers
+            //);
 
-            if (promotion != null)
-            {
-                var promotioDTO = _mapper.Map<GetDetailPromotionDTO>(promotion);
+            //if (promotion != null)
+            //{
+            //    var promotioDTO = _mapper.Map<GetDetailPromotionDTO>(promotion);
 
-                // Check for available promotions
-                foreach (var voucher in promotioDTO.vouchers)
-                {
-                    var availablePromotion = _promotionRepository.GetAvailableByVoucherId((Guid)voucher.id).Result;
-                    if (availablePromotion != null)
-                    {
-                        voucher.salePrice = voucher.originalPrice - (voucher.originalPrice * availablePromotion.FirstOrDefault().PercentDiscount / 100);
-                        voucher.percentDiscount = availablePromotion.FirstOrDefault().PercentDiscount;
-                    }
-                }
+            //    // Check for available promotions
+            //    foreach (var voucher in promotioDTO.vouchers)
+            //    {
+            //        var availablePromotion = _promotionRepository.GetAvailableByVoucherId((Guid)voucher.id).Result;
+            //        if (availablePromotion != null)
+            //        {
+            //            voucher.salePrice = voucher.originalPrice - (voucher.originalPrice * availablePromotion.FirstOrDefault().PercentDiscount / 100);
+            //            voucher.percentDiscount = availablePromotion.FirstOrDefault().PercentDiscount;
+            //        }
+            //    }
 
-                return promotioDTO;
-            }
-            else
-            {
-                throw new NotFoundException($"Không tìm thấy promotion với id {id}");
-            }
+            //    return promotioDTO;
+            //}
+            //else
+            //{
+            //    throw new NotFoundException($"Không tìm thấy promotion với id {id}");
+            //}
+
+            return null;
         }
 
         public async Task<DynamicResponseModel<GetPromotionDTO>> GetPromotionsAsync(PagingRequest pagingRequest, PromotionFilter promotionFilter)

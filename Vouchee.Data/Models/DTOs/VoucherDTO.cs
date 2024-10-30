@@ -82,27 +82,22 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? id { get; set; }
         public string? title { get; set; }
         public string? description { get; set; }
-        public string? image { get; set; }
-        public decimal? originalPrice { get; set; }
-        public decimal? sellPrice { get; set; }
-        public decimal? salePrice { get; set; }
-        public decimal? percentDiscount { get; set; }
-        public int? quantity { get; set; }
         public decimal? rating { get; set; }
         public string? video { get; set; }
         public DateTime? createDate { get; set; }
 
+        public decimal? percentDiscount { get; set; }
+        public decimal? originalPrice => modals.FirstOrDefault(m => m.index == 0)?.originalPrice;
+        public decimal? sellPrice => modals.FirstOrDefault(m => m.index == 0)?.sellPrice;
+        public decimal? salePrice => sellPrice.HasValue && percentDiscount.HasValue ? sellPrice * (1 - percentDiscount / 100) : null;
+
+        public int? stock => modals?.Sum(m => m.voucherCodes?.Count) ?? 0;
+
+        public string? image => modals.FirstOrDefault(m => m.index == 0)?.image;
+
         public Guid? brandId { get; set; }
         public string? brandName { get; set; }
         public string? brandImage { get; set; }
-
-        public Guid? supplierId { get; set; }
-        public string? supplierName { get; set; }
-        public string? supplierImage { get; set; }
-
-        public Guid? sellerId { get; set; }
-        public string? sellerName { get; set; }
-        public string? sellerImage { get; set; }
 
         public virtual ICollection<GetMediaDTO> medias { get; set; }
         public virtual ICollection<GetCategoryDTO> categories { get; set; }
@@ -114,14 +109,25 @@ namespace Vouchee.Business.Models.DTOs
 
     }
 
-    public class GetDetailVoucherDTO : VoucherDTO
+    public class GetAddressVoucherDTO : VoucherDTO
     {
-        public GetDetailVoucherDTO()
+        public GetAddressVoucherDTO()
         {
             addresses = [];
         }
 
-        public virtual IEnumerable<GetDistanceAddressDTO>? addresses { get; set; }
+        public virtual IEnumerable<GetAddressDTO> addresses { get; set; }
+    }
+
+    public class GetDetailVoucherDTO : VoucherDTO
+    {
+        public Guid? sellerId { get; set; }
+        public string? sellerName { get; set; }
+        public string? sellerImage { get; set; }
+
+        public Guid? supplierId { get; set; }
+        public string? supplierName { get; set; }
+        public string? supplierImage { get; set; }
     }
 
     public class GetBestSoldVoucherDTO : VoucherDTO
@@ -133,188 +139,4 @@ namespace Vouchee.Business.Models.DTOs
     {
         public int quantity { get; set; }
     }
-
-    //public class GetAllVoucherDTO
-    //{
-    //    public GetAllVoucherDTO()
-    //    {
-    //        categories = [];
-    //        addresses = [];
-    //        modals = [];
-    //    }
-
-    //    public Guid? id { get; set; }
-
-    //    public string? title { get; set; }
-    //    public string? description { get; set; }
-    //    public string? image { get; set; }
-    //    public decimal? originalPrice { get; set; }
-    //    public decimal? sellPrice { get; set; }
-    //    public decimal? salePrice { get; set; }
-    //    public decimal? percentDiscount { get; set; }
-    //    public Guid? brandId { get; set; }
-    //    public string? brandName { get; set; }
-    //    public string? brandImage { get; set; }
-    //    public Guid? supplierId { get; set; }
-    //    public string? supplierName { get; set; }
-    //    public string? supplierImage { get; set; }
-    //    public int? quantity { get; set; }
-    //    public decimal? rating { get; set; }
-    //    public string? video { get; set; }
-
-    //    public virtual ICollection<GetAllAddressDTO> addresses { get; set; }
-    //    public virtual ICollection<GetCategoryDTO>? categories { get; set; }
-    //    public virtual ICollection<GetModalDTO> modals { get; set; }
-    //}
-    //public class GetBestBuyVoucherDTO
-    //{
-    //    public GetBestBuyVoucherDTO()
-    //    {
-    //        categories = [];
-    //        modals = [];
-    //    }
-    //    public Guid? id { get; set; }
-
-    //    public string? title { get; set; }
-    //    public string? image { get; set; }
-    //    public decimal? originalPrice { get; set; }
-    //    public decimal? sellPrice { get; set; }
-    //    public decimal? salePrice { get; set; }
-    //    public decimal? percentDiscount { get; set; }
-    //    public Guid? brandId { get; set; }
-    //    public string? brandName { get; set; }
-    //    public string? brandImage { get; set; }
-    //    public Guid? supplierId { get; set; }
-    //    public string? supplierName { get; set; }
-    //    public string? supplierImage { get; set; }
-    //    public int? quantity { get; set; }
-    //    public decimal? rating { get; set; }
-    //    public string? video { get; set; }
-    //    public decimal? TotalQuantitySold { get; set; }
-
-    //    public virtual ICollection<GetCategoryDTO>? categories { get; set; }
-    //    public virtual ICollection<GetModalDTO>? modals { get; set; }
-    //}
-    //public class GetNearestVoucherDTO
-    //{
-    //    public GetNearestVoucherDTO()
-    //    {
-    //        addresses = [];
-    //        categories = [];
-    //        modals = [];
-    //    }
-    //    public Guid? id { get; set; }
-
-    //    public string? title { get; set; }
-    //    //public string? description { get; set; }
-    //    public string? image { get; set; }
-    //    public decimal? originalPrice { get; set; }
-    //    public decimal? sellPrice { get; set; }
-    //    public decimal? salePrice { get; set; }
-    //    public decimal? percentDiscount { get; set; }
-    //    public Guid? brandId { get; set; }
-    //    public string? brandName { get; set; }
-    //    public string? brandImage { get; set; }
-    //    public Guid? supplierId { get; set; }
-    //    public string? supplierName { get; set; }
-    //    public string? supplierImage { get; set; }
-    //    public int? quantity { get; set; }
-    //    public decimal? rating { get; set; }
-    //    public string? video { get; set; }
-
-    //    public virtual ICollection<GetCategoryDTO>? categories { get; set; }
-    //    public virtual ICollection<GetAllAddressDTO>? addresses { get; set; }
-    //    public virtual ICollection<GetModalDTO> modals { get; set; }
-    //}
-    //public class GetDetailVoucherDTO
-    //{
-    //    public GetDetailVoucherDTO()
-    //    {
-    //        addresses = [];
-    //        categories = [];
-    //        medias = [];
-    //        modals = [];
-    //    }
-
-    //    public Guid? id { get; set; }
-
-    //    public string? title { get; set; }
-    //    public string? description { get; set; }
-    //    public string? image { get; set; }
-    //    public decimal? originalPrice { get; set; }
-    //    public decimal? sellPrice { get; set; }
-    //    public decimal? salePrice { get; set; }
-    //    public decimal? percentDiscount { get; set; }
-    //    public int? quantity { get; set; }
-    //    public decimal? rating { get; set; }
-    //    public string? video { get; set; }
-
-    //    public Guid? brandId { get; set; }
-    //    public string? brandName { get; set; }
-    //    public string? brandImage { get; set; }
-
-    //    public Guid? supplierId { get; set; }
-    //    public string? supplierName { get; set; }
-    //    public string? supplierImage { get; set; }
-
-    //    public Guid? createBy { get; set; }
-    //    public string? sellerName { get; set; }
-    //    public string? sellerImage { get; set; }
-
-
-    //    public virtual ICollection<GetDetailModalDTO>? modals { get; set; }
-    //    public virtual ICollection<GetCategoryDTO> categories { get; set; }
-    //    public virtual ICollection<GetMediaDTO> medias { get; set; }
-    //    public virtual ICollection<GetAllAddressDTO>? addresses { get; set; }
-    //}
-
-    //public class GetNewestVoucherDTO
-    //{
-    //    public GetNewestVoucherDTO()
-    //    {
-    //        categories = [];
-    //        modals = [];
-    //    }
-
-    //    public Guid? id { get; set; }
-
-    //    public string? title { get; set; }
-    //    public decimal? originalPrice { get; set; }
-    //    public decimal? sellPrice { get; set; }
-    //    public decimal? salePrice { get; set; }
-    //    public decimal? percentDiscount { get; set; }
-    //    public Guid? brandId { get; set; }
-    //    public string? brandName { get; set; }
-    //    public string? brandImage { get; set; }
-    //    // Tạm thời sẽ trả ra hình ảnh đầu tiên
-    //    public string? image { get; set; }
-    //    public Guid? supplierId { get; set; }
-    //    public string? supplierName { get; set; }
-    //    public string? supplierImage { get; set; }
-    //    public int? quantity { get; set; }
-    //    public decimal? rating { get; set; }
-    //    public string? video { get; set; }
-
-    //    public DateTime? createDate { get; set; }
-
-    //    public virtual ICollection<GetModalDTO> modals { get; set; }
-    //    public virtual ICollection<GetCategoryDTO>? categories { get; set; }
-    //}
-
-    //public class VoucherDTO
-    //{
-    //    public Guid? id { get; set; }
-
-    //    public string? title { get; set; }
-    //    public decimal? originalPrice { get; set; }
-    //    public decimal? sellPrice { get; set; }
-    //    public decimal? salePrice { get; set; }
-    //    public string? image { get; set; }
-    //    public decimal? percentDiscount { get; set; }
-    //}
-
-    //public class CartModalDTO : VoucherDTO
-    //{
-    //    public int quantity { get; set; }
-    //}
 }

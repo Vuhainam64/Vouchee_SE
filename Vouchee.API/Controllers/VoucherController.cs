@@ -70,7 +70,7 @@ namespace Vouchee.API.Controllers
         [HttpGet("get_nearest_vouchers")]
         public async Task<IActionResult> GetNearestVouchers([FromQuery] DistanceFilter distanceFilter,
                                                                 [FromQuery] VoucherFilter voucherFilter,
-                                                                IList<Guid>? categoryIds)
+                                                                [FromQuery] IList<Guid>? categoryIds)
         {
             var result = await _voucherService.GetDetailVouchersAsync(distanceFilter, voucherFilter, categoryIds);
             return Ok(result);

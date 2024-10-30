@@ -150,6 +150,6 @@ namespace Vouchee.Data.Models.DTOs
         public DateTime? createDate { get; set; }
         public Guid? createBy { get; set; }
 
-        public virtual ICollection<GetDetailVoucherDTO>? vouchers { get; set; }
+        public virtual ICollection<GetVoucherDTO>? vouchers { get; set; }
     }
 }

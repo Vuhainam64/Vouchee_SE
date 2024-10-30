@@ -57,7 +57,7 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? updateBy { get; set; }
 
         public virtual ICollection<CartDTO> carts { get; set; }
-        public virtual ICollection<GetDetailVoucherDTO> vouchers { get; set; }
+        public virtual ICollection<GetVoucherDTO> vouchers { get; set; }
         public virtual ICollection<GetOrderDTO>? orders { get; set; }
     }
 

@@ -13,16 +13,16 @@ namespace Vouchee.Business.Services
         public Task<ResponseMessage<dynamic>> CreateVoucherAsync(CreateVoucherDTO createVoucherDTO, ThisUserObj thisUserObj);
 
         // READ
-        public Task<GetDetailVoucherDTO> GetVoucherByIdAsync(Guid id);
+        public Task<GetVoucherDTO> GetVoucherByIdAsync(Guid id);
         public Task<DynamicResponseModel<GetVoucherDTO>> GetVoucherAsync(PagingRequest pagingRequest,
                                                                             VoucherFilter voucherFilter,
                                                                             IList<Guid>? categoryIds);
-        public Task<DynamicDistanceResponseModel<GetDetailVoucherDTO>> GetDetailVouchersAsync(DistanceFilter distanceFilter,
-                                                                                        VoucherFilter voucherFiler,
-                                                                                        IList<Guid>? categoryIds);
-        public Task<IList<GetVoucherDTO>> GetNewestVouchers(int numberOfVoucher = 8);
-        public Task<IList<GetBestSoldVoucherDTO>> GetTopSaleVouchers(int numberOFVoucher = 8);
-        public Task<IList<GetVoucherDTO>> GetSalestVouchers(int numberOfVoucher = 8);
+        public Task<DynamicDistanceResponseModel<GetVoucherDTO>> GetDetailVouchersAsync(DistanceFilter distanceFilter,
+                                                                                            VoucherFilter voucherFiler,
+                                                                                            IList<Guid>? categoryIds);
+        public Task<IList<GetVoucherDTO>> GetNewestVouchers(int numberOfVoucher);
+        public Task<IList<GetBestSoldVoucherDTO>> GetTopSaleVouchers(int numberOFVoucher);
+        public Task<IList<GetVoucherDTO>> GetSalestVouchers(int numberOfVoucher);
         public Task<DynamicResponseModel<GetVoucherDTO>> GetVoucherBySellerId(Guid sellerId, 
                                                                                 PagingRequest pagingRequest, 
                                                                                 VoucherFilter voucherFilter,

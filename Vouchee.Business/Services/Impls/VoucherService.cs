@@ -157,158 +157,135 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<IList<GetVoucherDTO>> GetNewestVouchers(int numberOfVoucher)
         {
+            DateTime currentDate = DateTime.Now;
             IList<GetVoucherDTO> result;
-            try
-            {
-                result = _voucherRepository.GetTable()
-                                            .Include(x => x.Medias)
-                                            .Include(x => x.Supplier)
-                                            .Include(x => x.Categories)
-                                            .Include(x => x.Brand)
-                                            .OrderByDescending(x => x.CreateDate)
-                                            .Take(numberOfVoucher)
-                                            .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
-                                            .ToList();
-
-                if (result != null && result.Count() != 0)
-                {
-
-                    foreach (var voucher in result)
-                    {
-                        voucher.originalPrice = voucher.modals.FirstOrDefault(x => x.index == 0).originalPrice;
-                        voucher.sellPrice = voucher.modals.FirstOrDefault(x => x.index == 0).sellPrice;
-                        voucher.image = voucher.modals.FirstOrDefault(x => x.index == 0).image;
-
-                        var currentDate = DateTime.Now;
-                        var promotions = _voucherRepository.GetByIdAsync(voucher.id, includeProperties: query => query.Include(x => x.Promotions)).Result.Promotions;
-
-                        var availablePromotion = promotions.FirstOrDefault(promotion => promotion.StartDate <= currentDate && promotion.EndDate >= currentDate);
-
-                        if (availablePromotion != null)
-                        {
-                            voucher.salePrice = voucher.originalPrice - (voucher.originalPrice * availablePromotion.PercentDiscount / 100);
-                            voucher.percentDiscount = availablePromotion.PercentDiscount;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải voucher");
-            }
+            result = await _voucherRepository.GetTable()
+                                        .Include(x => x.Medias)
+                                        .Include(x => x.Categories)
+                                        .Include(x => x.Brand)
+                                        .Include(x => x.Promotions.Where(x => x.StartDate <= currentDate && currentDate <= x.EndDate))
+                                        .Include(x => x.Modals)
+                                            .ThenInclude(x => x.VoucherCodes)
+                                        .OrderByDescending(x => x.CreateDate)
+                                        .Take(numberOfVoucher != 0 ? numberOfVoucher : 10)
+                                        .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
+                                        .ToListAsync();
             return result;
         }
 
         public async Task<IList<GetBestSoldVoucherDTO>> GetTopSaleVouchers(int numberOfVoucher)
         {
-            IQueryable<GetBestSoldVoucherDTO> voucher;
+            //IQueryable<GetBestSoldVoucherDTO> voucher;
 
-            var orderDetails = _orderDetailRepository.GetTable()
-                .GroupBy(od => od.ModalId)
-                .Select(group => new
-                {
-                    VoucherId = group.Key,
-                    TotalQuantitySold = group.Sum(od => od.Quantity)
-                })
-                .OrderByDescending(vs => vs.TotalQuantitySold)
-                .ToList();
+            //var orderDetails = _orderDetailRepository.GetTable()
+            //    .GroupBy(od => od.ModalId)
+            //    .Select(group => new
+            //    {
+            //        VoucherId = group.Key,
+            //        TotalQuantitySold = group.Sum(od => od.Quantity)
+            //    })
+            //    .OrderByDescending(vs => vs.TotalQuantitySold)
+            //    .ToList();
 
-            voucher = _voucherRepository.GetTable()
-                .Include(x => x.Medias)
-                .Include(x => x.Supplier)
-                .Include(x => x.Categories)
-                .Include(x => x.Brand)
-                .Where(v => orderDetails.Select(od => od.VoucherId).Contains(v.Id))
-                .ProjectTo<GetBestSoldVoucherDTO>(_mapper.ConfigurationProvider);
+            //voucher = _voucherRepository.GetTable()
+            //    .Include(x => x.Medias)
+            //    .Include(x => x.Supplier)
+            //    .Include(x => x.Categories)
+            //    .Include(x => x.Brand)
+            //    .Where(v => orderDetails.Select(od => od.VoucherId).Contains(v.Id))
+            //    .ProjectTo<GetBestSoldVoucherDTO>(_mapper.ConfigurationProvider);
 
-            var result = voucher.ToList().Select(voucher => new GetBestSoldVoucherDTO
-            {
-                video = voucher.video,
-                id = voucher.id,
-                title = voucher.title,
-                image = voucher.modals.FirstOrDefault(x => x.index == 0).image,
-                originalPrice = voucher.modals.FirstOrDefault(x => x.index == 0).originalPrice,
-                sellPrice = voucher.modals.FirstOrDefault(x => x.index == 0).sellPrice,
-                totalQuantitySold = orderDetails.First(od => od.VoucherId == voucher.id).TotalQuantitySold,
-                categories = voucher.categories,
-                brandId = voucher.brandId,
-                brandImage = voucher.brandImage,
-                brandName = voucher.brandName,
-                modals = voucher.modals,
-                supplierId = voucher.supplierId,
-                supplierImage = voucher.supplierImage,
-                supplierName = voucher.supplierName,
-                quantity = voucher.quantity,
-                rating = voucher.rating,
-            })
-            .OrderByDescending(v => v.totalQuantitySold)
-            .ToList();
+            //var result = voucher.ToList().Select(voucher => new GetBestSoldVoucherDTO
+            //{
+            //    video = voucher.video,
+            //    id = voucher.id,
+            //    title = voucher.title,
+            //    image = voucher.modals.FirstOrDefault(x => x.index == 0).image,
+            //    originalPrice = voucher.modals.FirstOrDefault(x => x.index == 0).originalPrice,
+            //    sellPrice = voucher.modals.FirstOrDefault(x => x.index == 0).sellPrice,
+            //    totalQuantitySold = orderDetails.First(od => od.VoucherId == voucher.id).TotalQuantitySold,
+            //    categories = voucher.categories,
+            //    brandId = voucher.brandId,
+            //    brandImage = voucher.brandImage,
+            //    brandName = voucher.brandName,
+            //    modals = voucher.modals,
+            //    supplierId = voucher.supplierId,
+            //    supplierImage = voucher.supplierImage,
+            //    supplierName = voucher.supplierName,
+            //    quantity = voucher.quantity,
+            //    rating = voucher.rating,
+            //})
+            //.OrderByDescending(v => v.totalQuantitySold)
+            //.ToList();
 
-            var result2 = result;
+            //var result2 = result;
 
-            foreach (var test in result2)
-            {
-                var currentDate = DateTime.Now;
-                var promotions = _voucherRepository.GetByIdAsync(test.id, includeProperties: query => query.Include(x => x.Promotions)).Result.Promotions;
+            //foreach (var test in result2)
+            //{
+            //    var currentDate = DateTime.Now;
+            //    var promotions = _voucherRepository.GetByIdAsync(test.id, includeProperties: query => query.Include(x => x.Promotions)).Result.Promotions;
 
-                var availablePromotion = promotions.FirstOrDefault(promotion => promotion.StartDate <= currentDate && promotion.EndDate >= currentDate);
+            //    var availablePromotion = promotions.FirstOrDefault(promotion => promotion.StartDate <= currentDate && promotion.EndDate >= currentDate);
 
-                if (availablePromotion != null)
-                {
-                    test.salePrice = test.originalPrice - (test.originalPrice * availablePromotion.PercentDiscount / 100);
-                    test.percentDiscount = availablePromotion.PercentDiscount;
-                }
-            }
+            //    if (availablePromotion != null)
+            //    {
+            //        test.salePrice = test.originalPrice - (test.originalPrice * availablePromotion.PercentDiscount / 100);
+            //        test.percentDiscount = availablePromotion.PercentDiscount;
+            //    }
+            //}
 
-            return result2;
+            //return result2;
+
+            return null;
         }
 
-        public async Task<GetDetailVoucherDTO> GetVoucherByIdAsync(Guid id)
+        public async Task<GetVoucherDTO> GetVoucherByIdAsync(Guid id)
         {
-            var voucher = await _voucherRepository.GetByIdAsync(id,
-                                    query => query.Include(x => x.Brand)
-                                                        .ThenInclude(x => x.Addresses)
-                                                    .Include(x => x.Supplier)
-                                                    .Include(x => x.Categories)
-                                                        .ThenInclude(x => x.VoucherType)
-                                                    .Include(x => x.Seller)
-                                                    .Include(x => x.Modals)
-                                                        .ThenInclude(x => x.VoucherCodes)
-                                                    .Include(x => x.Medias));
+            return null;
 
-            if (voucher != null)
-            {
-                GetDetailVoucherDTO voucherDTO = _mapper.Map<GetDetailVoucherDTO>(voucher);
+            //var voucher = await _voucherRepository.GetByIdAsync(id,
+            //                        query => query.Include(x => x.Brand)
+            //                                            .ThenInclude(x => x.Addresses)
+            //                                        .Include(x => x.Supplier)
+            //                                        .Include(x => x.Categories)
+            //                                            .ThenInclude(x => x.VoucherType)
+            //                                        .Include(x => x.Seller)
+            //                                        .Include(x => x.Modals)
+            //                                            .ThenInclude(x => x.VoucherCodes)
+            //                                        .Include(x => x.Medias));
 
-                voucherDTO.image = voucher.Modals.FirstOrDefault(x => x.Index == 0).Image;
-                voucherDTO.originalPrice = voucher.Modals.FirstOrDefault(x => x.Index == 0).OriginalPrice;
-                voucherDTO.sellPrice = voucher.Modals.FirstOrDefault(x => x.Index == 0).SellPrice;
+            //if (voucher != null)
+            //{
+            //    GetDetailVoucherDTO voucherDTO = _mapper.Map<GetDetailVoucherDTO>(voucher);
 
-                var currentDate = DateTime.Now;
-                var promotions = _voucherRepository.GetByIdAsync(voucherDTO.id, includeProperties: query => query.Include(x => x.Promotions)).Result.Promotions;
+            //    voucherDTO.image = voucher.Modals.FirstOrDefault(x => x.Index == 0).Image;
+            //    voucherDTO.originalPrice = voucher.Modals.FirstOrDefault(x => x.Index == 0).OriginalPrice;
+            //    voucherDTO.sellPrice = voucher.Modals.FirstOrDefault(x => x.Index == 0).SellPrice;
 
-                var availablePromotion = promotions.FirstOrDefault(promotion => promotion.StartDate <= currentDate && promotion.EndDate >= currentDate);
+            //    var currentDate = DateTime.Now;
+            //    var promotions = _voucherRepository.GetByIdAsync(voucherDTO.id, includeProperties: query => query.Include(x => x.Promotions)).Result.Promotions;
 
-                if (availablePromotion != null)
-                {
-                    voucherDTO.salePrice = voucherDTO.originalPrice - (voucherDTO.originalPrice * availablePromotion.PercentDiscount / 100);
-                    voucherDTO.percentDiscount = availablePromotion.PercentDiscount;
-                }
+            //    var availablePromotion = promotions.FirstOrDefault(promotion => promotion.StartDate <= currentDate && promotion.EndDate >= currentDate);
 
-                foreach (var modal in voucherDTO.modals)
-                {
-                    modal.quantity = modal.voucherCodes.Where(x => x.status == ObjectStatusEnum.ACTIVE.ToString()).Count();
-                }
+            //    if (availablePromotion != null)
+            //    {
+            //        voucherDTO.salePrice = voucherDTO.originalPrice - (voucherDTO.originalPrice * availablePromotion.PercentDiscount / 100);
+            //        voucherDTO.percentDiscount = availablePromotion.PercentDiscount;
+            //    }
 
-                voucherDTO.quantity = voucherDTO.modals.Sum(x => x.quantity);
+            //    foreach (var modal in voucherDTO.modals)
+            //    {
+            //        modal.quantity = modal.voucherCodes.Where(x => x.status == ObjectStatusEnum.ACTIVE.ToString()).Count();
+            //    }
 
-                return voucherDTO;
-            }
-            else
-            {
-                throw new NotFoundException($"Không tìm thấy voucher với id {id}");
-            }
+            //    voucherDTO.quantity = voucherDTO.modals.Sum(x => x.quantity);
+
+            //    return voucherDTO;
+            //}
+            //else
+            //{
+            //    throw new NotFoundException($"Không tìm thấy voucher với id {id}");
+            //}
         }
 
         public async Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO)
@@ -340,9 +317,12 @@ namespace Vouchee.Business.Services.Impls
             (int, IQueryable<GetVoucherDTO>) result;
 
             result = _voucherRepository.GetTable()
-                        .Where(x =>
-                            (string.IsNullOrEmpty(voucherFilter.title) || x.Title.ToLower().Contains(voucherFilter.title.ToLower()))
-                            && (categoryIds == null || !categoryIds.Any() || x.Categories.Any(c => categoryIds.Contains(c.Id))))
+                        .Include(x => x.Medias)
+                        .Include(x => x.Supplier)
+                        .Include(x => x.Categories)
+                        .Include(x => x.Brand)
+                        .Include(x => x.Modals)
+                            .ThenInclude(x => x.VoucherCodes)
                         .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
                         .DynamicFilter(_mapper.Map<GetVoucherDTO>(voucherFilter))
                         .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
@@ -359,99 +339,100 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<DynamicDistanceResponseModel<GetDetailVoucherDTO>> GetDetailVouchersAsync(DistanceFilter distanceFilter,
+        public async Task<DynamicDistanceResponseModel<GetVoucherDTO>> GetDetailVouchersAsync(DistanceFilter distanceFilter,
                                                                                         VoucherFilter voucherFilter,
                                                                                         IList<Guid>? categoryIds)
         {
-            var result= _voucherRepository.GetTable(includeProperties: x => x
-                        .Include(x => x.Supplier)
-                        .Include(x => x.Categories)
-                        .Include(x => x.Modals)
-                            .ThenInclude(x => x.VoucherCodes)
-                        .Include(x => x.Medias)
-                        .Include(x => x.Brand)
-                            .ThenInclude(x => x.Addresses))
-                        .ProjectTo<GetDetailVoucherDTO>(_mapper.ConfigurationProvider)
-                        .Where(x =>
-                            (string.IsNullOrEmpty(voucherFilter.title) || x.title.ToLower().Contains(voucherFilter.title.ToLower()))
-                            && (categoryIds == null || !categoryIds.Any() || x.categories.Any(c => categoryIds.Contains(c.id.Value))))
-                        .AsEnumerable()
-                        .Select(v =>
-                        {
-                            v.addresses = v.addresses?
-                                .Where(a => a.lon.HasValue && a.lat.HasValue) // Filter addresses with lat/lon
-                                .Select(a =>
-                                {
-                                    a.distance = DistanceHelper.CalculateDistance(distanceFilter.lat, distanceFilter.lon, a.lat.Value, a.lon.Value);
-                                    return a;
-                                })
-                                .OrderBy(d => d.distance)
-                                .Take(distanceFilter.numberOfAddress);
+            //var result= _voucherRepository.GetTable(includeProperties: x => x
+            //            .Include(x => x.Supplier)
+            //            .Include(x => x.Categories)
+            //            .Include(x => x.Modals)
+            //                .ThenInclude(x => x.VoucherCodes)
+            //            .Include(x => x.Medias)
+            //            .Include(x => x.Brand)
+            //                .ThenInclude(x => x.Addresses))
+            //            .ProjectTo<GetDetailVoucherDTO>(_mapper.ConfigurationProvider)
+            //            .Where(x =>
+            //                (string.IsNullOrEmpty(voucherFilter.title) || x.title.ToLower().Contains(voucherFilter.title.ToLower()))
+            //                    && (categoryIds == null || !categoryIds.Any() || x.categories.Any(c => categoryIds.Contains(c.id.Value))))
+            //            .AsEnumerable()
+            //            .Select(v =>
+            //            {
+            //                v.addresses = v.addresses?
+            //                    .Where(a => a.lon.HasValue && a.lat.HasValue) // Filter addresses with lat/lon
+            //                    .Select(a =>
+            //                    {
+            //                        a.distance = DistanceHelper.CalculateDistance(distanceFilter.lat, distanceFilter.lon, a.lat.Value, a.lon.Value);
+            //                        return a;
+            //                    })
+            //                    .OrderBy(d => d.distance)
+            //                    .Take(distanceFilter.numberOfAddress);
+            //                return v;
+            //            })
+            //            .Take(distanceFilter.numberOfVoucher);
 
-                            return v;
-                        })
-                        .Take(distanceFilter.numberOfVoucher);
+            //var response = new DynamicDistanceResponseModel<GetDetailVoucherDTO>
+            //{
+            //    distanceData = new DistanceData
+            //    {
+            //        numberOfAddress = distanceFilter.numberOfAddress,
+            //        numberOfVoucher = distanceFilter.numberOfVoucher
+            //    },
+            //    results = result.ToList()
+            //};
 
-            var response = new DynamicDistanceResponseModel<GetDetailVoucherDTO>
-            {
-                distanceData = new DistanceData
-                {
-                    numberOfAddress = distanceFilter.numberOfAddress,
-                    numberOfVoucher = distanceFilter.numberOfVoucher
-                },
-                results = result.ToList()
-            };
+            //foreach (var voucher in response.results)
+            //{
+            //    voucher.image = voucher.medias.FirstOrDefault(x => x.index == 0)?.url;
+            //    voucher.originalPrice = voucher.modals.FirstOrDefault(x => x.index == 0)?.originalPrice;
+            //    voucher.sellPrice = voucher.modals.FirstOrDefault(x => x.index == 0)?.sellPrice;
+            //    voucher.quantity = voucher.modals.Sum(modal => modal.voucherCodes?.Count);
+            //}
 
-            foreach (var voucher in response.results)
-            {
-                voucher.image = voucher.medias.FirstOrDefault(x => x.index == 0)?.url;
-                voucher.originalPrice = voucher.modals.FirstOrDefault(x => x.index == 0)?.originalPrice;
-                voucher.sellPrice = voucher.modals.FirstOrDefault(x => x.index == 0)?.sellPrice;
-                voucher.quantity = voucher.modals.Sum(modal => modal.voucherCodes?.Count);
-            }
+            //return response;
 
-            return response;
+            return null;
         }
 
         public async Task<IList<GetVoucherDTO>> GetSalestVouchers(int numberOfVoucher)
         {
-            DateTime currenDate = DateTime.Now;
-            IList<GetVoucherDTO> vouchers = [];
+            //DateTime currenDate = DateTime.Now;
+            //IList<GetVoucherDTO> vouchers = [];
 
-            List<Promotion> promotions = _promotionRepository.GetTable()
-                                                                .Include(x => x.Vouchers)
-                                                                    .ThenInclude(v => v.Categories) // Include categories of the vouchers
-                                                                .Include(x => x.Vouchers)
-                                                                    .ThenInclude(v => v.Brand) // Include the brand of the vouchers
-                                                                .Include(x => x.Vouchers)
-                                                                    .ThenInclude(x => x.Medias)
-                                                                .Include(x => x.Vouchers)
-                                                                    .ThenInclude(x => x.Supplier)
-                                                                .Include(x => x.Vouchers)
-                                                                    .ThenInclude(x => x.Modals)
-                                                                .Where(x => x.StartDate <= currenDate && currenDate <= x.EndDate)
-                                                                .ToList();
-            if (promotions.Count != 0)
-            {
-                foreach (var promotion in promotions)
-                {
-                    if (promotion.Vouchers.Count != 0)
-                    {
-                        foreach (var voucher in promotion.Vouchers)
-                        {
-                            var existedVoucher = _mapper.Map<GetVoucherDTO>(voucher);
+            //List<Promotion> promotions = _promotionRepository.GetTable()
+            //                                                    .Include(x => x.Vouchers)
+            //                                                        .ThenInclude(v => v.Categories) // Include categories of the vouchers
+            //                                                    .Include(x => x.Vouchers)
+            //                                                        .ThenInclude(v => v.Brand) // Include the brand of the vouchers
+            //                                                    .Include(x => x.Vouchers)
+            //                                                        .ThenInclude(x => x.Medias)
+            //                                                    .Include(x => x.Vouchers)
+            //                                                        .ThenInclude(x => x.Supplier)
+            //                                                    .Include(x => x.Vouchers)
+            //                                                        .ThenInclude(x => x.Modals)
+            //                                                    .Where(x => x.StartDate <= currenDate && currenDate <= x.EndDate)
+            //                                                    .ToList();
+            //if (promotions.Count != 0)
+            //{
+            //    foreach (var promotion in promotions)
+            //    {
+            //        if (promotion.Vouchers.Count != 0)
+            //        {
+            //            foreach (var voucher in promotion.Vouchers)
+            //            {
+            //                var existedVoucher = _mapper.Map<GetVoucherDTO>(voucher);
 
-                            existedVoucher.sellPrice = existedVoucher.modals.FirstOrDefault(x => x.index == 0).sellPrice;
-                            existedVoucher.originalPrice = existedVoucher.modals.FirstOrDefault(x => x.index == 0).originalPrice;
-                            existedVoucher.salePrice = existedVoucher.originalPrice - (existedVoucher.originalPrice * promotion.PercentDiscount / 100);
-                            existedVoucher.percentDiscount = promotion.PercentDiscount;
-                            existedVoucher.image = voucher.Medias.Count != 0 ? voucher.Medias.FirstOrDefault(x => x.Index == 0).Url : null;
-                            vouchers.Add(existedVoucher);
-                        }
-                    }
-                }
-                return vouchers;
-            }
+            //                existedVoucher.sellPrice = existedVoucher.modals.FirstOrDefault(x => x.index == 0).sellPrice;
+            //                existedVoucher.originalPrice = existedVoucher.modals.FirstOrDefault(x => x.index == 0).originalPrice;
+            //                existedVoucher.salePrice = existedVoucher.originalPrice - (existedVoucher.originalPrice * promotion.PercentDiscount / 100);
+            //                existedVoucher.percentDiscount = promotion.PercentDiscount;
+            //                existedVoucher.image = voucher.Medias.Count != 0 ? voucher.Medias.FirstOrDefault(x => x.Index == 0).Url : null;
+            //                vouchers.Add(existedVoucher);
+            //            }
+            //        }
+            //    }
+            //    return vouchers;
+            //}
 
             return null;
         }
@@ -461,65 +442,67 @@ namespace Vouchee.Business.Services.Impls
                                                                                         VoucherFilter voucherFilter, 
                                                                                         IList<Guid>? categoryIds)
         {
-            var existedSeller = await _userRepository.FindAsync(sellerId, false);
+            //var existedSeller = await _userRepository.FindAsync(sellerId, false);
 
-            if (existedSeller == null)
-            {
-                throw new NotFoundException("Không tìm thấy seller này");
-            }
+            //if (existedSeller == null)
+            //{
+            //    throw new NotFoundException("Không tìm thấy seller này");
+            //}
 
-            (int, IQueryable<GetVoucherDTO>) result;
+            //(int, IQueryable<GetVoucherDTO>) result;
 
-            result = _voucherRepository.GetTable().Where(x =>
-                                                            (string.IsNullOrEmpty(voucherFilter.title) || x.Title.ToLower().Contains(voucherFilter.title.ToLower())) 
-                                                            && (categoryIds == null || !categoryIds.Any() || x.Categories.Any(c => categoryIds.Contains(c.Id)))
-                                                        )
-                                                    .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
-                                                    .DynamicFilter(_mapper.Map<GetVoucherDTO>(voucherFilter))
-                                                    .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+            //result = _voucherRepository.GetTable().Where(x =>
+            //                                                (string.IsNullOrEmpty(voucherFilter.title) || x.Title.ToLower().Contains(voucherFilter.title.ToLower())) 
+            //                                                && (categoryIds == null || !categoryIds.Any() || x.Categories.Any(c => categoryIds.Contains(c.Id)))
+            //                                            )
+            //                                        .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
+            //                                        .DynamicFilter(_mapper.Map<GetVoucherDTO>(voucherFilter))
+            //                                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
 
-            var response = new DynamicResponseModel<GetVoucherDTO>()
-            {
-                metaData = new MetaData()
-                {
-                    page = pagingRequest.page,
-                    size = pagingRequest.pageSize,
-                    total = result.Item1 // Total vouchers count for metadata
-                },
-                results = result.Item2.ToList()
-            };
+            //var response = new DynamicResponseModel<GetVoucherDTO>()
+            //{
+            //    metaData = new MetaData()
+            //    {
+            //        page = pagingRequest.page,
+            //        size = pagingRequest.pageSize,
+            //        total = result.Item1 // Total vouchers count for metadata
+            //    },
+            //    results = result.Item2.ToList()
+            //};
 
-            if (response.results != null && response.results.Count() != 0)
-            {
+            //if (response.results != null && response.results.Count() != 0)
+            //{
 
-                foreach (var voucher in response.results)
-                {
-                    voucher.originalPrice = voucher.modals.FirstOrDefault(x => x.index == 0).originalPrice;
-                    voucher.sellPrice = voucher.modals.FirstOrDefault(x => x.index == 0).sellPrice;
-                    voucher.image = voucher.modals.FirstOrDefault(x => x.index == 0).image;
+            //    foreach (var voucher in response.results)
+            //    {
+            //        voucher.originalPrice = voucher.modals.FirstOrDefault(x => x.index == 0).originalPrice;
+            //        voucher.sellPrice = voucher.modals.FirstOrDefault(x => x.index == 0).sellPrice;
+            //        voucher.image = voucher.modals.FirstOrDefault(x => x.index == 0).image;
 
-                    var currentDate = DateTime.Now;
-                    var promotions = _voucherRepository.GetByIdAsync(voucher.id, includeProperties: query => query.Include(x => x.Promotions)).Result.Promotions;
+            //        var currentDate = DateTime.Now;
+            //        var promotions = _voucherRepository.GetByIdAsync(voucher.id, includeProperties: query => query.Include(x => x.Promotions)).Result.Promotions;
 
-                    var availablePromotion = promotions.FirstOrDefault(promotion => promotion.StartDate <= currentDate && promotion.EndDate >= currentDate);
+            //        var availablePromotion = promotions.FirstOrDefault(promotion => promotion.StartDate <= currentDate && promotion.EndDate >= currentDate);
 
-                    if (availablePromotion != null)
-                    {
-                        voucher.salePrice = voucher.originalPrice - (voucher.originalPrice * availablePromotion.PercentDiscount / 100);
-                        voucher.percentDiscount = availablePromotion.PercentDiscount;
-                    }
+            //        if (availablePromotion != null)
+            //        {
+            //            voucher.salePrice = voucher.originalPrice - (voucher.originalPrice * availablePromotion.PercentDiscount / 100);
+            //            voucher.percentDiscount = availablePromotion.PercentDiscount;
+            //        }
 
-                    foreach (var modal in voucher.modals)
-                    {
-                        modal.quantity = modal.voucherCodes.Where(x => x.status == ObjectStatusEnum.ACTIVE.ToString()).Count();
-                    }
+            //        foreach (var modal in voucher.modals)
+            //        {
+            //            modal.quantity = modal.voucherCodes.Where(x => x.status == ObjectStatusEnum.ACTIVE.ToString()).Count();
+            //        }
 
-                    voucher.quantity = voucher.modals.Sum(x => x.quantity);
-                }
-            }
+            //        voucher.quantity = voucher.modals.Sum(x => x.quantity);
+            //    }
+            //}
 
-            return response;
+            //return response;
+
+            return null;
         }
 
         //public async Task<IList<GetDetailVoucherDTO>> GetNearestVouchers(decimal lon, decimal lat)

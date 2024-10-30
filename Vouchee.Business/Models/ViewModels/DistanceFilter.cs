@@ -8,8 +8,8 @@ namespace Vouchee.Business.Models.ViewModels
 {
     public class DistanceFilter
     {
-        public decimal lon { get; set; }
-        public decimal lat { get; set; }
+        public required decimal lon { get; set; }
+        public required decimal lat { get; set; }
         public int numberOfVoucher { get; set; } = 5;
         public int numberOfAddress { get; set; } = 10;
     }

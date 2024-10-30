@@ -51,11 +51,12 @@ namespace Vouchee.Data.Models.DTOs
         public string? title { get; set; }
         public decimal? originalPrice { get; set; }
         public decimal? sellPrice { get; set; }
-        public int? quantity { get; set; }
         public string? image { get; set; }
         public int? index { get; set; }
         public DateOnly? startDate { get; set; }
         public DateOnly? endDate { get; set; }
+
+        public int? stock => voucherCodes?.Count(vc => vc.status == VoucherCodeStatusEnum.ACTIVE.ToString()) ?? 0;
 
         public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
     }
