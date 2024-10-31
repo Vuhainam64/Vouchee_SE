@@ -53,7 +53,13 @@ namespace Vouchee.API.Controllers
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
             var result = await _cartService.GetCartsAsync(currentUser);
-            return Ok(result);
+
+            if (result != null)
+            {
+                return Ok(result);
+            }
+
+            return Ok("Giỏ hàng đang trống");
         }
 
         // UPDATE

@@ -23,6 +23,7 @@ namespace Vouchee.Business.Services.Impls
     {
         private readonly ICartService _cartService;
 
+        private readonly IModalRepository _modalRepository;
         private readonly IUserRepository _userRepository;
         private readonly IVoucherCodeRepository _voucherCodeRepository;
         private readonly IOrderDetailRepository _orderDetailRepository;
@@ -30,7 +31,8 @@ namespace Vouchee.Business.Services.Impls
         private readonly IOrderRepository _orderRepository;
         private readonly IMapper _mapper;
 
-        public OrderService(IUserRepository userRepository,
+        public OrderService(IModalRepository modalRepository,
+                                IUserRepository userRepository,
                                 ICartService cartService,
                                 IVoucherRepository voucherRepository,
                                 IOrderRepository orderRepository,
@@ -38,6 +40,7 @@ namespace Vouchee.Business.Services.Impls
                                 IVoucherCodeRepository voucherCodeRepository,
                                 IMapper mapper)
         {
+            _modalRepository = modalRepository;
             _userRepository = userRepository;
             _cartService = cartService;
             _voucherCodeRepository = voucherCodeRepository;
@@ -118,13 +121,37 @@ namespace Vouchee.Business.Services.Impls
                         UnitPrice = (decimal)modal.sellPrice,
                         Status = OrderStatusEnum.PENDING.ToString(),
                         CreateDate = DateTime.Now,
-                        CreateBy = thisUserObj.userId
+                        CreateBy = thisUserObj.userId,
                     });
+
+                    var existedModal = await _modalRepository.FindAsync(modal.id.Value, false);
+                    if (existedModal != null && existedModal.Stock >= modal.quantity)
+                    {
+                        existedModal.Stock -= modal.quantity;
+                        await _modalRepository.UpdateAsync(existedModal);
+                    }
+                }
+
+                var groupedModals = seller.modals.GroupBy(x => x.voucherId);
+
+                foreach (var modals in groupedModals)
+                {
+                    var voucherId = modals.Key;
+                    var voucherModals = await _modalRepository.GetWhereAsync(x => x.VoucherId == voucherId);
+
+                    bool isOutOfStock = voucherModals.All(m => m.Stock <= 0);
+
+                    var existedVoucher = await _voucherRepository.FindAsync((Guid)voucherId, false);
+                    if (existedVoucher != null)
+                    {
+                        existedVoucher.Status = isOutOfStock ? VoucherStatusEnum.OUT_OF_STOCK.ToString() : VoucherStatusEnum.SELLING.ToString();
+                        existedVoucher.Stock = voucherModals.Sum(x => x.Stock);
+                        await _voucherRepository.UpdateAsync(existedVoucher);
+                    }
                 }
             }
 
             order.TotalPrice = order.OrderDetails.Sum(x => x.TotalPrice);
-            order.DiscountValue = 0;
 
             Guid? orderId = await _orderRepository.AddAsync(order);
 
