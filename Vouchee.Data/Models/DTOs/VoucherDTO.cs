@@ -84,14 +84,15 @@ namespace Vouchee.Business.Models.DTOs
         public string? description { get; set; }
         public decimal? rating { get; set; }
         public string? video { get; set; }
+        public int stock { get; set; }
         public DateTime? createDate { get; set; }
+        public Guid? sellerId { get; set; }
 
+        public Guid? promotionId { get; set; }
         public decimal? percentDiscount { get; set; }
         public decimal? originalPrice => modals.FirstOrDefault(m => m.index == 0)?.originalPrice;
         public decimal? sellPrice => modals.FirstOrDefault(m => m.index == 0)?.sellPrice;
         public decimal? salePrice => sellPrice.HasValue && percentDiscount.HasValue ? sellPrice * (1 - percentDiscount / 100) : null;
-
-        public int? stock => modals?.Sum(m => m.voucherCodes?.Count) ?? 0;
 
         public string? image => modals.FirstOrDefault(m => m.index == 0)?.image;
 

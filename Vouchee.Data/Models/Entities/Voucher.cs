@@ -57,6 +57,7 @@ namespace Vouchee.Data.Models.Entities
         [Column(TypeName = "decimal(10,5)")]
         public decimal Rating { get; set; }
         public string? Video { get; set; }
+        public int Stock { get; set; }
 
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]

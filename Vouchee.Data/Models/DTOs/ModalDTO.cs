@@ -40,10 +40,10 @@ namespace Vouchee.Data.Models.DTOs
 
     public class GetModalDTO
     {
-        public GetModalDTO()
-        {
-            voucherCodes = [];
-        }
+        //public GetModalDTO()
+        //{
+        //    voucherCodes = [];
+        //}
 
         public Guid? id { get; set; }
         public Guid? voucherId { get; set; }
@@ -55,10 +55,9 @@ namespace Vouchee.Data.Models.DTOs
         public int? index { get; set; }
         public DateOnly? startDate { get; set; }
         public DateOnly? endDate { get; set; }
+        public int? stock { get; set; }
 
-        public int? stock => voucherCodes?.Count(vc => vc.status == VoucherCodeStatusEnum.ACTIVE.ToString()) ?? 0;
-
-        public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
+        // public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
     }
 
     public class GetDetailModalDTO : GetModalDTO

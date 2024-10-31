@@ -21,6 +21,7 @@ namespace Vouchee.API.AppStarts
                 .ForMember(x => x.brandName, dest => dest.MapFrom(opt => opt.Brand.Name))
                 .ForMember(x => x.brandImage, dest => dest.MapFrom(opt => opt.Brand.Image))
                 .ForMember(x => x.percentDiscount, dest => dest.MapFrom(opt => opt.Promotions.First().PercentDiscount))
+                .ForMember(x => x.promotionId, dest => dest.MapFrom(opt => opt.Promotions.First().Id))
                 .ReverseMap();
 
             CreateMap<Voucher, GetDetailVoucherDTO>()
@@ -31,18 +32,21 @@ namespace Vouchee.API.AppStarts
                 .ForMember(x => x.brandName, dest => dest.MapFrom(opt => opt.Brand.Name))
                 .ForMember(x => x.brandImage, dest => dest.MapFrom(opt => opt.Brand.Image))
                 .ForMember(x => x.percentDiscount, dest => dest.MapFrom(opt => opt.Promotions.First().PercentDiscount))
+                .ForMember(x => x.promotionId, dest => dest.MapFrom(opt => opt.Promotions.First().Id))
                 .ReverseMap();
 
             CreateMap<Voucher, GetBestSoldVoucherDTO>()
                 .ForMember(x => x.brandName, dest => dest.MapFrom(opt => opt.Brand.Name))
                 .ForMember(x => x.brandImage, dest => dest.MapFrom(opt => opt.Brand.Image))
                 .ForMember(x => x.percentDiscount, dest => dest.MapFrom(opt => opt.Promotions.First().PercentDiscount))
+                .ForMember(x => x.promotionId, dest => dest.MapFrom(opt => opt.Promotions.First().Id))
                 .ReverseMap();
             
             CreateMap<Voucher, CartVoucherDTO>()
                 .ForMember(x => x.brandName, dest => dest.MapFrom(opt => opt.Brand.Name))
                 .ForMember(x => x.brandImage, dest => dest.MapFrom(opt => opt.Brand.Image))
                 .ForMember(x => x.percentDiscount, dest => dest.MapFrom(opt => opt.Promotions.First().PercentDiscount))
+                .ForMember(x => x.promotionId, dest => dest.MapFrom(opt => opt.Promotions.First().Id))
                 .ReverseMap();
 
             CreateMap<VoucherDTO, VoucherFilter>().ReverseMap();

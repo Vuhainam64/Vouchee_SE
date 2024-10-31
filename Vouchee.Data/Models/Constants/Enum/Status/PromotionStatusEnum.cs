@@ -10,6 +10,7 @@ namespace Vouchee.Data.Models.Constants.Enum.Status
     {
         INACTIVE,
         ACTIVE,
-        OUT_OF_STOCK
+        OUT_OF_STOCK,
+        EXPIRED
     }
 }

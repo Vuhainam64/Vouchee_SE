@@ -159,32 +159,19 @@ namespace Vouchee.Business.Services.Impls
         {
             DateTime currentDate = DateTime.Now;
 
-            // Fetch data from the repository
-            var result = await  _voucherRepository.GetTable()
-                                .Include(x => x.Medias)
+            var result = _voucherRepository.GetTable()
                                 .Include(x => x.Categories)
                                 .Include(x => x.Brand)
-                                .Include(x => x.Promotions.Where(p => p.StartDate <= currentDate && currentDate <= p.EndDate))
-                                .Include(x => x.Modals)
-                                    .ThenInclude(m => m.VoucherCodes.Where(vc => vc.Status == "ACTIVE"))
+                                .Include(x => x.Medias.Where(x => x.Index == 0))
+                                .Include(x => x.Modals.Where(x => x.Index == 0))
+                                .Include(x => x.Promotions.Where(x => x.Status != PromotionStatusEnum.EXPIRED.ToString() 
+                                                                        && x.Status != PromotionStatusEnum.OUT_OF_STOCK.ToString())
+                                .Where(x => x.st > 0)
                                 .OrderByDescending(v => v.CreateDate)
-                                .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider).ToListAsync();
+                                .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider);
 
-            //var result = _voucherRepository.GetTable()
-            //        .Include(x => x.Medias)
-            //        .Include(x => x.Categories)
-            //        .Include(x => x.Brand)
-            //        .Include(x => x.Promotions.Where(p => p.StartDate <= currentDate && currentDate <= p.EndDate))
-            //        .Include(x => x.Modals)
-            //            .ThenInclude(m => m.VoucherCodes.Where(vc => vc.Status == "ACTIVE"))
-            //        .OrderByDescending(v => v.CreateDate)
-            //        .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
-            //        .Where(x => x.stock > 0);
-            // chỗ này sai khi query stock trực tiếp dưới db
-
-            return result.Where(x => x.stock > 0).ToList();
+            return await result.ToListAsync();
         }
-
 
         public async Task<IList<GetBestSoldVoucherDTO>> GetTopSaleVouchers(int numberOfVoucher)
         {
