@@ -44,48 +44,41 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<CartDTO> GetCartsAsync(ThisUserObj thisUserObj)
         {
-            //_currentUser = _userRepository.CheckLocal().First(x => x.Id == thisUserObj.userId);
+            _currentUser = _userRepository.CheckLocal().First(x => x.Id == thisUserObj.userId);
 
-            //CartDTO cartDTO = new();
+            CartDTO cartDTO = new();
 
-            //foreach (var cartItem in _currentUser.Carts)
-            //{
-            //    var currentModal = cartItem.Modal;
+            foreach (var cartItem in _currentUser.Carts)
+            {
+                var currentModal = cartItem.Modal;
 
-            //    if (currentModal != null)
-            //    {
-            //        var sellerCart = cartDTO.sellers.FirstOrDefault(s => s.id == currentModal.Voucher.SellerID);
-            //        if (sellerCart == null)
-            //        {
-            //            sellerCart = new SellerCartDTO
-            //            {
-            //                id = currentModal?.Voucher.SellerID,
-            //                name = currentModal?.Voucher.Seller.Name,
-            //                image = currentModal.Voucher.Seller.Image,
-            //                modals = new List<CartVoucherDTO>()
-            //            };
-            //            cartDTO.sellers.Add(sellerCart);
-            //        }
+                if (currentModal != null)
+                {
+                    var sellerCart = cartDTO.sellers.FirstOrDefault(s => s.id == currentModal.Voucher.SellerID);
+                    if (sellerCart == null)
+                    {
+                        sellerCart = new SellerCartDTO
+                        {
+                            id = currentModal?.Voucher.SellerID,
+                            name = currentModal?.Voucher.Seller.Name,
+                            image = currentModal.Voucher.Seller.Image,
+                            modals = new List<CartModalDTO>()
+                        };
+                        cartDTO.sellers.Add(sellerCart);
+                    }
 
-            //        sellerCart.modals.Add(new CartVoucherDTO
-            //        {
-            //            id = cartItem.Modal?.Id,
-            //            originalPrice = cartItem.Modal?.OriginalPrice,
-            //            sellPrice = cartItem.Modal?.SellPrice,
-            //            title = cartItem.Modal?.Title,
-            //            quantity = cartItem.Quantity,
-            //            image = cartItem.Modal?.Image
-            //        });
-            //    }
-            //}
+                    sellerCart.modals.Add(new CartModalDTO
+                    {
+                        quantity = cartItem.Quantity,
+                    });
+                }
+            }
 
-            //cartDTO.totalQuantity = cartDTO.sellers.Sum(s => s.modals.Sum(m => m.quantity));
-            //cartDTO.totalPrice = (decimal) cartDTO.sellers.Sum(s => s.modals.Sum(m => m.sellPrice * m.quantity));
-            //cartDTO.discountPrice = (decimal) cartDTO.sellers.Sum(s => s.modals.Sum(m => (m.originalPrice * m.quantity) * m.percentDiscount));
+            cartDTO.totalQuantity = cartDTO.sellers.Sum(s => s.modals.Sum(m => m.quantity));
+            cartDTO.totalPrice = cartDTO.sellers.Sum(s => s.modals.Sum(m => m.sellPrice * m.quantity)).Value;
+            cartDTO.discountPrice = cartDTO.sellers.Sum(s => s.modals.Sum(m => (m.originalPrice * m.quantity) * m.percentDiscount)).Value;
 
-            //return cartDTO;
-
-            return null;
+            return cartDTO;
         }
 
         public async Task<bool> AddItemAsync(Guid modalId, ThisUserObj thisUserObj)

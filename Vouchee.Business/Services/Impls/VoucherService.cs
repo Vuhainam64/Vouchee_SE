@@ -183,16 +183,16 @@ namespace Vouchee.Business.Services.Impls
         public async Task<dynamic> GetVoucherByIdAsync(Guid id, PagingRequest pagingRequest)
         {
             var voucher = _mapper.Map<GetDetailVoucherDTO>(await _voucherRepository.GetByIdAsync(id,
-                                    query => query.Include(x => x.Brand)
-                                                        .ThenInclude(x => x.Addresses)
-                                                    .Include(x => x.Supplier)
-                                                    .Include(x => x.Categories)
-                                                        .ThenInclude(x => x.VoucherType)
-                                                    .Include(x => x.Seller)
-                                                    .Include(x => x.Modals)
-                                                        .ThenInclude(x => x.VoucherCodes)
-                                                    .Include(x => x.Medias)
-                                                    .Include(x => x.Promotions)));
+                                                                query => query.Include(x => x.Brand)
+                                                                                    .ThenInclude(x => x.Addresses)
+                                                                                .Include(x => x.Supplier)
+                                                                                .Include(x => x.Categories)
+                                                                                    .ThenInclude(x => x.VoucherType)
+                                                                                .Include(x => x.Seller)
+                                                                                .Include(x => x.Modals)
+                                                                                    .ThenInclude(x => x.VoucherCodes)
+                                                                                .Include(x => x.Medias)
+                                                                                .Include(x => x.Promotions)));
 
             if (voucher != null)
             {

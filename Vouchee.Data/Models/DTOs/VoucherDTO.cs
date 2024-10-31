@@ -75,9 +75,6 @@ namespace Vouchee.Business.Models.DTOs
         public VoucherDTO()
         {
             categories = [];
-            modals = [];
-            medias = [];
-            promotions = [];
         }
 
         public Guid? id { get; set; }
@@ -89,22 +86,18 @@ namespace Vouchee.Business.Models.DTOs
         public DateTime? createDate { get; set; }
         public Guid? sellerId { get; set; }
 
-        public Guid? promotionId { get; set; }
         public decimal? percentDiscount { get; set; }
-        public decimal? originalPrice => modals.FirstOrDefault(m => m.index == 0)?.originalPrice;
-        public decimal? sellPrice => modals.FirstOrDefault(m => m.index == 0)?.sellPrice;
-        public decimal? salePrice => sellPrice.HasValue && percentDiscount.HasValue ? sellPrice * (1 - percentDiscount / 100) : null;
+        public decimal? originalPrice { get; set; }
+        public decimal? sellPrice { get; set; }
+        public decimal? salePrice => sellPrice - (sellPrice * (percentDiscount / 100));
 
-        public string? image => modals.FirstOrDefault(m => m.index == 0)?.image;
+        public string? image { get; set; }
 
         public Guid? brandId { get; set; }
         public string? brandName { get; set; }
         public string? brandImage { get; set; }
 
-        public virtual ICollection<GetPromotionDTO> promotions { get; set; }
-        public virtual ICollection<GetMediaDTO> medias { get; set; }
         public virtual ICollection<GetCategoryDTO> categories { get; set; }
-        public virtual ICollection<GetModalDTO> modals { get; set; }
     }
 
     public class GetVoucherDTO : VoucherDTO
@@ -142,11 +135,5 @@ namespace Vouchee.Business.Models.DTOs
     public class GetBestSoldVoucherDTO : VoucherDTO
     {
         public int? totalQuantitySold { get; set; }
-    }
-
-
-    public class CartVoucherDTO : VoucherDTO
-    {
-        public int quantity { get; set; }
     }
 }

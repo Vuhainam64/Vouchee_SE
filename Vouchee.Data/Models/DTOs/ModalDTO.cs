@@ -40,24 +40,19 @@ namespace Vouchee.Data.Models.DTOs
 
     public class GetModalDTO
     {
-        //public GetModalDTO()
-        //{
-        //    voucherCodes = [];
-        //}
-
         public Guid? id { get; set; }
         public Guid? voucherId { get; set; }
 
         public string? title { get; set; }
         public decimal? originalPrice { get; set; }
         public decimal? sellPrice { get; set; }
+        public decimal? salePrice { get; set; }
+        public decimal? percentDiscount { get; set; }
         public string? image { get; set; }
         public int? index { get; set; }
         public DateOnly? startDate { get; set; }
         public DateOnly? endDate { get; set; }
         public int? stock { get; set; }
-
-        // public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
     }
 
     public class GetDetailModalDTO : GetModalDTO
@@ -68,5 +63,15 @@ namespace Vouchee.Data.Models.DTOs
         }
 
         public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
+    }
+
+    public class CartModalDTO : GetModalDTO
+    {
+        public Guid? sellerId { get; set; }
+        public Guid? sellerName { get; set; }
+        public string? sellerImage { get; set; }
+        public int quantity { get; set; }
+        public Guid? promotionId { get; set; }
+        public GetPromotionDTO? promotion { get; set; }
     }
 }

@@ -157,7 +157,23 @@ namespace Vouchee.Data.Helpers
                     query = includeProperties(query);
                 }
 
-                return await query.FirstOrDefaultAsync(e => EF.Property<object>(e, "Id").Equals(id));
+                // Check if the entity is already tracked in the context
+                var entity = await query.AsTracking().FirstOrDefaultAsync(e => EF.Property<object>(e, "Id").Equals(id));
+
+                if (entity != null)
+                {
+                    // Check if the entity has been modified in the database
+                    var entry = _context.Entry(entity);
+                    if (entry.State == EntityState.Detached)
+                    {
+                        // Reload the entity if it's detached or modified
+                        await _context.Entry(entity).ReloadAsync();
+                    }
+                    return entity;
+                }
+
+                // If the entity does not exist, return null
+                return null;
             }
             catch (Exception ex)
             {
