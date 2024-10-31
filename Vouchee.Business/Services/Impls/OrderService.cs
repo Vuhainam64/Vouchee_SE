@@ -107,21 +107,21 @@ namespace Vouchee.Business.Services.Impls
                 OrderDetails = new List<OrderDetail>() // Assuming OrderDetails is a collection
             };
 
-            //foreach (var seller in cartDTO.sellers)
-            //{
-            //    foreach (var modal in seller.modals)
-            //    {
-            //        order.OrderDetails.Add(new OrderDetail
-            //        {
-            //            ModalId = modal.id,
-            //            Quantity = modal.quantity,
-            //            UnitPrice = (decimal) modal.sellPrice,
-            //            Status = OrderStatusEnum.PENDING.ToString(),
-            //            CreateDate = DateTime.Now,
-            //            CreateBy = thisUserObj.userId
-            //        });
-            //    }
-            //}
+            foreach (var seller in cartDTO.sellers)
+            {
+                foreach (var modal in seller.modals)
+                {
+                    order.OrderDetails.Add(new OrderDetail
+                    {
+                        ModalId = modal.id,
+                        Quantity = modal.quantity,
+                        UnitPrice = (decimal)modal.sellPrice,
+                        Status = OrderStatusEnum.PENDING.ToString(),
+                        CreateDate = DateTime.Now,
+                        CreateBy = thisUserObj.userId
+                    });
+                }
+            }
 
             order.TotalPrice = order.OrderDetails.Sum(x => x.TotalPrice);
             order.DiscountValue = 0;

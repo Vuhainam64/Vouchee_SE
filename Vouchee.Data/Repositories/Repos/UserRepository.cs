@@ -23,15 +23,18 @@ namespace Vouchee.Data.Repositories.Repos
         {
             try
             {
-                User user = await _userDAO.GetFirstOrDefaultAsync(
-                    filter: x => x.Email.ToLower().Equals(email.ToLower()),
-                    includeProperties: query => query
-                        .Include(x => x.Role)
-                        .Include(x => x.Carts)
-                            .ThenInclude(cart => cart.Modal) 
-                        .Include(x => x.Carts)
-                            .ThenInclude(cart => cart.Modal) 
-                                .ThenInclude(voucher => voucher.Voucher.Seller)
+                User? user = await _userDAO.GetFirstOrDefaultAsync(
+                                filter: x => x.Email.ToLower().Equals(email.ToLower()),
+                                includeProperties: query => query
+                                    .Include(x => x.Role)
+                                    .Include(x => x.Carts)
+                                        .ThenInclude(cart => cart.Modal) 
+                                    .Include(x => x.Carts)
+                                        .ThenInclude(cart => cart.Modal) 
+                                            .ThenInclude(voucher => voucher.Voucher.Seller)
+                                    .Include(x => x.Carts)
+                                        .ThenInclude(cart => cart.Modal)
+                                            .ThenInclude(voucher => voucher.Voucher.Promotions)
                 );
                 if (user != null)
                 {

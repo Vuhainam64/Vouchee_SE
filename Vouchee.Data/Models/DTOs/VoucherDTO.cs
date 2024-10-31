@@ -44,6 +44,7 @@ namespace Vouchee.Business.Models.DTOs
         public string? video { get; set; }
 
         public DateTime? createDate = DateTime.Now;
+        public int stock = 0;
         public VoucherStatusEnum status { get; set; }
 
         public virtual ICollection<CreateModalDTO> modals { get; set; }

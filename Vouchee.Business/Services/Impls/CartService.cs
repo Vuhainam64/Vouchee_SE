@@ -46,39 +46,35 @@ namespace Vouchee.Business.Services.Impls
         {
             _currentUser = _userRepository.CheckLocal().First(x => x.Id == thisUserObj.userId);
 
-            CartDTO cartDTO = new();
-
-            foreach (var cartItem in _currentUser.Carts)
+            if (_currentUser.Carts.Count() != 0)
             {
-                var currentModal = cartItem.Modal;
+                CartDTO cartDTO = new();
 
-                if (currentModal != null)
+                var groupedCarts = _currentUser.Carts.GroupBy(cartItem => cartItem.Modal.Voucher.Seller?.Id).ToList();
+                foreach (var carts in groupedCarts)
                 {
-                    var sellerCart = cartDTO.sellers.FirstOrDefault(s => s.id == currentModal.Voucher.SellerID);
-                    if (sellerCart == null)
+                    SellerCartDTO sellerCartDTO = new();
+                    sellerCartDTO.sellerId = carts.Key;
+                    sellerCartDTO.sellerName = carts.First(x => x.Modal.Voucher.SellerID == carts.Key).Modal.Voucher.Seller.Name;
+                    sellerCartDTO.sellerImage = carts.First(x => x.Modal.Voucher.SellerID == carts.Key).Modal.Voucher.Seller.Image;
+
+                    foreach (var cart in _currentUser.Carts)
                     {
-                        sellerCart = new SellerCartDTO
-                        {
-                            id = currentModal?.Voucher.SellerID,
-                            name = currentModal?.Voucher.Seller.Name,
-                            image = currentModal.Voucher.Seller.Image,
-                            modals = new List<CartModalDTO>()
-                        };
-                        cartDTO.sellers.Add(sellerCart);
+                        sellerCartDTO.modals.Add(_mapper.Map<CartModalDTO>(cart.Modal));
+                        sellerCartDTO.modals.FirstOrDefault(x => x.id == cart.ModalId).quantity = cart.Quantity;
                     }
 
-                    sellerCart.modals.Add(new CartModalDTO
-                    {
-                        quantity = cartItem.Quantity,
-                    });
+                    cartDTO.sellers.Add(sellerCartDTO);
+
+                    cartDTO.totalQuantity = cartDTO.sellers.Sum(x => x.modals.Sum(x => x.quantity));
+                    cartDTO.totalPrice = (decimal) cartDTO.sellers.Sum(s => s.modals.Sum(x => x.originalPrice));
+                    cartDTO.discountPrice = (decimal) cartDTO.sellers.Sum(s => s.modals.Sum(x => x.salePrice));
                 }
+
+                return cartDTO;
             }
 
-            cartDTO.totalQuantity = cartDTO.sellers.Sum(s => s.modals.Sum(m => m.quantity));
-            cartDTO.totalPrice = cartDTO.sellers.Sum(s => s.modals.Sum(m => m.sellPrice * m.quantity)).Value;
-            cartDTO.discountPrice = cartDTO.sellers.Sum(s => s.modals.Sum(m => (m.originalPrice * m.quantity) * m.percentDiscount)).Value;
-
-            return cartDTO;
+            return null;
         }
 
         public async Task<bool> AddItemAsync(Guid modalId, ThisUserObj thisUserObj)

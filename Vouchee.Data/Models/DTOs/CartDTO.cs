@@ -53,9 +53,9 @@ namespace Vouchee.Data.Models.DTOs
             modals = [];
         }
 
-        public Guid? id { get; set; }
-        public string? name { get; set; }
-        public string? image { get; set; }
+        public Guid? sellerId { get; set; }
+        public string? sellerName { get; set; }
+        public string? sellerImage { get; set; }
 
         public virtual ICollection<CartModalDTO> modals { get; set; }
     }
