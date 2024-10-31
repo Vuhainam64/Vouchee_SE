@@ -77,6 +77,7 @@ namespace Vouchee.Business.Models.DTOs
             categories = [];
             modals = [];
             medias = [];
+            promotions = [];
         }
 
         public Guid? id { get; set; }
@@ -100,6 +101,7 @@ namespace Vouchee.Business.Models.DTOs
         public string? brandName { get; set; }
         public string? brandImage { get; set; }
 
+        public virtual ICollection<GetPromotionDTO> promotions { get; set; }
         public virtual ICollection<GetMediaDTO> medias { get; set; }
         public virtual ICollection<GetCategoryDTO> categories { get; set; }
         public virtual ICollection<GetModalDTO> modals { get; set; }
@@ -110,31 +112,38 @@ namespace Vouchee.Business.Models.DTOs
 
     }
 
-    public class GetAddressVoucherDTO : VoucherDTO
+    public class GetNearestVoucherDTO : VoucherDTO
     {
-        public GetAddressVoucherDTO()
+        public GetNearestVoucherDTO()
         {
             addresses = [];
         }
 
-        public virtual IEnumerable<GetAddressDTO> addresses { get; set; }
+        public virtual IEnumerable<GetDistanceAddressDTO> addresses { get; set; }
     }
 
     public class GetDetailVoucherDTO : VoucherDTO
     {
-        public Guid? sellerId { get; set; }
+        public GetDetailVoucherDTO()
+        {
+            addresses = [];
+        }
+
         public string? sellerName { get; set; }
         public string? sellerImage { get; set; }
 
         public Guid? supplierId { get; set; }
         public string? supplierName { get; set; }
         public string? supplierImage { get; set; }
+
+        public virtual IEnumerable<GetAddressDTO> addresses { get; set; }
     }
 
     public class GetBestSoldVoucherDTO : VoucherDTO
     {
         public int? totalQuantitySold { get; set; }
     }
+
 
     public class CartVoucherDTO : VoucherDTO
     {

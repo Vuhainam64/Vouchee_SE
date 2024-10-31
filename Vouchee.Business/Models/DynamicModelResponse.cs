@@ -12,22 +12,10 @@ namespace Vouchee.Business.Models
         public List<T>? results { get; set; }
     }
 
-    public class DynamicDistanceResponseModel<T>
-    {
-        public DistanceData? distanceData { get; set; }
-        public List<T>? results { get; set; }
-    }
-
     public class MetaData
     {
         public int page { get; set; }
         public int size { get; set; }
         public int total { get; set; }
-    }
-
-    public class DistanceData
-    {
-        public int numberOfVoucher { get; set; }
-        public int numberOfAddress { get; set; }
     }
 }

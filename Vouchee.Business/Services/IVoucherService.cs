@@ -13,11 +13,12 @@ namespace Vouchee.Business.Services
         public Task<ResponseMessage<dynamic>> CreateVoucherAsync(CreateVoucherDTO createVoucherDTO, ThisUserObj thisUserObj);
 
         // READ
-        public Task<GetVoucherDTO> GetVoucherByIdAsync(Guid id);
+        public Task<dynamic> GetVoucherByIdAsync(Guid id, PagingRequest pagingRequest);
         public Task<DynamicResponseModel<GetVoucherDTO>> GetVoucherAsync(PagingRequest pagingRequest,
                                                                             VoucherFilter voucherFilter,
                                                                             IList<Guid>? categoryIds);
-        public Task<DynamicDistanceResponseModel<GetVoucherDTO>> GetDetailVouchersAsync(DistanceFilter distanceFilter,
+        public Task<DynamicResponseModel<GetNearestVoucherDTO>> GetNearestVouchersAsync(PagingRequest pagingRequest,
+                                                                                            DistanceFilter distanceFilter,
                                                                                             VoucherFilter voucherFiler,
                                                                                             IList<Guid>? categoryIds);
         public Task<IList<GetVoucherDTO>> GetNewestVouchers(int numberOfVoucher);

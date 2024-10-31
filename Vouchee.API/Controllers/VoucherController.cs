@@ -68,11 +68,12 @@ namespace Vouchee.API.Controllers
         }
 
         [HttpGet("get_nearest_vouchers")]
-        public async Task<IActionResult> GetNearestVouchers([FromQuery] DistanceFilter distanceFilter,
+        public async Task<IActionResult> GetNearestVouchers([FromQuery] PagingRequest pagingRequest,
+                                                                [FromQuery] DistanceFilter distanceFilter,
                                                                 [FromQuery] VoucherFilter voucherFilter,
                                                                 [FromQuery] IList<Guid>? categoryIds)
         {
-            var result = await _voucherService.GetDetailVouchersAsync(distanceFilter, voucherFilter, categoryIds);
+            var result = await _voucherService.GetNearestVouchersAsync(pagingRequest, distanceFilter, voucherFilter, categoryIds);
             return Ok(result);
         }
 
@@ -85,14 +86,14 @@ namespace Vouchee.API.Controllers
 
         // GET BY ID
         [HttpGet("get_voucher/{id}")]
-        public async Task<IActionResult> GetVoucherById(Guid id)
+        public async Task<IActionResult> GetVoucherById(Guid id, [FromQuery] PagingRequest pagingRequest)
         {
-            var voucher = await _voucherService.GetVoucherByIdAsync(id);
+            var voucher = await _voucherService.GetVoucherByIdAsync(id, pagingRequest);
             return Ok(voucher);
         }
 
         [HttpGet("get_voucher_by_seller_id/{sellerId}")]
-        public async Task<IActionResult> GetVoucherById([FromQuery] Guid sellerId, 
+        public async Task<IActionResult> GetVoucherById(Guid sellerId, 
                                                             [FromQuery] PagingRequest pagingRequest,
                                                             [FromQuery] VoucherFilter voucherFilter,
                                                             [FromQuery] IList<Guid>? categoryIds)

@@ -10,7 +10,6 @@ namespace Vouchee.Business.Models.ViewModels
     {
         public required decimal lon { get; set; }
         public required decimal lat { get; set; }
-        public int numberOfVoucher { get; set; } = 5;
-        public int numberOfAddress { get; set; } = 10;
+        public int numberOfAddress { get; set; }
     }
 }

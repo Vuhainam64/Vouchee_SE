@@ -23,7 +23,7 @@ namespace Vouchee.Data.Helpers.Base
                                     Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null);
         Task<IEnumerable<TEntity>?> GetWhereAsync(Expression<Func<TEntity, bool>> filter,
                                     Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null);
-        IQueryable<TEntity> GetTable(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null);
+        IQueryable<TEntity> GetTable();
         void Attach(TEntity entity);
         void Detach(TEntity entity);
         public IQueryable<TEntity> CheckLocal();

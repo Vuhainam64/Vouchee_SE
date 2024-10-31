@@ -181,17 +181,11 @@ namespace Vouchee.Data.Helpers
             }
         }
 
-        public IQueryable<TEntity> GetTable(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null)
+        public IQueryable<TEntity> GetTable()
         {
             try
             {
                 IQueryable<TEntity> query = Table;
-
-                if (includeProperties != null)
-                {
-                    query = includeProperties(query);
-                }
-
                 return query;
             }
             catch (Exception ex)
