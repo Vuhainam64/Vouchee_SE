@@ -12,17 +12,17 @@ namespace Vouchee.Business.Services
     public interface ICartService
     {
         // CREATE
-        public Task<bool> AddItemAsync(Guid modalId, ThisUserObj thisUserObj);
+        public Task<CartDTO> AddItemAsync(Guid modalId, ThisUserObj thisUserObj);
 
         // READ
         public Task<CartDTO> GetCartsAsync(ThisUserObj thisUserObj);
 
         // UPDATE
-        public Task<bool> IncreaseQuantityAsync(Guid modalId, ThisUserObj thisUserObj);
-        public Task<bool> DecreaseQuantityAsync(Guid modalId, ThisUserObj thisUserObj);
-        public Task<bool> UpdateQuantityAsync(Guid modalId, int quantity, ThisUserObj thisUserObj);
+        public Task<CartDTO> IncreaseQuantityAsync(Guid modalId, ThisUserObj thisUserObj);
+        public Task<CartDTO> DecreaseQuantityAsync(Guid modalId, ThisUserObj thisUserObj);
+        public Task<CartDTO> UpdateQuantityAsync(Guid modalId, int quantity, ThisUserObj thisUserObj);
 
         // DELETE
-        public Task<bool> RemoveItemAsync(Guid modalId, ThisUserObj thisUserObj);
+        public Task<CartDTO> RemoveItemAsync(Guid modalId, ThisUserObj thisUserObj);
     }
 }

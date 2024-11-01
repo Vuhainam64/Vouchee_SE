@@ -14,18 +14,21 @@ namespace Vouchee.Data.Helpers.Base
     {
         Task<Guid?> AddAsync(TEntity entity);
         Task<TEntity> Add(TEntity entity);
-        Task<bool> UpdateAsync(TEntity entity);
+        Task<bool> UpdateAsync(TEntity entity, bool isTracking = false);
         Task<bool> DeleteAsync(TEntity entity);
-        Task<TEntity> FindAsync(Guid id, bool trackChanges);
+        Task<TEntity> FindAsync(Guid id, bool isTracking = false);
         Task<TEntity?> GetByIdAsync(object id,
-                                    Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> includeProperties = null);
+                                    Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> includeProperties = null,
+                                    bool isTracking = false);
         Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> filter,
-                                    Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null);
+                                    Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null,
+                                    bool isTracking = false);
         Task<IEnumerable<TEntity>?> GetWhereAsync(Expression<Func<TEntity, bool>> filter,
-                                    Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null);
+                                    Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null,
+                                    bool isTracking = false);
         IQueryable<TEntity> GetTable();
-        void Attach(TEntity entity);
-        void Detach(TEntity entity);
-        public IQueryable<TEntity> CheckLocal();
+        //void Attach(object entity);
+        //void Detach(object entity);
+        //public IQueryable<TEntity> CheckLocal();
     }
 }

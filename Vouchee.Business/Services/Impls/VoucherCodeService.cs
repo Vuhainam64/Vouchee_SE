@@ -49,15 +49,15 @@ namespace Vouchee.Business.Services.Impls
             try
             {
                 Modal? modal = null;
-                var vouchers = _voucherRepository.CheckLocal();
+                //var vouchers = _voucherRepository.CheckLocal();
 
-                foreach (var voucher in vouchers)
-                {
-                    if (voucher.Modals != null && voucher.Modals.Count != 0)
-                    {
-                        modal = voucher.Modals.FirstOrDefault(x => x.Id == modalId);
-                    }
-                }
+                //foreach (var voucher in vouchers)
+                //{
+                //    if (voucher.Modals != null && voucher.Modals.Count != 0)
+                //    {
+                //        modal = voucher.Modals.FirstOrDefault(x => x.Id == modalId);
+                //    }
+                //}
 
                 if (modal == null)
                 {

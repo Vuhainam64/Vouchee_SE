@@ -68,20 +68,23 @@ namespace Vouchee.Data.Helpers
             }
         }
 
-        public async Task<bool> UpdateAsync(TEntity entity)
+        public async Task<bool> UpdateAsync(TEntity entity, bool isTracking = false)
         {
             try
             {
-                _context.Update(entity);
+                if (!isTracking)
+                {
+                    _context.Update(entity);
+                }
                 return await _context.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {
-                LoggerService.Logger(ex.InnerException?.Message);
-                throw new Exception(ex.InnerException?.Message);
+                var errorMessage = ex.InnerException?.Message ?? ex.Message;
+                LoggerService.Logger(errorMessage);
+                throw new Exception(errorMessage);
             }
         }
-
 
         public async Task<bool> DeleteAsync(TEntity entity)
         {
@@ -99,11 +102,12 @@ namespace Vouchee.Data.Helpers
         }
 
         public async Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> filter,
-                                                           Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null)
+                                                            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null, 
+                                                            bool isTracking = false)
         {
             try
             {
-                IQueryable<TEntity> query = Table;
+                IQueryable<TEntity> query = isTracking ? Table : Table.AsNoTracking();
 
                 // Apply includes with ThenInclude support
                 if (includeProperties != null)
@@ -123,11 +127,12 @@ namespace Vouchee.Data.Helpers
         }
 
         public async Task<IEnumerable<TEntity>> GetWhereAsync(Expression<Func<TEntity, bool>> filter,
-                                                                Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null)
+                                                                Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null,
+                                                                bool isTracking = false)
         {
             try
             {
-                IQueryable<TEntity> query = Table;
+                IQueryable<TEntity> query = isTracking ? Table : Table.AsNoTracking();
 
                 // Apply includes with ThenInclude support if provided
                 if (includeProperties != null)
@@ -146,11 +151,13 @@ namespace Vouchee.Data.Helpers
         }
 
 
-        public async Task<TEntity?> GetByIdAsync(object id, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null)
+        public async Task<TEntity?> GetByIdAsync(object id, 
+                                                    Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null,
+                                                    bool isTracking = false)
         {
             try
             {
-                IQueryable<TEntity> query = Table;
+                IQueryable<TEntity> query = isTracking ? Table : Table.AsNoTracking();
 
                 if (includeProperties != null)
                 {
@@ -158,19 +165,9 @@ namespace Vouchee.Data.Helpers
                 }
 
                 // Check if the entity is already tracked in the context
-                var entity = await query.AsTracking().FirstOrDefaultAsync(e => EF.Property<object>(e, "Id").Equals(id));
+                var entity = await query.FirstOrDefaultAsync(e => EF.Property<object>(e, "Id").Equals(id));
 
-                if (entity != null)
-                {
-                    // Check if the entity has been modified in the database
-                    var entry = _context.Entry(entity);
-                    if (entry.State == EntityState.Detached)
-                    {
-                        // Reload the entity if it's detached or modified
-                        await _context.Entry(entity).ReloadAsync();
-                    }
-                    return entity;
-                }
+                return entity;
 
                 // If the entity does not exist, return null
                 return null;
@@ -183,7 +180,7 @@ namespace Vouchee.Data.Helpers
         }
 
 
-        public async Task<TEntity?> FindAsync(Guid id, bool trackChanges = true)
+        public async Task<TEntity?> FindAsync(Guid id, bool trackChanges = false)
         {
             try
             {
@@ -236,12 +233,12 @@ namespace Vouchee.Data.Helpers
             }
         }
 
-        public void Attach(TEntity entity)
+        public void Attach(object entity)
         {
             _context.Attach(entity);
         }
 
-        public void Detach(TEntity entity)
+        public void Detach(object entity)
         {
             _context.Entry(entity).State = EntityState.Detached;
         }
