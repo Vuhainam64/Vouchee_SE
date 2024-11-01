@@ -182,44 +182,54 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<dynamic> GetVoucherByIdAsync(Guid id, PagingRequest pagingRequest)
         {
-            var voucher = _mapper.Map<GetDetailVoucherDTO>(await _voucherRepository.GetByIdAsync(id,
-                                                                query => query.Include(x => x.Brand)
-                                                                                    .ThenInclude(x => x.Addresses)
-                                                                                .Include(x => x.Supplier)
-                                                                                .Include(x => x.Categories)
-                                                                                    .ThenInclude(x => x.VoucherType)
-                                                                                .Include(x => x.Seller)
-                                                                                .Include(x => x.Modals)
-                                                                                    .ThenInclude(x => x.VoucherCodes)
-                                                                                .Include(x => x.Medias)
-                                                                                .Include(x => x.Promotions)));
-
-            if (voucher != null)
+            try
             {
-                var total = voucher.addresses.Count();
+                var existedVoucher = await _voucherRepository.GetByIdAsync(id,
+                                                    query => query.Include(x => x.Brand)
+                                                                        .ThenInclude(x => x.Addresses)
+                                                                    .Include(x => x.Supplier)
+                                                                    .Include(x => x.Categories)
+                                                                        .ThenInclude(x => x.VoucherType)
+                                                                    .Include(x => x.Seller)
+                                                                    .Include(x => x.Modals)
+                                                                        .ThenInclude(x => x.VoucherCodes)
+                                                                    .Include(x => x.Medias)
+                                                                    .Include(x => x.Promotions));
 
-                var pagedAddresses = voucher.addresses
-                    .Skip((pagingRequest.page - 1) * pagingRequest.pageSize) // Skip the previous pages
-                    .Take(pagingRequest.pageSize).ToList();
-
-                voucher.addresses = pagedAddresses;
-
-                return new
+                if (existedVoucher != null)
                 {
-                    metaData = new
+                    var voucher = _mapper.Map<GetDetailVoucherDTO>(existedVoucher);
+                    var total = voucher.addresses.Count();
+
+                    var pagedAddresses = voucher.addresses
+                        .Skip((pagingRequest.page - 1) * pagingRequest.pageSize)
+                        .Take(pagingRequest.pageSize).ToList();
+
+                    voucher.addresses = pagedAddresses;
+
+                    return new
                     {
-                        page = pagingRequest.page,
-                        size = pagingRequest.pageSize,
-                        total = total
-                    },
-                    results = voucher
-                };
+                        metaData = new
+                        {
+                            page = pagingRequest.page,
+                            size = pagingRequest.pageSize,
+                            total = total
+                        },
+                        results = voucher
+                    };
+                }
+                else
+                {
+                    throw new NotFoundException($"Không tìm thấy voucher với id {id}");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                throw new NotFoundException($"Không tìm thấy voucher với id {id}");
+                LoggerService.Logger(ex.InnerException?.Message);
+                throw new Exception(ex.InnerException?.Message);
             }
         }
+
         public async Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO)
         {
             try
