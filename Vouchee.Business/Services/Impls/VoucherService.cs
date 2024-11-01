@@ -250,7 +250,6 @@ namespace Vouchee.Business.Services.Impls
 
             result = _voucherRepository.GetTable()
                         .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
-                        .Where(x => x.stock > 0)
                         .DynamicFilter(_mapper.Map<GetVoucherDTO>(voucherFilter))
                         .Where(x => categoryIds == null || !categoryIds.Any() || x.categories.Any(c => categoryIds.Contains(c.id.Value)))
                         .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
