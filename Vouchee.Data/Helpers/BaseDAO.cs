@@ -63,8 +63,8 @@ namespace Vouchee.Data.Helpers
             }
             catch (Exception ex)
             {
-                LoggerService.Logger(ex.Message);
-                throw new Exception(ex.Message);
+                LoggerService.Logger(ex.InnerException?.Message);
+                throw new Exception(ex.InnerException?.Message);
             }
         }
 
@@ -77,8 +77,8 @@ namespace Vouchee.Data.Helpers
             }
             catch (Exception ex)
             {
-                LoggerService.Logger(ex.Message);
-                throw new Exception("Error  or updating entity", ex);
+                LoggerService.Logger(ex.InnerException?.Message);
+                throw new Exception(ex.InnerException?.Message);
             }
         }
 
@@ -93,8 +93,8 @@ namespace Vouchee.Data.Helpers
             }
             catch (Exception ex)
             {
-                LoggerService.Logger(ex.Message);
-                throw new Exception(ex.Message);
+                LoggerService.Logger(ex.InnerException?.Message);
+                throw new Exception(ex.InnerException?.Message);
             }
         }
 
@@ -117,8 +117,8 @@ namespace Vouchee.Data.Helpers
             }
             catch (Exception ex)
             {
-                LoggerService.Logger(ex.Message);
-                throw new Exception(ex.Message);
+                LoggerService.Logger(ex.InnerException?.Message);
+                throw new Exception(ex.InnerException?.Message);
             }
         }
 
@@ -140,8 +140,8 @@ namespace Vouchee.Data.Helpers
             }
             catch (Exception ex)
             {
-                LoggerService.Logger(ex.Message);
-                throw new Exception(ex.Message);
+                LoggerService.Logger(ex.InnerException?.Message);
+                throw new Exception(ex.InnerException?.Message);
             }
         }
 
@@ -177,8 +177,8 @@ namespace Vouchee.Data.Helpers
             }
             catch (Exception ex)
             {
-                LoggerService.Logger(ex.Message);
-                throw new Exception(ex.Message);
+                LoggerService.Logger(ex.InnerException?.Message);
+                throw new Exception(ex.InnerException?.Message);
             }
         }
 
@@ -192,8 +192,8 @@ namespace Vouchee.Data.Helpers
             }
             catch (Exception ex)
             {
-                LoggerService.Logger(ex.Message);
-                throw new Exception(ex.Message);
+                LoggerService.Logger(ex.InnerException?.Message);
+                throw new Exception(ex.InnerException?.Message);
             }
         }
 
@@ -206,8 +206,8 @@ namespace Vouchee.Data.Helpers
             }
             catch (Exception ex)
             {
-                LoggerService.Logger(ex.Message);
-                throw new Exception(ex.Message);
+                LoggerService.Logger(ex.InnerException?.Message);
+                throw new Exception(ex.InnerException?.Message);
             }
         }
 
@@ -231,8 +231,8 @@ namespace Vouchee.Data.Helpers
             }
             catch (Exception ex)
             {
-                LoggerService.Logger(ex.Message);
-                return null;
+                LoggerService.Logger(ex.InnerException?.Message);
+                throw new Exception(ex.InnerException?.Message);
             }
         }
 
