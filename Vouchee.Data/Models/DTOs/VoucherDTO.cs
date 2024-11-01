@@ -121,6 +121,7 @@ namespace Vouchee.Business.Models.DTOs
         public GetDetailVoucherDTO()
         {
             addresses = [];
+            modals = [];
         }
 
         public string? sellerName { get; set; }
@@ -130,6 +131,7 @@ namespace Vouchee.Business.Models.DTOs
         public string? supplierName { get; set; }
         public string? supplierImage { get; set; }
 
+        public virtual ICollection<GetModalDTO> modals { get; set; }
         public virtual IEnumerable<GetAddressDTO> addresses { get; set; }
     }
 
