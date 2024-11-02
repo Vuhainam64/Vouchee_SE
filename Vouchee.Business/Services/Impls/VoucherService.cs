@@ -122,13 +122,18 @@ namespace Vouchee.Business.Services.Impls
                 }
             }
                
-            var voucherId = await _voucherRepository.AddAsync(voucher);
+            voucher = await _voucherRepository.Add(voucher);
+
+            if (voucher != null)
+            {
+                _voucherRepository.Detach(voucher);
+            }
 
             return new ResponseMessage<dynamic>()
             {
                 message = "Tạo voucher thành công",
                 result = true,
-                value = voucherId
+                value = voucher.Id
             };
         }
 

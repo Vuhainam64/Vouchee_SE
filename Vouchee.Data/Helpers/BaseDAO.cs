@@ -49,9 +49,9 @@ namespace Vouchee.Data.Helpers
             try
             {
                 await Table.AddAsync(entity);
-                var result = await _context.SaveChangesAsync();
+                var result = await SaveChanges();
 
-                if (result > 0)
+                if (result)
                 {
                     var idProperty = typeof(TEntity).GetProperty("Id");
                     if (idProperty != null)
@@ -73,7 +73,7 @@ namespace Vouchee.Data.Helpers
             try
             {
                 _context.Update(entity);
-                return await _context.SaveChangesAsync() > 0;
+                return await SaveChanges();
             }
             catch (Exception ex)
             {
@@ -88,7 +88,7 @@ namespace Vouchee.Data.Helpers
             try
             {
                 Table.Remove(entity);
-                await _context.SaveChangesAsync();
+                await SaveChanges();
                 return true;
             }
             catch (Exception ex)
@@ -210,9 +210,9 @@ namespace Vouchee.Data.Helpers
             try
             {
                 await Table.AddAsync(entity);
-                var result = await _context.SaveChangesAsync();
+                var result = await SaveChanges();
 
-                if (result > 0)
+                if (result)
                 {
                     return entity;
                 }
@@ -269,7 +269,14 @@ namespace Vouchee.Data.Helpers
 
         public async Task<bool> SaveChanges()
         {
+            _context.ChangeTracker.DetectChanges();
+            Console.WriteLine(_context.ChangeTracker.DebugView.LongView);
             return await _context.SaveChangesAsync() > 0;
+        }
+
+        public EntityState GetEntityState(TEntity entity)
+        {
+            return _context.Entry(entity).State;
         }
     }
 }

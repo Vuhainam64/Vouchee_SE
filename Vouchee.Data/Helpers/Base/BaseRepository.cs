@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Query;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,10 +45,12 @@ namespace Vouchee.Data.Helpers.Base
 
         public async Task<bool> SaveChanges() => await _dao.SaveChanges();
 
-        //public void Attach(object entity) => _dao.Attach(entity);
+        public void Attach(object entity) => _dao.Attach(entity);
 
         //public IQueryable<TEntity> CheckLocal() => _dao.CheckLocal();
 
-        //public void Detach(object entity) => _dao.Detach(entity);
+        public void Detach(object entity) => _dao.Detach(entity);
+
+        public EntityState GetEntityState(TEntity entity) => _dao.GetEntityState(entity);
     }
 }

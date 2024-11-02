@@ -28,8 +28,9 @@ namespace Vouchee.Data.Helpers.Base
                                     bool isTracking = false);
         IQueryable<TEntity> GetTable();
         Task<bool> SaveChanges();
-        //void Attach(object entity);
-        //void Detach(object entity);
+        void Attach(object entity);
+        void Detach(object entity);
         //public IQueryable<TEntity> CheckLocal();
+        public EntityState GetEntityState(TEntity entity);
     }
 }

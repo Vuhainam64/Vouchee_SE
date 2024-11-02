@@ -14,7 +14,7 @@ namespace Vouchee.Business.Services
     public interface IVoucherCodeService
     {
         // CREATE
-        public Task<Guid?> CreateVoucherCodeAsync(Guid modalId, [FromBody] CreateVoucherCodeDTO createVoucherCodeDTO, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<IList<Guid?>>> CreateVoucherCodeAsync(Guid modalId, IList<CreateVoucherCodeDTO> createVoucherCodeDTOs, ThisUserObj thisUserObj);
 
         // READ
         public Task<GetVoucherCodeDTO> GetVoucherCodeByIdAsync(Guid id);
