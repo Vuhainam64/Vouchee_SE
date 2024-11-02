@@ -58,9 +58,17 @@ namespace Vouchee.Business.Services.Impls
                                                                     .ThenInclude(voucher => voucher.Voucher.Promotions),
                                                         isTracking: true);
 
+            foreach (var modal in _user.Carts)
+            {
+                var state = _modalRepository.GetEntityState(modal);
+                if (state == EntityState.Detached)
+                {
+                    _modalRepository.Attach(modal);
+                }
+            }
+
             // check for modified voucher, modal, voucher
 
-            var x = _modalRepository.GetModifiedEntity();
 
             if (_user.Carts.Count() != 0)
             {

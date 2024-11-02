@@ -291,7 +291,7 @@ namespace Vouchee.Data.Helpers
             entry.State = state;
         }
 
-        public async Task ReloadAsync(TEntity entity)
+        public async Task ReloadAsync(object entity)
         {
             await _context.Entry(entity).ReloadAsync();
         }
@@ -300,6 +300,11 @@ namespace Vouchee.Data.Helpers
         {
             var trackedEntities = _context.ChangeTracker.Entries();
             return trackedEntities;
+        }
+
+        public void MarkModified(TEntity entity)
+        {
+            _context.Entry<TEntity>(entity).State = EntityState.Modified;
         }
     }
 }

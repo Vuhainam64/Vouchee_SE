@@ -55,8 +55,10 @@ namespace Vouchee.Data.Helpers.Base
 
         public void SetEntityState(TEntity entity, EntityState entityState) => _dao.SetEntityState(entity, entityState);
 
-        public async Task ReloadAsync(TEntity entity) => await _dao.ReloadAsync(entity);
+        public async Task ReloadAsync(object entity) => await _dao.ReloadAsync(entity);
 
         public object GetModifiedEntity() => _dao.GetModifiedEntity();
+
+        public void MarkModified(TEntity entity) => _dao.MarkModified(entity);
     }
 }
