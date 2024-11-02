@@ -16,7 +16,7 @@ namespace Vouchee.Data.Helpers.Base
 
         public Task<Guid?> AddAsync(TEntity entity) => _dao.AddAsync(entity);
 
-        public Task<bool> UpdateAsync(TEntity entity, bool isTracking = false) => _dao.UpdateAsync(entity, isTracking);
+        public Task<bool> UpdateAsync(TEntity entity) => _dao.UpdateAsync(entity);
 
         public Task<bool> DeleteAsync(TEntity entity) => _dao.DeleteAsync(entity);
 
@@ -42,6 +42,7 @@ namespace Vouchee.Data.Helpers.Base
                                                             bool isTracking = false)
             => _dao.GetWhereAsync(filter, includeProperties, isTracking);
 
+        public async Task<bool> SaveChanges() => await _dao.SaveChanges();
 
         //public void Attach(object entity) => _dao.Attach(entity);
 

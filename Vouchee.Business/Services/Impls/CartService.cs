@@ -118,7 +118,7 @@ namespace Vouchee.Business.Services.Impls
                     cartModal.UpdateBy = thisUserObj.userId;
                     cartModal.UpdateDate = DateTime.Now;
 
-                    var result = await _userRepository.UpdateAsync(_user, isTracking: true);
+                    var result = await _userRepository.SaveChanges();
                     if (result)
                     {
                         await GetCartsAsync(thisUserObj);
@@ -148,7 +148,7 @@ namespace Vouchee.Business.Services.Impls
                     Modal = existedModal,
                 });
 
-                var result = await _userRepository.UpdateAsync(_user, isTracking: true); 
+                var result = await _userRepository.SaveChanges();
                 if (result)
                 {
                     await GetCartsAsync(thisUserObj);
@@ -183,7 +183,7 @@ namespace Vouchee.Business.Services.Impls
                 }
 
 
-                var result = await _userRepository.UpdateAsync(_user, isTracking: true);
+                var result = await _userRepository.SaveChanges();
                 if (result)
                 {
                     await GetCartsAsync(thisUserObj);
@@ -225,7 +225,7 @@ namespace Vouchee.Business.Services.Impls
                     cartModal.UpdateDate = DateTime.Now;
 
 
-                    var result = await _userRepository.UpdateAsync(_user, isTracking: true);
+                    var result = await _userRepository.SaveChanges();
                     if (result)
                     {
                         await GetCartsAsync(thisUserObj);
@@ -253,7 +253,7 @@ namespace Vouchee.Business.Services.Impls
 
                 _user.Carts.Remove(cartVoucher);
 
-                var result = await _userRepository.UpdateAsync(_user, isTracking: true);
+                var result = await _userRepository.SaveChanges();
                 if (result)
                 {
                     await GetCartsAsync(thisUserObj);
@@ -301,7 +301,7 @@ namespace Vouchee.Business.Services.Impls
                 cartVoucher.UpdateDate = DateTime.Now;
 
 
-                var result = await _userRepository.UpdateAsync(_user, isTracking: true);
+                var result = await _userRepository.SaveChanges();
                 if (result)
                 {
                     await GetCartsAsync(thisUserObj);

@@ -68,14 +68,11 @@ namespace Vouchee.Data.Helpers
             }
         }
 
-        public async Task<bool> UpdateAsync(TEntity entity, bool isTracking = false)
+        public async Task<bool> UpdateAsync(TEntity entity)
         {
             try
             {
-                if (!isTracking)
-                {
-                    _context.Update(entity);
-                }
+                _context.Update(entity);
                 return await _context.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
@@ -212,13 +209,9 @@ namespace Vouchee.Data.Helpers
         {
             try
             {
-                // Add the entity to the database context
                 await Table.AddAsync(entity);
-
-                // Save changes to the databaseCannot insert duplicate key in object 'dbo.Address'. The duplicate key value is (0d968c2d-c4b7-4f53-ad61-27e7c79ec655).
                 var result = await _context.SaveChangesAsync();
 
-                // If the save was successful, return the entity
                 if (result > 0)
                 {
                     return entity;
@@ -272,6 +265,11 @@ namespace Vouchee.Data.Helpers
             }
 
             return trackedAddress;
+        }
+
+        public async Task<bool> SaveChanges()
+        {
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

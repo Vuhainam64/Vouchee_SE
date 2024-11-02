@@ -14,7 +14,7 @@ namespace Vouchee.Data.Helpers.Base
     {
         Task<Guid?> AddAsync(TEntity entity);
         Task<TEntity> Add(TEntity entity);
-        Task<bool> UpdateAsync(TEntity entity, bool isTracking = false);
+        Task<bool> UpdateAsync(TEntity entity);
         Task<bool> DeleteAsync(TEntity entity);
         Task<TEntity> FindAsync(Guid id, bool isTracking = false);
         Task<TEntity?> GetByIdAsync(object id,
@@ -27,6 +27,7 @@ namespace Vouchee.Data.Helpers.Base
                                     Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null,
                                     bool isTracking = false);
         IQueryable<TEntity> GetTable();
+        Task<bool> SaveChanges();
         //void Attach(object entity);
         //void Detach(object entity);
         //public IQueryable<TEntity> CheckLocal();
