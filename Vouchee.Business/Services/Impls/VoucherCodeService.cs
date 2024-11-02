@@ -72,6 +72,9 @@ namespace Vouchee.Business.Services.Impls
 
                 exisedModal.Stock += list.Count();
 
+                // mình đang tạo voucher code
+                // mình đồng thời update cái voucher code trong modal => chắc chắn nó phải là MODIFIED
+                // nên phải attach nó
                 var state = _modalRepository.GetEntityState(exisedModal);
 
                 if (state == EntityState.Modified)

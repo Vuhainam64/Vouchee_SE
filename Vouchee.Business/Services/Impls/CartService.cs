@@ -99,14 +99,15 @@ namespace Vouchee.Business.Services.Impls
             var cartModal = _user.Carts.FirstOrDefault(x => x.ModalId == modalId);
             if (cartModal != null)
             {
-                if (cartModal.Modal.Voucher.SellerID == thisUserObj.userId)
-                {
-                    throw new ConflictException($"{cartModal.ModalId} là modal của shop bạn. Bạn không thể order chính modal của mình");
-                }
+                // Nào fix xong thì mở
+                //if (cartModal.Modal.Voucher.SellerID == thisUserObj.userId)
+                //{
+                //    throw new ConflictException($"{cartModal.ModalId} là modal của shop bạn. Bạn không thể order chính modal của mình");
+                //}
                 var modal = await _modalRepository.FindAsync(modalId, false);
                 if (cartModal.Quantity >= modal.Stock)
                 {
-                    throw new ConflictException($"HIện tại modal này mới có {modal.Stock} code");
+                    throw new ConflictException($"Hiện tại modal này mới có {modal.Stock} code");
                 }
                 if (cartModal.Quantity >= 20)
                 {
@@ -117,6 +118,8 @@ namespace Vouchee.Business.Services.Impls
                     cartModal.Quantity += 1;
                     cartModal.UpdateBy = thisUserObj.userId;
                     cartModal.UpdateDate = DateTime.Now;
+
+                    var state = _userRepository.GetEntityState(_user);
 
                     var result = await _userRepository.SaveChanges();
                     if (result)
@@ -151,6 +154,7 @@ namespace Vouchee.Business.Services.Impls
                 var result = await _userRepository.SaveChanges();
                 if (result)
                 {
+                    _userRepository.Attach(_user);
                     await GetCartsAsync(thisUserObj);
                     return _cartDTO;
                 }
@@ -182,7 +186,7 @@ namespace Vouchee.Business.Services.Impls
                     cartVoucher.UpdateDate = DateTime.Now;
                 }
 
-
+                var state = _userRepository.GetEntityState(_user);
                 var result = await _userRepository.SaveChanges();
                 if (result)
                 {
@@ -212,7 +216,7 @@ namespace Vouchee.Business.Services.Impls
 
                 if (cartModal.Quantity >= modal.Stock)
                 {
-                    throw new ConflictException($"HIện tại modal này mới có {modal.Stock} code");
+                    throw new ConflictException($"Hiện tại modal này mới có {modal.Stock} code");
                 }
                 else if (cartModal.Quantity >= 20)
                 {
@@ -224,7 +228,7 @@ namespace Vouchee.Business.Services.Impls
                     cartModal.UpdateBy = thisUserObj.userId;
                     cartModal.UpdateDate = DateTime.Now;
 
-
+                    var state = _userRepository.GetEntityState(_user);
                     var result = await _userRepository.SaveChanges();
                     if (result)
                     {
@@ -253,6 +257,7 @@ namespace Vouchee.Business.Services.Impls
 
                 _user.Carts.Remove(cartVoucher);
 
+                var state = _userRepository.GetEntityState(_user);
                 var result = await _userRepository.SaveChanges();
                 if (result)
                 {
@@ -288,11 +293,11 @@ namespace Vouchee.Business.Services.Impls
 
                 var modal = await _modalRepository.FindAsync(modalId, false);
 
-                if (quantity >= modal.Stock)
+                if (quantity > modal.Stock)
                 {
-                    throw new ConflictException($"HIện tại modal này mới có {modal.Stock} code");
+                    throw new ConflictException($"Hiện tại modal này mới có {modal.Stock} code");
                 }
-                if (cartVoucher.Quantity >= 20)
+                if (cartVoucher.Quantity > 20)
                 {
                     throw new ConflictException($"Modal {modalId} không thể vượt quá 20");
                 }
@@ -300,7 +305,7 @@ namespace Vouchee.Business.Services.Impls
                 cartVoucher.UpdateBy = thisUserObj.userId;
                 cartVoucher.UpdateDate = DateTime.Now;
 
-
+                var state = _userRepository.GetEntityState(_user);
                 var result = await _userRepository.SaveChanges();
                 if (result)
                 {

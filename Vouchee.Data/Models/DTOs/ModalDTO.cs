@@ -73,5 +73,9 @@ namespace Vouchee.Data.Models.DTOs
     public class CartModalDTO : ModalDTO
     {
         public int quantity { get; set; }
+
+        public decimal? totalPrice => quantity * sellPrice;
+        public decimal? discountPrice => quantity * salePrice;
+        public decimal? finalPrice => totalPrice - discountPrice;
     }
 }

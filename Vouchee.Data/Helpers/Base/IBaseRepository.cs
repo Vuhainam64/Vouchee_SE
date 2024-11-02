@@ -31,6 +31,7 @@ namespace Vouchee.Data.Helpers.Base
         void Attach(object entity);
         void Detach(object entity);
         //public IQueryable<TEntity> CheckLocal();
-        public EntityState GetEntityState(TEntity entity);
+        public EntityState GetEntityState(object entity);
+        public void SetEntityState(TEntity entity, EntityState entityState);
     }
 }

@@ -274,9 +274,19 @@ namespace Vouchee.Data.Helpers
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public EntityState GetEntityState(TEntity entity)
+        public EntityState GetEntityState(object entity)
         {
             return _context.Entry(entity).State;
+        }
+
+        public void SetEntityState(TEntity entity, EntityState state)
+        {
+            var entry = _context.Entry(entity);
+            if (entry.State == EntityState.Detached)
+            {
+                _context.Attach(entity);
+            }
+            entry.State = state;
         }
     }
 }
