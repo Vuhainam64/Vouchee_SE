@@ -79,8 +79,8 @@ namespace Vouchee.Business.Services.Impls
                     cartDTO.sellers.Add(sellerCartDTO);
 
                     cartDTO.totalQuantity = cartDTO.sellers.Sum(x => x.modals.Sum(x => x.quantity));
-                    cartDTO.totalPrice = (decimal) cartDTO.sellers.Sum(s => s.modals.Sum(x => x.originalPrice));
-                    cartDTO.discountPrice = (decimal) cartDTO.sellers.Sum(s => s.modals.Sum(x => x.salePrice));
+                    cartDTO.totalPrice = (decimal) cartDTO.sellers.Sum(s => s.modals.Sum(x => x.totalPrice));
+                    cartDTO.discountPrice = (decimal) cartDTO.sellers.Sum(s => s.modals.Sum(x => x.discountPrice));
                 }
 
                 _cartDTO = cartDTO;
