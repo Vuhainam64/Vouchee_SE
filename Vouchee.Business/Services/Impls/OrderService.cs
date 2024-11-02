@@ -172,12 +172,12 @@ namespace Vouchee.Business.Services.Impls
         public async Task<User> GetCurrentUser(Guid userId)
         {
             User? userInstance = null;
-            IQueryable<User> users = _userRepository.CheckLocal();
+            //IQueryable<User> users = _userRepository.CheckLocal();
 
-            if (users != null && users.Count() != 0)
-            {
-                userInstance = users.FirstOrDefault(x => x.Id == userId);
-            }
+            //if (users != null && users.Count() != 0)
+            //{
+            //    userInstance = users.FirstOrDefault(x => x.Id == userId);
+            //}
 
             if (userInstance == null)
             {

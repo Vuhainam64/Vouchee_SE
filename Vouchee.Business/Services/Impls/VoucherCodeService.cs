@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,8 +33,8 @@ namespace Vouchee.Business.Services.Impls
         private readonly IMapper _mapper;
 
         public VoucherCodeService(IModalRepository modalRepository,
-                                    IVoucherCodeRepository voucherCodeRepository, 
-                                    IVoucherRepository voucherRepository, 
+                                    IVoucherCodeRepository voucherCodeRepository,
+                                    IVoucherRepository voucherRepository,
                                     IFileUploadService fileUploadService,
                                     IMapper mapper)
         {
@@ -44,40 +45,62 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<Guid?> CreateVoucherCodeAsync(Guid modalId, CreateVoucherCodeDTO createVoucherCodeDTO, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<IList<Guid?>>> CreateVoucherCodeAsync(Guid modalId, IList<CreateVoucherCodeDTO> createVoucherCodeDTOs, ThisUserObj thisUserObj)
         {
             try
             {
-                Modal? modal = null;
-                var vouchers = _voucherRepository.CheckLocal();
-
-                foreach (var voucher in vouchers)
-                {
-                    if (voucher.Modals != null && voucher.Modals.Count != 0)
-                    {
-                        modal = voucher.Modals.FirstOrDefault(x => x.Id == modalId);
-                    }
-                }
-
-                if (modal == null)
-                {
-                    modal = await _modalRepository.FindAsync(modalId, false);
-                }
-
-                if (modal == null)
+                IList<Guid?> list = [];
+                
+                var exisedModal = await _modalRepository.GetByIdAsync(modalId, includeProperties: x => x.Include(x => x.Voucher), isTracking: true);
+                if (exisedModal == null)
                 {
                     throw new NotFoundException($"Không tìm thấy voucher với id {modalId}");
                 }
 
-                VoucherCode voucherCode = _mapper.Map<VoucherCode>(createVoucherCodeDTO);
+                foreach (var createVoucherCode in createVoucherCodeDTOs)
+                {
+                    VoucherCode voucherCode = _mapper.Map<VoucherCode>(createVoucherCode);
 
-                voucherCode.ModalId = modal.Id;
-                voucherCode.Status = VoucherCodeStatusEnum.ACTIVE.ToString();
-                voucherCode.CreateBy = thisUserObj.userId;
+                    voucherCode.ModalId = exisedModal.Id;
+                    voucherCode.Status = VoucherCodeStatusEnum.ACTIVE.ToString();
+                    voucherCode.CreateBy = thisUserObj.userId;
 
-                var voucherCodeId = await _voucherCodeRepository.AddAsync(voucherCode);
+                    var voucherCodeId = await _voucherCodeRepository.AddAsync(voucherCode);
 
-                return voucherCodeId;
+                    list.Add(voucherCodeId);
+                }
+
+                exisedModal.Stock += list.Count();
+
+                // mình đang tạo voucher code
+                // mình đồng thời update cái voucher code trong modal => chắc chắn nó phải là MODIFIED
+                // nên phải attach nó
+                var state = _modalRepository.GetEntityState(exisedModal);
+
+                if (state == EntityState.Modified)
+                {
+                    _modalRepository.Attach(exisedModal);
+                }
+
+                var stockUpdateSuccess = await _modalRepository.UpdateAsync(exisedModal);
+                
+                if (stockUpdateSuccess)
+                {
+                    exisedModal.Voucher.Stock += exisedModal.Stock;
+                    
+                    var voucherUpdateSuccess = await _voucherRepository.UpdateAsync(exisedModal.Voucher);
+                    if (voucherUpdateSuccess)
+                    {
+                        return new ResponseMessage<IList<Guid?>>()
+                        {
+                            message = "Thêm thành công",
+                            result = true,
+                            value = list
+                        };
+                    }
+                }
+
+                return null;
             }
             catch (Exception ex)
             {

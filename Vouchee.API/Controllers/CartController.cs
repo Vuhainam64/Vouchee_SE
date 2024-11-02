@@ -63,42 +63,42 @@ namespace Vouchee.API.Controllers
         }
 
         // UPDATE
-        [HttpPut("increase_quantity/{voucherId}")]
+        [HttpPut("increase_quantity/{modalId}")]
         [Authorize]
-        public async Task<IActionResult> IncreaseQuantity(Guid voucherId)
+        public async Task<IActionResult> IncreaseQuantity(Guid modalId)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            var result = await _cartService.IncreaseQuantityAsync(voucherId, currentUser);
+            var result = await _cartService.IncreaseQuantityAsync(modalId, currentUser);
             return Ok(result);
         }
 
-        [HttpPut("decrease_quantity/{voucherId}")]
-        public async Task<IActionResult> DecreaseQuantity(Guid voucherId)
+        [HttpPut("decrease_quantity/{modalId}")]
+        public async Task<IActionResult> DecreaseQuantity(Guid modalId)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            var result = await _cartService.DecreaseQuantityAsync(voucherId, currentUser);
+            var result = await _cartService.DecreaseQuantityAsync(modalId, currentUser);
             return Ok(result);
         }
 
-        [HttpPut("update_quantity/{voucherId}")]
-        public async Task<IActionResult> UpdateQuantity(Guid voucherId, int quantity)
+        [HttpPut("update_quantity/{modalId}")]
+        public async Task<IActionResult> UpdateQuantity(Guid modalId, int quantity)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            var result = await _cartService.UpdateQuantityAsync(voucherId, quantity, currentUser);
+            var result = await _cartService.UpdateQuantityAsync(modalId, quantity, currentUser);
             return Ok(result);
         }
 
         // DELETE
-        [HttpDelete("remove_item/{voucherId}")]
+        [HttpDelete("remove_item/{modalId}")]
         [Authorize]
-        public async Task<IActionResult> RemoveItem(Guid voucherId)
+        public async Task<IActionResult> RemoveItem(Guid modalId)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            var result = await _cartService.RemoveItemAsync(voucherId, currentUser);
+            var result = await _cartService.RemoveItemAsync(modalId, currentUser);
             return Ok(result);
         }
     }

@@ -13,7 +13,7 @@ using Vouchee.Data.Models.Filters;
 namespace Vouchee.API.Controllers
 {
     [ApiController]
-    [Route("api/modal")]
+    [Route("api/v1/modal")]
     [EnableCors("MyAllowSpecificOrigins")]
     public class ModalController : ControllerBase
     {

@@ -41,18 +41,8 @@ namespace Vouchee.API.Controllers
         public async Task<IActionResult> CreateVoucherCode(Guid modalId, [FromBody] IList<CreateVoucherCodeDTO> createVoucherCodeDTOs)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
-
-            List<Guid> voucherCodeIds = [];
-
-            foreach (var voucherCode in createVoucherCodeDTOs)
-            {
-                var result = await _voucherCodeService.CreateVoucherCodeAsync(modalId, voucherCode, currentUser);
-                if (result != Guid.Empty)
-                {
-                    voucherCodeIds.Add((Guid)result);
-                }
-            }
-            return Ok(voucherCodeIds);
+            var result = await _voucherCodeService.CreateVoucherCodeAsync(modalId, createVoucherCodeDTOs, currentUser);
+            return Ok(result);
         }
 
         // READ
