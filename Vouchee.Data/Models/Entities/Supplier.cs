@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 namespace Vouchee.Data.Models.Entities
 {
     [Table("Supplier")]
+    [Index(nameof(UserId), Name = "IX_Supplier_UserId")]
     public partial class Supplier
     {
         public Supplier()
@@ -19,6 +20,11 @@ namespace Vouchee.Data.Models.Entities
 
         [InverseProperty(nameof(Voucher.Supplier))]
         public virtual ICollection<Voucher> Vouchers { get; set; }
+
+        public Guid? UserId { get; set; }
+        [ForeignKey(nameof(UserId))]
+        [InverseProperty("Supplier")]
+        public required virtual User? User { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]

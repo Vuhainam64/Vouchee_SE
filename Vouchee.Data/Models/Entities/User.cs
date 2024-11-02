@@ -33,6 +33,8 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty("Users")]
         public virtual Role? Role { get; set; }
 
+        public virtual Supplier? Supplier { get; set; }
+
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
