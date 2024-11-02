@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Google.Api;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -21,23 +22,27 @@ using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
 using Vouchee.Data.Repositories.IRepos;
 using Vouchee.Data.Repositories.Repos;
+using static Grpc.Core.Metadata;
 
 namespace Vouchee.Business.Services.Impls
 {
     public class VoucherCodeService : IVoucherCodeService
     {
+        private readonly IUserRepository _userRepository;
         private readonly IModalRepository _modalRepository;
         private readonly IFileUploadService _fileUploadService;
         private readonly IVoucherCodeRepository _voucherCodeRepository;
         private readonly IVoucherRepository _voucherRepository;
         private readonly IMapper _mapper;
 
-        public VoucherCodeService(IModalRepository modalRepository,
+        public VoucherCodeService(IUserRepository userRepository,
+                                    IModalRepository modalRepository,
                                     IVoucherCodeRepository voucherCodeRepository,
                                     IVoucherRepository voucherRepository,
                                     IFileUploadService fileUploadService,
                                     IMapper mapper)
         {
+            _userRepository = userRepository;
             _modalRepository = modalRepository;
             _fileUploadService = fileUploadService;
             _voucherCodeRepository = voucherCodeRepository;
@@ -49,9 +54,14 @@ namespace Vouchee.Business.Services.Impls
         {
             try
             {
-                IList<Guid?> list = [];
-                
-                var exisedModal = await _modalRepository.GetByIdAsync(modalId, includeProperties: x => x.Include(x => x.Voucher), isTracking: true);
+                IList<Guid?> list = new List<Guid?>();
+
+                var exisedModal = await _modalRepository.GetByIdAsync(modalId,
+                    includeProperties: x => x.Include(m => m.Voucher)
+                                             .Include(m => m.Carts)
+                                                 .ThenInclude(c => c.Buyer),
+                    isTracking: true);
+
                 if (exisedModal == null)
                 {
                     throw new NotFoundException($"Không tìm thấy voucher với id {modalId}");
@@ -59,36 +69,33 @@ namespace Vouchee.Business.Services.Impls
 
                 foreach (var createVoucherCode in createVoucherCodeDTOs)
                 {
-                    VoucherCode voucherCode = _mapper.Map<VoucherCode>(createVoucherCode);
-
+                    var voucherCode = _mapper.Map<VoucherCode>(createVoucherCode);
                     voucherCode.ModalId = exisedModal.Id;
                     voucherCode.Status = VoucherCodeStatusEnum.ACTIVE.ToString();
                     voucherCode.CreateBy = thisUserObj.userId;
 
                     var voucherCodeId = await _voucherCodeRepository.AddAsync(voucherCode);
-
                     list.Add(voucherCodeId);
                 }
 
-                exisedModal.Stock += list.Count();
+                // Update the stock of exisedModal
+                exisedModal.Stock += list.Count;
 
-                // mình đang tạo voucher code
-                // mình đồng thời update cái voucher code trong modal => chắc chắn nó phải là MODIFIED
-                // nên phải attach nó
+                // Check if the state of exisedModal has changed and attach if necessary
                 var state = _modalRepository.GetEntityState(exisedModal);
-
-                if (state == EntityState.Modified)
+                if (state == EntityState.Detached)
                 {
-                    _modalRepository.Attach(exisedModal);
+                    _modalRepository.MarkModified(exisedModal);
                 }
-
+                state = _modalRepository.GetEntityState(exisedModal);
                 var stockUpdateSuccess = await _modalRepository.UpdateAsync(exisedModal);
-                
+
                 if (stockUpdateSuccess)
                 {
+                    // Update voucher stock as well
                     exisedModal.Voucher.Stock += exisedModal.Stock;
-                    
                     var voucherUpdateSuccess = await _voucherRepository.UpdateAsync(exisedModal.Voucher);
+
                     if (voucherUpdateSuccess)
                     {
                         return new ResponseMessage<IList<Guid?>>()
@@ -100,7 +107,12 @@ namespace Vouchee.Business.Services.Impls
                     }
                 }
 
-                return null;
+                return new ResponseMessage<IList<Guid?>>()
+                {
+                    message = "Failed to update voucher stock",
+                    result = false,
+                    value = null
+                };
             }
             catch (Exception ex)
             {
@@ -108,6 +120,7 @@ namespace Vouchee.Business.Services.Impls
                 throw new CreateObjectException(ex.Message);
             }
         }
+
 
         public async Task<bool> DeleteVoucherCodeAsync(Guid id)
         {
