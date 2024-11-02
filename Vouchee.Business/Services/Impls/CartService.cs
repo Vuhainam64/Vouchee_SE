@@ -58,6 +58,10 @@ namespace Vouchee.Business.Services.Impls
                                                                     .ThenInclude(voucher => voucher.Voucher.Promotions),
                                                         isTracking: true);
 
+            // check for modified voucher, modal, voucher
+
+            var x = _modalRepository.GetModifiedEntity();
+
             if (_user.Carts.Count() != 0)
             {
                 CartDTO cartDTO = new();

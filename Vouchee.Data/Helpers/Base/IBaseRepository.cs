@@ -30,8 +30,10 @@ namespace Vouchee.Data.Helpers.Base
         Task<bool> SaveChanges();
         void Attach(object entity);
         void Detach(object entity);
-        //public IQueryable<TEntity> CheckLocal();
+        public IQueryable<TEntity> CheckLocal();
         public EntityState GetEntityState(object entity);
         public void SetEntityState(TEntity entity, EntityState entityState);
+        public Task ReloadAsync(TEntity entity);
+        public object GetModifiedEntity();
     }
 }

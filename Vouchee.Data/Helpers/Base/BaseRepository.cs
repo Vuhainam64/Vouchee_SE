@@ -47,12 +47,16 @@ namespace Vouchee.Data.Helpers.Base
 
         public void Attach(object entity) => _dao.Attach(entity);
 
-        //public IQueryable<TEntity> CheckLocal() => _dao.CheckLocal();
+        public IQueryable<TEntity> CheckLocal() => _dao.CheckLocal();
 
         public void Detach(object entity) => _dao.Detach(entity);
 
         public EntityState GetEntityState(object entity) => _dao.GetEntityState(entity);
 
         public void SetEntityState(TEntity entity, EntityState entityState) => _dao.SetEntityState(entity, entityState);
+
+        public async Task ReloadAsync(TEntity entity) => await _dao.ReloadAsync(entity);
+
+        public object GetModifiedEntity() => _dao.GetModifiedEntity();
     }
 }

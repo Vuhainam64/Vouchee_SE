@@ -33,8 +33,8 @@ namespace Vouchee.Business.Services.Impls
         private readonly IMapper _mapper;
 
         public VoucherCodeService(IModalRepository modalRepository,
-                                    IVoucherCodeRepository voucherCodeRepository, 
-                                    IVoucherRepository voucherRepository, 
+                                    IVoucherCodeRepository voucherCodeRepository,
+                                    IVoucherRepository voucherRepository,
                                     IFileUploadService fileUploadService,
                                     IMapper mapper)
         {
@@ -87,6 +87,7 @@ namespace Vouchee.Business.Services.Impls
                 if (stockUpdateSuccess)
                 {
                     exisedModal.Voucher.Stock += exisedModal.Stock;
+                    
                     var voucherUpdateSuccess = await _voucherRepository.UpdateAsync(exisedModal.Voucher);
                     if (voucherUpdateSuccess)
                     {

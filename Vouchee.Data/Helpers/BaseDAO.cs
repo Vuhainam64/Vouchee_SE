@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Linq.Expressions;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
+using System.Xml;
 using Vouchee.Data.Models.Entities;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -238,7 +240,6 @@ namespace Vouchee.Data.Helpers
 
         public IQueryable<TEntity> CheckLocal()
         {
-            // Retrieve the set for the specific entity type
             return _context.Set<TEntity>().Local.AsQueryable();
         }
 
@@ -276,6 +277,7 @@ namespace Vouchee.Data.Helpers
 
         public EntityState GetEntityState(object entity)
         {
+            _context.ChangeTracker.DetectChanges();
             return _context.Entry(entity).State;
         }
 
@@ -287,6 +289,17 @@ namespace Vouchee.Data.Helpers
                 _context.Attach(entity);
             }
             entry.State = state;
+        }
+
+        public async Task ReloadAsync(TEntity entity)
+        {
+            await _context.Entry(entity).ReloadAsync();
+        }
+
+        public object GetModifiedEntity()
+        {
+            var trackedEntities = _context.ChangeTracker.Entries();
+            return trackedEntities;
         }
     }
 }
