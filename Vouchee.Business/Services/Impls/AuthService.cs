@@ -1,22 +1,17 @@
 ﻿using AutoMapper;
-using Azure.Core;
 using FirebaseAdmin.Auth;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
-using Vouchee.Business.Models.ViewModels;
-using Vouchee.Business.Services.Extensions.RedisCache;
 using Vouchee.Data.Models.Constants.Dictionary;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Status;
-using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Repositories.IRepos;
 using UnauthorizedAccessException = Vouchee.Business.Exceptions.UnauthorizedAccessException;
@@ -48,6 +43,17 @@ namespace Vouchee.Business.Services.Impls
         {
             AuthResponse response = new();
 
+            try
+            {
+                string trimmedToken = firebaseToken.TrimEnd('=');
+                FirebaseToken x = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(trimmedToken);
+            }
+            catch (FirebaseAuthException ex)
+            {
+                // Log the exception and handle it accordingly
+                Console.WriteLine($"Error verifying token: {ex.Message}");
+                throw; // Or handle as needed
+            }
             FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
             string uid = decryptedToken.Uid;
 
