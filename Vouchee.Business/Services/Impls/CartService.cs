@@ -43,7 +43,7 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<CartDTO> GetCartsAsync(ThisUserObj thisUserObj)
+        public async Task<CartDTO> GetCartsAsync(ThisUserObj thisUserObj, bool isTracking = false)
         {
             _user = await _userRepository.GetByIdAsync(thisUserObj.userId,
                                                         includeProperties: query => query
@@ -52,18 +52,16 @@ namespace Vouchee.Business.Services.Impls
                                                                 .ThenInclude(cart => cart.Modal)
                                                             .Include(x => x.Carts)
                                                                 .ThenInclude(cart => cart.Modal)
+                                                                    .ThenInclude(voucher => voucher.Voucher)
+                                                            .Include(x => x.Carts)
+                                                                .ThenInclude(cart => cart.Modal)
                                                                     .ThenInclude(voucher => voucher.Voucher.Seller)
                                                             .Include(x => x.Carts)
                                                                 .ThenInclude(cart => cart.Modal)
-                                                                    .ThenInclude(voucher => voucher.Voucher.Promotions),
-                                                        isTracking: true);
+                                                                    .ThenInclude(voucher => voucher.Voucher.Promotions)
+                                                                    , isTracking);
 
             // check for modified voucher, modal, voucher
-            foreach (var cart in _user.Carts)
-            {
-                var status = _modalRepository.GetEntityState(cart.Modal);
-               
-            }
 
             if (_user.Carts.Count() != 0)
             {
@@ -100,7 +98,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<CartDTO> AddItemAsync(Guid modalId, ThisUserObj thisUserObj)
         {
-            await GetCartsAsync(thisUserObj);
+            await GetCartsAsync(thisUserObj, true);
 
             // Voucher exist in cart already
             var cartModal = _user.Carts.FirstOrDefault(x => x.ModalId == modalId);
@@ -195,7 +193,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<CartDTO> DecreaseQuantityAsync(Guid modalId, ThisUserObj thisUserObj)
         {
-            await GetCartsAsync(thisUserObj);
+            await GetCartsAsync(thisUserObj, true);
 
             if (_user.Carts != null && _user.Carts.Count != 0)
             {
@@ -231,7 +229,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<CartDTO> IncreaseQuantityAsync(Guid modalId, ThisUserObj thisUserObj)
         {
-            await GetCartsAsync(thisUserObj);
+            await GetCartsAsync(thisUserObj, true);
 
             if (_user.Carts.Count != 0)
             {
@@ -275,7 +273,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<CartDTO> RemoveItemAsync(Guid modalId, ThisUserObj thisUserObj)
         {
-            await GetCartsAsync(thisUserObj);
+            await GetCartsAsync(thisUserObj, true);
 
             if (_user.Carts != null && _user.Carts.Count != 0)
             {
@@ -310,7 +308,7 @@ namespace Vouchee.Business.Services.Impls
                 throw new ConflictException("Bạn chỉ có thể mua tối đa 20 code mỗi loại voucher");
             }
 
-            await GetCartsAsync(thisUserObj);
+            await GetCartsAsync(thisUserObj, true);
 
             if (_user.Carts != null && _user.Carts.Count != 0)
             {

@@ -88,12 +88,13 @@ namespace Vouchee.Business.Services.Impls
                 // Update voucher stock as well
                 exisedModal.Voucher.Stock += count;
 
-                var voucherUpdateSuccess = await _voucherRepository.UpdateAsync(exisedModal.Voucher);
+                var voucherUpdateSuccess = await _modalRepository.UpdateAsync(exisedModal);
 
                 var voucherCodes = exisedModal.VoucherCodes
                                         .OrderByDescending(x => x.CreateDate)
                                         .Take(count)
                                         .ToList();
+
                 exisedModal.VoucherCodes = voucherCodes;
 
                 if (voucherUpdateSuccess)

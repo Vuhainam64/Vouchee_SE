@@ -74,8 +74,7 @@ namespace Vouchee.Data.Helpers
         {
             try
             {
-                _context.Set<TEntity>().Attach(entity);
-                _context.Entry(entity).State = EntityState.Modified;
+                _context.Update(entity);
                 return await SaveChanges();
             }
             catch (Exception ex)
