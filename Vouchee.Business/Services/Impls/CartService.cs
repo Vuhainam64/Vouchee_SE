@@ -112,7 +112,7 @@ namespace Vouchee.Business.Services.Impls
                         _userRepository.Attach(cart.Modal);
                     }
                 }
-                Nào fix xong thì mở
+                // Nào fix xong thì mở
                 if (cartModal.Modal.Voucher.SellerID == thisUserObj.userId)
                 {
                     throw new ConflictException($"{cartModal.ModalId} là modal của shop bạn. Bạn không thể order chính modal của mình");
