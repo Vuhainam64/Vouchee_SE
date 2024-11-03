@@ -74,7 +74,8 @@ namespace Vouchee.Data.Helpers
         {
             try
             {
-                _context.Update(entity);
+                _context.Set<TEntity>().Attach(entity);
+                _context.Entry(entity).State = EntityState.Modified;
                 return await SaveChanges();
             }
             catch (Exception ex)
@@ -270,9 +271,17 @@ namespace Vouchee.Data.Helpers
 
         public async Task<bool> SaveChanges()
         {
-            _context.ChangeTracker.DetectChanges();
-            Console.WriteLine(_context.ChangeTracker.DebugView.LongView);
-            return await _context.SaveChangesAsync() > 0;
+            try
+            {
+                _context.ChangeTracker.DetectChanges();
+                Console.WriteLine(_context.ChangeTracker.DebugView.LongView);
+                return await _context.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.InnerException.Message);
+                throw new Exception(ex.InnerException.Message);
+            }
         }
 
         public EntityState GetEntityState(object entity)
