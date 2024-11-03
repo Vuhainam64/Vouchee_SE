@@ -377,7 +377,7 @@ namespace Vouchee.Business.Services.Impls
                     new Claim(ClaimTypes.Actor, response.name),
                     roleClaim
                 }),
-                Expires = DateTime.UtcNow.AddHours(24), // Set access token expiration
+                Expires = DateTime.UtcNow.AddHours(5000), // Set access token expiration
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
 
