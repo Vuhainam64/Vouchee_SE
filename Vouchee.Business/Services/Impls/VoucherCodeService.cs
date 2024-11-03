@@ -18,6 +18,7 @@ using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Constants.Number;
+using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
 using Vouchee.Data.Repositories.IRepos;
@@ -50,11 +51,11 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<ResponseMessage<IList<Guid?>>> CreateVoucherCodeAsync(Guid modalId, IList<CreateVoucherCodeDTO> createVoucherCodeDTOs, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<GetDetailModalDTO>> CreateVoucherCodeAsync(Guid modalId, IList<CreateVoucherCodeDTO> createVoucherCodeDTOs, ThisUserObj thisUserObj)
         {
             try
             {
-                IList<Guid?> list = new List<Guid?>();
+                IList<Guid> list = [];
 
                 var exisedModal = await _modalRepository.GetByIdAsync(modalId,
                     includeProperties: x => x.Include(m => m.Voucher)
@@ -67,6 +68,8 @@ namespace Vouchee.Business.Services.Impls
                     throw new NotFoundException($"Không tìm thấy voucher với id {modalId}");
                 }
 
+                int count = 0;
+
                 foreach (var createVoucherCode in createVoucherCodeDTOs)
                 {
                     var voucherCode = _mapper.Map<VoucherCode>(createVoucherCode);
@@ -74,45 +77,37 @@ namespace Vouchee.Business.Services.Impls
                     voucherCode.Status = VoucherCodeStatusEnum.ACTIVE.ToString();
                     voucherCode.CreateBy = thisUserObj.userId;
 
-                    var voucherCodeId = await _voucherCodeRepository.AddAsync(voucherCode);
-                    list.Add(voucherCodeId);
+                    exisedModal.VoucherCodes.Add(voucherCode);
+
+                    count++;
                 }
 
                 // Update the stock of exisedModal
-                exisedModal.Stock += list.Count;
+                exisedModal.Stock += count;
 
-                // Check if the state of exisedModal has changed and attach if necessary
-                var state = _modalRepository.GetEntityState(exisedModal);
-                if (state == EntityState.Detached)
+                // Update voucher stock as well
+                exisedModal.Voucher.Stock += count;
+
+                var voucherUpdateSuccess = await _modalRepository.UpdateAsync(exisedModal);
+
+                var voucherCodes = exisedModal.VoucherCodes
+                                        .OrderByDescending(x => x.CreateDate)
+                                        .Take(count)
+                                        .ToList();
+
+                exisedModal.VoucherCodes = voucherCodes;
+
+                if (voucherUpdateSuccess)
                 {
-                    _modalRepository.MarkModified(exisedModal);
-                }
-                state = _modalRepository.GetEntityState(exisedModal);
-                var stockUpdateSuccess = await _modalRepository.UpdateAsync(exisedModal);
-
-                if (stockUpdateSuccess)
-                {
-                    // Update voucher stock as well
-                    exisedModal.Voucher.Stock += exisedModal.Stock;
-                    var voucherUpdateSuccess = await _voucherRepository.UpdateAsync(exisedModal.Voucher);
-
-                    if (voucherUpdateSuccess)
+                    return new ResponseMessage<GetDetailModalDTO>()
                     {
-                        return new ResponseMessage<IList<Guid?>>()
-                        {
-                            message = "Thêm thành công",
-                            result = true,
-                            value = list
-                        };
-                    }
+                        message = "Thêm thành công",
+                        result = true,
+                        value = _mapper.Map<GetDetailModalDTO>(exisedModal)
+                    };
                 }
 
-                return new ResponseMessage<IList<Guid?>>()
-                {
-                    message = "Failed to update voucher stock",
-                    result = false,
-                    value = null
-                };
+                return null;
             }
             catch (Exception ex)
             {
