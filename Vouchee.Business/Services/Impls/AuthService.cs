@@ -42,19 +42,10 @@ namespace Vouchee.Business.Services.Impls
         public async Task<AuthResponse> GetToken(string firebaseToken)
         {
             AuthResponse response = new();
+ 
+            string inputStr = Encoding.UTF8.GetString(Convert.FromBase64String(firebaseToken));
 
-            try
-            {
-                string trimmedToken = firebaseToken.TrimEnd('=');
-                FirebaseToken x = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(trimmedToken);
-            }
-            catch (FirebaseAuthException ex)
-            {
-                // Log the exception and handle it accordingly
-                Console.WriteLine($"Error verifying token: {ex.Message}");
-                throw; // Or handle as needed
-            }
-            FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
+            FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(inputStr);
             string uid = decryptedToken.Uid;
 
             UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
