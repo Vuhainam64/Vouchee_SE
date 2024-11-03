@@ -112,49 +112,35 @@ namespace Vouchee.Business.Services.Impls
                         _userRepository.Attach(cart.Modal);
                     }
                 }
-                // Nào fix xong thì mở
-                //if (cartModal.Modal.Voucher.SellerID == thisUserObj.userId)
-                //{
-                //    throw new ConflictException($"{cartModal.ModalId} là modal của shop bạn. Bạn không thể order chính modal của mình");
-                //}
-                //var modal = await _modalRepository.FindAsync(modalId, false);
-                //if (cartModal.Quantity >= modal.Stock)
-                //{
-                //    throw new ConflictException($"Hiện tại modal này mới có {modal.Stock} code");
-                //}
-                //if (cartModal.Quantity >= 20)
-                //{
-                //    throw new ConflictException("Quantity đã vượt quá 20");
-                //}
-                //else
-                //{
-                //    cartModal.Quantity += 1;
-                //    cartModal.UpdateBy = thisUserObj.userId;
-                //    cartModal.UpdateDate = DateTime.Now;
-
-                //    var userState = _userRepository.GetEntityState(_user);
-
-                //    _userRepository.SetEntityState(_user, EntityState.Modified);
-                //    var result = await _userRepository.SaveChanges();
-                //    if (result)
-                //    {
-                //        await GetCartsAsync(thisUserObj);
-                //        return _cartDTO;
-                //    }
-                //}
-
-                cartModal.Quantity += 1;
-                cartModal.UpdateBy = thisUserObj.userId;
-                cartModal.UpdateDate = DateTime.Now;
-
-                var userState = _userRepository.GetEntityState(_user);
-
-                _userRepository.SetEntityState(_user, EntityState.Modified);
-                var result = await _userRepository.SaveChanges();
-                if (result)
+                Nào fix xong thì mở
+                if (cartModal.Modal.Voucher.SellerID == thisUserObj.userId)
                 {
-                    await GetCartsAsync(thisUserObj);
-                    return _cartDTO;
+                    throw new ConflictException($"{cartModal.ModalId} là modal của shop bạn. Bạn không thể order chính modal của mình");
+                }
+                var modal = await _modalRepository.FindAsync(modalId, false);
+                if (cartModal.Quantity >= modal.Stock)
+                {
+                    throw new ConflictException($"Hiện tại modal này mới có {modal.Stock} code");
+                }
+                if (cartModal.Quantity >= 20)
+                {
+                    throw new ConflictException("Quantity đã vượt quá 20");
+                }
+                else
+                {
+                    cartModal.Quantity += 1;
+                    cartModal.UpdateBy = thisUserObj.userId;
+                    cartModal.UpdateDate = DateTime.Now;
+
+                    var userState = _userRepository.GetEntityState(_user);
+
+                    _userRepository.SetEntityState(_user, EntityState.Modified);
+                    var result = await _userRepository.SaveChanges();
+                    if (result)
+                    {
+                        await GetCartsAsync(thisUserObj);
+                        return _cartDTO;
+                    }
                 }
             }
             else
