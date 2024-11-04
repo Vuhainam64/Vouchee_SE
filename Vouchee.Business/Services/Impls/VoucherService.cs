@@ -334,7 +334,7 @@ namespace Vouchee.Business.Services.Impls
             return await result.ToListAsync();
         }
 
-        public async Task<DynamicResponseModel<GetVoucherDTO>> GetVoucherBySellerId(Guid sellerId, 
+        public async Task<DynamicResponseModel<GetVoucherSeller>> GetVoucherBySellerId(Guid sellerId, 
                                                                                         PagingRequest pagingRequest, 
                                                                                         VoucherFilter voucherFilter, 
                                                                                         IList<Guid>? categoryIds)
@@ -346,17 +346,17 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Không tìm thấy seller này");
             }
 
-            (int, IQueryable<GetVoucherDTO>) result;
+            (int, IQueryable<GetVoucherSeller>) result;
 
             result = _voucherRepository.GetTable().Include(x => x.Seller)
                                                     .Where(x => (categoryIds == null || !categoryIds.Any() || x.Categories.Any(c => categoryIds.Contains(c.Id)))
                                                             && x.SellerID == sellerId)
-                                                    .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
-                                                    .DynamicFilter(_mapper.Map<GetVoucherDTO>(voucherFilter))
+                                                    .ProjectTo<GetVoucherSeller>(_mapper.ConfigurationProvider)
+                                                    .DynamicFilter(_mapper.Map<GetVoucherSeller>(voucherFilter))
                                                     .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
 
-            var response = new DynamicResponseModel<GetVoucherDTO>()
+            var response = new DynamicResponseModel<GetVoucherSeller>()
             {
                 metaData = new MetaData()
                 {
