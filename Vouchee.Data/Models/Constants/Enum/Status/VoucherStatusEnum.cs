@@ -10,6 +10,7 @@ namespace Vouchee.Data.Models.Constants.Enum.Status
     {
         NOT_SELL,
         SELLING,
-        OUT_OF_STOCK
+        OUT_OF_STOCK,
+        DELETE
     }
 }

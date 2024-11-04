@@ -27,7 +27,8 @@ namespace Vouchee.API.AppStarts
                 .ForMember(x => x.brandName, dest => dest.MapFrom(opt => opt.Brand.Name))
                 .ForMember(x => x.brandImage, dest => dest.MapFrom(opt => opt.Brand.Image))
                 .ReverseMap();
-            CreateMap<Voucher, GetVoucherSeller>()
+
+            CreateMap<Voucher, GetVoucherSellerDTO>()
                .ForMember(dest => dest.image, opt => opt.MapFrom(src => src.Medias.FirstOrDefault(m => m.Index == 0).Url))
                .ForMember(dest => dest.originalPrice, opt => opt.MapFrom(src => src.Modals.FirstOrDefault(m => m.Index == 0).OriginalPrice))
                .ForMember(dest => dest.sellPrice, opt => opt.MapFrom(src => src.Modals.FirstOrDefault(m => m.Index == 0).SellPrice))
@@ -36,6 +37,7 @@ namespace Vouchee.API.AppStarts
                .ForMember(x => x.brandName, dest => dest.MapFrom(opt => opt.Brand.Name))
                .ForMember(x => x.brandImage, dest => dest.MapFrom(opt => opt.Brand.Image))
                .ReverseMap();
+
             CreateMap<Voucher, GetDetailVoucherDTO>()
                 .ForMember(dest => dest.image, opt => opt.MapFrom(src => src.Medias.FirstOrDefault(m => m.Index == 0).Url))
                 .ForMember(dest => dest.originalPrice, opt => opt.MapFrom(src => src.Modals.FirstOrDefault(m => m.Index == 0).OriginalPrice))
@@ -82,6 +84,7 @@ namespace Vouchee.API.AppStarts
                 .ReverseMap();
 
             CreateMap<GetVoucherDTO, VoucherFilter>().ReverseMap();
+            CreateMap<GetVoucherSellerDTO, VoucherFilter>().ReverseMap();
             CreateMap<GetBestSoldVoucherDTO, VoucherFilter>().ReverseMap();
             CreateMap<GetNearestVoucherDTO, VoucherFilter>().ReverseMap();
 

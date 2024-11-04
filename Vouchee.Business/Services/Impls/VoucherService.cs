@@ -326,7 +326,7 @@ namespace Vouchee.Business.Services.Impls
             return await result.ToListAsync();
         }
 
-        public async Task<DynamicResponseModel<GetVoucherSeller>> GetVoucherBySellerId(Guid sellerId, 
+        public async Task<DynamicResponseModel<GetVoucherSellerDTO>> GetVoucherBySellerId(Guid sellerId, 
                                                                                         PagingRequest pagingRequest, 
                                                                                         VoucherFilter voucherFilter, 
                                                                                         IList<Guid>? categoryIds)
@@ -338,17 +338,17 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Không tìm thấy seller này");
             }
 
-            (int, IQueryable<GetVoucherSeller>) result;
+            (int, IQueryable<GetVoucherSellerDTO>) result;
 
             result = _voucherRepository.GetTable().Include(x => x.Seller)
                                                     .Where(x => (categoryIds == null || !categoryIds.Any() || x.Categories.Any(c => categoryIds.Contains(c.Id)))
                                                             && x.SellerID == sellerId)
-                                                    .ProjectTo<GetVoucherSeller>(_mapper.ConfigurationProvider)
-                                                    .DynamicFilter(_mapper.Map<GetVoucherSeller>(voucherFilter))
+                                                    .ProjectTo<GetVoucherSellerDTO>(_mapper.ConfigurationProvider)
+                                                    .DynamicFilter(_mapper.Map<GetVoucherSellerDTO>(voucherFilter))
                                                     .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
 
-            var response = new DynamicResponseModel<GetVoucherSeller>()
+            var response = new DynamicResponseModel<GetVoucherSellerDTO>()
             {
                 metaData = new MetaData()
                 {
