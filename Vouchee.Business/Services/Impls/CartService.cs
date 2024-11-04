@@ -63,9 +63,10 @@ namespace Vouchee.Business.Services.Impls
 
             // check for modified voucher, modal, voucher
 
+            CartDTO cartDTO = new();
+
             if (_user.Carts.Count() != 0)
             {
-                CartDTO cartDTO = new();
 
                 var groupedCarts = _user.Carts.GroupBy(cartItem => cartItem.Modal.Voucher.Seller?.Id).ToList();
                 foreach (var carts in groupedCarts)
@@ -87,13 +88,10 @@ namespace Vouchee.Business.Services.Impls
                     cartDTO.totalPrice = (decimal) cartDTO.sellers.Sum(s => s.modals.Sum(x => x.totalPrice));
                     cartDTO.discountPrice = (decimal) cartDTO.sellers.Sum(s => s.modals.Sum(x => x.discountPrice));
                 }
-
-                _cartDTO = cartDTO;
-
-                return _cartDTO;
             }
 
-            return null;
+            _cartDTO = cartDTO;
+            return _cartDTO;
         }
 
         public async Task<CartDTO> AddItemAsync(Guid modalId, ThisUserObj thisUserObj)
