@@ -24,10 +24,10 @@ namespace Vouchee.Business.Services
         public Task<IList<GetVoucherDTO>> GetNewestVouchers(int numberOfVoucher);
         public Task<IList<GetBestSoldVoucherDTO>> GetTopSaleVouchers(int numberOFVoucher);
         public Task<IList<GetVoucherDTO>> GetSalestVouchers(int numberOfVoucher);
-        public Task<DynamicResponseModel<GetVoucherSeller>> GetVoucherBySellerId(Guid sellerId, 
-                                                                                PagingRequest pagingRequest, 
-                                                                                VoucherFilter voucherFilter,
-                                                                                IList<Guid>? categoryIds);
+        public Task<DynamicResponseModel<GetVoucherSellerDTO>> GetVoucherBySellerId(Guid sellerId, 
+                                                                                        PagingRequest pagingRequest, 
+                                                                                        VoucherFilter voucherFilter,
+                                                                                        IList<Guid>? categoryIds);
 
         // UPDATE
         public Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO);

@@ -105,13 +105,16 @@ namespace Vouchee.Business.Models.DTOs
     {
 
     }
-    public class GetVoucherSeller : VoucherDTO
+
+    public class GetVoucherSellerDTO : VoucherDTO
     {
-        public GetVoucherSeller() {
-            modal = [];
+        public GetVoucherSellerDTO() {
+            modals = [];
         }
-        public virtual IEnumerable<GetModalDTO> modal { get; set; }
+
+        public virtual IEnumerable<GetModalDTO> modals { get; set; }
     }
+
     public class GetNearestVoucherDTO : VoucherDTO
     {
         public GetNearestVoucherDTO()
