@@ -122,7 +122,7 @@ namespace Vouchee.Business.Services.Impls
                 var existedModal = await _modalRepository.GetByIdAsync(id,isTracking:true);
                 if (existedModal != null)
                 {
-                    existedModal.Status = (existedModal.Status == "SAVE") ? "NOTSAVE" : "SAVE";
+                    existedModal.Status = (existedModal.Status == "SELLING") ? "NOT_SELL" : "SELLING";
                     return await _modalRepository.UpdateAsync(existedModal);
                 }
                 else

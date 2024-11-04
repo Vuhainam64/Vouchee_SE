@@ -255,7 +255,7 @@ namespace Vouchee.Business.Services.Impls
                 var existedVoucher = await _voucherRepository.GetByIdAsync(id,isTracking:true);
                 if (existedVoucher != null)
                 {
-                    existedVoucher.Status = (existedVoucher.Status == "SAVE") ? "NOTSAVE" : "SAVE";
+                    existedVoucher.Status = (existedVoucher.Status == "SELLING") ? "NOT_SELL" : "SELLING";
                     return await _voucherRepository.UpdateAsync(existedVoucher);
                 }
                 else
