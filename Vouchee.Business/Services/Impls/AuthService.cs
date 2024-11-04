@@ -42,10 +42,8 @@ namespace Vouchee.Business.Services.Impls
         public async Task<AuthResponse> GetToken(string firebaseToken)
         {
             AuthResponse response = new();
- 
-            string inputStr = Encoding.UTF8.GetString(Convert.FromBase64String(firebaseToken));
 
-            FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(inputStr);
+            FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
             string uid = decryptedToken.Uid;
 
             UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
