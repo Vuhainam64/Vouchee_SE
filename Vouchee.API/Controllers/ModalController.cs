@@ -66,7 +66,11 @@ namespace Vouchee.API.Controllers
             var result = await _modalService.UpdateModalAsync(id, updateModalDTO);
             return Ok(result);
         }
-
+        public async Task<IActionResult> UpdateModalStatus(Guid id)
+        {
+            var result = await _modalService.UpdateModalStatusAsync(id);
+            return Ok(result);
+        }
         // DELETE
         [HttpDelete("delete_modal/{id}")]
         public async Task<IActionResult> DeleteVoucherCode(Guid id)
