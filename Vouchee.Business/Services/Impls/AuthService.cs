@@ -1,22 +1,17 @@
 ﻿using AutoMapper;
-using Azure.Core;
 using FirebaseAdmin.Auth;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
-using Vouchee.Business.Models.ViewModels;
-using Vouchee.Business.Services.Extensions.RedisCache;
 using Vouchee.Data.Models.Constants.Dictionary;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Status;
-using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Repositories.IRepos;
 using UnauthorizedAccessException = Vouchee.Business.Exceptions.UnauthorizedAccessException;
@@ -377,7 +372,7 @@ namespace Vouchee.Business.Services.Impls
                     new Claim(ClaimTypes.Actor, response.name),
                     roleClaim
                 }),
-                Expires = DateTime.UtcNow.AddHours(24), // Set access token expiration
+                Expires = DateTime.UtcNow.AddHours(5000), // Set access token expiration
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
 

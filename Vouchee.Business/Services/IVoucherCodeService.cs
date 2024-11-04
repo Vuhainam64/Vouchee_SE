@@ -8,13 +8,15 @@ using Vouchee.Business.Models;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Filters;
 using Microsoft.AspNetCore.Mvc;
+using Vouchee.Data.Models.DTOs;
+using System.Collections;
 
 namespace Vouchee.Business.Services
 {
     public interface IVoucherCodeService
     {
         // CREATE
-        public Task<ResponseMessage<IList<Guid?>>> CreateVoucherCodeAsync(Guid modalId, IList<CreateVoucherCodeDTO> createVoucherCodeDTOs, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<GetDetailModalDTO>> CreateVoucherCodeAsync(Guid modalId, IList<CreateVoucherCodeDTO> createVoucherCodeDTOs, ThisUserObj thisUserObj);
 
         // READ
         public Task<GetVoucherCodeDTO> GetVoucherCodeByIdAsync(Guid id);

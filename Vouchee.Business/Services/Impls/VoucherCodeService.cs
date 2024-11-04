@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Google.Api;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -17,27 +18,32 @@ using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Constants.Number;
+using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
 using Vouchee.Data.Repositories.IRepos;
 using Vouchee.Data.Repositories.Repos;
+using static Grpc.Core.Metadata;
 
 namespace Vouchee.Business.Services.Impls
 {
     public class VoucherCodeService : IVoucherCodeService
     {
+        private readonly IUserRepository _userRepository;
         private readonly IModalRepository _modalRepository;
         private readonly IFileUploadService _fileUploadService;
         private readonly IVoucherCodeRepository _voucherCodeRepository;
         private readonly IVoucherRepository _voucherRepository;
         private readonly IMapper _mapper;
 
-        public VoucherCodeService(IModalRepository modalRepository,
+        public VoucherCodeService(IUserRepository userRepository,
+                                    IModalRepository modalRepository,
                                     IVoucherCodeRepository voucherCodeRepository,
                                     IVoucherRepository voucherRepository,
                                     IFileUploadService fileUploadService,
                                     IMapper mapper)
         {
+            _userRepository = userRepository;
             _modalRepository = modalRepository;
             _fileUploadService = fileUploadService;
             _voucherCodeRepository = voucherCodeRepository;
@@ -45,59 +51,60 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<ResponseMessage<IList<Guid?>>> CreateVoucherCodeAsync(Guid modalId, IList<CreateVoucherCodeDTO> createVoucherCodeDTOs, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<GetDetailModalDTO>> CreateVoucherCodeAsync(Guid modalId, IList<CreateVoucherCodeDTO> createVoucherCodeDTOs, ThisUserObj thisUserObj)
         {
             try
             {
-                IList<Guid?> list = [];
-                
-                var exisedModal = await _modalRepository.GetByIdAsync(modalId, includeProperties: x => x.Include(x => x.Voucher), isTracking: true);
+                IList<Guid> list = [];
+
+                var exisedModal = await _modalRepository.GetByIdAsync(modalId,
+                    includeProperties: x => x.Include(m => m.Voucher)
+                                             .Include(m => m.Carts)
+                                                 .ThenInclude(c => c.Buyer),
+                    isTracking: true);
+
                 if (exisedModal == null)
                 {
                     throw new NotFoundException($"Không tìm thấy voucher với id {modalId}");
                 }
 
+                int count = 0;
+
                 foreach (var createVoucherCode in createVoucherCodeDTOs)
                 {
-                    VoucherCode voucherCode = _mapper.Map<VoucherCode>(createVoucherCode);
-
+                    var voucherCode = _mapper.Map<VoucherCode>(createVoucherCode);
                     voucherCode.ModalId = exisedModal.Id;
                     voucherCode.Status = VoucherCodeStatusEnum.ACTIVE.ToString();
                     voucherCode.CreateBy = thisUserObj.userId;
 
-                    var voucherCodeId = await _voucherCodeRepository.AddAsync(voucherCode);
+                    exisedModal.VoucherCodes.Add(voucherCode);
 
-                    list.Add(voucherCodeId);
+                    count++;
                 }
 
-                exisedModal.Stock += list.Count();
+                // Update the stock of exisedModal
+                exisedModal.Stock += count;
 
-                // mình đang tạo voucher code
-                // mình đồng thời update cái voucher code trong modal => chắc chắn nó phải là MODIFIED
-                // nên phải attach nó
-                var state = _modalRepository.GetEntityState(exisedModal);
+                // Update voucher stock as well
+                exisedModal.Voucher.Stock += count;
 
-                if (state == EntityState.Modified)
+                var voucherUpdateSuccess = await _modalRepository.UpdateAsync(exisedModal);
+
+                var voucherCodes = exisedModal.VoucherCodes
+                                        .OrderByDescending(x => x.CreateDate)
+                                        .Take(count)
+                                        .ToList();
+
+                exisedModal.VoucherCodes = voucherCodes;
+
+                if (voucherUpdateSuccess)
                 {
-                    _modalRepository.Attach(exisedModal);
-                }
-
-                var stockUpdateSuccess = await _modalRepository.UpdateAsync(exisedModal);
-                
-                if (stockUpdateSuccess)
-                {
-                    exisedModal.Voucher.Stock += exisedModal.Stock;
-                    
-                    var voucherUpdateSuccess = await _voucherRepository.UpdateAsync(exisedModal.Voucher);
-                    if (voucherUpdateSuccess)
+                    return new ResponseMessage<GetDetailModalDTO>()
                     {
-                        return new ResponseMessage<IList<Guid?>>()
-                        {
-                            message = "Thêm thành công",
-                            result = true,
-                            value = list
-                        };
-                    }
+                        message = "Thêm thành công",
+                        result = true,
+                        value = _mapper.Map<GetDetailModalDTO>(exisedModal)
+                    };
                 }
 
                 return null;
@@ -108,6 +115,7 @@ namespace Vouchee.Business.Services.Impls
                 throw new CreateObjectException(ex.Message);
             }
         }
+
 
         public async Task<bool> DeleteVoucherCodeAsync(Guid id)
         {

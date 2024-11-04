@@ -99,7 +99,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<Guid?> CreateOrderAsync(ThisUserObj thisUserObj)
         {
-            CartDTO cartDTO = await _cartService.GetCartsAsync(thisUserObj);
+            CartDTO cartDTO = await _cartService.GetCartsAsync(thisUserObj, false);
 
             Order order = new()
             {

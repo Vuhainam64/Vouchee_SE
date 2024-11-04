@@ -270,9 +270,17 @@ namespace Vouchee.Data.Helpers
 
         public async Task<bool> SaveChanges()
         {
-            _context.ChangeTracker.DetectChanges();
-            Console.WriteLine(_context.ChangeTracker.DebugView.LongView);
-            return await _context.SaveChangesAsync() > 0;
+            try
+            {
+                _context.ChangeTracker.DetectChanges();
+                Console.WriteLine(_context.ChangeTracker.DebugView.LongView);
+                return await _context.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.InnerException.Message);
+                throw new Exception(ex.InnerException.Message);
+            }
         }
 
         public EntityState GetEntityState(object entity)
@@ -291,7 +299,7 @@ namespace Vouchee.Data.Helpers
             entry.State = state;
         }
 
-        public async Task ReloadAsync(TEntity entity)
+        public async Task ReloadAsync(object entity)
         {
             await _context.Entry(entity).ReloadAsync();
         }
@@ -300,6 +308,11 @@ namespace Vouchee.Data.Helpers
         {
             var trackedEntities = _context.ChangeTracker.Entries();
             return trackedEntities;
+        }
+
+        public void MarkModified(TEntity entity)
+        {
+            _context.Entry<TEntity>(entity).State = EntityState.Modified;
         }
     }
 }

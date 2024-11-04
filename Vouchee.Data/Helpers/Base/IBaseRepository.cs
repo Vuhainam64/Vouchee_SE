@@ -33,7 +33,8 @@ namespace Vouchee.Data.Helpers.Base
         public IQueryable<TEntity> CheckLocal();
         public EntityState GetEntityState(object entity);
         public void SetEntityState(TEntity entity, EntityState entityState);
-        public Task ReloadAsync(TEntity entity);
+        public Task ReloadAsync(object entity);
         public object GetModifiedEntity();
+        public void MarkModified(TEntity entity);
     }
 }
