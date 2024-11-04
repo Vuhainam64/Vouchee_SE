@@ -24,6 +24,8 @@ namespace Vouchee.API.AppStarts
             //    options.UseSqlServer(configuration.GetConnectionString("PROD"))
             //           .EnableSensitiveDataLogging() // Enable sensitive data logging
             //           .LogTo(Console.WriteLine, LogLevel.Information)); // Log SQL commands
+            services.AddScoped<DbContext, VoucheeContext>();
+
             services.AddScoped(typeof(BaseDAO<>));
 
             services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
