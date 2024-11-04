@@ -97,7 +97,7 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? brandId { get; set; }
         public string? brandName { get; set; }
         public string? brandImage { get; set; }
-
+        public string? status { get; set; }
         public virtual ICollection<GetCategoryDTO> categories { get; set; }
     }
 
@@ -105,7 +105,13 @@ namespace Vouchee.Business.Models.DTOs
     {
 
     }
-
+    public class GetVoucherSeller : VoucherDTO
+    {
+        public GetVoucherSeller() {
+            modal = [];
+        }
+        public virtual IEnumerable<GetModalDTO> modal { get; set; }
+    }
     public class GetNearestVoucherDTO : VoucherDTO
     {
         public GetNearestVoucherDTO()
