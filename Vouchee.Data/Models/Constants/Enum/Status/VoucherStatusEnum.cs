@@ -8,9 +8,9 @@ namespace Vouchee.Data.Models.Constants.Enum.Status
 {
     public enum VoucherStatusEnum
     {
-        NOT_SELL,
-        SELLING,
-        OUT_OF_STOCK,
-        DELETE
+        NONE,
+        PENDING, 
+        VIOLENT,
+        DELETED,
     }
 }

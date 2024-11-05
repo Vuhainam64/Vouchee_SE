@@ -341,7 +341,7 @@ namespace Vouchee.Business.Services.Impls
 
             result = _voucherRepository.GetTable().Include(x => x.Seller)
                                                     .Where(x => (categoryIds == null || !categoryIds.Any() || x.Categories.Any(c => categoryIds.Contains(c.Id)))
-                                                            && x.SellerID == sellerId)
+                                                            && x.SellerID == sellerId && x.IsActive == voucherFilter.isActive)
                                                     .ProjectTo<GetVoucherSellerDTO>(_mapper.ConfigurationProvider)
                                                     .DynamicFilter(_mapper.Map<GetVoucherSellerDTO>(voucherFilter))
                                                     .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
@@ -355,7 +355,7 @@ namespace Vouchee.Business.Services.Impls
                     size = pagingRequest.pageSize,
                     total = result.Item1 // Total vouchers count for metadata
                 },
-                results = result.Item2.ToList()
+                results = await result.Item2.ToListAsync()
             };
 
             return response;

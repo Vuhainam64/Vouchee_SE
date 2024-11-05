@@ -29,6 +29,8 @@ namespace Vouchee.API.AppStarts
                 .ReverseMap();
 
             CreateMap<Voucher, GetVoucherSellerDTO>()
+               .ForMember(x => x.supplierName, dest => dest.MapFrom(opt => opt.Supplier.Name))
+               .ForMember(x => x.supplierImage, dest => dest.MapFrom(opt => opt.Supplier.Image))
                .ForMember(dest => dest.stock, opt => opt.MapFrom(src => src.Modals.Sum(x => x.Stock)))
                .ForMember(dest => dest.image, opt => opt.MapFrom(src => src.Medias.FirstOrDefault(m => m.Index == 0).Url))
                .ForMember(dest => dest.originalPrice, opt => opt.MapFrom(src => src.Modals.FirstOrDefault(m => m.Index == 0).OriginalPrice))

@@ -143,7 +143,6 @@ namespace Vouchee.Business.Services.Impls
                     var existedVoucher = await _voucherRepository.FindAsync((Guid)voucherId, false);
                     if (existedVoucher != null)
                     {
-                        existedVoucher.Status = isOutOfStock ? VoucherStatusEnum.OUT_OF_STOCK.ToString() : VoucherStatusEnum.SELLING.ToString();
                         existedVoucher.Stock = voucherModals.Sum(x => x.Stock);
                         await _voucherRepository.UpdateAsync(existedVoucher);
                     }
