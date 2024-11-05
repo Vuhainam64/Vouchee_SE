@@ -13,6 +13,7 @@ using Vouchee.Business.Models.ViewModels;
 using Vouchee.Business.Services.Extensions.Filebase;
 using Vouchee.Business.Utils;
 using Vouchee.Data.Helpers;
+using Vouchee.Data.Helpers.Base;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Constants.Enum.Status;
@@ -20,39 +21,37 @@ using Vouchee.Data.Models.Constants.Number;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
-using Vouchee.Data.Repositories.IRepos;
-using Vouchee.Data.Repositories.Repos;
 
 namespace Vouchee.Business.Services.Impls
 {
     public class VoucherService : IVoucherService
     {
-        private readonly IUserRepository _userRepository;
-        private readonly IImageRepository _imageRepository;
-        private readonly ISupplierRepository _supplierRepository;
-        private readonly IBrandRepository _brandReposiroty;
-        private readonly IPromotionRepository _promotionRepository;
-        private readonly ICategoryRepository _categoryRepository;
+        private readonly IBaseRepository<User> _userRepository;
+        private readonly IBaseRepository<Media> _mediaRepository;
+        private readonly IBaseRepository<Supplier> _supplierRepository;
+        private readonly IBaseRepository<Brand> _brandReposiroty;
+        private readonly IBaseRepository<Promotion> _promotionRepository;
+        private readonly IBaseRepository<Category> _categoryRepository;
         private readonly IFileUploadService _fileUploadService;
-        private readonly IVoucherRepository _voucherRepository;
-        private readonly IOrderDetailRepository _orderDetailRepository;
+        private readonly IBaseRepository<Voucher> _voucherRepository;
+        private readonly IBaseRepository<OrderDetail> _orderDetailRepository;
         private readonly IMapper _mapper;
 
-        public VoucherService(IUserRepository userRepository,
-                                IImageRepository imageRepository,
-                                ISupplierRepository supplierRepository,
-                                IBrandRepository brandRepository,
-                                IPromotionRepository promotionRepository,
-                                ICategoryRepository categoryRepository,
+        public VoucherService(IBaseRepository<User> userRepository,
+                                IBaseRepository<Media> mediaRepository,
+                                IBaseRepository<Supplier> supplierRepository,
+                                IBaseRepository<Brand> brandReposiroty,
+                                IBaseRepository<Promotion> promotionRepository,
+                                IBaseRepository<Category> categoryRepository,
                                 IFileUploadService fileUploadService,
-                                IVoucherRepository voucherRepository,
-                                IOrderDetailRepository orderDetailRepository,
+                                IBaseRepository<Voucher> voucherRepository,
+                                IBaseRepository<OrderDetail> orderDetailRepository,
                                 IMapper mapper)
         {
             _userRepository = userRepository;
-            _imageRepository = imageRepository;
+            _mediaRepository = mediaRepository;
             _supplierRepository = supplierRepository;
-            _brandReposiroty = brandRepository;
+            _brandReposiroty = brandReposiroty;
             _promotionRepository = promotionRepository;
             _categoryRepository = categoryRepository;
             _fileUploadService = fileUploadService;

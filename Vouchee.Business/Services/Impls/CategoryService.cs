@@ -10,27 +10,26 @@ using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
 using Vouchee.Business.Services.Extensions.Filebase;
 using Vouchee.Data.Helpers;
+using Vouchee.Data.Helpers.Base;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Constants.Number;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
-using Vouchee.Data.Repositories.IRepos;
-using Vouchee.Data.Repositories.Repos;
 
 namespace Vouchee.Business.Services.Impls
 {
     public class CategoryService : ICategoryService
     {
-        private readonly IVoucherTypeRepository _voucherTypeRepository;
+        private readonly IBaseRepository<VoucherType> _voucherTypeRepository;
         private readonly IFileUploadService _fileUploadService;
-        private readonly ICategoryRepository _categoryRepository;
+        private readonly IBaseRepository<Category> _categoryRepository;
         private readonly IMapper _mapper;
 
-        public CategoryService(IVoucherTypeRepository voucherTypeRepository,
+        public CategoryService(IBaseRepository<VoucherType> voucherTypeRepository,
                                 IFileUploadService fileUploadService,
-                                ICategoryRepository categoryRepository, 
+                                IBaseRepository<Category> categoryRepository, 
                                 IMapper mapper)
         {
             _voucherTypeRepository = voucherTypeRepository;

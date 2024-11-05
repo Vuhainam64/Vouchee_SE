@@ -7,6 +7,7 @@ using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Services.Extensions.Filebase;
 using Vouchee.Data.Helpers;
+using Vouchee.Data.Helpers.Base;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Constants.Enum.Status;
@@ -14,20 +15,18 @@ using Vouchee.Data.Models.Constants.Number;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
-using Vouchee.Data.Repositories.IRepos;
-using Vouchee.Data.Repositories.Repos;
 
 namespace Vouchee.Business.Services.Impls
 {
     public class VoucherTypeService : IVoucherTypeService
     {
         private readonly IFileUploadService _fileUploadService;
-        private readonly IVoucherTypeRepository _voucherTypeRepository;
+        private readonly IBaseRepository<VoucherType> _voucherTypeRepository;
         private readonly IMapper _mapper;
 
-        public VoucherTypeService(IFileUploadService fileUploadService, 
-                                    IVoucherTypeRepository voucherTypeRepository, 
-                                    IMapper mapper)
+        public VoucherTypeService(IFileUploadService fileUploadService,
+                                      IBaseRepository<VoucherType> voucherTypeRepository,
+                                      IMapper mapper)
         {
             _fileUploadService = fileUploadService;
             _voucherTypeRepository = voucherTypeRepository;

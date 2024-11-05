@@ -5,21 +5,21 @@ using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Data.Helpers;
+using Vouchee.Data.Helpers.Base;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Constants.Number;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
-using Vouchee.Data.Repositories.IRepos;
 
 namespace Vouchee.Business.Services.Impls
 {
     public class UserService : IUserService
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IBaseRepository<User> _userRepository;
         private readonly IMapper _mapper;
 
-        public UserService(IUserRepository userRepository, 
+        public UserService(IBaseRepository<User> userRepository, 
                             IMapper mapper)
         {
             _userRepository = userRepository;
@@ -69,7 +69,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<GetUserDTO> GetUserByEmailAsync(string email)
         {
-            var user = await _userRepository.GetUserByEmail(email);
+            var user = await _userRepository.GetFirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()));
             if (user != null)
             {
                 GetUserDTO userDTO = _mapper.Map<GetUserDTO>(user);

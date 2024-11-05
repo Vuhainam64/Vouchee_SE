@@ -6,8 +6,6 @@ using Vouchee.Business.Services.Impls;
 using Vouchee.Business.Services;
 using Vouchee.Data.Helpers.Base;
 using Vouchee.Data.Helpers;
-using Vouchee.Data.Repositories.IRepos;
-using Vouchee.Data.Repositories.Repos;
 using Vouchee.Business.Models;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -20,13 +18,7 @@ namespace Vouchee.API.AppStarts
     {
         public static void AddDependencyInjection(this IServiceCollection services, IConfiguration configuration)
         {
-            //services.AddDbContext<VoucheeContext>(options =>
-            //    options.UseSqlServer(configuration.GetConnectionString("PROD"))
-            //           .EnableSensitiveDataLogging() // Enable sensitive data logging
-            //           .LogTo(Console.WriteLine, LogLevel.Information)); // Log SQL commands
-            services.AddScoped<DbContext, VoucheeContext>();
-
-            services.AddScoped(typeof(BaseDAO<>));
+            services.AddScoped(typeof(VoucheeContext));
 
             services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 
@@ -40,61 +32,42 @@ namespace Vouchee.API.AppStarts
 
             // VOUCHER
             services.AddScoped<IVoucherService, VoucherService>();
-            services.AddScoped<IVoucherRepository, VoucherRepository>();
 
             // ORDER
             services.AddScoped<IOrderService, OrderService>();
-            services.AddScoped<IOrderRepository, OrderRepository>();
 
             // ROLE
             services.AddScoped<IRoleService, RoleService>();
-            services.AddScoped<IRoleRepository, RoleRepository>();
 
             // SHOP
             services.AddScoped<IAddressService, AddressService>();
-            services.AddScoped<IAddressRepository, AddressRepository>();
 
             // SUPPLIER
             services.AddScoped<ISupplierService, SupplierService>();
-            services.AddScoped<ISupplierRepository, SupplierRepository>();
 
             // USER
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IUserRepository, UserRepository>();
 
             // VOUCHER
             services.AddScoped<IVoucherService, VoucherService>();
-            services.AddScoped<IVoucherRepository, VoucherRepository>();
 
             // VOUCHER TYPE
             services.AddScoped<IVoucherTypeService, VoucherTypeService>();
-            services.AddScoped<IVoucherTypeRepository, VoucherTypeRepository>();
 
             // PROMOTION
             services.AddScoped<IPromotionService, PromotionService>();
-            services.AddScoped<IPromotionRepository, PromotionRepository>();
 
             // VOUCHER CODE
             services.AddScoped<IVoucherCodeService, VoucherCodeService>();
-            services.AddScoped<IVoucherCodeRepository, VoucherCodeRepository>();
 
             // CATEGORY
             services.AddScoped<ICategoryService, CategoryService>();
-            services.AddScoped<ICategoryRepository, CategoryRepository>();
 
             // BRAND
             services.AddScoped<IBrandService, BrandService>();
-            services.AddScoped<IBrandRepository, BrandRepository>();
-
-            // ORDER DETAIL
-            services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
 
             // SUB VOUCHER
             services.AddScoped<IModalService, ModalService>();
-            services.AddScoped<IModalRepository, ModalRepository>();
-
-            // IMAGE
-            services.AddScoped<IImageRepository, ImageRepository>();
 
             // CART
             services.AddScoped<ICartService, CartService>();
