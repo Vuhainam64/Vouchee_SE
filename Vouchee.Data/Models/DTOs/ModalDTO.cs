@@ -28,7 +28,9 @@ namespace Vouchee.Data.Models.DTOs
 
         public string? image { get; set; }
 
-        public VoucherStatusEnum status { get; set; }
+        public VoucherStatusEnum status = VoucherStatusEnum.NONE;
+
+        public bool IsActive { get; set; }
 
         public DateTime createDate = DateTime.Now;
     }

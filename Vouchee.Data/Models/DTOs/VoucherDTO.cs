@@ -45,7 +45,8 @@ namespace Vouchee.Business.Models.DTOs
 
         public DateTime? createDate = DateTime.Now;
         public int stock = 0;
-        public VoucherStatusEnum status { get; set; }
+        public VoucherStatusEnum status = VoucherStatusEnum.NONE;
+        public bool IsActive { get; set; }
 
         public virtual ICollection<CreateModalDTO> modals { get; set; }
     }
