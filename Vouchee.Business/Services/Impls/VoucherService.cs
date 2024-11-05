@@ -240,15 +240,49 @@ namespace Vouchee.Business.Services.Impls
                 throw new UpdateObjectException("Lỗi không xác định khi cập nhật voucher");
             }
         }
-        public async Task<bool> UpdateVoucherStatusAsync(Guid id)
+        public async Task<ResponseMessage<GetVoucherDTO>> UpdateVoucherStatusAsync(Guid id, VoucherStatusEnum voucherStatus)
         {
             try
             {
                 var existedVoucher = await _voucherRepository.GetByIdAsync(id,isTracking:true);
                 if (existedVoucher != null)
                 {
-                    existedVoucher.IsActive = (existedVoucher.IsActive == true) ? false : true;
-                    return await _voucherRepository.UpdateAsync(existedVoucher);
+                    existedVoucher.Status = voucherStatus.ToString();
+                    await _voucherRepository.UpdateAsync(existedVoucher);
+                    return new ResponseMessage<GetVoucherDTO>()
+                    {
+                        message = "Đổi isActive thành công",
+                        result = true,
+                        value = _mapper.Map<GetVoucherDTO>(existedVoucher)
+                    };
+                }
+                else
+                {
+                    throw new NotFoundException("Không tìm thấy voucher");
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.Message);
+                throw new UpdateObjectException("Lỗi không xác định khi cập nhật voucher");
+            }
+        }
+        public async Task<ResponseMessage<GetVoucherDTO>> UpdateVoucherisActiveAsync(Guid id, bool isActive)
+        {
+            try
+            {
+                var existedVoucher = await _voucherRepository.GetByIdAsync(id, isTracking: true);
+                if (existedVoucher != null)
+                {
+                    /*existedVoucher.IsActive = (existedVoucher.IsActive == true) ? false : true;*/
+                    existedVoucher.IsActive = isActive;
+                    await _voucherRepository.UpdateAsync(existedVoucher);
+                    return new ResponseMessage<GetVoucherDTO>()
+                    {
+                        message = "Đổi isActive thành công",
+                        result = true,
+                        value = _mapper.Map<GetVoucherDTO>(existedVoucher)
+                    };
                 }
                 else
                 {

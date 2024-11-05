@@ -10,6 +10,7 @@ using Vouchee.Business.Models.ViewModels;
 using Vouchee.Business.Services;
 using Vouchee.Business.Services.Impls;
 using Vouchee.Data.Models.Constants.Enum.Sort;
+using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Filters;
 
 namespace Vouchee.API.Controllers
@@ -113,12 +114,17 @@ namespace Vouchee.API.Controllers
         }
 
         [HttpPut("update_voucher_status/{id}")]
-        public async Task<IActionResult> UpdateVoucherStatus(Guid id)
+        public async Task<IActionResult> UpdateVoucherStatus(Guid id, VoucherStatusEnum voucherStatus)
         {
-            var result = await _voucherService.UpdateVoucherStatusAsync(id);
+            var result = await _voucherService.UpdateVoucherStatusAsync(id, voucherStatus);
             return Ok(result);
         }
-
+        [HttpPut("update_voucher_isActive/{id}")]
+        public async Task<IActionResult> UpdateVoucherisActive(Guid id, bool isActive)
+        {
+            var result = await _voucherService.UpdateVoucherisActiveAsync(id, isActive);
+            return Ok(result);
+        }
         // DELETE
         [HttpDelete("delete_voucher/{id}")]
         public async Task<IActionResult> DeleteVoucher(Guid id)

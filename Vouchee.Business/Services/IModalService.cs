@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Vouchee.Business.Models;
+using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Filters;
 
@@ -20,7 +21,8 @@ namespace Vouchee.Business.Services
 
         // UPDATE
         public Task<bool> UpdateModalAsync(Guid id, UpdateModalDTO updateModalDTO);
-        public Task<bool> UpdateModalStatusAsync(Guid id);
+        public Task<ResponseMessage<GetModalDTO>> UpdateModalStatusAsync(Guid id, VoucherStatusEnum modalStatus);
+        public Task<ResponseMessage<GetModalDTO>> UpdateModalisActiveAsync(Guid id, bool isActive);
 
         // DELETE
         public Task<bool> DeleteModalAsync(Guid id);

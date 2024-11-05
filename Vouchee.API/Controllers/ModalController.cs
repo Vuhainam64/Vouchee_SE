@@ -9,6 +9,7 @@ using Vouchee.Business.Services;
 using Vouchee.Business.Services.Impls;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Filters;
+using Vouchee.Data.Models.Constants.Enum.Status;
 
 namespace Vouchee.API.Controllers
 {
@@ -67,9 +68,15 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
         [HttpPut("update_modal_status/{id}")]
-        public async Task<IActionResult> UpdateModalStatus(Guid id)
+        public async Task<IActionResult> UpdateModalStatus(Guid id, VoucherStatusEnum modalStatus)
         {
-            var result = await _modalService.UpdateModalStatusAsync(id);
+            var result = await _modalService.UpdateModalStatusAsync(id, modalStatus);
+            return Ok(result);
+        }
+        [HttpPut("update_modal_isActive/{id}")]
+        public async Task<IActionResult> UpdateModalisActive(Guid id, bool isActive)
+        {
+            var result = await _modalService.UpdateModalisActiveAsync(id, isActive);
             return Ok(result);
         }
         // DELETE

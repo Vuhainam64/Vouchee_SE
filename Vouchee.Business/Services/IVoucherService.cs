@@ -1,7 +1,9 @@
-﻿using Vouchee.Business.Models;
+﻿using Google.Rpc;
+using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Models.ViewModels;
 using Vouchee.Data.Models.Constants.Enum.Sort;
+using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Filters;
 using static Vouchee.Business.Services.Impls.VoucherService;
 
@@ -31,7 +33,8 @@ namespace Vouchee.Business.Services
 
         // UPDATE
         public Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO);
-        public Task<bool> UpdateVoucherStatusAsync(Guid id);
+        public Task<ResponseMessage<GetVoucherDTO>> UpdateVoucherStatusAsync(Guid id, VoucherStatusEnum voucherStatus);
+        public Task<ResponseMessage<GetVoucherDTO>> UpdateVoucherisActiveAsync(Guid id, bool isActive);
 
         // DELETE
         public Task<bool> DeleteVoucherAsync(Guid id);
