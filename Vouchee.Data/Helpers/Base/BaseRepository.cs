@@ -1,64 +1,229 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Vouchee.Data.Helpers.Base
 {
     public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : class
     {
-        private readonly BaseDAO<TEntity> _dao;
+        private readonly VoucheeContext _context;
+        private readonly DbSet<TEntity> _table;
 
-        public BaseRepository() => _dao = BaseDAO<TEntity>.Instance;
+        public BaseRepository(VoucheeContext context)
+        {
+            _context = context;
+            _table = context.Set<TEntity>();
+        }
 
-        public Task<Guid?> AddAsync(TEntity entity) => _dao.AddAsync(entity);
+        public async Task<Guid?> AddAsync(TEntity entity)
+        {
+            try
+            {
+                await _table.AddAsync(entity);
+                var result = await SaveChanges();
+                if (result)
+                {
+                    var idProperty = typeof(TEntity).GetProperty("Id");
+                    return idProperty != null ? (Guid?)idProperty.GetValue(entity) : null;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.InnerException?.Message);
+                throw new Exception(ex.InnerException?.Message);
+            }
+        }
 
-        public Task<bool> UpdateAsync(TEntity entity) => _dao.UpdateAsync(entity);
+        public async Task<TEntity> Add(TEntity entity)
+        {
+            try
+            {
+                await _table.AddAsync(entity);
+                var result = await SaveChanges();
+                return result ? entity : null; // Return null if no changes were saved
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.InnerException?.Message);
+                throw new Exception(ex.InnerException?.Message);
+            }
+        }
 
-        public Task<bool> DeleteAsync(TEntity entity) => _dao.DeleteAsync(entity);
+        public async Task<bool> UpdateAsync(TEntity entity)
+        {
+            try
+            {
+                _context.Update(entity);
+                return await SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.InnerException?.Message);
+                throw new Exception(ex.InnerException?.Message);
+            }
+        }
 
-        public Task<TEntity?> GetByIdAsync(object id, 
-                                            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties,
-                                            bool isTracking = false) 
-            => _dao.GetByIdAsync(id, includeProperties, isTracking);
+        public async Task<bool> DeleteAsync(TEntity entity)
+        {
+            try
+            {
+                _table.Remove(entity);
+                await SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.InnerException?.Message);
+                throw new Exception(ex.InnerException?.Message);
+            }
+        }
 
-        public IQueryable<TEntity> GetTable() => _dao.GetTable();
+        public async Task<TEntity> FindAsync(Guid id, bool isTracking = false)
+        {
+            try
+            {
+                var query = isTracking ? _table : _table.AsNoTracking();
+                return await query.FirstOrDefaultAsync(e => EF.Property<Guid>(e, "Id") == id);
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.InnerException?.Message);
+                throw new Exception(ex.InnerException?.Message);
+            }
+        }
 
-        public Task<TEntity> FindAsync(Guid id, bool isTracking = false) 
-            => _dao.FindAsync(id, isTracking);
+        public async Task<TEntity?> GetByIdAsync(object id,
+            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null,
+            bool isTracking = false)
+        {
+            try
+            {
+                IQueryable<TEntity> query = isTracking ? _table : _table.AsNoTracking();
+                if (includeProperties != null)
+                {
+                    query = includeProperties(query);
+                }
+                return await query.FirstOrDefaultAsync(e => EF.Property<object>(e, "Id").Equals(id));
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.InnerException?.Message);
+                throw new Exception(ex.InnerException?.Message);
+            }
+        }
 
-        public Task<TEntity> Add(TEntity entity) => _dao.Add(entity);
+        public async Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> filter,
+            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null,
+            bool isTracking = false)
+        {
+            try
+            {
+                IQueryable<TEntity> query = isTracking ? _table : _table.AsNoTracking();
+                if (includeProperties != null)
+                {
+                    query = includeProperties(query);
+                }
+                return await query.FirstOrDefaultAsync(filter);
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.InnerException?.Message);
+                throw new Exception(ex.InnerException?.Message);
+            }
+        }
 
-        public Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> filter, 
-                                                        Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties,
-                                                        bool isTracking = false)
-            => _dao.GetFirstOrDefaultAsync(filter, includeProperties, isTracking);
+        public async Task<IEnumerable<TEntity>?> GetWhereAsync(Expression<Func<TEntity, bool>> filter,
+            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties = null,
+            bool isTracking = false)
+        {
+            try
+            {
+                IQueryable<TEntity> query = isTracking ? _table : _table.AsNoTracking();
+                if (includeProperties != null)
+                {
+                    query = includeProperties(query);
+                }
+                return await query.Where(filter).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.InnerException?.Message);
+                throw new Exception(ex.InnerException?.Message);
+            }
+        }
 
-        public Task<IEnumerable<TEntity>?> GetWhereAsync(Expression<Func<TEntity, bool>> filter, 
-                                                            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeProperties,
-                                                            bool isTracking = false)
-            => _dao.GetWhereAsync(filter, includeProperties, isTracking);
+        public IQueryable<TEntity> GetTable()
+        {
+            return _table;
+        }
 
-        public async Task<bool> SaveChanges() => await _dao.SaveChanges();
+        public async Task<bool> SaveChanges()
+        {
+            try
+            {
+                return await _context.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.InnerException?.Message);
+                throw new Exception(ex.InnerException?.Message);
+            }
+        }
 
-        public void Attach(object entity) => _dao.Attach(entity);
+        public void Attach(TEntity entity)
+        {
+            _context.Attach(entity);
+        }
 
-        public IQueryable<TEntity> CheckLocal() => _dao.CheckLocal();
+        public void Detach(object entity)
+        {
+            _context.Entry(entity).State = EntityState.Detached;
+        }
 
-        public void Detach(object entity) => _dao.Detach(entity);
+        public IQueryable<TEntity> CheckLocal()
+        {
+            return _context.Set<TEntity>().Local.AsQueryable();
+        }
 
-        public EntityState GetEntityState(object entity) => _dao.GetEntityState(entity);
+        public EntityState GetEntityState(object entity)
+        {
+            return _context.Entry(entity).State;
+        }
 
-        public void SetEntityState(TEntity entity, EntityState entityState) => _dao.SetEntityState(entity, entityState);
+        public void SetEntityState(TEntity entity, EntityState entityState)
+        {
+            var entry = _context.Entry(entity);
+            if (entry.State == EntityState.Detached)
+            {
+                _context.Attach(entity);
+            }
+            entry.State = entityState;
+        }
 
-        public async Task ReloadAsync(object entity) => await _dao.ReloadAsync(entity);
+        public async Task ReloadAsync(object entity)
+        {
+            await _context.Entry(entity).ReloadAsync();
+        }
 
-        public object GetModifiedEntity() => _dao.GetModifiedEntity();
+        public object GetModifiedEntity()
+        {
+            return _context.ChangeTracker.Entries();
+        }
 
-        public void MarkModified(TEntity entity) => _dao.MarkModified(entity);
+        public void MarkModified(TEntity entity)
+        {
+            _context.Entry(entity).State = EntityState.Modified;
+        }
+
+        public void Attach(object entity)
+        {
+            _context.Attach(entity);
+        }
     }
 }

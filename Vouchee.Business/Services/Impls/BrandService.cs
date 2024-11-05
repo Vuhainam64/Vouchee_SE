@@ -12,24 +12,23 @@ using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Services.Extensions.Filebase;
 using Vouchee.Data.Helpers;
+using Vouchee.Data.Helpers.Base;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Constants.Number;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
-using Vouchee.Data.Repositories.IRepos;
-using Vouchee.Data.Repositories.Repos;
 
 namespace Vouchee.Business.Services.Impls
 {
     public class BrandService : IBrandService
     {
-        private readonly IBrandRepository _brandRepository;
+        private readonly IBaseRepository<Brand> _brandRepository;
         private readonly IFileUploadService _fileUploadService;
         private readonly IMapper _mapper;
 
-        public BrandService(IBrandRepository brandRepository,
+        public BrandService(IBaseRepository<Brand> brandRepository,
                                 IFileUploadService fileUploadService, 
                                 IMapper mapper)
         {

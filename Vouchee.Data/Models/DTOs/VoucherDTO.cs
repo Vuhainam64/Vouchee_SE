@@ -98,6 +98,7 @@ namespace Vouchee.Business.Models.DTOs
         public string? brandName { get; set; }
         public string? brandImage { get; set; }
         public string? status { get; set; }
+        public bool? isActive { get; set; }
         public virtual ICollection<GetCategoryDTO> categories { get; set; }
     }
 
@@ -111,6 +112,10 @@ namespace Vouchee.Business.Models.DTOs
         public GetVoucherSellerDTO() {
             modals = [];
         }
+
+        public Guid? supplierId { get; set; }
+        public string? supplierName { get; set; }
+        public string? supplierImage { get; set; }
 
         public virtual IEnumerable<GetModalDTO> modals { get; set; }
     }

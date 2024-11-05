@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FirebaseAdmin.Auth;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -9,11 +10,11 @@ using System.Text;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
+using Vouchee.Data.Helpers.Base;
 using Vouchee.Data.Models.Constants.Dictionary;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Entities;
-using Vouchee.Data.Repositories.IRepos;
 using UnauthorizedAccessException = Vouchee.Business.Exceptions.UnauthorizedAccessException;
 
 namespace Vouchee.Business.Services.Impls
@@ -21,16 +22,16 @@ namespace Vouchee.Business.Services.Impls
     public class AuthService : IAuthService
     {
         private readonly AppSettings _appSettings;
-        private readonly IRoleRepository _roleRepository;
-        private readonly IUserRepository _userRepository;
+        private readonly IBaseRepository<Role> _roleRepository;
+        private readonly IBaseRepository<User> _userRepository;
         private readonly IMapper _mapper;
         private readonly IDistributedCache _cache;
 
         public AuthService(IOptions<AppSettings> appSettings, 
-                            IUserRepository userRepository,
+                            IBaseRepository<User> userRepository,
+                            IBaseRepository<Role> roleRepository,
                             IDistributedCache cache,
-                            IMapper mapper,
-                            IRoleRepository roleRepository)
+                            IMapper mapper)
         {
             _cache = cache;
             _appSettings = appSettings.Value;
@@ -52,7 +53,8 @@ namespace Vouchee.Business.Services.Impls
             var phoneNumber = userRecord.PhoneNumber?.ToString() ?? null;
             string lastName = userRecord.DisplayName;
 
-            var user = await _userRepository.GetUserByEmail(email);
+            var user = await _userRepository.GetFirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()), 
+                                                                        includeProperties: x => x.Include(x => x.Role));
             GetUserDTO useDTO = _mapper.Map<GetUserDTO>(user);
 
             // trường hợp người dùng mới, mặc định là buyer
@@ -103,89 +105,89 @@ namespace Vouchee.Business.Services.Impls
             return response;
         }
 
-        public async Task<AuthResponse> LoginWithEmail(LoginByEmailDTO loginByEmailDTO)
-        {
-            // Initialize response
-            AuthResponse response = new();
+        //public async Task<AuthResponse> LoginWithEmail(LoginByEmailDTO loginByEmailDTO)
+        //{
+        //    // Initialize response
+        //    AuthResponse response = new();
 
-            // Get the user based on the email login DTO
-            User? user = await _userRepository.LoginWithEmail(loginByEmailDTO);
+        //    // Get the user based on the email login DTO
+        //    User? user = await _userRepository(loginByEmailDTO);
 
-            // Check if the user exists
-            if (user != null)
-            {
-                // Populate user details into response
-                response.id = user.Id.ToString();
-                response.email = user.Email;
-                response.name = user.Name;
-                response.image = user.Image;
-                response.phoneNumber = user.PhoneNumber;
+        //    // Check if the user exists
+        //    if (user != null)
+        //    {
+        //        // Populate user details into response
+        //        response.id = user.Id.ToString();
+        //        response.email = user.Email;
+        //        response.name = user.Name;
+        //        response.image = user.Image;
+        //        response.phoneNumber = user.PhoneNumber;
 
-                // Handle role assignment using RoleId
-                if (user.RoleId.Equals(Guid.Parse("FF54ACC6-C4E9-4B73-A158-FD640B4B6940")))
-                {
-                    response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.ADMIN.ToString());
-                    response.roleName = RoleEnum.ADMIN.ToString();
-                }
-                else
-                {
-                    response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.USER.ToString());
-                    response.roleName = RoleEnum.USER.ToString();
-                }
+        //        // Handle role assignment using RoleId
+        //        if (user.RoleId.Equals(Guid.Parse("FF54ACC6-C4E9-4B73-A158-FD640B4B6940")))
+        //        {
+        //            response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.ADMIN.ToString());
+        //            response.roleName = RoleEnum.ADMIN.ToString();
+        //        }
+        //        else
+        //        {
+        //            response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.USER.ToString());
+        //            response.roleName = RoleEnum.USER.ToString();
+        //        }
 
-                // Generate tokens and update response with token details and expiration times
-                response = await GenerateTokenAsync(response, response.roleName);
+        //        // Generate tokens and update response with token details and expiration times
+        //        response = await GenerateTokenAsync(response, response.roleName);
 
-                // Adding token expiration times
-                //response.accessTokenExpiresAt = DateTime.UtcNow.AddMinutes(30);  // e.g., Access token valid for 30 minutes
-                //response.refreshTokenExpiresAt = DateTime.UtcNow.AddDays(7);     // e.g., Refresh token valid for 7 days
+        //        // Adding token expiration times
+        //        //response.accessTokenExpiresAt = DateTime.UtcNow.AddMinutes(30);  // e.g., Access token valid for 30 minutes
+        //        //response.refreshTokenExpiresAt = DateTime.UtcNow.AddDays(7);     // e.g., Refresh token valid for 7 days
 
-                //if (_userRepository.StoreRefreshToken(user, response.refreshToken, response.refreshTokenExpiresAt).Result == false)
-                //{
-                //    throw new Exception("Lỗi khi lưu trữ refresh token");
-                //}
-            }
+        //        //if (_userRepository.StoreRefreshToken(user, response.refreshToken, response.refreshTokenExpiresAt).Result == false)
+        //        //{
+        //        //    throw new Exception("Lỗi khi lưu trữ refresh token");
+        //        //}
+        //    }
 
-            return response;
-        }
+        //    return response;
+        //}
 
 
-        public async Task<AuthResponse> LoginWithPhoneNumber(LoginByPhoneNumberDTO loginByPhoneNumberDTO)
-        {
-            AuthResponse response = new();
+        //public async Task<AuthResponse> LoginWithPhoneNumber(LoginByPhoneNumberDTO loginByPhoneNumberDTO)
+        //{
+        //    AuthResponse response = new();
 
-            User? user = await _userRepository.LoginWithPhone(loginByPhoneNumberDTO);
+        //    User? user = await _userRepository.LoginWithPhone(loginByPhoneNumberDTO);
 
-            if (user != null)
-            {
-                response.id = user.Id.ToString();
-                response.email = user.Email.ToString();
-                response.name = user.Name.ToString();
-                response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.USER.ToString());
-                response.roleName = RoleEnum.USER.ToString();
-                response = await GenerateTokenAsync(response, RoleEnum.USER.ToString());
-            }
+        //    if (user != null)
+        //    {
+        //        response.id = user.Id.ToString();
+        //        response.email = user.Email.ToString();
+        //        response.name = user.Name.ToString();
+        //        response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.USER.ToString());
+        //        response.roleName = RoleEnum.USER.ToString();
+        //        response = await GenerateTokenAsync(response, RoleEnum.USER.ToString());
+        //    }
 
-            return response;
-        }
+        //    return response;
+        //}
 
-        public async Task<AuthResponse> Register(RegisterDTO registerDTO)
-        {
-            AuthResponse response = new();
-            User newUser = _mapper.Map<User>(registerDTO);
-            Guid? id = await _userRepository.AddAsync(newUser);
-            if (id != null)
-            {
-                response.id = newUser.Id.ToString();
-                response.email = newUser.Email;
-                response.name = newUser.Name;
-                response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.USER.ToString());
-                response.roleName = RoleEnum.USER.ToString();
-                response = await GenerateTokenAsync(response, RoleEnum.USER.ToString());
-            }
+        //public async Task<AuthResponse> Register(RegisterDTO registerDTO)
+        //{
+        //    AuthResponse response = new();
+        //    User newUser = _mapper.Map<User>(registerDTO);
+        //    Guid? id = await _userRepository.AddAsync(newUser);
+        //    if (id != null)
+        //    {
+        //        response.id = newUser.Id.ToString();
+        //        response.email = newUser.Email;
+        //        response.name = newUser.Name;
+        //        response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.USER.ToString());
+        //        response.roleName = RoleEnum.USER.ToString();
+        //        response = await GenerateTokenAsync(response, RoleEnum.USER.ToString());
+        //    }
 
-            return response;
-        }
+        //    return response;
+        //}
 
         //public async Task<AuthResponse> GetTokenAdmin(string firebaseToken)
         //{

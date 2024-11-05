@@ -33,6 +33,14 @@ namespace Vouchee.Business.Helpers
                         // Skip filtering for collection properties
                         continue;
                     }
+                    else if (item.PropertyType == typeof(bool) || item.PropertyType == typeof(bool?))
+                    {
+                        var propertyVal = item.GetValue(entity, null);
+                        if (propertyVal != null)
+                        {
+                            source = source.Where($"{item.Name} == @0", propertyVal);
+                        }
+                    }
                     else
                     {
                         var propertyVal = item.GetValue(entity, null);

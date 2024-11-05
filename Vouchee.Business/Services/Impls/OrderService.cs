@@ -7,6 +7,7 @@ using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Models.ViewModels;
 using Vouchee.Data.Helpers;
+using Vouchee.Data.Helpers.Base;
 using Vouchee.Data.Models.Constants.Dictionary;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Constants.Enum.Status;
@@ -14,8 +15,6 @@ using Vouchee.Data.Models.Constants.Number;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
-using Vouchee.Data.Repositories.IRepos;
-using Vouchee.Data.Repositories.Repos;
 
 namespace Vouchee.Business.Services.Impls
 {
@@ -23,21 +22,21 @@ namespace Vouchee.Business.Services.Impls
     {
         private readonly ICartService _cartService;
 
-        private readonly IModalRepository _modalRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly IVoucherCodeRepository _voucherCodeRepository;
-        private readonly IOrderDetailRepository _orderDetailRepository;
-        private readonly IVoucherRepository _voucherRepository;
-        private readonly IOrderRepository _orderRepository;
+        private readonly IBaseRepository<Modal> _modalRepository;
+        private readonly IBaseRepository<User> _userRepository;
+        private readonly IBaseRepository<VoucherCode> _voucherCodeRepository;
+        private readonly IBaseRepository<OrderDetail> _orderDetailRepository;
+        private readonly IBaseRepository<Voucher> _voucherRepository;
+        private readonly IBaseRepository<Order> _orderRepository;
         private readonly IMapper _mapper;
 
-        public OrderService(IModalRepository modalRepository,
-                                IUserRepository userRepository,
+        public OrderService(IBaseRepository<Modal> modalRepository,
+                                IBaseRepository<User> userRepository,
                                 ICartService cartService,
-                                IVoucherRepository voucherRepository,
-                                IOrderRepository orderRepository,
-                                IOrderDetailRepository orderDetailRepository,
-                                IVoucherCodeRepository voucherCodeRepository,
+                                IBaseRepository<Voucher> voucherRepository,
+                                IBaseRepository<Order> orderRepository,
+                                IBaseRepository<OrderDetail> orderDetailRepository,
+                                IBaseRepository<VoucherCode> voucherCodeRepository,
                                 IMapper mapper)
         {
             _modalRepository = modalRepository;
@@ -144,7 +143,6 @@ namespace Vouchee.Business.Services.Impls
                     var existedVoucher = await _voucherRepository.FindAsync((Guid)voucherId, false);
                     if (existedVoucher != null)
                     {
-                        existedVoucher.Status = isOutOfStock ? VoucherStatusEnum.OUT_OF_STOCK.ToString() : VoucherStatusEnum.SELLING.ToString();
                         existedVoucher.Stock = voucherModals.Sum(x => x.Stock);
                         await _voucherRepository.UpdateAsync(existedVoucher);
                     }

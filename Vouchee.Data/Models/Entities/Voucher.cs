@@ -59,6 +59,7 @@ namespace Vouchee.Data.Models.Entities
         public string? Video { get; set; }
         public int Stock { get; set; }
 
+        public bool IsActive { get; set; }
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime CreateDate { get; set; }

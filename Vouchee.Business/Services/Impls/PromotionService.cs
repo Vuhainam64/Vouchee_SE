@@ -13,6 +13,7 @@ using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Services.Extensions.Filebase;
 using Vouchee.Data.Helpers;
+using Vouchee.Data.Helpers.Base;
 using Vouchee.Data.Models.Constants.Dictionary;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
@@ -20,21 +21,19 @@ using Vouchee.Data.Models.Constants.Number;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
-using Vouchee.Data.Repositories.IRepos;
-using Vouchee.Data.Repositories.Repos;
 
 namespace Vouchee.Business.Services.Impls
 {
     public class PromotionService : IPromotionService
     {
-        private readonly IVoucherRepository _voucherRepository;
+        private readonly IBaseRepository<Voucher> _voucherRepository;
         private readonly IFileUploadService _fileUploadService;
-        private readonly IPromotionRepository _promotionRepository;
+        private readonly IBaseRepository<Promotion> _promotionRepository;
         private readonly IMapper _mapper;
 
-        public PromotionService(IVoucherRepository voucherRepository,
+        public PromotionService(IBaseRepository<Voucher> voucherRepository,
                                     IFileUploadService fileUploadService,
-                                    IPromotionRepository promotionRepository, 
+                                    IBaseRepository<Promotion> promotionRepository, 
                                     IMapper mapper)
         {
             _voucherRepository = voucherRepository;
@@ -120,19 +119,19 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<IList<GetPromotionDTO>> GetPromotionByBuyerId(Guid buyerId)
-        {
-            var promotion = await _promotionRepository.GetPromotionByBuyerId(buyerId);
-            if (promotion != null)
-            {
-                var promotioDTO = _mapper.Map<IList<GetPromotionDTO>>(promotion);
-                return promotioDTO;
-            }
-            else
-            {
-                throw new NotFoundException($"Không tìm thấy promotion của buyer id {buyerId}");
-            }
-        }
+        //public async Task<IList<GetPromotionDTO>> GetPromotionByBuyerId(Guid buyerId)
+        //{
+        //    var promotion = await _promotionRepository.GetFirstOrDefaultAsync(x => x.);
+        //    if (promotion != null)
+        //    {
+        //        var promotioDTO = _mapper.Map<IList<GetPromotionDTO>>(promotion);
+        //        return promotioDTO;
+        //    }
+        //    else
+        //    {
+        //        throw new NotFoundException($"Không tìm thấy promotion của buyer id {buyerId}");
+        //    }
+        //}
 
         public async Task<GetDetailPromotionDTO> GetPromotionByIdAsync(Guid id)
         {

@@ -12,29 +12,28 @@ using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Services.Extensions.Filebase;
 using Vouchee.Data.Helpers;
+using Vouchee.Data.Helpers.Base;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
-using Vouchee.Data.Repositories.IRepos;
-using Vouchee.Data.Repositories.Repos;
 
 namespace Vouchee.Business.Services.Impls
 {
     public class CartService : ICartService
     {
-        private readonly IModalRepository _modalRepository;
-        private readonly IVoucherRepository _voucherRepository;
-        private readonly IUserRepository _userRepository;
+        private readonly IBaseRepository<Modal> _modalRepository;
+        private readonly IBaseRepository<Voucher> _voucherRepository;
+        private readonly IBaseRepository<User> _userRepository;
         private readonly IMapper _mapper;
 
         private User? _user;
         private CartDTO? _cartDTO;
 
-        public CartService(IModalRepository modalRepository,
-                            IVoucherRepository voucherRepository,
-                            IUserRepository userRepository, 
+        public CartService(IBaseRepository<Modal> modalRepository,
+                            IBaseRepository<Voucher> voucherRepository,
+                            IBaseRepository<User> userRepository, 
                             IMapper mapper)
         {
             _modalRepository = modalRepository;
