@@ -12,7 +12,6 @@ using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
-using Vouchee.Data.Repositories.IRepos;
 
 namespace Vouchee.API.Controllers
 {
@@ -21,19 +20,16 @@ namespace Vouchee.API.Controllers
     [EnableCors("MyAllowSpecificOrigins")]
     public class AddressController : ControllerBase
     {
-        private readonly ISupplierRepository _supplierRepository;
         private readonly IBrandService _brandService;
         private readonly IAddressService _addressRepository;
         private readonly IUserService _userService;
         private readonly IRoleService _roleService;
 
-        public AddressController(ISupplierRepository supplierRepository,
-                                IBrandService brandService,
-                                IAddressService addressService, 
-                                IUserService userService, 
-                                IRoleService roleService)
+        public AddressController(IBrandService brandService,
+                                    IAddressService addressService, 
+                                    IUserService userService, 
+                                    IRoleService roleService)
         {
-            _supplierRepository = supplierRepository;
             _brandService = brandService;
             _addressRepository = addressService;
             _userService = userService;

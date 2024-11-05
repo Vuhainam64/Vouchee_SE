@@ -67,13 +67,13 @@ namespace Vouchee.API.Controllers
             return Ok(promotion);
         }
 
-        [HttpGet("get_promotion_by_buyer/{buyerId}")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetPromotionByBuyerId(Guid buyerId)
-        {
-            var promotion = await _promotionService.GetPromotionByBuyerId(buyerId);
-            return Ok(promotion);
-        }
+        //[HttpGet("get_promotion_by_buyer/{buyerId}")]
+        //[AllowAnonymous]
+        //public async Task<IActionResult> GetPromotionByBuyerId(Guid buyerId)
+        //{
+        //    var promotion = await _promotionService.GetPromotionByBuyerId(buyerId);
+        //    return Ok(promotion);
+        //}
 
         // UPDATE
         [HttpPut("update_promotion/{id}")]

@@ -12,26 +12,25 @@ using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
 using Vouchee.Business.Services.Extensions.Filebase;
 using Vouchee.Data.Helpers;
+using Vouchee.Data.Helpers.Base;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Constants.Number;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
-using Vouchee.Data.Repositories.IRepos;
-using Vouchee.Data.Repositories.Repos;
 
 namespace Vouchee.Business.Services.Impls
 {
     public class ModalService : IModalService
     {
-        private readonly IVoucherRepository _voucherRepository;
+        private readonly IBaseRepository<Voucher> _voucherRepository;
         private readonly IFileUploadService _fileUploadService;
-        private readonly IModalRepository _modalRepository;
+        private readonly IBaseRepository<Modal> _modalRepository;
         private readonly IMapper _mapper;
-        public ModalService(IVoucherRepository voucherRepository,
+        public ModalService(IBaseRepository<Voucher> voucherRepository,
                                     IFileUploadService fileUploadService,
-                                    IModalRepository modalRepository, 
+                                    IBaseRepository<Modal> modalRepository, 
                                     IMapper mapper)
         {
             _voucherRepository = voucherRepository;

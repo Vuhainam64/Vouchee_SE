@@ -7,6 +7,7 @@ using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Data.Helpers;
+using Vouchee.Data.Helpers.Base;
 using Vouchee.Data.Models.Constants.Enum;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Constants.Enum.Status;
@@ -14,17 +15,16 @@ using Vouchee.Data.Models.Constants.Number;
 using Vouchee.Data.Models.DTOs.Dashboard;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
-using Vouchee.Data.Repositories.IRepos;
 
 namespace Vouchee.Business.Services.Impls
 {
     public class SupplierService : ISupplierService
     {
-        private readonly ISupplierRepository _supplierRepository;
+        private readonly IBaseRepository<Supplier> _supplierRepository;
         private readonly IMapper _mapper;
 
-        public SupplierService(ISupplierRepository supplierRepository,
-                            IMapper mapper)
+        public SupplierService(IBaseRepository<Supplier> supplierRepository,
+                                    IMapper mapper)
         {
             _supplierRepository = supplierRepository;
             _mapper = mapper;
