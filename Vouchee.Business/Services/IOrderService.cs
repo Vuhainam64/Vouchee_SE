@@ -10,7 +10,7 @@ namespace Vouchee.Business.Services
     {
         // CREATE
         // public Task<Guid?> CreateOrderAsync(CreateOrderDTO createOrderDTO, ThisUserObj thisUserObj);
-        public Task<Guid?> CreateOrderAsync(ThisUserObj thisUserObj);
+        public Task<ResponseMessage<Guid>> CreateOrderAsync(ThisUserObj thisUserObj);
 
         // READ
         public Task<GetOrderDTO> GetOrderByIdAsync(Guid id);
