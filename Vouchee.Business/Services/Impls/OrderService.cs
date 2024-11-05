@@ -96,75 +96,134 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<Guid?> CreateOrderAsync(ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<Guid>> CreateOrderAsync(ThisUserObj thisUserObj)
         {
             CartDTO cartDTO = await _cartService.GetCartsAsync(thisUserObj, false);
 
             Order order = new()
             {
-                PaymentType = "MOMO",
-                Status = "PENDING", // Fixed typo from "PENING" to "PENDING"
+                PaymentType = "BANKING",
+                Status = OrderStatusEnum.PENDING.ToString(),
                 CreateBy = thisUserObj.userId,
                 CreateDate = DateTime.Now,
-                OrderDetails = new List<OrderDetail>() // Assuming OrderDetails is a collection
+                OrderDetails = new List<OrderDetail>()
             };
 
+            // duyet tung seller
             foreach (var seller in cartDTO.sellers)
             {
-                foreach (var modal in seller.modals)
-                {
-                    order.OrderDetails.Add(new OrderDetail
-                    {
-                        ModalId = modal.id,
-                        Quantity = modal.quantity,
-                        UnitPrice = (decimal)modal.sellPrice,
-                        Status = OrderStatusEnum.PENDING.ToString(),
-                        CreateDate = DateTime.Now,
-                        CreateBy = thisUserObj.userId,
-                    });
-
-                    var existedModal = await _modalRepository.FindAsync(modal.id.Value, false);
-                    if (existedModal != null && existedModal.Stock >= modal.quantity)
-                    {
-                        existedModal.Stock -= modal.quantity;
-                        await _modalRepository.UpdateAsync(existedModal);
-                    }
-                }
-
+                var result = false;
                 var groupedModals = seller.modals.GroupBy(x => x.voucherId);
 
+                // gop tung modal co cung voucher id
                 foreach (var modals in groupedModals)
                 {
-                    var voucherId = modals.Key;
-                    var voucherModals = await _modalRepository.GetWhereAsync(x => x.VoucherId == voucherId);
+                    var existedVoucher = await _voucherRepository.GetByIdAsync(modals.Key, 
+                                                                                    isTracking: true,
+                                                                                    includeProperties: x => x.Include(x => x.Modals)
+                                                                                                                .ThenInclude(x => x.Carts));
 
-                    bool isOutOfStock = voucherModals.All(m => m.Stock <= 0);
-
-                    var existedVoucher = await _voucherRepository.FindAsync((Guid)voucherId, false);
                     if (existedVoucher != null)
                     {
-                        existedVoucher.Stock = voucherModals.Sum(x => x.Stock);
-                        await _voucherRepository.UpdateAsync(existedVoucher);
+                        // duyet tung modal 
+                        foreach (var cartModal in modals)
+                        {
+                            var existedModal = existedVoucher.Modals.FirstOrDefault(x => x.Id == cartModal.id);
+
+                            // kiem tra ton kho cua modal
+                            if (cartModal.quantity > existedModal?.Stock)
+                            {
+                                throw new ConflictException($"Bạn đặt {cartModal.quantity} {cartModal.title} nhưng trong khi chỉ còn {existedModal.Stock}");
+                            }
+
+                            existedModal.Stock -= cartModal.quantity;
+                            existedVoucher.Stock -= cartModal.quantity;
+
+                            existedModal.Carts.Remove(existedModal.Carts.FirstOrDefault(c => c.BuyerId == thisUserObj.userId));
+
+                            order.OrderDetails.Add(new OrderDetail
+                            {
+                                ModalId = existedModal.Id,
+                                Quantity = cartModal.quantity,
+                                UnitPrice = (decimal) existedModal.SellPrice,
+                                Status = OrderStatusEnum.PENDING.ToString(),
+                                CreateDate = DateTime.Now,
+                                CreateBy = thisUserObj.userId,
+                            });
+                        }
                     }
+
+                    result = await _voucherRepository.UpdateAsync(existedVoucher);
                 }
             }
 
             order.TotalPrice = order.OrderDetails.Sum(x => x.TotalPrice);
-
-            Guid? orderId = await _orderRepository.AddAsync(order);
-
-            if (orderId != Guid.Empty)
+            var orderId = await _orderRepository.AddAsync(order);
+            if (orderId == Guid.Empty)
             {
-                foreach (var seller in cartDTO.sellers)
-                {
-                    foreach (var x in seller.modals)
-                    {
-                        await _cartService.RemoveItemAsync((Guid)x.id, thisUserObj);
-                    }
-                }
+                throw new Exception("Failed to create order.");
             }
 
-            return orderId;
+            return new ResponseMessage<Guid>
+            {
+                message = "Tạo order thành công",
+                result = true,
+                value = (Guid)orderId
+            };
+            //foreach (var seller in cartDTO.sellers)
+            //{
+            //    foreach (var modal in seller.modals)
+            //    {
+            //        order.OrderDetails.Add(new OrderDetail
+            //        {
+            //            ModalId = modal.id,
+            //            Quantity = modal.quantity,
+            //            UnitPrice = (decimal)modal.sellPrice,
+            //            Status = OrderStatusEnum.PENDING.ToString(),
+            //            CreateDate = DateTime.Now,
+            //            CreateBy = thisUserObj.userId,
+            //        });
+
+            //        var existedModal = await _modalRepository.FindAsync(modal.id.Value, true);
+            //        if (existedModal != null && existedModal.Stock >= modal.quantity)
+            //        {
+            //            existedModal.Stock -= modal.quantity;
+            //            await _modalRepository.UpdateAsync(existedModal);
+            //        }
+            //    }
+
+            //    var groupedModals = seller.modals.GroupBy(x => x.voucherId);
+
+            //    foreach (var modals in groupedModals)
+            //    {
+            //        var voucherId = modals.Key;
+            //        var voucherModals = await _modalRepository.GetWhereAsync(x => x.VoucherId == voucherId);
+
+            //        var existedVoucher = await _voucherRepository.FindAsync((Guid)voucherId, true);
+            //        if (existedVoucher != null)
+            //        {
+            //            existedVoucher.Stock = voucherModals.Sum(x => x.Stock);
+            //            await _voucherRepository.UpdateAsync(existedVoucher);
+            //        }
+            //    }
+            //}
+
+            //order.TotalPrice = order.OrderDetails.Sum(x => x.TotalPrice);
+
+            //Guid? orderId = await _orderRepository.AddAsync(order);
+
+            //if (orderId != Guid.Empty)
+            //{
+            //    foreach (var seller in cartDTO.sellers)
+            //    {
+            //        foreach (var x in seller.modals)
+            //        {
+            //            await _cartService.RemoveItemAsync((Guid)x.id, thisUserObj);
+            //        }
+            //    }
+            //}
+
+            // return null;
         }
 
         public async Task<User> GetCurrentUser(Guid userId)
@@ -248,23 +307,15 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<GetOrderDTO> GetOrderByIdAsync(Guid id)
         {
-            try
+            var order = await _orderRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.OrderDetails).ThenInclude(x => x.VoucherCodes));
+            if (order != null)
             {
-                var order = await _orderRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.OrderDetails).ThenInclude(x => x.VoucherCodes));
-                if (order != null)
-                {
-                    var orderDTO = _mapper.Map<GetOrderDTO>(order);
-                    return orderDTO;
-                }
-                else
-                {
-                    throw new NotFoundException($"Không tìm thấy order với id {id}");
-                }
+                var orderDTO = _mapper.Map<GetOrderDTO>(order);
+                return orderDTO;
             }
-            catch (Exception ex)
+            else
             {
-                LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải order");
+                throw new NotFoundException($"Không tìm thấy order với id {id}");
             }
         }
 
