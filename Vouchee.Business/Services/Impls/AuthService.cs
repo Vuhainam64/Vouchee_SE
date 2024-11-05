@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FirebaseAdmin.Auth;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -52,7 +53,8 @@ namespace Vouchee.Business.Services.Impls
             var phoneNumber = userRecord.PhoneNumber?.ToString() ?? null;
             string lastName = userRecord.DisplayName;
 
-            var user = await _userRepository.GetFirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()));
+            var user = await _userRepository.GetFirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()), 
+                                                                        includeProperties: x => x.Include(x => x.Role));
             GetUserDTO useDTO = _mapper.Map<GetUserDTO>(user);
 
             // trường hợp người dùng mới, mặc định là buyer
