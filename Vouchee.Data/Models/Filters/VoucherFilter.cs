@@ -13,6 +13,6 @@ namespace Vouchee.Data.Models.Filters
     {
         public string? title { get; set; }
         public VoucherStatusEnum? status { get; set; }
-        public bool? isActive { get; set; } = true;
+        public bool? isActive { get; set; } 
     }
 }
