@@ -31,6 +31,7 @@ namespace Vouchee.Business.Services
 
         // UPDATE
         public Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO);
+        public Task<bool> UpdateVoucherStatusAsync(Guid id);
 
         // DELETE
         public Task<bool> DeleteVoucherAsync(Guid id);

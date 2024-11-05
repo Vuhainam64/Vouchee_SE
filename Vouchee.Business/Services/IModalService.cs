@@ -20,6 +20,7 @@ namespace Vouchee.Business.Services
 
         // UPDATE
         public Task<bool> UpdateModalAsync(Guid id, UpdateModalDTO updateModalDTO);
+        public Task<bool> UpdateModalStatusAsync(Guid id);
 
         // DELETE
         public Task<bool> DeleteModalAsync(Guid id);

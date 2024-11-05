@@ -112,6 +112,13 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
+        [HttpPut("update_voucher_status/{id}")]
+        public async Task<IActionResult> UpdateVoucherStatus(Guid id)
+        {
+            var result = await _voucherService.UpdateVoucherStatusAsync(id);
+            return Ok(result);
+        }
+
         // DELETE
         [HttpDelete("delete_voucher/{id}")]
         public async Task<IActionResult> DeleteVoucher(Guid id)

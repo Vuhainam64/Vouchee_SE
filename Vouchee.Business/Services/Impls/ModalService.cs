@@ -113,5 +113,27 @@ namespace Vouchee.Business.Services.Impls
         {
             throw new NotImplementedException();
         }
+
+        public async Task<bool> UpdateModalStatusAsync(Guid id)
+        {
+            try
+            {
+                var existedModal = await _modalRepository.GetByIdAsync(id,isTracking:true);
+                if (existedModal != null)
+                {
+                    existedModal.IsActive = (existedModal.IsActive == true) ? false : true;
+                    return await _modalRepository.UpdateAsync(existedModal);
+                }
+                else
+                {
+                    throw new NotFoundException("Không tìm thấy modal");
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.Message);
+                throw new UpdateObjectException("Lỗi không xác định khi cập nhật modal");
+            }
+        }
     }
 }
