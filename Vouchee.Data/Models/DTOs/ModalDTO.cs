@@ -53,7 +53,8 @@ namespace Vouchee.Data.Models.DTOs
         public DateOnly? startDate { get; set; }
         public DateOnly? endDate { get; set; }
         public int? stock { get; set; }
-        public string status { get; set; }
+        public string? status { get; set; }
+        public bool? isActive { get; set; }
     }
 
     public class GetModalDTO : ModalDTO
