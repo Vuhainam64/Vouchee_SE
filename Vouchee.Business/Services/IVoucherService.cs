@@ -18,13 +18,13 @@ namespace Vouchee.Business.Services
         public Task<dynamic> GetVoucherByIdAsync(Guid id, PagingRequest pagingRequest);
         public Task<DynamicResponseModel<GetVoucherDTO>> GetVoucherAsync(PagingRequest pagingRequest,
                                                                             VoucherFilter voucherFilter,
-                                                                            IList<Guid>? categoryIds);
+                                                                            SortVoucherEnum sortVoucherEnum);
         public Task<DynamicResponseModel<GetNearestVoucherDTO>> GetNearestVouchersAsync(PagingRequest pagingRequest,
                                                                                             DistanceFilter distanceFilter,
                                                                                             VoucherFilter voucherFiler,
                                                                                             IList<Guid>? categoryIds);
         public Task<IList<GetVoucherDTO>> GetNewestVouchers(int numberOfVoucher);
-        public Task<IList<GetBestSoldVoucherDTO>> GetTopSaleVouchers(int numberOFVoucher);
+        public Task<IList<GetVoucherDTO>> GetTopSaleVouchers(int numberOFVoucher);
         public Task<IList<GetVoucherDTO>> GetSalestVouchers(int numberOfVoucher);
         public Task<DynamicResponseModel<GetVoucherSellerDTO>> GetVoucherBySellerId(Guid sellerId, 
                                                                                         PagingRequest pagingRequest, 

@@ -44,8 +44,11 @@ namespace Vouchee.Business.Models.DTOs
         public string? video { get; set; }
 
         public DateTime? createDate = DateTime.Now;
+
         public int stock = 0;
+
         public VoucherStatusEnum status = VoucherStatusEnum.NONE;
+
         public bool IsActive { get; set; }
 
         public virtual ICollection<CreateModalDTO> modals { get; set; }
@@ -98,6 +101,15 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? brandId { get; set; }
         public string? brandName { get; set; }
         public string? brandImage { get; set; }
+
+        public Guid? supplierId { get; set; }
+        public string? supplierName { get; set; }
+        public string? supplierImage { get; set; }
+
+        public Guid? sellerID { get; set; }
+        public string? sellerName { get; set; }
+        public string? sellerImage { get; set; }
+
         public string? status { get; set; }
         public bool? isActive { get; set; }
         public virtual ICollection<GetCategoryDTO> categories { get; set; }
@@ -105,7 +117,7 @@ namespace Vouchee.Business.Models.DTOs
 
     public class GetVoucherDTO : VoucherDTO
     {
-
+        public int? totalQuantitySold { get; set; }
     }
 
     public class GetVoucherSellerDTO : VoucherDTO
@@ -113,10 +125,6 @@ namespace Vouchee.Business.Models.DTOs
         public GetVoucherSellerDTO() {
             modals = [];
         }
-
-        public Guid? supplierId { get; set; }
-        public string? supplierName { get; set; }
-        public string? supplierImage { get; set; }
 
         public virtual IEnumerable<GetModalDTO> modals { get; set; }
     }
@@ -140,20 +148,8 @@ namespace Vouchee.Business.Models.DTOs
             medias = [];
         }
 
-        public string? sellerName { get; set; }
-        public string? sellerImage { get; set; }
-
-        public Guid? supplierId { get; set; }
-        public string? supplierName { get; set; }
-        public string? supplierImage { get; set; }
-
         public virtual ICollection<GetModalDTO> modals { get; set; }
         public virtual IEnumerable<GetAddressDTO> addresses { get; set; }
         public virtual ICollection<GetMediaDTO> medias { get; set; }
-    }
-
-    public class GetBestSoldVoucherDTO : VoucherDTO
-    {
-        public int? totalQuantitySold { get; set; }
     }
 }
