@@ -24,6 +24,8 @@ namespace Vouchee.API.AppStarts
                 .ForMember(dest => dest.sellPrice, opt => opt.MapFrom(src => src.Modals.FirstOrDefault(m => m.Index == 0).SellPrice))
                 .ForMember(dest => dest.percentDiscount, opt => opt.MapFrom(src => src.Promotions.FirstOrDefault(p => p.StartDate <= DateTime.Now
                                                                                     && DateTime.Now <= p.EndDate).PercentDiscount))
+                .ForMember(x => x.supplierName, dest => dest.MapFrom(opt => opt.Supplier.Name))
+                .ForMember(x => x.supplierImage, dest => dest.MapFrom(opt => opt.Supplier.Image))
                 .ForMember(x => x.brandName, dest => dest.MapFrom(opt => opt.Brand.Name))
                 .ForMember(x => x.brandImage, dest => dest.MapFrom(opt => opt.Brand.Image))
                 .ReverseMap();

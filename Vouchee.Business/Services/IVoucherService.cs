@@ -18,7 +18,8 @@ namespace Vouchee.Business.Services
         public Task<dynamic> GetVoucherByIdAsync(Guid id, PagingRequest pagingRequest);
         public Task<DynamicResponseModel<GetVoucherDTO>> GetVoucherAsync(PagingRequest pagingRequest,
                                                                             VoucherFilter voucherFilter,
-                                                                            IList<Guid>? categoryIds);
+                                                                            SortVoucherEnum sortVoucher
+                                                                        );
         public Task<DynamicResponseModel<GetNearestVoucherDTO>> GetNearestVouchersAsync(PagingRequest pagingRequest,
                                                                                             DistanceFilter distanceFilter,
                                                                                             VoucherFilter voucherFiler,

@@ -8,5 +8,9 @@ namespace Vouchee.Data.Models.Constants.Enum.Sort
 {
     public enum SortVoucherEnum
     {
+        NEWEST,
+        BEST_SOLD,
+        ASCENDING, 
+        DESCENDING
     }
 }

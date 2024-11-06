@@ -98,6 +98,11 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? brandId { get; set; }
         public string? brandName { get; set; }
         public string? brandImage { get; set; }
+
+        public Guid? supplierId { get; set; }
+        public string? supplierName { get; set; }
+        public string? supplierImage { get; set; }
+
         public string? status { get; set; }
         public bool? isActive { get; set; }
         public virtual ICollection<GetCategoryDTO> categories { get; set; }
@@ -113,10 +118,6 @@ namespace Vouchee.Business.Models.DTOs
         public GetVoucherSellerDTO() {
             modals = [];
         }
-
-        public Guid? supplierId { get; set; }
-        public string? supplierName { get; set; }
-        public string? supplierImage { get; set; }
 
         public virtual IEnumerable<GetModalDTO> modals { get; set; }
     }
@@ -142,10 +143,6 @@ namespace Vouchee.Business.Models.DTOs
 
         public string? sellerName { get; set; }
         public string? sellerImage { get; set; }
-
-        public Guid? supplierId { get; set; }
-        public string? supplierName { get; set; }
-        public string? supplierImage { get; set; }
 
         public virtual ICollection<GetModalDTO> modals { get; set; }
         public virtual IEnumerable<GetAddressDTO> addresses { get; set; }

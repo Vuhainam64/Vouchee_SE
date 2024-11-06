@@ -46,6 +46,8 @@ namespace Vouchee.Data.Models.Entities
         public decimal DiscountPrice => TotalPrice * DiscountValue;
         [Column(TypeName = "decimal(18,5)")]
         public decimal FinalPrice => TotalPrice - DiscountPrice;
+        public int? PointUp { get; set; }
+        public int? PointDown { get; set; }
 
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]

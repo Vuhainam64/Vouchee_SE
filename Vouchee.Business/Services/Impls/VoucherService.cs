@@ -221,91 +221,105 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO)
         {
-            try
+            var existedVoucher = await _voucherRepository.GetByIdAsync(id);
+            if (existedVoucher != null)
             {
-                var existedVoucher = await _voucherRepository.GetByIdAsync(id);
-                if (existedVoucher != null)
-                {
-                    var entity = _mapper.Map<Voucher>(updateVoucherDTO);
-                    return await _voucherRepository.UpdateAsync(entity);
-                }
-                else
-                {
-                    throw new NotFoundException("Không tìm thấy voucher");
-                }
+                var entity = _mapper.Map<Voucher>(updateVoucherDTO);
+                return await _voucherRepository.UpdateAsync(entity);
             }
-            catch (Exception ex)
+            else
             {
-                LoggerService.Logger(ex.Message);
-                throw new UpdateObjectException("Lỗi không xác định khi cập nhật voucher");
+                throw new NotFoundException("Không tìm thấy voucher");
             }
         }
+
         public async Task<ResponseMessage<GetVoucherDTO>> UpdateVoucherStatusAsync(Guid id, VoucherStatusEnum voucherStatus)
         {
-            try
+            var existedVoucher = await _voucherRepository.GetByIdAsync(id,isTracking:true);
+            if (existedVoucher != null)
             {
-                var existedVoucher = await _voucherRepository.GetByIdAsync(id,isTracking:true);
-                if (existedVoucher != null)
+                existedVoucher.Status = voucherStatus.ToString();
+                await _voucherRepository.UpdateAsync(existedVoucher);
+                return new ResponseMessage<GetVoucherDTO>()
                 {
-                    existedVoucher.Status = voucherStatus.ToString();
-                    await _voucherRepository.UpdateAsync(existedVoucher);
-                    return new ResponseMessage<GetVoucherDTO>()
-                    {
-                        message = "Đổi isActive thành công",
-                        result = true,
-                        value = _mapper.Map<GetVoucherDTO>(existedVoucher)
-                    };
-                }
-                else
-                {
-                    throw new NotFoundException("Không tìm thấy voucher");
-                }
+                    message = "Đổi isActive thành công",
+                    result = true,
+                    value = _mapper.Map<GetVoucherDTO>(existedVoucher)
+                };
             }
-            catch (Exception ex)
+            else
             {
-                LoggerService.Logger(ex.Message);
-                throw new UpdateObjectException("Lỗi không xác định khi cập nhật voucher");
+                throw new NotFoundException("Không tìm thấy voucher");
             }
         }
         public async Task<ResponseMessage<GetVoucherDTO>> UpdateVoucherisActiveAsync(Guid id, bool isActive)
-        {
-            try
+        { 
+            var existedVoucher = await _voucherRepository.GetByIdAsync(id, isTracking: true);
+            if (existedVoucher != null)
             {
-                var existedVoucher = await _voucherRepository.GetByIdAsync(id, isTracking: true);
-                if (existedVoucher != null)
+                /*existedVoucher.IsActive = (existedVoucher.IsActive == true) ? false : true;*/
+                existedVoucher.IsActive = isActive;
+                await _voucherRepository.UpdateAsync(existedVoucher);
+                return new ResponseMessage<GetVoucherDTO>()
                 {
-                    /*existedVoucher.IsActive = (existedVoucher.IsActive == true) ? false : true;*/
-                    existedVoucher.IsActive = isActive;
-                    await _voucherRepository.UpdateAsync(existedVoucher);
-                    return new ResponseMessage<GetVoucherDTO>()
-                    {
-                        message = "Đổi isActive thành công",
-                        result = true,
-                        value = _mapper.Map<GetVoucherDTO>(existedVoucher)
-                    };
-                }
-                else
-                {
-                    throw new NotFoundException("Không tìm thấy voucher");
-                }
+                    message = "Đổi isActive thành công",
+                    result = true,
+                    value = _mapper.Map<GetVoucherDTO>(existedVoucher)
+                };
             }
-            catch (Exception ex)
+            else
             {
-                LoggerService.Logger(ex.Message);
-                throw new UpdateObjectException("Lỗi không xác định khi cập nhật voucher");
+                throw new NotFoundException("Không tìm thấy voucher");
             }
         }
+
         public async Task<DynamicResponseModel<GetVoucherDTO>> GetVoucherAsync(PagingRequest pagingRequest,
-                                                                                VoucherFilter voucherFilter,
-                                                                                IList<Guid>? categoryIds)
+                                                                  VoucherFilter voucherFilter,
+                                                                  SortVoucherEnum sortVoucherEnum)
         {
             (int, IQueryable<GetVoucherDTO>) result;
 
-            result = _voucherRepository.GetTable()
-                        .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
-                        .DynamicFilter(_mapper.Map<GetVoucherDTO>(voucherFilter))
-                        .Where(x => categoryIds == null || !categoryIds.Any() || x.categories.Any(c => categoryIds.Contains(c.id.Value)))
-                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+            var vouchers = _voucherRepository.GetTable()
+                         .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
+                         .DynamicFilter(_mapper.Map<GetVoucherDTO>(voucherFilter));
+
+            if (voucherFilter.categoryIds != null && voucherFilter.categoryIds.Any())
+            {
+                vouchers = vouchers.Where(x => x.categories.Any(c => voucherFilter.categoryIds.Contains(c.id.Value)));
+            }
+
+            if (voucherFilter.supplierIDs != null && voucherFilter.supplierIDs.Any())
+            {
+                vouchers = vouchers.Where(x => voucherFilter.supplierIDs.Contains((Guid)x.supplierId));
+            }
+
+            if (voucherFilter.minPrice.HasValue)
+            {
+                vouchers = vouchers.Where(x => x.sellPrice >= voucherFilter.minPrice.Value);
+            }
+
+            if (voucherFilter.maxPrice.HasValue)
+            {
+                vouchers = vouchers.Where(x => x.sellPrice <= voucherFilter.maxPrice.Value);
+            }
+
+            switch (sortVoucherEnum)
+            {
+                case SortVoucherEnum.NEWEST:
+                    vouchers = vouchers.OrderByDescending(x => x.createDate);
+                    break;
+                case SortVoucherEnum.OLDEST:
+                    vouchers = vouchers.OrderBy(x => x.createDate);
+                    break;
+                case SortVoucherEnum.ASCENDING:
+                    vouchers = vouchers.OrderBy(x => x.sellPrice);
+                    break;
+                case SortVoucherEnum.DESCENDING:
+                    vouchers = vouchers.OrderByDescending(x => x.sellPrice);
+                    break;
+            }
+
+            result = vouchers.PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
             return new DynamicResponseModel<GetVoucherDTO>()
             {
@@ -313,9 +327,9 @@ namespace Vouchee.Business.Services.Impls
                 {
                     page = pagingRequest.page,
                     size = pagingRequest.pageSize,
-                    total = result.Item1 // Total vouchers count for metadata
+                    total = result.Item1
                 },
-                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+                results = await result.Item2.ToListAsync()
             };
         }
 
