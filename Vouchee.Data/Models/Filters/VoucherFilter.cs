@@ -13,6 +13,11 @@ namespace Vouchee.Data.Models.Filters
     {
         public string? title { get; set; }
         public VoucherStatusEnum? status { get; set; }
-        public bool? isActive { get; set; } 
+        public bool? isActive { get; set; }
+        public bool? isInStock { get; set; }
+        public IList<Guid>? categoryIDs { get; set; }
+        public IList<Guid>? supplierIDs { get; set; }
+        public decimal? minPrice { get; set; } = 5000;
+        public decimal? maxPrice { get; set; } = 10000000;
     }
 }

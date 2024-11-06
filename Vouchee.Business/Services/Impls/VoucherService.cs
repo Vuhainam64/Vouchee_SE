@@ -149,20 +149,20 @@ namespace Vouchee.Business.Services.Impls
             var result = _voucherRepository.GetTable()
                                 .OrderByDescending(v => v.CreateDate)
                                 .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
-                                .Where(x => x.stock > 0)
+                                .Where(x => x.stock > 0 && x.status == VoucherStatusEnum.NONE.ToString() && x.isActive == true)
                                 .Take(numberOfVoucher != 0 ? numberOfVoucher : 10);
 
             return await result.ToListAsync();
         }
 
-        public async Task<IList<GetBestSoldVoucherDTO>> GetTopSaleVouchers(int numberOfVoucher)
+        public async Task<IList<GetVoucherDTO>> GetTopSaleVouchers(int numberOfVoucher)
         {
-            IQueryable<GetBestSoldVoucherDTO> result;
+            IQueryable<GetVoucherDTO> result;
 
             result = _voucherRepository.GetTable().Include(x => x.Modals)
                                                     .ThenInclude(x => x.OrderDetails)
-                        .ProjectTo<GetBestSoldVoucherDTO>(_mapper.ConfigurationProvider)
-                        .Where(x => x.stock > 0)
+                        .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
+                        .Where(x => x.stock > 0 && x.status == VoucherStatusEnum.NONE.ToString() && x.isActive == true)
                         .OrderByDescending(x => x.totalQuantitySold)
                         .Take(numberOfVoucher != 0 ? numberOfVoucher : 10);
 
@@ -224,6 +224,7 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Không tìm thấy voucher");
             }
         }
+        
         public async Task<ResponseMessage<GetVoucherDTO>> UpdateVoucherStatusAsync(Guid id, VoucherStatusEnum voucherStatus)
         {
             var existedVoucher = await _voucherRepository.GetByIdAsync(id, isTracking: true);
@@ -243,6 +244,7 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Không tìm thấy voucher");
             }
         }
+        
         public async Task<ResponseMessage<GetVoucherDTO>> UpdateVoucherisActiveAsync(Guid id, bool isActive)
         {
             var existedVoucher = await _voucherRepository.GetByIdAsync(id, isTracking: true);
@@ -263,17 +265,41 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Không tìm thấy voucher");
             }
         }
+        
         public async Task<DynamicResponseModel<GetVoucherDTO>> GetVoucherAsync(PagingRequest pagingRequest,
-                                                                                VoucherFilter voucherFilter,
-                                                                                IList<Guid>? categoryIds)
+                                                                        VoucherFilter voucherFilter,
+                                                                        SortVoucherEnum sortVoucherEnum)
         {
             (int, IQueryable<GetVoucherDTO>) result;
 
-            result = _voucherRepository.GetTable()
-                        .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
-                        .DynamicFilter(_mapper.Map<GetVoucherDTO>(voucherFilter))
-                        .Where(x => categoryIds == null || !categoryIds.Any() || x.categories.Any(c => categoryIds.Contains(c.id.Value)))
-                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+            var query = _voucherRepository.GetTable()
+                            .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
+                            .DynamicFilter(_mapper.Map<GetVoucherDTO>(voucherFilter))
+                            .Where(x =>
+                                (voucherFilter.categoryIDs == null || !voucherFilter.categoryIDs.Any() || x.categories.Any(c => voucherFilter.categoryIDs.Contains(c.id.Value))) &&
+                                (string.IsNullOrEmpty(voucherFilter.title) || x.title.Contains(voucherFilter.title)) &&
+                                (!voucherFilter.status.HasValue || x.status == voucherFilter.status.ToString()) &&
+                                (!voucherFilter.isActive.HasValue || x.isActive == voucherFilter.isActive.Value) &&
+                                (voucherFilter.supplierIDs == null || !voucherFilter.supplierIDs.Any() || voucherFilter.supplierIDs.Contains((Guid)x.supplierId)) &&
+                                (voucherFilter.minPrice == null || x.sellPrice >= voucherFilter.minPrice) &&
+                                (voucherFilter.maxPrice == null || x.sellPrice <= voucherFilter.maxPrice)
+                            );
+
+            if (voucherFilter.isInStock != null && voucherFilter.isInStock == true)
+            {
+                query = query.Where(x => x.stock > 0);
+            }
+
+            query = sortVoucherEnum switch
+            {
+                SortVoucherEnum.NEWEST => query.OrderByDescending(x => x.createDate),
+                SortVoucherEnum.SELLEST => query.OrderByDescending(x => x.totalQuantitySold),
+                SortVoucherEnum.PRICE_ASCENDING => query.OrderBy(x => x.sellPrice),
+                SortVoucherEnum.PRICE_DESCENDING => query.OrderByDescending(x => x.sellPrice),
+                _ => query
+            };
+
+            result = query.PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
             return new DynamicResponseModel<GetVoucherDTO>()
             {
@@ -281,22 +307,23 @@ namespace Vouchee.Business.Services.Impls
                 {
                     page = pagingRequest.page,
                     size = pagingRequest.pageSize,
-                    total = result.Item1 // Total vouchers count for metadata
+                    total = result.Item1
                 },
-                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+                results = await result.Item2.ToListAsync() 
             };
         }
 
         public async Task<DynamicResponseModel<GetNearestVoucherDTO>> GetNearestVouchersAsync(PagingRequest pagingRequest,
-                                                                                            DistanceFilter distanceFilter,
-                                                                                            VoucherFilter voucherFilter,
-                                                                                            IList<Guid>? categoryIds)
+                                                                                                DistanceFilter distanceFilter,
+                                                                                                VoucherFilter voucherFilter,
+                                                                                                IList<Guid>? categoryIds)
         {
             var result = _voucherRepository.GetTable().Include(x => x.Brand)
                                                             .ThenInclude(x => x.Addresses)
                         .ProjectTo<GetNearestVoucherDTO>(_mapper.ConfigurationProvider)
                         .DynamicFilter(_mapper.Map<GetNearestVoucherDTO>(voucherFilter))
                         .Where(x => categoryIds == null || !categoryIds.Any() || x.categories.Any(c => categoryIds.Contains(c.id.Value)))
+                        .Where(x => x.stock > 0 && x.status == VoucherStatusEnum.NONE.ToString() && x.isActive == true)
                         .AsEnumerable()
                         .Select(v =>
                         {
@@ -334,7 +361,7 @@ namespace Vouchee.Business.Services.Impls
             var result = _voucherRepository.GetTable()
                     .OrderByDescending(v => v.CreateDate)
                     .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
-                    .Where(x => x.stock > 0 && x.percentDiscount != null)
+                    .Where(x => x.stock > 0 && x.status == VoucherStatusEnum.NONE.ToString() && x.isActive == true && x.percentDiscount != null )
                     .OrderByDescending(x => x.percentDiscount);
 
             return await result.ToListAsync();
@@ -375,224 +402,5 @@ namespace Vouchee.Business.Services.Impls
 
             return response;
         }
-
-        //public async Task<IList<GetDetailVoucherDTO>> GetNearestVouchers(decimal lon, decimal lat)
-        //{
-        //    try
-        //    {
-        //        decimal R = 6371; // Earth's radius in kilometers
-        //        decimal ToRadians(decimal value) => (decimal)(Math.PI / 180) * value;
-
-        //        // Retrieve all vouchers and map to DTO
-        //        var vouchers = _voucherRepository.GetTable()
-        //            .Include(x => x.Medias)
-        //            .Include(x => x.Supplier)
-        //            .Include(x => x.Categories)
-        //            .Include(x => x.Brand)
-        //                .ThenInclude(x => x.Addresses)
-        //            .ProjectTo<GetDetailVoucherDTO>(_mapper.ConfigurationProvider)
-        //            .ToList(); // Materialize the data
-
-        //        // Calculate nearest vouchers based on addresses
-        //        var nearestVouchers = vouchers
-        //            .Select(voucher =>
-        //            {
-        //                var nearestAddress = voucher.addresses
-        //                    .Where(a => a.lat.HasValue && a.lon.HasValue)
-        //                    .Select(a =>
-        //                    {
-        //                        decimal dLat = ToRadians(lat - (decimal)a.lat);
-        //                        decimal dLon = ToRadians(lon - (decimal)a.lon);
-        //                        decimal lat1 = ToRadians(lat);
-        //                        decimal lat2 = ToRadians((decimal)a.lat);
-
-        //                        decimal aVal = (decimal)(Math.Sin((double)dLat / 2) * Math.Sin((double)dLat / 2) +
-        //                                                 Math.Cos((double)lat1) * Math.Cos((double)lat2) *
-        //                                                 Math.Sin((double)dLon / 2) * Math.Sin((double)dLon / 2));
-
-        //                        decimal c = 2 * (decimal)Math.Atan2(Math.Sqrt((double)aVal), Math.Sqrt(1 - (double)aVal));
-
-        //                        decimal distance = R * c; // Calculate distance
-
-        //                        return new
-        //                        {
-        //                            Address = a,
-        //                            Distance = Math.Round(distance, 2) // Round distance to 2 decimal places
-        //                        };
-        //                    })
-        //                    .OrderBy(a => a.Distance) // Sort by closest distance
-        //                    .Take(5);
-
-        //                if (nearestAddress != null)
-        //                {
-        //                    return new GetDetailVoucherDTO
-        //                    {
-        //                        video = voucher.video,
-        //                        id = voucher.id,
-        //                        title = voucher.title,
-        //                        categories = voucher.categories,
-        //                        image = voucher.modals.FirstOrDefault(x => x.index == 0).image,
-        //                        originalPrice = voucher.modals.FirstOrDefault(x => x.index == 0).originalPrice,
-        //                        sellPrice = voucher.modals.FirstOrDefault(x => x.index == 0).sellPrice,
-        //                        brandId = voucher.brandId,
-        //                        brandImage = voucher.brandImage,
-        //                        brandName = voucher.brandName,
-        //                        supplierId = voucher.supplierId,
-        //                        supplierImage = voucher.supplierImage,
-        //                        supplierName = voucher.supplierName,
-        //                        quantity = voucher.quantity,
-        //                        rating = voucher.rating,
-        //                        addresses = nearestAddress
-        //                                .Select(na => new GetDistanceAddressDTO
-        //                                {
-        //                                    id = na.Address.id,
-        //                                    name = na.Address.name,
-        //                                    lat = na.Address.lat,
-        //                                    lon = na.Address.lon,
-        //                                    distance = Math.Round(na.Distance, 2) // Round distance to 2 decimal places
-        //                                })
-        //                                .ToList() // Map to address DTOs and create a list of nearest 5 addresses
-        //                    };
-        //                }
-        //                return null;
-        //            })
-        //            .Where(v => v != null) // Filter out vouchers without a nearest address
-        //            .Take(8) // Limit to the 8 nearest vouchers
-        //            .ToList();
-
-        //        var result2 = nearestVouchers;
-
-        //        foreach (var test in result2)
-        //        {
-        //            var currentDate = DateTime.Now;
-        //            var promotions = _voucherRepository.GetByIdAsync(test.id, includeProperties: query => query.Include(x => x.Promotions)).Result.Promotions;
-
-        //            var availablePromotion = promotions.FirstOrDefault(promotion => promotion.StartDate <= currentDate && promotion.EndDate >= currentDate);
-
-        //            if (availablePromotion != null)
-        //            {
-        //                test.salePrice = test.originalPrice - (test.originalPrice * availablePromotion.PercentDiscount / 100);
-        //                test.percentDiscount = availablePromotion.PercentDiscount;
-        //            }
-        //        }
-
-        //        return nearestVouchers;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        LoggerService.Logger(ex.Message);
-        //        throw new LoadException("An unexpected error occurred while loading nearest vouchers");
-        //    }
-        //}
-
-        //public async Task<DynamicResponseModel<GetDetailVoucherDTO>> GetVouchersAsync(PagingRequest pagingRequest,
-        //                                                                                 VoucherFilter voucherFilter,
-        //                                                                                 List<Guid>? categoryID)
-        //{
-        //    (int, IQueryable<GetDetailVoucherDTO>) result;
-        //    try
-        //    {
-        //        result.Item2 = _voucherRepository.GetTable(includeProperties: x => x
-        //                                .Include(x => x.Supplier)
-        //                                .Include(x => x.Categories)
-        //                                .Include(x => x.Modals)
-        //                                    .ThenInclude(x => x.VoucherCodes)
-        //                                .Include(x => x.Medias)
-        //                                .Include(x => x.Brand)
-        //                                    .ThenInclude(x => x.Addresses))
-        //                                .ProjectTo<GetDetailVoucherDTO>(_mapper.ConfigurationProvider)
-        //                                .Where(x =>
-        //                                    (string.IsNullOrEmpty(voucherFilter.title) || x.title.ToLower().Contains(voucherFilter.title.ToLower())) 
-        //                                    && (categoryID == null || !categoryID.Any() || x.categories.Any(c => categoryID.Contains(c.id.Value))))
-        //                                .AsEnumerable() 
-        //                                .Select(v =>
-        //                                {
-        //                                    v.addresses = v.addresses?
-        //                                        .Where(a => a.lon.HasValue && a.lat.HasValue) // Filter addresses with lat/lon
-        //                                        .Select(a =>
-        //                                        {
-        //                                            a.distance = DistanceHelper.CalculateDistance(lat, lon, a.lat.Value, a.lon.Value);
-        //                                            return a;
-        //                                        })
-        //                                        .OrderBy(d => d.distance) 
-        //                                        .Take(pagingRequest.pageSize != 0 ? pagingRequest.pageSize : 10);
-
-        //                                    return v; 
-        //                                })
-        //                                .Take(pagingRequest.page != 0 ? pagingRequest.page : 5)
-        //                                .AsQueryable();
-
-        //        var result2 = result.Item2.ToList();
-
-        //        foreach (var voucher in result2)
-        //        {
-        //            voucher.image = voucher.medias.FirstOrDefault(x => x.index == 0)?.url;
-        //            voucher.originalPrice = voucher.modals.FirstOrDefault(x => x.index == 0)?.originalPrice;
-        //            voucher.sellPrice = voucher.modals.FirstOrDefault(x => x.index == 0)?.sellPrice;
-        //            voucher.quantity = voucher.modals.Sum(modal => modal.voucherCodes?.Count);
-        //        }
-
-        //        return new DynamicResponseModel<GetDetailVoucherDTO>
-        //        {
-        //            metaData = new MetaData
-        //            {
-        //                page = pagingRequest.page,
-        //                size = pagingRequest.pageSize,
-        //                total = result.Item2.Count()
-        //            },
-        //            results = result2
-        //        };
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        LoggerService.Logger($"Error: {ex.Message}, StackTrace: {ex.StackTrace}");
-        //        throw new LoadException("An unexpected error occurred while loading vouchers.");
-        //    }
-        //}
-
-        //public async Task<IList<GetVoucherDTO>> GetSalestVouchers()
-        //{
-        //    // check all active promotion
-        //    DateTime currenDate = DateTime.Now;
-        //    List<GetVoucherDTO> vouchers = new();
-
-        //    List<Promotion> promotions = _promotionRepository.GetTable()
-        //                                                        .Include(x => x.Vouchers)
-        //                                                            .ThenInclude(v => v.Categories) // Include categories of the vouchers
-        //                                                        .Include(x => x.Vouchers)
-        //                                                            .ThenInclude(v => v.Brand) // Include the brand of the vouchers
-        //                                                        .Include(x => x.Vouchers)
-        //                                                            .ThenInclude(x => x.Medias)
-        //                                                        .Include(x => x.Vouchers)
-        //                                                            .ThenInclude(x => x.Supplier)
-        //                                                        .Include(x => x.Vouchers)
-        //                                                            .ThenInclude(x => x.Modals)
-        //                                                        .ToList()
-        //                                                        .Where(x => x.StartDate <= currenDate && currenDate <= x.EndDate)
-        //                                                        .ToList();
-        //    if (promotions.Count != 0)
-        //    {
-        //        foreach (var promotion in promotions)
-        //        {
-        //            if (promotion.Vouchers.Count != 0)
-        //            {
-        //                foreach (var voucher in promotion.Vouchers)
-        //                {
-        //                    var existedVoucher = _mapper.Map<GetVoucherDTO>(voucher);
-
-        //                    existedVoucher.sellPrice = existedVoucher.modals.FirstOrDefault(x => x.index == 0).sellPrice;
-        //                    existedVoucher.originalPrice = existedVoucher.modals.FirstOrDefault(x => x.index == 0).originalPrice;
-        //                    existedVoucher.salePrice = existedVoucher.originalPrice - (existedVoucher.originalPrice * promotion.PercentDiscount / 100);
-        //                    existedVoucher.percentDiscount = promotion.PercentDiscount;
-        //                    existedVoucher.image = voucher.Medias.Count != 0 ? voucher.Medias.FirstOrDefault(x => x.Index == 0).Url : null;
-        //                    vouchers.Add(existedVoucher);
-        //                }
-        //            }
-        //        }
-        //        return vouchers;
-        //    }
-
-        //    return null;
-        //}
     }
 }
