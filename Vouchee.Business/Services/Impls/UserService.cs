@@ -19,7 +19,7 @@ namespace Vouchee.Business.Services.Impls
         private readonly IBaseRepository<User> _userRepository;
         private readonly IMapper _mapper;
 
-        public UserService(IBaseRepository<User> userRepository, 
+        public UserService(IBaseRepository<User> userRepository,
                             IMapper mapper)
         {
             _userRepository = userRepository;
@@ -28,43 +28,27 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<Guid?> CreateUserAsync(CreateUserDTO createUserDTO, ThisUserObj thisUserObj)
         {
-            try
-            {
-                var user = _mapper.Map<User>(createUserDTO);
+            var user = _mapper.Map<User>(createUserDTO);
 
-                user.Status = UserStatusEnum.ACTIVE.ToString();
+            user.Status = UserStatusEnum.ACTIVE.ToString();
 
-                var userId = await _userRepository.AddAsync(user);
-                return userId;
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new CreateObjectException("Lỗi không xác định khi tạo user");
-            }
+            var userId = await _userRepository.AddAsync(user);
+            return userId;
         }
 
         public async Task<bool> DeleteUserAsync(Guid id)
         {
-            try
+            bool result = false;
+            var user = await _userRepository.GetByIdAsync(id);
+            if (user != null)
             {
-                bool result = false;
-                var user = await _userRepository.GetByIdAsync(id);
-                if (user != null)
-                {
-                    result = await _userRepository.DeleteAsync(user);
-                }
-                else
-                {
-                    throw new NotFoundException($"Không tìm thấy user với id {id}");
-                }
-                return result;
+                result = await _userRepository.DeleteAsync(user);
             }
-            catch (Exception ex)
+            else
             {
-                LoggerService.Logger(ex.Message);
-                throw new DeleteObjectException("Lỗi không xác định khi xóa user");
+                throw new NotFoundException($"Không tìm thấy user với id {id}");
             }
+            return result;
         }
 
         public async Task<GetUserDTO> GetUserByEmailAsync(string email)
@@ -99,7 +83,7 @@ namespace Vouchee.Business.Services.Impls
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải user");
+                throw new LoadException(ex.Message);
             }
         }
 
@@ -114,30 +98,22 @@ namespace Vouchee.Business.Services.Impls
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải voucher");
+                throw new LoadException(ex.Message);
             }
             return result.ToList();
         }
 
         public async Task<bool> UpdateUserAsync(Guid id, UpdateUserDTO updateUserDTO, ThisUserObj thisUserObj)
         {
-            try
+            var existedUser = await _userRepository.GetByIdAsync(id);
+            if (existedUser != null)
             {
-                var existedUser = await _userRepository.GetByIdAsync(id);
-                if (existedUser != null)
-                {
-                    var entity = _mapper.Map<User>(updateUserDTO);
-                    return await _userRepository.UpdateAsync(entity);
-                }
-                else
-                {
-                    throw new NotFoundException("Không tìm thấy user");
-                }
+                var entity = _mapper.Map<User>(updateUserDTO);
+                return await _userRepository.UpdateAsync(entity);
             }
-            catch (Exception ex)
+            else
             {
-                LoggerService.Logger(ex.Message);
-                throw new UpdateObjectException("Lỗi không xác định khi cập nhật user");
+                throw new NotFoundException("Không tìm thấy user");
             }
         }
     }

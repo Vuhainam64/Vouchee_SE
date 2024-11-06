@@ -117,23 +117,15 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<bool> DeleteVoucherCodeAsync(Guid id)
         {
-            try
+            var existedVoucherCode = await _voucherCodeRepository.FindAsync(id, false);
+            if (existedVoucherCode == null)
             {
-                var existedVoucherCode = await _voucherCodeRepository.FindAsync(id, false);
-                if (existedVoucherCode == null)
-                {
-                    throw new NotFoundException($"Không tìm thấy voucher code với id {id}");
-                }
-
-                var result = await _voucherCodeRepository.DeleteAsync(existedVoucherCode);
-
-                return result;
+                throw new NotFoundException($"Không tìm thấy voucher code với id {id}");
             }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new DeleteObjectException(ex.Message);
-            }
+
+            var result = await _voucherCodeRepository.DeleteAsync(existedVoucherCode);
+
+            return result;
         }
 
         public async Task<GetVoucherCodeDTO> GetVoucherCodeByIdAsync(Guid id)
@@ -148,7 +140,7 @@ namespace Vouchee.Business.Services.Impls
                     throw new NotFoundException($"Không tìm thấy voucher code với id {id}");
                 }
 
-                return voucherCodeDTO;   
+                return voucherCodeDTO;
             }
             catch (Exception ex)
             {
@@ -183,26 +175,18 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<bool> UpdateVoucherCodeAsync(Guid id, UpdateVoucherCodeDTO updateVoucherCodeDTO)
         {
-            try
+            var existedVoucherCode = await _voucherCodeRepository.FindAsync(id, false);
+
+            if (existedVoucherCode == null)
             {
-                var existedVoucherCode = await _voucherCodeRepository.FindAsync(id, false);
-
-                if (existedVoucherCode == null)
-                {
-                    throw new NotFoundException($"Không tìm thấy voucher code với id {id}");
-                }
-
-                _mapper.Map(updateVoucherCodeDTO, existedVoucherCode);
-
-                var result = await _voucherCodeRepository.UpdateAsync(existedVoucherCode);
-
-                return result;
+                throw new NotFoundException($"Không tìm thấy voucher code với id {id}");
             }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new UpdateObjectException(ex.Message);
-            }
+
+            _mapper.Map(updateVoucherCodeDTO, existedVoucherCode);
+
+            var result = await _voucherCodeRepository.UpdateAsync(existedVoucherCode);
+
+            return result;
         }
     }
 }

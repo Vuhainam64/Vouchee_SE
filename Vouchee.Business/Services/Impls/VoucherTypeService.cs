@@ -35,53 +35,38 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<Guid?> CreateVoucherTypeAsync(CreateVoucherTypeDTO createVoucherTypeDTO, ThisUserObj thisUserObj)
         {
-            try
-            {
-                var voucherType = _mapper.Map<VoucherType>(createVoucherTypeDTO);
-                voucherType.CreateBy = thisUserObj.userId;
+            var voucherType = _mapper.Map<VoucherType>(createVoucherTypeDTO);
+            voucherType.CreateBy = thisUserObj.userId;
 
-                var voucherTypeId = await _voucherTypeRepository.AddAsync(voucherType);
-                
-                if (voucherTypeId != null && createVoucherTypeDTO.image != null)
+            var voucherTypeId = await _voucherTypeRepository.AddAsync(voucherType);
+
+            if (voucherTypeId != null && createVoucherTypeDTO.image != null)
+            {
+                voucherType.Image = await _fileUploadService.UploadImageToFirebase(createVoucherTypeDTO.image, thisUserObj.userId.ToString(), StoragePathEnum.VOUCHER_TYPE);
+
+                if (!await _voucherTypeRepository.UpdateAsync(voucherType))
                 {
-                    voucherType.Image = await _fileUploadService.UploadImageToFirebase(createVoucherTypeDTO.image, thisUserObj.userId.ToString(), StoragePathEnum.VOUCHER_TYPE);
-
-                    if (!await _voucherTypeRepository.UpdateAsync(voucherType))
-                    {
-                        throw new UpdateObjectException("Không thể update voucher type");
-                    }
+                    throw new UpdateObjectException("Không thể update voucher type");
                 }
-                
-                return voucherTypeId;
             }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new CreateObjectException("Lỗi không xác định khi tạo voucher type");
-            }
+
+            return voucherTypeId;
         }
 
         public async Task<bool> DeleteVoucherTypeAsync(Guid id)
         {
-            try
+
+            bool result = false;
+            var voucherType = await _voucherTypeRepository.GetByIdAsync(id);
+            if (voucherType != null)
             {
-                bool result = false;
-                var voucherType = await _voucherTypeRepository.GetByIdAsync(id);
-                if (voucherType != null)
-                {
-                    result = await _voucherTypeRepository.DeleteAsync(voucherType);
-                }
-                else
-                {
-                    throw new NotFoundException($"Không tìm thấy voucher type với id {id}");
-                }
-                return result;
+                result = await _voucherTypeRepository.DeleteAsync(voucherType);
             }
-            catch (Exception ex)
+            else
             {
-                LoggerService.Logger(ex.Message);
-                throw new DeleteObjectException("Lỗi không xác định khi xóa voucher type");
+                throw new NotFoundException($"Không tìm thấy voucher type với id {id}");
             }
+            return result;
         }
 
         public async Task<GetVoucherTypeDTO> GetVoucherTypeByIdAsync(Guid id)
@@ -103,7 +88,7 @@ namespace Vouchee.Business.Services.Impls
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải voucher type");
+                throw new LoadException(ex.Message);
             }
         }
 
@@ -120,7 +105,7 @@ namespace Vouchee.Business.Services.Impls
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải voucher type");
+                throw new LoadException(ex.Message);
             }
             return new DynamicResponseModel<GetVoucherTypeDTO>()
             {
@@ -136,24 +121,17 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<bool> UpdateVoucherTypeAsync(Guid id, UpdateVoucherTypeDTO updateVoucherTypeDTO)
         {
-            try
+            var existedVoucherType = await _voucherTypeRepository.GetByIdAsync(id);
+            if (existedVoucherType != null)
             {
-                var existedVoucherType = await _voucherTypeRepository.GetByIdAsync(id);
-                if (existedVoucherType != null)
-                {
-                    var entity = _mapper.Map<VoucherType>(updateVoucherTypeDTO);
-                    return await _voucherTypeRepository.UpdateAsync(entity);
-                }
-                else
-                {
-                    throw new NotFoundException("Không tìm thấy voucher type");
-                }
+                var entity = _mapper.Map<VoucherType>(updateVoucherTypeDTO);
+                return await _voucherTypeRepository.UpdateAsync(entity);
             }
-            catch (Exception ex)
+            else
             {
-                LoggerService.Logger(ex.Message);
-                throw new UpdateObjectException("Lỗi không xác định khi cập nhật voucher type");
+                throw new NotFoundException("Không tìm thấy voucher type");
             }
+
         }
     }
 }
