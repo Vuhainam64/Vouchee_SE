@@ -111,7 +111,7 @@ namespace Vouchee.Business.Services.Impls
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải category");
+                throw new LoadException(ex.Message);
             }
             return new DynamicResponseModel<GetCategoryDTO>()
             {

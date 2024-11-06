@@ -32,43 +32,27 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<Guid?> CreateSupplierAsync(CreateSupplierDTO createSupplierDTO)
         {
-            try
-            {
-                var supplier = _mapper.Map<Supplier>(createSupplierDTO);
+            var supplier = _mapper.Map<Supplier>(createSupplierDTO);
 
-                supplier.Status = ObjectStatusEnum.ACTIVE.ToString();
+            supplier.Status = ObjectStatusEnum.ACTIVE.ToString();
 
-                var supplierId = await _supplierRepository.AddAsync(supplier);
-                return supplierId;
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new CreateObjectException("Lỗi không xác định khi tạo supplier");
-            }
+            var supplierId = await _supplierRepository.AddAsync(supplier);
+            return supplierId;
         }
 
         public async Task<bool> DeleteSupplierAsync(Guid id)
         {
-            try
+            bool result = false;
+            var supplier = await _supplierRepository.GetByIdAsync(id);
+            if (supplier != null)
             {
-                bool result = false;
-                var supplier = await _supplierRepository.GetByIdAsync(id);
-                if (supplier != null)
-                {
-                    result = await _supplierRepository.DeleteAsync(supplier);
-                }
-                else
-                {
-                    throw new NotFoundException($"Không tìm thấy supplier với id {id}");
-                }
-                return result;
+                result = await _supplierRepository.DeleteAsync(supplier);
             }
-            catch (Exception ex)
+            else
             {
-                LoggerService.Logger(ex.Message);
-                throw new DeleteObjectException("Lỗi không xác định khi xóa supplier");
+                throw new NotFoundException($"Không tìm thấy supplier với id {id}");
             }
+            return result;
         }
 
         public async Task<IList<BestSuppleriDTO>> GetBestSuppliers()
@@ -79,7 +63,7 @@ namespace Vouchee.Business.Services.Impls
                 // Fetch suppliers and include their vouchers and order details
                 suppliers = _supplierRepository.GetTable()
                     .Include(s => s.Vouchers)
-                        //.ThenInclude(v => v.OrderDetails) // Include order details to calculate sold quantities
+                    //.ThenInclude(v => v.OrderDetails) // Include order details to calculate sold quantities
                     .ToList();
 
                 // Calculate the total sold vouchers for each supplier and map it to BestSuppleriDTO
@@ -90,8 +74,8 @@ namespace Vouchee.Business.Services.Impls
                         name = supplier.Name,
                         image = supplier.Image,
                         //soldVoucher = supplier.Vouchers
-                            //.SelectMany(v => v.OrderDetails)  // Get all order details across all vouchers
-                            //.Sum(od => od.Quantity)           // Sum up the sold quantities (assuming Quantity field exists)
+                        //.SelectMany(v => v.OrderDetails)  // Get all order details across all vouchers
+                        //.Sum(od => od.Quantity)           // Sum up the sold quantities (assuming Quantity field exists)
                     })
                     .OrderByDescending(s => s.soldVoucher) // Order by sold voucher quantity in descending order
                     .ToList();
@@ -101,7 +85,7 @@ namespace Vouchee.Business.Services.Impls
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải supplier");
+                throw new LoadException(ex.Message);
             }
         }
 
@@ -123,7 +107,7 @@ namespace Vouchee.Business.Services.Impls
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải supplier");
+                throw new LoadException(ex.Message);
             }
         }
 
@@ -138,30 +122,22 @@ namespace Vouchee.Business.Services.Impls
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải supplier");
+                throw new LoadException(ex.Message);
             }
             return result.ToList();
         }
 
         public async Task<bool> UpdateSupplierAsync(Guid id, UpdateSupplierDTO updateSupplierDTO)
         {
-            try
+            var existedSupplier = await _supplierRepository.GetByIdAsync(id);
+            if (existedSupplier != null)
             {
-                var existedSupplier = await _supplierRepository.GetByIdAsync(id);
-                if (existedSupplier != null)
-                {
-                    var entity = _mapper.Map<Supplier>(updateSupplierDTO);
-                    return await _supplierRepository.UpdateAsync(entity);
-                }
-                else
-                {
-                    throw new NotFoundException("Không tìm thấy supplier");
-                }
+                var entity = _mapper.Map<Supplier>(updateSupplierDTO);
+                return await _supplierRepository.UpdateAsync(entity);
             }
-            catch (Exception ex)
+            else
             {
-                LoggerService.Logger(ex.Message);
-                throw new UpdateObjectException("Lỗi không xác định khi cập nhật supplier");
+                throw new NotFoundException("Không tìm thấy supplier");
             }
         }
     }

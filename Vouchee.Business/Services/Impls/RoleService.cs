@@ -20,7 +20,7 @@ namespace Vouchee.Business.Services.Impls
         private readonly IBaseRepository<Role> _roleRepository;
         private readonly IMapper _mapper;
 
-        public RoleService(IBaseRepository<Role> roleRepository, 
+        public RoleService(IBaseRepository<Role> roleRepository,
                             IMapper mapper)
         {
             _roleRepository = roleRepository;
@@ -29,44 +29,28 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<Guid?> CreateRoleAsync(CreateRoleDTO createRoleDTO)
         {
-            try
-            {
-                var role = _mapper.Map<Role>(createRoleDTO);
+            var role = _mapper.Map<Role>(createRoleDTO);
 
-                role.Status = ObjectStatusEnum.ACTIVE.ToString();
+            role.Status = ObjectStatusEnum.ACTIVE.ToString();
 
-                var roleId = await _roleRepository.AddAsync(role);
+            var roleId = await _roleRepository.AddAsync(role);
 
-                return roleId;
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new CreateObjectException("Lỗi không xác định khi tạo id");
-            }
+            return roleId;
         }
 
         public async Task<bool> DeleteRoleAsync(Guid id)
         {
-            try
+            var result = false;
+            var role = await _roleRepository.GetByIdAsync(id);
+            if (role != null)
             {
-                var result = false;
-                var role = await _roleRepository.GetByIdAsync(id);
-                if (role != null)
-                {
-                    result = await _roleRepository.DeleteAsync(role);
-                }
-                else
-                {
-                    throw new NotFoundException($"Không tìm thấy role với id {id}");
-                }
-                return result;
+                result = await _roleRepository.DeleteAsync(role);
             }
-            catch (Exception ex)
+            else
             {
-                LoggerService.Logger(ex.Message);
-                throw new DeleteObjectException("Lỗi không xác định khi xóa role");
+                throw new NotFoundException($"Không tìm thấy role với id {id}");
             }
+            return result;
         }
 
         public async Task<GetRoleDTO> GetRoleByIdAsync(Guid id)
@@ -87,7 +71,7 @@ namespace Vouchee.Business.Services.Impls
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải role");
+                throw new LoadException(ex.Message);
             }
         }
 
@@ -101,29 +85,21 @@ namespace Vouchee.Business.Services.Impls
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải role");
+                throw new LoadException(ex.Message);
             }
         }
 
         public async Task<bool> UpdateRoleAsync(Guid id, UpdateRoleDTO updateRoleDTO)
         {
-            try
+            var existedRole = await _roleRepository.GetByIdAsync(id);
+            if (existedRole != null)
             {
-                var existedRole = await _roleRepository.GetByIdAsync(id);
-                if (existedRole != null)
-                {
-                    var entity = _mapper.Map<Role>(updateRoleDTO);
-                    return await _roleRepository.UpdateAsync(entity);
-                }
-                else
-                {
-                    throw new NotFoundException("Không tìm thấy role");
-                }
+                var entity = _mapper.Map<Role>(updateRoleDTO);
+                return await _roleRepository.UpdateAsync(entity);
             }
-            catch (Exception ex)
+            else
             {
-                LoggerService.Logger(ex.Message);
-                throw new UpdateObjectException("Lỗi không xác định khi cập nhật role");
+                throw new NotFoundException("Không tìm thấy role");
             }
         }
     }

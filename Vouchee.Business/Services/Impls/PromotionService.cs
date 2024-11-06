@@ -33,7 +33,7 @@ namespace Vouchee.Business.Services.Impls
 
         public PromotionService(IBaseRepository<Voucher> voucherRepository,
                                     IFileUploadService fileUploadService,
-                                    IBaseRepository<Promotion> promotionRepository, 
+                                    IBaseRepository<Promotion> promotionRepository,
                                     IMapper mapper)
         {
             _voucherRepository = voucherRepository;
@@ -44,51 +44,39 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<Guid?> CreatePromotionAsync(CreatePromotionDTO createPromotionDTO, ThisUserObj thisUserObj)
         {
-            try
+
+            var promotion = _mapper.Map<Promotion>(createPromotionDTO);
+
+            promotion.CreateBy = thisUserObj.userId;
+
+            var promotionId = _promotionRepository.AddAsync(promotion).Result;
+
+            if (createPromotionDTO.image != null && promotionId != null)
             {
-                var promotion = _mapper.Map<Promotion>(createPromotionDTO);
+                promotion.Image = await _fileUploadService.UploadImageToFirebase(createPromotionDTO.image, thisUserObj.userId.ToString(), StoragePathEnum.PROMOTION);
 
-                promotion.CreateBy = thisUserObj.userId;
-
-                var promotionId = _promotionRepository.AddAsync(promotion).Result;
-                
-                if (createPromotionDTO.image != null && promotionId != null)
-                {
-                    promotion.Image = await _fileUploadService.UploadImageToFirebase(createPromotionDTO.image, thisUserObj.userId.ToString(), StoragePathEnum.PROMOTION);
-
-                    await _promotionRepository.UpdateAsync(promotion);
-                }
-
-                return promotionId;
+                await _promotionRepository.UpdateAsync(promotion);
             }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new Exception("Lỗi không xác định khi tạo promotion");
-            }
+
+            return promotionId;
+
         }
 
         public async Task<bool> DeletePromotionAsync(Guid id, ThisUserObj thisUserObj)
         {
-            try
+
+            var result = false;
+            var promotion = await _promotionRepository.GetByIdAsync(id);
+            if (promotion != null)
             {
-                var result = false;
-                var promotion = await _promotionRepository.GetByIdAsync(id);
-                if (promotion != null)
-                {
-                    result = await _promotionRepository.DeleteAsync(promotion);
-                }
-                else
-                {
-                    throw new NotFoundException($"Không tìm thấy promotion với id {id}");
-                }
-                return result;
+                result = await _promotionRepository.DeleteAsync(promotion);
             }
-            catch (Exception ex)
+            else
             {
-                LoggerService.Logger(ex.Message);
-                throw new DeleteObjectException("Lỗi không xác định khi xóa promotion");
+                throw new NotFoundException($"Không tìm thấy promotion với id {id}");
             }
+            return result;
+
         }
 
         public async Task<DynamicResponseModel<GetPromotionDTO>> GetActivePromotion(PagingRequest pagingRequest, PromotionFilter promotionFilter)
@@ -105,7 +93,7 @@ namespace Vouchee.Business.Services.Impls
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải promotion");
+                throw new LoadException(ex.Message);
             }
             return new DynamicResponseModel<GetPromotionDTO>()
             {
@@ -181,7 +169,7 @@ namespace Vouchee.Business.Services.Impls
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải promotion");
+                throw new LoadException(ex.Message);
             }
             return new DynamicResponseModel<GetPromotionDTO>()
             {
@@ -197,23 +185,15 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<bool> UpdatePromotionAsync(Guid id, UpdatePromotionDTO updatePromotionDTO, ThisUserObj thisUserObj)
         {
-            try
+            var existedPromotion = await _promotionRepository.GetByIdAsync(id);
+            if (existedPromotion != null)
             {
-                var existedPromotion = await _promotionRepository.GetByIdAsync(id);
-                if (existedPromotion != null)
-                {
-                    var entity = _mapper.Map<Promotion>(updatePromotionDTO);
-                    return await _promotionRepository.UpdateAsync(entity);
-                }
-                else
-                {
-                    throw new NotFoundException("Không tìm thấy order");
-                }
+                var entity = _mapper.Map<Promotion>(updatePromotionDTO);
+                return await _promotionRepository.UpdateAsync(entity);
             }
-            catch (Exception ex)
+            else
             {
-                LoggerService.Logger(ex.Message);
-                throw new UpdateObjectException("Lỗi không xác định khi cập nhật order");
+                throw new NotFoundException("Không tìm thấy order");
             }
         }
     }
