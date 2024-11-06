@@ -42,31 +42,24 @@ namespace Vouchee.Business.Services.Impls
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
-                throw new CreateObjectException("Lỗi không xác định khi tạo address");
+                throw new CreateObjectException(ex.Message);
             }
         }
 
         public async Task<bool> DeleteAddressAsync(Guid id)
         {
-            try
+            bool result = false;
+            var address = await _addressRepository.GetByIdAsync(id);
+            if (address != null)
             {
-                bool result = false;
-                var address = await _addressRepository.GetByIdAsync(id);
-                if (address != null)
-                {
-                    result = await _addressRepository.DeleteAsync(address);
-                }
-                else
-                {
-                    throw new NotFoundException($"Không tìm thấy address với id {id}");
-                }
-                return result;
+                result = await _addressRepository.DeleteAsync(address);
             }
-            catch (Exception ex)
+            else
             {
-                LoggerService.Logger(ex.Message);
-                throw new DeleteObjectException("Lỗi không xác định khi xóa address");
+                throw new NotFoundException($"Không tìm thấy address với id {id}");
             }
+            return result;
+
         }
 
         public async Task<GetDetailAddressDTO> GetAddressByIdAsync(Guid id)
@@ -87,7 +80,7 @@ namespace Vouchee.Business.Services.Impls
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải address");
+                throw new LoadException(ex.Message);
             }
         }
 
@@ -113,23 +106,15 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<bool> UpdateAddressAsync(Guid id, UpdateAddressDTO updateAddressDTO)
         {
-            try
+            var existedAddress = await _addressRepository.GetByIdAsync(id);
+            if (existedAddress != null)
             {
-                var existedAddress = await _addressRepository.GetByIdAsync(id);
-                if (existedAddress != null)
-                {
-                    var entity = _mapper.Map<Address>(updateAddressDTO);
-                    return await _addressRepository.UpdateAsync(entity);
-                }
-                else
-                {
-                    throw new NotFoundException("Không tìm thấy addess");
-                }
+                var entity = _mapper.Map<Address>(updateAddressDTO);
+                return await _addressRepository.UpdateAsync(entity);
             }
-            catch (Exception ex)
+            else
             {
-                LoggerService.Logger(ex.Message);
-                throw new UpdateObjectException("Lỗi không xác định khi cập nhật address");
+                throw new NotFoundException("Không tìm thấy addess");
             }
         }
     }

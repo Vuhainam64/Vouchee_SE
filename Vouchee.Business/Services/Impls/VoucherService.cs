@@ -118,7 +118,7 @@ namespace Vouchee.Business.Services.Impls
                     voucher.Medias.Add(media);
                 }
             }
-               
+
             voucher = await _voucherRepository.Add(voucher);
 
             return new ResponseMessage<dynamic>()
@@ -131,25 +131,17 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<bool> DeleteVoucherAsync(Guid id)
         {
-            try
+            bool result = false;
+            var voucher = await _voucherRepository.GetByIdAsync(id);
+            if (voucher != null)
             {
-                bool result = false;
-                var voucher = await _voucherRepository.GetByIdAsync(id);
-                if (voucher != null)
-                {
-                    result = await _voucherRepository.DeleteAsync(voucher);
-                }
-                else
-                {
-                    throw new NotFoundException($"Không tìm thấy voucher với id {id}");
-                }
-                return result;
+                result = await _voucherRepository.DeleteAsync(voucher);
             }
-            catch (Exception ex)
+            else
             {
-                LoggerService.Logger(ex.Message);
-                throw new DeleteObjectException("Lỗi không xác định khi xóa voucher");
+                throw new NotFoundException($"Không tìm thấy voucher với id {id}");
             }
+            return result;
         }
 
         public async Task<IList<GetVoucherDTO>> GetNewestVouchers(int numberOfVoucher)
@@ -221,58 +213,80 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO)
         {
-            var existedVoucher = await _voucherRepository.GetByIdAsync(id);
-            if (existedVoucher != null)
+            try
             {
-                var entity = _mapper.Map<Voucher>(updateVoucherDTO);
-                return await _voucherRepository.UpdateAsync(entity);
+                var existedVoucher = await _voucherRepository.GetByIdAsync(id);
+                if (existedVoucher != null)
+                {
+                    var entity = _mapper.Map<Voucher>(updateVoucherDTO);
+                    return await _voucherRepository.UpdateAsync(entity);
+                }
+                else
+                {
+                    throw new NotFoundException("Không tìm thấy voucher");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                throw new NotFoundException("Không tìm thấy voucher");
+                LoggerService.Logger(ex.Message);
+                throw new UpdateObjectException("Lỗi không xác định khi cập nhật voucher");
             }
         }
-
         public async Task<ResponseMessage<GetVoucherDTO>> UpdateVoucherStatusAsync(Guid id, VoucherStatusEnum voucherStatus)
         {
-            var existedVoucher = await _voucherRepository.GetByIdAsync(id,isTracking:true);
-            if (existedVoucher != null)
+            try
             {
-                existedVoucher.Status = voucherStatus.ToString();
-                await _voucherRepository.UpdateAsync(existedVoucher);
-                return new ResponseMessage<GetVoucherDTO>()
+                var existedVoucher = await _voucherRepository.GetByIdAsync(id,isTracking:true);
+                if (existedVoucher != null)
                 {
-                    message = "Đổi isActive thành công",
-                    result = true,
-                    value = _mapper.Map<GetVoucherDTO>(existedVoucher)
-                };
+                    existedVoucher.Status = voucherStatus.ToString();
+                    await _voucherRepository.UpdateAsync(existedVoucher);
+                    return new ResponseMessage<GetVoucherDTO>()
+                    {
+                        message = "Đổi isActive thành công",
+                        result = true,
+                        value = _mapper.Map<GetVoucherDTO>(existedVoucher)
+                    };
+                }
+                else
+                {
+                    throw new NotFoundException("Không tìm thấy voucher");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                throw new NotFoundException("Không tìm thấy voucher");
+                LoggerService.Logger(ex.Message);
+                throw new UpdateObjectException("Lỗi không xác định khi cập nhật voucher");
             }
         }
         public async Task<ResponseMessage<GetVoucherDTO>> UpdateVoucherisActiveAsync(Guid id, bool isActive)
-        { 
-            var existedVoucher = await _voucherRepository.GetByIdAsync(id, isTracking: true);
-            if (existedVoucher != null)
+        {
+            try
             {
-                /*existedVoucher.IsActive = (existedVoucher.IsActive == true) ? false : true;*/
-                existedVoucher.IsActive = isActive;
-                await _voucherRepository.UpdateAsync(existedVoucher);
-                return new ResponseMessage<GetVoucherDTO>()
+                var existedVoucher = await _voucherRepository.GetByIdAsync(id, isTracking: true);
+                if (existedVoucher != null)
                 {
-                    message = "Đổi isActive thành công",
-                    result = true,
-                    value = _mapper.Map<GetVoucherDTO>(existedVoucher)
-                };
+                    /*existedVoucher.IsActive = (existedVoucher.IsActive == true) ? false : true;*/
+                    existedVoucher.IsActive = isActive;
+                    await _voucherRepository.UpdateAsync(existedVoucher);
+                    return new ResponseMessage<GetVoucherDTO>()
+                    {
+                        message = "Đổi isActive thành công",
+                        result = true,
+                        value = _mapper.Map<GetVoucherDTO>(existedVoucher)
+                    };
+                }
+                else
+                {
+                    throw new NotFoundException("Không tìm thấy voucher");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                throw new NotFoundException("Không tìm thấy voucher");
+                LoggerService.Logger(ex.Message);
+                throw new UpdateObjectException("Lỗi không xác định khi cập nhật voucher");
             }
         }
-
         public async Task<DynamicResponseModel<GetVoucherDTO>> GetVoucherAsync(PagingRequest pagingRequest,
                                                                   VoucherFilter voucherFilter,
                                                                   SortVoucherEnum sortVoucherEnum)
@@ -386,9 +400,9 @@ namespace Vouchee.Business.Services.Impls
             return await result.ToListAsync();
         }
 
-        public async Task<DynamicResponseModel<GetVoucherSellerDTO>> GetVoucherBySellerId(Guid sellerId, 
-                                                                                        PagingRequest pagingRequest, 
-                                                                                        VoucherFilter voucherFilter, 
+        public async Task<DynamicResponseModel<GetVoucherSellerDTO>> GetVoucherBySellerId(Guid sellerId,
+                                                                                        PagingRequest pagingRequest,
+                                                                                        VoucherFilter voucherFilter,
                                                                                         IList<Guid>? categoryIds)
         {
             var existedSeller = await _userRepository.FindAsync(sellerId, false);

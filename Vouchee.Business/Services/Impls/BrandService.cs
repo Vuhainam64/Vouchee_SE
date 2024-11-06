@@ -77,7 +77,7 @@ namespace Vouchee.Business.Services.Impls
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải brand");
+                throw new LoadException(ex.Message);
             }
         }
 
@@ -94,7 +94,7 @@ namespace Vouchee.Business.Services.Impls
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải brand");
+                throw new LoadException(ex.Message);
             }
             return new DynamicResponseModel<GetDetalBrandDTO>()
             {

@@ -301,7 +301,7 @@ namespace Vouchee.Business.Services.Impls
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
-                throw new DeleteObjectException("Lỗi không xác định khi xóa order");
+                throw new DeleteObjectException(ex.Message);
             }
         }
 
@@ -358,7 +358,7 @@ namespace Vouchee.Business.Services.Impls
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
-                throw new UpdateObjectException("Lỗi không xác định khi cập nhật order");
+                throw new UpdateObjectException(ex.Message);
             }
         }
     }

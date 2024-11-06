@@ -31,7 +31,7 @@ namespace Vouchee.Business.Services.Impls
         private readonly IMapper _mapper;
         public ModalService(IBaseRepository<Voucher> voucherRepository,
                                     IFileUploadService fileUploadService,
-                                    IBaseRepository<Modal> modalRepository, 
+                                    IBaseRepository<Modal> modalRepository,
                                     IMapper mapper)
         {
             _voucherRepository = voucherRepository;
@@ -45,7 +45,7 @@ namespace Vouchee.Business.Services.Impls
             Modal modal = _mapper.Map<Modal>(createModalDTO);
 
             var existVoucher = await _voucherRepository.FindAsync(voucherId, false);
-            
+
             if (existVoucher == null)
             {
                 throw new NotFoundException("Không tìm thấy voucher với id");
@@ -73,7 +73,7 @@ namespace Vouchee.Business.Services.Impls
                                                                                                 .ThenInclude(x => x.OrderDetail));
 
             if (modal == null)
-               throw new NotFoundException("Khong tim thay sub voucher");
+                throw new NotFoundException("Khong tim thay sub voucher");
 
             return _mapper.Map<GetModalDTO>(modal);
         }
@@ -96,7 +96,7 @@ namespace Vouchee.Business.Services.Impls
             catch (Exception ex)
             {
                 LoggerService.Logger(ex.Message);
-                throw new LoadException("Lỗi không xác định khi tải sub voucher");
+                throw new LoadException(ex.Message);
             }
             return new DynamicResponseModel<GetModalDTO>()
             {
@@ -117,41 +117,57 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<ResponseMessage<GetModalDTO>> UpdateModalisActiveAsync(Guid id, bool isActive)
         {
-            var existedModal = await _modalRepository.GetByIdAsync(id, isTracking: true);
-            if (existedModal != null)
+            try
             {
-                existedModal.IsActive = isActive;
-                await _modalRepository.UpdateAsync(existedModal);
-                return new ResponseMessage<GetModalDTO>()
+                var existedModal = await _modalRepository.GetByIdAsync(id, isTracking: true);
+                if (existedModal != null)
                 {
-                    message = "Đổi isActive thành công",
-                    result = true,
-                    value = _mapper.Map<GetModalDTO>(existedModal)
-                };
+                    existedModal.IsActive = isActive;
+                    await _modalRepository.UpdateAsync(existedModal);
+                    return new ResponseMessage<GetModalDTO>()
+                    {
+                        message = "Đổi isActive thành công",
+                        result = true,
+                        value = _mapper.Map<GetModalDTO>(existedModal)
+                    };
+                }
+                else
+                {
+                    throw new NotFoundException("Không tìm thấy modal");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                throw new NotFoundException("Không tìm thấy modal");
+                LoggerService.Logger(ex.Message);
+                throw new UpdateObjectException("Lỗi không xác định khi cập nhật modal");
             }
         }
 
         public async Task<ResponseMessage<GetModalDTO>> UpdateModalStatusAsync(Guid id, VoucherStatusEnum modalStatus)
         {
-            var existedModal = await _modalRepository.GetByIdAsync(id,isTracking:true);
-            if (existedModal != null)
+            try
             {
-                existedModal.Status = modalStatus.ToString();
-                await _modalRepository.UpdateAsync(existedModal);
-                return new ResponseMessage<GetModalDTO>()
+                var existedModal = await _modalRepository.GetByIdAsync(id,isTracking:true);
+                if (existedModal != null)
                 {
-                    message = "Đổi status thành công",
-                    result = true,
-                    value = _mapper.Map<GetModalDTO>(existedModal)
-                };
+                    existedModal.Status = modalStatus.ToString();
+                    await _modalRepository.UpdateAsync(existedModal);
+                    return new ResponseMessage<GetModalDTO>()
+                    {
+                        message = "Đổi status thành công",
+                        result = true,
+                        value = _mapper.Map<GetModalDTO>(existedModal)
+                    };
+                }
+                else
+                {
+                    throw new NotFoundException("Không tìm thấy modal");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                throw new NotFoundException("Không tìm thấy modal");
+                LoggerService.Logger(ex.Message);
+                throw new UpdateObjectException("Lỗi không xác định khi cập nhật modal");
             }
         }
     }
