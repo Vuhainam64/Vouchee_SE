@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vouchee.Data.Helpers;
 
@@ -11,9 +12,11 @@ using Vouchee.Data.Helpers;
 namespace Vouchee.Data.Migrations
 {
     [DbContext(typeof(VoucheeContext))]
-    partial class VoucheeContextModelSnapshot : ModelSnapshot
+    [Migration("20241106205907_ChangeIntToDecimal")]
+    partial class ChangeIntToDecimal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -295,11 +298,11 @@ namespace Vouchee.Data.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<int>("OriginalPrice")
-                        .HasColumnType("int");
+                    b.Property<decimal>("OriginalPrice")
+                        .HasColumnType("decimal(18,5)");
 
-                    b.Property<int>("SellPrice")
-                        .HasColumnType("int");
+                    b.Property<decimal>("SellPrice")
+                        .HasColumnType("decimal(18,5)");
 
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("date");
@@ -344,18 +347,18 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<int>("DiscountValue")
-                        .HasColumnType("int");
+                    b.Property<decimal>("DiscountValue")
+                        .HasColumnType("decimal(18,5)");
 
                     b.Property<string>("PaymentType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PointDown")
-                        .HasColumnType("int");
+                    b.Property<decimal?>("PointDown")
+                        .HasColumnType("decimal(18,5)");
 
-                    b.Property<int>("PointUp")
-                        .HasColumnType("int");
+                    b.Property<decimal?>("PointUp")
+                        .HasColumnType("decimal(18,5)");
 
                     b.Property<Guid?>("PromotionId")
                         .HasColumnType("uniqueidentifier");
@@ -364,8 +367,8 @@ namespace Vouchee.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TotalPrice")
-                        .HasColumnType("int");
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,5)");
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
@@ -395,8 +398,8 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<int>("DiscountValue")
-                        .HasColumnType("int");
+                    b.Property<decimal>("DiscountValue")
+                        .HasColumnType("decimal(18,5)");
 
                     b.Property<Guid?>("ModalId")
                         .HasColumnType("uniqueidentifier");
@@ -414,8 +417,8 @@ namespace Vouchee.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UnitPrice")
-                        .HasColumnType("int");
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("decimal(18,5)");
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
@@ -459,15 +462,15 @@ namespace Vouchee.Data.Migrations
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("MoneyDiscount")
-                        .HasColumnType("int");
+                    b.Property<decimal?>("MoneyDiscount")
+                        .HasColumnType("decimal(10,5)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PercentDiscount")
-                        .HasColumnType("int");
+                    b.Property<decimal?>("PercentDiscount")
+                        .HasColumnType("decimal(10,5)");
 
                     b.Property<string>("Policy")
                         .HasColumnType("nvarchar(max)");
@@ -657,8 +660,8 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<int>("VPoint")
-                        .HasColumnType("int");
+                    b.Property<decimal?>("VPoint")
+                        .HasColumnType("decimal(18,5)");
 
                     b.HasKey("Id");
 

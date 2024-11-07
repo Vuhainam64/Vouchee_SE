@@ -45,11 +45,12 @@ namespace Vouchee.Data.Models.DTOs
         public Guid? id { get; set; }
         public Guid? voucherId { get; set; }
 
+        public Guid? promotionId { get; set; }
         public string? title { get; set; }
-        public decimal? originalPrice { get; set; }
-        public decimal? sellPrice { get; set; }
-        public decimal? salePrice => sellPrice - (sellPrice * (percentDiscount / 100));
-        public decimal? percentDiscount { get; set; }
+        public int? originalPrice { get; set; }
+        public int? sellPrice { get; set; }
+        public int? salePrice => sellPrice - (sellPrice * (percentDiscount / 100));
+        public int? percentDiscount { get; set; }
         public string? image { get; set; }
         public int? index { get; set; }
         public DateOnly? startDate { get; set; }
@@ -78,8 +79,8 @@ namespace Vouchee.Data.Models.DTOs
     {
         public int quantity { get; set; }
 
-        public decimal? totalPrice => quantity * sellPrice;
-        public decimal? discountPrice => quantity * salePrice;
-        public decimal? finalPrice => totalPrice - discountPrice;
+        public int? totalPrice => quantity * sellPrice;
+        public int? discountPrice { get; set; } = 0;
+        public int? finalPrice => totalPrice - discountPrice;
     }
 }

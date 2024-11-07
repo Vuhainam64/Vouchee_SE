@@ -96,9 +96,16 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<ResponseMessage<Guid>> CreateOrderAsync(ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<Guid>> CreateOrderAsync(ThisUserObj thisUserObj, bool usingPoint = false)
         {
+            var user = await _userRepository.GetByIdAsync(thisUserObj.userId, isTracking: true);
+
             CartDTO cartDTO = await _cartService.GetCartsAsync(thisUserObj, false);
+
+            if (cartDTO == null)
+            {
+                throw new NotFoundException("Giỏ hàng đang trống");
+            }
 
             Order order = new()
             {
@@ -145,10 +152,11 @@ namespace Vouchee.Business.Services.Impls
                             {
                                 ModalId = existedModal.Id,
                                 Quantity = cartModal.quantity,
-                                UnitPrice = (decimal) existedModal.SellPrice,
+                                UnitPrice = existedModal.SellPrice,
                                 Status = OrderStatusEnum.PENDING.ToString(),
                                 CreateDate = DateTime.Now,
                                 CreateBy = thisUserObj.userId,
+                                PromotionId = cartModal.promotionId
                             });
                         }
                     }
@@ -158,6 +166,27 @@ namespace Vouchee.Business.Services.Impls
             }
 
             order.TotalPrice = order.OrderDetails.Sum(x => x.TotalPrice);
+            order.PointUp = order.FinalPrice / 1000;
+
+            if (usingPoint)
+            {
+                if (user.VPoint != 0)
+                {
+                    order.PointDown = user.VPoint;
+                    user.VPoint = order.PointUp;
+                }
+                else
+                {
+                    user.VPoint += order.FinalPrice / 1000;
+                }
+            }
+            else
+            {
+                user.VPoint += order.FinalPrice / 1000;
+            }
+
+            var userUpdate = await _userRepository.UpdateAsync(user);
+
             var orderId = await _orderRepository.AddAsync(order);
             if (orderId == Guid.Empty)
             {
@@ -170,117 +199,7 @@ namespace Vouchee.Business.Services.Impls
                 result = true,
                 value = (Guid)orderId
             };
-            //foreach (var seller in cartDTO.sellers)
-            //{
-            //    foreach (var modal in seller.modals)
-            //    {
-            //        order.OrderDetails.Add(new OrderDetail
-            //        {
-            //            ModalId = modal.id,
-            //            Quantity = modal.quantity,
-            //            UnitPrice = (decimal)modal.sellPrice,
-            //            Status = OrderStatusEnum.PENDING.ToString(),
-            //            CreateDate = DateTime.Now,
-            //            CreateBy = thisUserObj.userId,
-            //        });
-
-            //        var existedModal = await _modalRepository.FindAsync(modal.id.Value, true);
-            //        if (existedModal != null && existedModal.Stock >= modal.quantity)
-            //        {
-            //            existedModal.Stock -= modal.quantity;
-            //            await _modalRepository.UpdateAsync(existedModal);
-            //        }
-            //    }
-
-            //    var groupedModals = seller.modals.GroupBy(x => x.voucherId);
-
-            //    foreach (var modals in groupedModals)
-            //    {
-            //        var voucherId = modals.Key;
-            //        var voucherModals = await _modalRepository.GetWhereAsync(x => x.VoucherId == voucherId);
-
-            //        var existedVoucher = await _voucherRepository.FindAsync((Guid)voucherId, true);
-            //        if (existedVoucher != null)
-            //        {
-            //            existedVoucher.Stock = voucherModals.Sum(x => x.Stock);
-            //            await _voucherRepository.UpdateAsync(existedVoucher);
-            //        }
-            //    }
-            //}
-
-            //order.TotalPrice = order.OrderDetails.Sum(x => x.TotalPrice);
-
-            //Guid? orderId = await _orderRepository.AddAsync(order);
-
-            //if (orderId != Guid.Empty)
-            //{
-            //    foreach (var seller in cartDTO.sellers)
-            //    {
-            //        foreach (var x in seller.modals)
-            //        {
-            //            await _cartService.RemoveItemAsync((Guid)x.id, thisUserObj);
-            //        }
-            //    }
-            //}
-
-            // return null;
         }
-
-        public async Task<User> GetCurrentUser(Guid userId)
-        {
-            User? userInstance = null;
-            //IQueryable<User> users = _userRepository.CheckLocal();
-
-            //if (users != null && users.Count() != 0)
-            //{
-            //    userInstance = users.FirstOrDefault(x => x.Id == userId);
-            //}
-
-            if (userInstance == null)
-            {
-                userInstance = await _userRepository.GetByIdAsync(userId, includeProperties: x => x.Include(x => x.Carts)
-                                                                                                    .ThenInclude(x => x.Modal));
-            }
-
-            return userInstance;
-        }
-
-        //public async Task<Guid?> CreateOrderAsync(CreateOrderDTO createOrderDTO, ThisUserObj thisUserObj)
-        //{
-        //    try
-        //    {
-        //        var order = _mapper.Map<Order>(createOrderDTO);
-
-        //        foreach (var orderDetail in order.OrderDetails)
-        //        {
-        //            var voucher = _voucherRepository.GetByIdAsync(orderDetail.VoucherId).Result;
-        //            if (voucher == null)
-        //            {
-        //                throw new NotFoundException($"Không tìm thấy voucher với ID {orderDetail.VoucherId}");
-        //            }
-        //            if (orderDetail.Quantity > voucher.Quantity)
-        //            {
-        //                throw new QuantityExcessException($"Voucher {voucher.Id} vượt quá số lượng tồn kho");
-        //            }
-
-        //            orderDetail.VoucherId = voucher.Id;
-        //            orderDetail.CreateBy = Guid.Parse(thisUserObj.userId);
-        //            orderDetail.UnitPrice = voucher.OriginalPrice;
-        //        }
-
-        //        order.CreateBy = Guid.Parse(thisUserObj.userId);
-        //        order.TotalPrice = order.OrderDetails.Sum(x => x.FinalPrice);
-
-        //        var orderId = await _orderRepository.AddAsync(order);
-
-        //        return orderId;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        LoggerService.Logger(ex.Message);
-        //        throw new CreateObjectException("Lỗi không xác định khi tạo order");
-        //    }
-        //}
 
         public async Task<bool> DeleteOrderAsync(Guid id)
         {

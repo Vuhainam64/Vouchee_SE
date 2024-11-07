@@ -39,11 +39,11 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? orderId { get; set; }
         public Guid? modalId { get; set; }
 
-        public decimal? unitPrice { get; set; }
-        public decimal? discountValue { get; set; }
-        public decimal? totalPrice { get; set; }
-        public decimal? discountPrice { get; set; }
-        public decimal? finalPrice { get; set; }
+        public int? unitPrice { get; set; }
+        public int? discountValue { get; set; }
+        public int? totalPrice { get; set; }
+        public int? discountPrice { get; set; }
+        public int? finalPrice { get; set; }
 
         public string? status { get; set; }
 

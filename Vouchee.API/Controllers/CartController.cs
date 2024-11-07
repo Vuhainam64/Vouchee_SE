@@ -37,62 +37,61 @@ namespace Vouchee.API.Controllers
         // CREATE
         [HttpPost("add_item/{modalId}")]
         [Authorize]
-        public async Task<IActionResult> AddItem(Guid modalId)
+        public async Task<IActionResult> AddItem(Guid modalId, [FromQuery] bool usingPoint)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            var result = await _cartService.AddItemAsync(modalId, currentUser);
+            var result = await _cartService.AddItemAsync(modalId, currentUser, usingPoint);
             return Ok(result);
         }
 
         // READ
         [HttpGet("get_all_item")]
         [Authorize]
-        public async Task<IActionResult> GetAllItemFromCart()
+        public async Task<IActionResult> GetAllItemFromCart([FromQuery] bool usingPoint)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            var result = await _cartService.GetCartsAsync(currentUser);
+            var result = await _cartService.GetCartsAsync(currentUser, isTracking: false, usingPoint);
             return Ok(result);
         }
 
         // UPDATE
         [HttpPut("increase_quantity/{modalId}")]
         [Authorize]
-        public async Task<IActionResult> IncreaseQuantity(Guid modalId)
+        public async Task<IActionResult> IncreaseQuantity(Guid modalId, [FromQuery] bool usingPoint)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            var result = await _cartService.IncreaseQuantityAsync(modalId, currentUser);
+            var result = await _cartService.IncreaseQuantityAsync(modalId, currentUser, usingPoint);
             return Ok(result);
         }
 
         [HttpPut("decrease_quantity/{modalId}")]
-        public async Task<IActionResult> DecreaseQuantity(Guid modalId)
+        public async Task<IActionResult> DecreaseQuantity(Guid modalId, [FromQuery] bool usingPoint)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            var result = await _cartService.DecreaseQuantityAsync(modalId, currentUser);
+            var result = await _cartService.DecreaseQuantityAsync(modalId, currentUser, usingPoint);
             return Ok(result);
         }
 
         [HttpPut("update_quantity/{modalId}")]
-        public async Task<IActionResult> UpdateQuantity(Guid modalId, int quantity)
+        public async Task<IActionResult> UpdateQuantity(Guid modalId, int quantity, [FromQuery] bool usingPoint)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            var result = await _cartService.UpdateQuantityAsync(modalId, quantity, currentUser);
+            var result = await _cartService.UpdateQuantityAsync(modalId, quantity, currentUser, usingPoint);
             return Ok(result);
         }
 
         // DELETE
         [HttpDelete("remove_item/{modalId}")]
         [Authorize]
-        public async Task<IActionResult> RemoveItem(Guid modalId)
+        public async Task<IActionResult> RemoveItem(Guid modalId, [FromQuery] bool usingPoint)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
-
-            var result = await _cartService.RemoveItemAsync(modalId, currentUser);
+            var result = await _cartService.RemoveItemAsync(modalId, currentUser, usingPoint);
             return Ok(result);
         }
     }
