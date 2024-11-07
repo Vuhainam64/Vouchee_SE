@@ -234,7 +234,7 @@ namespace Vouchee.Business.Services.Impls
                 await _voucherRepository.UpdateAsync(existedVoucher);
                 return new ResponseMessage<GetVoucherDTO>()
                 {
-                    message = "Đổi isActive thành công",
+                    message = "Đổi Status thành công",
                     result = true,
                     value = _mapper.Map<GetVoucherDTO>(existedVoucher)
                 };
