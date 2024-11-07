@@ -173,6 +173,7 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
+        
         public async Task<bool> UpdateVoucherCodeAsync(Guid id, UpdateVoucherCodeDTO updateVoucherCodeDTO)
         {
             var existedVoucherCode = await _voucherCodeRepository.FindAsync(id, false);
@@ -187,6 +188,27 @@ namespace Vouchee.Business.Services.Impls
             var result = await _voucherCodeRepository.UpdateAsync(existedVoucherCode);
 
             return result;
+        }
+        
+        public async Task<ResponseMessage<GetVoucherCodeDTO>> UpdateStatusVoucherCodeAsync(Guid id, VoucherCodeStatusEnum voucherCodeStatus)
+        {
+            var existedVoucherCode = await _voucherCodeRepository.FindAsync(id, true);
+
+            if (existedVoucherCode == null)
+            {
+                throw new NotFoundException($"Không tìm thấy voucher code với id {id}");
+            }
+
+            existedVoucherCode.Status = voucherCodeStatus.ToString();
+
+            await _voucherCodeRepository.UpdateAsync(existedVoucherCode);
+
+            return new ResponseMessage<GetVoucherCodeDTO>()
+            {
+                message = "Đổi Status thành công",
+                result = true,
+                value = _mapper.Map<GetVoucherCodeDTO>(existedVoucherCode)
+            };
         }
     }
 }
