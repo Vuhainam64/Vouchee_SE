@@ -42,7 +42,7 @@ namespace Vouchee.Data.Models.Entities
         public int TotalPrice { get; set; }
         public int DiscountPrice => TotalPrice * DiscountValue;
         public int PointDown { get; set; }
-        public int FinalPrice => TotalPrice - DiscountPrice;
+        public int FinalPrice => TotalPrice - DiscountPrice - PointDown;
         public int PointUp { get; set; }
 
         public required string Status { get; set; }

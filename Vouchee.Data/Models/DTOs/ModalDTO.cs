@@ -79,8 +79,8 @@ namespace Vouchee.Data.Models.DTOs
     {
         public int quantity { get; set; }
 
-        public decimal? totalPrice => quantity * sellPrice;
-        public decimal? discountPrice { get; set; } = 0;
-        public decimal? finalPrice => totalPrice - discountPrice;
+        public int? totalPrice => quantity * sellPrice;
+        public int? discountPrice { get; set; } = 0;
+        public int? finalPrice => totalPrice - discountPrice;
     }
 }

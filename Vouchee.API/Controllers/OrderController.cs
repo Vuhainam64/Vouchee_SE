@@ -36,11 +36,11 @@ namespace Vouchee.API.Controllers
         // CREATE
         [HttpPost("create_order")]
         [Authorize]
-        public async Task<IActionResult> CreateOrder()
+        public async Task<IActionResult> CreateOrder([FromQuery] bool usingPoint)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            var result = await _orderService.CreateOrderAsync(currentUser);
+            var result = await _orderService.CreateOrderAsync(currentUser, usingPoint);
             return Ok(result);
 
         }

@@ -82,10 +82,10 @@ namespace Vouchee.Business.Services.Impls
                     cartDTO.sellers.Add(sellerCartDTO);
 
                     cartDTO.totalQuantity = cartDTO.sellers.Sum(x => x.modals.Sum(x => x.quantity));
-                    cartDTO.totalPrice = (decimal) cartDTO.sellers.Sum(s => s.modals.Sum(x => x.finalPrice));
+                    cartDTO.totalPrice = cartDTO.sellers.Sum(s => s.modals.Sum(x => x.finalPrice));
                     if (usingPoint)
                     {
-                        cartDTO.vPoint = (decimal) _user.VPoint;
+                        cartDTO.vPoint = _user.VPoint;
                     }
                 }
             }

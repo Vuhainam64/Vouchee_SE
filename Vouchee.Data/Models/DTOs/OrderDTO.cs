@@ -46,7 +46,10 @@ namespace Vouchee.Business.Models.DTOs
         public int? discountValue { get; set; }
         public int? totalPrice { get; set; }
         public int? discountPrice { get; set; }
+        public int? pointDown { get; set; }
         public int? finalPrice { get; set; }
+        public int? pointUp { get; set; }
+
 
         public string? status { get; set; }
 
