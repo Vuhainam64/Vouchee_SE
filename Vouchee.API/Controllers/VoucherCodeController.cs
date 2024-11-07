@@ -8,6 +8,7 @@ using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Services;
 using Vouchee.Business.Services.Impls;
 using Vouchee.Data.Models.Constants.Enum.Sort;
+using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Filters;
 
@@ -66,6 +67,13 @@ namespace Vouchee.API.Controllers
         public async Task<IActionResult> UpdateVoucherCode(Guid id, [FromBody] UpdateVoucherCodeDTO updateVoucherCodeDTO)
         {
             var result = await _voucherCodeService.UpdateVoucherCodeAsync(id, updateVoucherCodeDTO);
+            return Ok(result);
+        }
+        [HttpPut("update_status_voucher_code/{id}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateStatusVoucherCode(Guid id, VoucherCodeStatusEnum voucherCodeStatus)
+        {
+            var result = await _voucherCodeService.UpdateStatusVoucherCodeAsync(id, voucherCodeStatus);
             return Ok(result);
         }
 
