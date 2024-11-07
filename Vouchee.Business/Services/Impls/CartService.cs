@@ -42,7 +42,7 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<CartDTO> GetCartsAsync(ThisUserObj thisUserObj, bool isTracking = false)
+        public async Task<CartDTO> GetCartsAsync(ThisUserObj thisUserObj, bool isTracking = false, bool usingPoint = false)
         {
             _user = await _userRepository.GetByIdAsync(thisUserObj.userId,
                                                         includeProperties: query => query
@@ -59,8 +59,6 @@ namespace Vouchee.Business.Services.Impls
                                                                 .ThenInclude(cart => cart.Modal)
                                                                     .ThenInclude(voucher => voucher.Voucher.Promotions)
                                                                     , isTracking);
-
-            // check for modified voucher, modal, voucher
 
             CartDTO cartDTO = new();
 
@@ -84,8 +82,11 @@ namespace Vouchee.Business.Services.Impls
                     cartDTO.sellers.Add(sellerCartDTO);
 
                     cartDTO.totalQuantity = cartDTO.sellers.Sum(x => x.modals.Sum(x => x.quantity));
-                    cartDTO.totalPrice = (decimal) cartDTO.sellers.Sum(s => s.modals.Sum(x => x.totalPrice));
-                    cartDTO.discountPrice = (decimal) cartDTO.sellers.Sum(s => s.modals.Sum(x => x.discountPrice));
+                    cartDTO.totalPrice = (decimal) cartDTO.sellers.Sum(s => s.modals.Sum(x => x.finalPrice));
+                    if (usingPoint)
+                    {
+                        cartDTO.vPoint = (decimal) _user.VPoint;
+                    }
                 }
             }
 

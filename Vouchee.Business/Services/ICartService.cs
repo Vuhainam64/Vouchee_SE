@@ -15,7 +15,7 @@ namespace Vouchee.Business.Services
         public Task<CartDTO> AddItemAsync(Guid modalId, ThisUserObj thisUserObj);
 
         // READ
-        public Task<CartDTO> GetCartsAsync(ThisUserObj thisUserObj, bool isTracking = false);
+        public Task<CartDTO> GetCartsAsync(ThisUserObj thisUserObj, bool isTracking = false, bool usePoint = false);
 
         // UPDATE
         public Task<CartDTO> IncreaseQuantityAsync(Guid modalId, ThisUserObj thisUserObj);

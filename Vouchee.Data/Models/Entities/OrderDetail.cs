@@ -42,16 +42,11 @@ namespace Vouchee.Data.Models.Entities
         [Key]
         public Guid Id { get; set; }
 
-        [Column(TypeName = "decimal(18,5)")]
-        public decimal UnitPrice { get; set; }
-        [Column(TypeName = "decimal(18,5)")]
-        public decimal DiscountValue { get; set; } = 0;
-        [Column(TypeName = "decimal(18,5)")]
-        public decimal TotalPrice => UnitPrice * Quantity;
-        [Column(TypeName = "decimal(18,5)")]
-        public decimal DiscountPrice => TotalPrice * DiscountValue * 100;
-        [Column(TypeName = "decimal(18,5)")]
-        public decimal FinalPrice => TotalPrice - DiscountPrice;
+        public int UnitPrice { get; set; }
+        public int DiscountValue { get; set; } = 0;
+        public int TotalPrice => UnitPrice * Quantity;
+        public int DiscountPrice => TotalPrice * DiscountValue * 100;
+        public int FinalPrice => TotalPrice - DiscountPrice;
         public int Quantity { get; set; }
 
         public required string Status { get; set; }
