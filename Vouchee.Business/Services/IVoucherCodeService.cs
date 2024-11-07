@@ -10,6 +10,7 @@ using Vouchee.Data.Models.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Vouchee.Data.Models.DTOs;
 using System.Collections;
+using Vouchee.Data.Models.Constants.Enum.Status;
 
 namespace Vouchee.Business.Services
 {
@@ -24,6 +25,7 @@ namespace Vouchee.Business.Services
 
         // UPDATE
         public Task<bool> UpdateVoucherCodeAsync(Guid id, UpdateVoucherCodeDTO updateVoucherCodeDTO);
+        public Task<ResponseMessage<GetVoucherCodeDTO>> UpdateStatusVoucherCodeAsync(Guid id, VoucherCodeStatusEnum voucherCodeStatus);
 
         // DELETE
         public Task<bool> DeleteVoucherCodeAsync(Guid id);
