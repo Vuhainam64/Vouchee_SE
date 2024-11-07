@@ -67,15 +67,36 @@ namespace Vouchee.Business.Services.Impls
             return false;
         }
 
-        public async Task<GetModalDTO> GetModalByIdAsync(Guid id)
+        public async Task<dynamic> GetModalByIdAsync(Guid id, PagingRequest pagingRequest)
         {
-            Modal modal = await _modalRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.VoucherCodes)
-                                                                                                .ThenInclude(x => x.OrderDetail));
+            Modal existedModal = await _modalRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.VoucherCodes));
 
-            if (modal == null)
-                throw new NotFoundException("Khong tim thay sub voucher");
+            if (existedModal != null)
+            {
+                var modal = _mapper.Map<GetDetailModalDTO>(existedModal);
+                var total = modal.voucherCodes.Count();
 
-            return _mapper.Map<GetModalDTO>(modal);
+                var pagedVoucherCode = modal.voucherCodes
+                    .Skip((pagingRequest.page - 1) * pagingRequest.pageSize)
+                    .Take(pagingRequest.pageSize).ToList();
+
+                modal.voucherCodes = pagedVoucherCode;
+
+                return new
+                {
+                    metaData = new
+                    {
+                        page = pagingRequest.page,
+                        size = pagingRequest.pageSize,
+                        total = total
+                    },
+                    results = modal
+                };
+            }
+            else
+            {
+                throw new NotFoundException($"Không tìm thấy voucher với id {id}");
+            }
         }
 
         public async Task<DynamicResponseModel<GetModalDTO>> GetModalsAsync(PagingRequest pagingRequest, ModalFilter modalFilter)

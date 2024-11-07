@@ -54,9 +54,9 @@ namespace Vouchee.API.Controllers
 
         // GET BY ID
         [HttpGet("get_modal/{id}")]
-        public async Task<IActionResult> GetVoucherCodeById(Guid id)
+        public async Task<IActionResult> GetVoucherCodeById(Guid id, [FromQuery] PagingRequest pagingRequest)
         {
-            var modal = await _modalService.GetModalByIdAsync(id);
+            var modal = await _modalService.GetModalByIdAsync(id, pagingRequest);
             return Ok(modal);
         }
 
