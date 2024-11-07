@@ -45,7 +45,7 @@ namespace Vouchee.API.Controllers
 
         // READ
         [HttpGet("get_all_modal")]
-        
+        [Authorize]
         public async Task<IActionResult> GetModals([FromQuery] PagingRequest pagingRequest,
                                                             [FromQuery] ModalFilter modalFilter)
         {
