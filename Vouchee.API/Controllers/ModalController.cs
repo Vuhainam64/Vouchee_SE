@@ -67,6 +67,7 @@ namespace Vouchee.API.Controllers
             var result = await _modalService.UpdateModalAsync(id, updateModalDTO);
             return Ok(result);
         }
+
         [HttpPut("update_modal_status/{id}")]
         public async Task<IActionResult> UpdateModalStatus(Guid id, VoucherStatusEnum modalStatus)
         {

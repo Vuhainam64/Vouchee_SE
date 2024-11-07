@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
@@ -45,6 +46,8 @@ namespace Vouchee.Business.Models.DTOs
             orders = [];
             vouchers = [];
             carts = [];
+            notificationFromUser = [];
+            notificationToUser = [];
         }
 
         public Guid? id { get; set; }
@@ -59,6 +62,9 @@ namespace Vouchee.Business.Models.DTOs
         public virtual ICollection<CartDTO> carts { get; set; }
         public virtual ICollection<GetVoucherDTO> vouchers { get; set; }
         public virtual ICollection<GetOrderDTO>? orders { get; set; }
+        public virtual ICollection<GetNotificationDTO> notificationToUser { get; set; }
+        [InverseProperty(nameof(Notification.Sender))]
+        public virtual ICollection<GetNotificationDTO> notificationFromUser { get; set; }
     }
 
     public class RegisterDTO
