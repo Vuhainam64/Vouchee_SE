@@ -186,14 +186,17 @@ namespace Vouchee.API.AppStarts
             CreateMap<Modal, GetModalDTO>()
                 .ForMember(dest => dest.percentDiscount, opt => opt.MapFrom(src => src.Voucher.Promotions.FirstOrDefault(p => p.StartDate <= DateTime.Now
                                                                                                     && DateTime.Now <= p.EndDate).PercentDiscount))
+                .ForMember(dest => dest.promotionId, opt => opt.MapFrom(src => src.Voucher.Promotions.FirstOrDefault(p => p.StartDate <= DateTime.Now
+                                                                                    && DateTime.Now <= p.EndDate).Id))
                 .ReverseMap();
             CreateMap<Modal, GetDetailModalDTO>().ReverseMap();
             CreateMap<GetModalDTO, ModalFilter>().ReverseMap();
-
             CreateMap<Modal, CartModalDTO>()
-                    .ForMember(dest => dest.percentDiscount, opt => opt.MapFrom(src => src.Voucher.Promotions.FirstOrDefault(p => p.StartDate <= DateTime.Now
-                                                                                                                        && DateTime.Now <= p.EndDate).PercentDiscount))
-                    .ReverseMap();
+                .ForMember(dest => dest.percentDiscount, opt => opt.MapFrom(src => src.Voucher.Promotions.FirstOrDefault(p => p.StartDate <= DateTime.Now
+                                                                                                                    && DateTime.Now <= p.EndDate).PercentDiscount))
+                .ForMember(dest => dest.promotionId, opt => opt.MapFrom(src => src.Voucher.Promotions.FirstOrDefault(p => p.StartDate <= DateTime.Now
+                                                                && DateTime.Now <= p.EndDate).Id))
+                .ReverseMap();
         }
     }
 }

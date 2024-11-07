@@ -63,7 +63,7 @@ namespace Vouchee.Business.Models.DTOs
 
         public string? name { get; set; }
         public string? description { get; set; }
-        public decimal? price { get; set; }
+        public int? price { get; set; }
         public DateTime? starDate { get; set; }
         public DateTime? endDate { get; set; }
         public string? policy { get; set; }
@@ -91,10 +91,10 @@ namespace Vouchee.Business.Models.DTOs
         public DateTime? createDate { get; set; }
         public Guid? sellerId { get; set; }
 
-        public decimal? percentDiscount { get; set; }
-        public decimal? originalPrice { get; set; }
-        public decimal? sellPrice { get; set; }
-        public decimal? salePrice => sellPrice - (sellPrice * (percentDiscount / 100));
+        public int? percentDiscount { get; set; }
+        public int? originalPrice { get; set; }
+        public int? sellPrice { get; set; }
+        public int? salePrice => sellPrice - (sellPrice * (percentDiscount / 100));
 
         public string? image { get; set; }
 
