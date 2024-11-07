@@ -37,7 +37,7 @@ namespace Vouchee.Data.Helpers
                                     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
                 IConfigurationRoot configuration = builder.Build();
                 optionsBuilder.EnableSensitiveDataLogging();
-                optionsBuilder.UseSqlServer(configuration.GetConnectionString("DEV"));
+                optionsBuilder.UseSqlServer(configuration.GetConnectionString("PROD"));
             }
         }
 
