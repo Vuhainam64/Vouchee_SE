@@ -204,6 +204,10 @@ namespace Vouchee.API.AppStarts
             CreateMap<Notification, UpdateNotificationDTO>().ReverseMap();
             CreateMap<Notification, GetNotificationDTO>().ReverseMap();
             CreateMap<GetNotificationDTO, NotifcationFilter>().ReverseMap();
+
+            // WALLET
+            CreateMap<Wallet, WalletDTO>().ReverseMap();
+            CreateMap<Wallet, GetWalletDTO>().ReverseMap();
         }
     }
 }

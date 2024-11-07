@@ -39,7 +39,7 @@ namespace Vouchee.Data.Models.Entities
 
         public required string Status { get; set; }
         public required DateTime CreateDate { get; set; }
-        public required Guid CreateBy { get; set; }
+        public Guid CreateBy { get; set; }
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
     }

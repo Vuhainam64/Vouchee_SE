@@ -65,6 +65,7 @@ namespace Vouchee.Business.Models.DTOs
         public virtual ICollection<GetNotificationDTO> notificationToUser { get; set; }
         [InverseProperty(nameof(Notification.Sender))]
         public virtual ICollection<GetNotificationDTO> notificationFromUser { get; set; }
+        public virtual ICollection<GetWalletDTO> wallets { get; set; }
     }
 
     public class RegisterDTO
