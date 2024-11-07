@@ -19,6 +19,8 @@ namespace Vouchee.Data.Models.Entities
             Orders = [];
             Vouchers = [];
             Carts = [];
+            ReceiverNotifications = [];
+            SenderNotifications = [];
         }
 
         [InverseProperty(nameof(Order.User))]
@@ -27,6 +29,10 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<Voucher> Vouchers { get; set; }
         [InverseProperty(nameof(Cart.Buyer))]
         public virtual ICollection<Cart> Carts { get; set; }
+        [InverseProperty(nameof(Notification.Receiver))]
+        public virtual ICollection<Notification> ReceiverNotifications { get; set; }
+        [InverseProperty(nameof(Notification.Sender))]
+        public virtual ICollection<Notification> SenderNotifications { get; set; }
 
         public Guid? RoleId { get; set; }
         [ForeignKey(nameof(RoleId))]

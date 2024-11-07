@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vouchee.Data.Helpers;
 
@@ -11,9 +12,11 @@ using Vouchee.Data.Helpers;
 namespace Vouchee.Data.Migrations
 {
     [DbContext(typeof(VoucheeContext))]
-    partial class VoucheeContextModelSnapshot : ModelSnapshot
+    [Migration("20241107121918_AddNotiDb")]
+    partial class AddNotiDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -347,14 +350,11 @@ namespace Vouchee.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("ReceiverId")
+                    b.Property<Guid?>("FromUserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("Seen")
                         .HasColumnType("bit");
-
-                    b.Property<Guid?>("SenderId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -362,6 +362,9 @@ namespace Vouchee.Data.Migrations
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("ToUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
@@ -371,9 +374,9 @@ namespace Vouchee.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "ReceiverId" }, "IX_Notification_ReceiverId");
+                    b.HasIndex(new[] { "FromUserId" }, "IX_Notification_FromUserId");
 
-                    b.HasIndex(new[] { "SenderId" }, "IX_Notification_SenderId");
+                    b.HasIndex(new[] { "ToUserId" }, "IX_Notification_ToUserId");
 
                     b.ToTable("Notification");
                 });
@@ -949,17 +952,17 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Notification", b =>
                 {
-                    b.HasOne("Vouchee.Data.Models.Entities.User", "Receiver")
-                        .WithMany("ReceiverNotifications")
-                        .HasForeignKey("ReceiverId");
+                    b.HasOne("Vouchee.Data.Models.Entities.User", "FromUser")
+                        .WithMany("NotificationFromUser")
+                        .HasForeignKey("FromUserId");
 
-                    b.HasOne("Vouchee.Data.Models.Entities.User", "Sender")
-                        .WithMany("SenderNotifications")
-                        .HasForeignKey("SenderId");
+                    b.HasOne("Vouchee.Data.Models.Entities.User", "ToUser")
+                        .WithMany("NotificationToUser")
+                        .HasForeignKey("ToUserId");
 
-                    b.Navigation("Receiver");
+                    b.Navigation("FromUser");
 
-                    b.Navigation("Sender");
+                    b.Navigation("ToUser");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Order", b =>
@@ -1109,11 +1112,11 @@ namespace Vouchee.Data.Migrations
                 {
                     b.Navigation("Carts");
 
+                    b.Navigation("NotificationFromUser");
+
+                    b.Navigation("NotificationToUser");
+
                     b.Navigation("Orders");
-
-                    b.Navigation("ReceiverNotifications");
-
-                    b.Navigation("SenderNotifications");
 
                     b.Navigation("Supplier");
 

@@ -177,7 +177,7 @@ namespace Vouchee.API.AppStarts
             CreateMap<Media, GetMediaDTO>().ReverseMap();
             
 
-            //Cart
+            // CART
             CreateMap<Cart,CartDTO>().ReverseMap();
 
             // MODAL
@@ -197,6 +197,13 @@ namespace Vouchee.API.AppStarts
                 .ForMember(dest => dest.promotionId, opt => opt.MapFrom(src => src.Voucher.Promotions.FirstOrDefault(p => p.StartDate <= DateTime.Now
                                                                 && DateTime.Now <= p.EndDate).Id))
                 .ReverseMap();
+
+            // NOTIFICATION
+            CreateMap<Notification, NotificationDTO>().ReverseMap();
+            CreateMap<Notification, CreateNotificationDTO>().ReverseMap();
+            CreateMap<Notification, UpdateNotificationDTO>().ReverseMap();
+            CreateMap<Notification, GetNotificationDTO>().ReverseMap();
+            CreateMap<GetNotificationDTO, NotifcationFilter>().ReverseMap();
         }
     }
 }

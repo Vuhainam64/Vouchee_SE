@@ -71,6 +71,9 @@ namespace Vouchee.API.AppStarts
 
             // CART
             services.AddScoped<ICartService, CartService>();
+
+            // NOTIFICATIOn
+            services.AddScoped<INotificationService, NotificationService>();
         }
 
         public static void AddSwaggerServices(this IServiceCollection services, IConfiguration configuration)
