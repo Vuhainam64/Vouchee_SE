@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Vouchee.Business.Models;
@@ -16,7 +17,7 @@ namespace Vouchee.Business.Services
         public Task<Guid?> CreateModalAsync(Guid voucherId, CreateModalDTO createModalDTO, ThisUserObj thisUserObj);
 
         // READ
-        public Task<GetModalDTO> GetModalByIdAsync(Guid id);
+        public Task<dynamic> GetModalByIdAsync(Guid id, PagingRequest pagingRequest);
         public Task<DynamicResponseModel<GetModalDTO>> GetModalsAsync(PagingRequest pagingRequest, ModalFilter modalFilter);
 
         // UPDATE
