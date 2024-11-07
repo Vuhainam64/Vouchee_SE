@@ -53,7 +53,6 @@ namespace Vouchee.Data.Models.Entities
         public string? BankName { get; set; }
         public string? BankAccount { get; set; }
         public int ResponsibilityScore { get; set; }
-        [Column(TypeName = "decimal(18,5)")]
         public int VPoint { get; set; }
 
         public required string Status { get; set; }
