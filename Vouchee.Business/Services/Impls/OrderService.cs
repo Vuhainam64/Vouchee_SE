@@ -102,6 +102,11 @@ namespace Vouchee.Business.Services.Impls
 
             CartDTO cartDTO = await _cartService.GetCartsAsync(thisUserObj, false);
 
+            if (cartDTO == null)
+            {
+                throw new NotFoundException("Giỏ hàng đang trống");
+            }
+
             Order order = new()
             {
                 PaymentType = "BANKING",
@@ -161,19 +166,26 @@ namespace Vouchee.Business.Services.Impls
             }
 
             order.TotalPrice = order.OrderDetails.Sum(x => x.TotalPrice);
-            order.PointUp = order.FinalPrice;
+            order.PointUp = order.FinalPrice / 1000;
 
             if (usingPoint)
             {
-                order.PointDown = user.VPoint;
-                user.VPoint = 0;
+                if (user.VPoint != 0)
+                {
+                    order.PointDown = user.VPoint;
+                    user.VPoint = order.PointUp;
+                }
+                else
+                {
+                    user.VPoint += order.FinalPrice / 1000;
+                }
             }
             else
             {
-                user.VPoint += order.FinalPrice;
+                user.VPoint += order.FinalPrice / 1000;
             }
 
-            await _userRepository.UpdateAsync(user);
+            var userUpdate = await _userRepository.UpdateAsync(user);
 
             var orderId = await _orderRepository.AddAsync(order);
             if (orderId == Guid.Empty)
