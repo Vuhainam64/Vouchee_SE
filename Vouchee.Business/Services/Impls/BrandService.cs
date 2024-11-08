@@ -63,7 +63,7 @@ namespace Vouchee.Business.Services.Impls
         {
             try
             {
-                var brand = await _brandRepository.GetByIdAsync(id);
+                var brand = await _brandRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Addresses));
                 if (brand != null)
                 {
                     var brandDTO = _mapper.Map<GetDetalBrandDTO>(brand);
