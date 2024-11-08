@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
@@ -30,6 +31,7 @@ namespace Vouchee.Business.Services.Impls
         {
             var user = _mapper.Map<User>(createUserDTO);
 
+            user.CreateBy = thisUserObj.userId;
             user.Status = UserStatusEnum.ACTIVE.ToString();
 
             var userId = await _userRepository.AddAsync(user);
@@ -69,7 +71,9 @@ namespace Vouchee.Business.Services.Impls
         {
             try
             {
-                var user = await _userRepository.GetByIdAsync(id);
+                var user = await _userRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Carts)
+                                                                                                .Include(x => x.Wallets)
+                                                                                                .Include(x => x.Role));
                 if (user != null)
                 {
                     GetUserDTO userDTO = _mapper.Map<GetUserDTO>(user);
@@ -103,13 +107,21 @@ namespace Vouchee.Business.Services.Impls
             return result.ToList();
         }
 
-        public async Task<bool> UpdateUserAsync(Guid id, UpdateUserDTO updateUserDTO, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<GetUserDTO>> UpdateUserAsync(Guid id, UpdateUserDTO updateUserDTO, ThisUserObj thisUserObj)
         {
-            var existedUser = await _userRepository.GetByIdAsync(id);
+            var existedUser = await _userRepository.GetByIdAsync(id, isTracking: true);
             if (existedUser != null)
             {
-                var entity = _mapper.Map<User>(updateUserDTO);
-                return await _userRepository.UpdateAsync(entity);
+                var entity = _mapper.Map(updateUserDTO, existedUser);
+                entity.UpdateBy = thisUserObj.userId;
+                await _userRepository.UpdateAsync(entity);
+
+                return new ResponseMessage<GetUserDTO>()
+                {
+                    message = "Cập nhật thành công",
+                    result = true,
+                    value = _mapper.Map<GetUserDTO>(entity)
+                };
             }
             else
             {

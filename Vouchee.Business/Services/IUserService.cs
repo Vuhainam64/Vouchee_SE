@@ -16,7 +16,7 @@ namespace Vouchee.Business.Services
         public Task<IList<GetUserDTO>> GetUsersAsync();
 
         // UPDATE
-        public Task<bool> UpdateUserAsync(Guid id, UpdateUserDTO updateUserDTO, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<GetUserDTO>> UpdateUserAsync(Guid id, UpdateUserDTO updateUserDTO, ThisUserObj thisUserObj);
 
         // DELETE
         public Task<bool> DeleteUserAsync(Guid id);
