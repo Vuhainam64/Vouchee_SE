@@ -190,7 +190,7 @@ namespace Vouchee.Business.Services.Impls
 
                 if (cartVoucher.Quantity <= 1)
                 {
-                    _user.Carts.Remove(cartVoucher);
+
                 }
                 else
                 {
