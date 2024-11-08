@@ -10,20 +10,11 @@ using System.Threading.Tasks;
 namespace Vouchee.Data.Models.Entities
 {
     [Table("WalletTransaction")]
-    [Index(nameof(OrderId), Name = "IX_WalletTransaction_OrderId")]
-    [Index(nameof(AccountTransactionId), Name = "IX_WalletTransaction_AccountTransactionId")]
-    [Index(nameof(SellerWalletId), Name = "IX_WalletTransaction_SellerWalletId")]
-    [Index(nameof(BuyerWalletId), Name = "IX_WalletTransaction_BuyerWalletId")]
     public class WalletTransaction
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
-
-        public Guid? AccountTransactionId { get; set; }
-        [ForeignKey(nameof(AccountTransactionId))]
-        [InverseProperty("WalletTransaction")]
-        public virtual AccountTransaction? AccountTransaction { get; set; }
 
         public Guid? OrderId { get; set; }
         [ForeignKey(nameof(OrderId))]
@@ -39,6 +30,11 @@ namespace Vouchee.Data.Models.Entities
         [ForeignKey(nameof(BuyerWalletId))]
         [InverseProperty(nameof(BuyerWallet.BuyerWalletTransactions))]
         public virtual Wallet? BuyerWallet { get; set; }
+
+        public Guid? TopUpRequestId { get; set; }
+        [ForeignKey(nameof(TopUpRequestId))]
+        [InverseProperty(nameof(TopUpRequest.WalletTransaction))]
+        public virtual TopUpRequest? TopUpRequest { get; set; }
 
         public int Amount { get; set; }
 

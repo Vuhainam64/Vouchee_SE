@@ -22,6 +22,7 @@ namespace Vouchee.Data.Models.Entities
             ReceiverNotifications = [];
             SenderNotifications = [];
             Wallets = [];
+            WithdrawRequests = [];
         }
 
         [InverseProperty(nameof(Order.User))]
@@ -36,6 +37,8 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<Notification> SenderNotifications { get; set; }
         [InverseProperty(nameof(Wallet.User))]
         public virtual ICollection<Wallet> Wallets { get; set; }
+        [InverseProperty(nameof(WithdrawRequest.User))]
+        public virtual ICollection<WithdrawRequest> WithdrawRequests { get; set; }
 
         public Guid? RoleId { get; set; }
         [ForeignKey(nameof(RoleId))]

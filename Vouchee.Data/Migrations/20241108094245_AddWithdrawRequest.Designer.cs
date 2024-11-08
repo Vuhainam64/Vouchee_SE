@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vouchee.Data.Helpers;
 
@@ -11,9 +12,11 @@ using Vouchee.Data.Helpers;
 namespace Vouchee.Data.Migrations
 {
     [DbContext(typeof(VoucheeContext))]
-    partial class VoucheeContextModelSnapshot : ModelSnapshot
+    [Migration("20241108094245_AddWithdrawRequest")]
+    partial class AddWithdrawRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -948,17 +951,23 @@ namespace Vouchee.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BuyerWalletId");
-
                     b.HasIndex("OrderId")
                         .IsUnique()
                         .HasFilter("[OrderId] IS NOT NULL");
 
-                    b.HasIndex("SellerWalletId");
-
                     b.HasIndex("TopUpRequestId")
                         .IsUnique()
                         .HasFilter("[TopUpRequestId] IS NOT NULL");
+
+                    b.HasIndex(new[] { "BuyerWalletId" }, "IX_WalletTransaction_BuyerWalletId");
+
+                    b.HasIndex(new[] { "OrderId" }, "IX_WalletTransaction_OrderId")
+                        .HasDatabaseName("IX_WalletTransaction_OrderId1");
+
+                    b.HasIndex(new[] { "SellerWalletId" }, "IX_WalletTransaction_SellerWalletId");
+
+                    b.HasIndex(new[] { "TopUpRequestId" }, "IX_WalletTransaction_TopUpRequestId")
+                        .HasDatabaseName("IX_WalletTransaction_TopUpRequestId1");
 
                     b.ToTable("WalletTransaction");
                 });

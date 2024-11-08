@@ -59,6 +59,11 @@ namespace Vouchee.Data.Helpers
             modelBuilder.Entity<Cart>().HasKey(c => new { c.BuyerId, c.ModalId });
             modelBuilder.Entity<Modal>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Notification>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            modelBuilder.Entity<Notification>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            modelBuilder.Entity<TopUpRequest>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            modelBuilder.Entity<Wallet>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            modelBuilder.Entity<WalletTransaction>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            modelBuilder.Entity<WithdrawRequest>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
 
             // modelBuilder.Seed();
             modelBuilder.Entity<User>()
@@ -71,10 +76,6 @@ namespace Vouchee.Data.Helpers
 
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
         {
-            configurationBuilder.Properties<DateOnly>()
-                                .HaveConversion<DateOnlyConverter>()
-                                .HaveColumnType("date");
-
             base.ConfigureConventions(configurationBuilder);
         }
     }

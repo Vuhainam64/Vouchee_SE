@@ -5,19 +5,28 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Entities;
 
 namespace Vouchee.Data.Models.DTOs
 {
-    public class AccountTransactionDTO
+    public class TopUpRequestDTO
     {
-        public Guid? fromUserId { get; set; }
-        public Guid? toUserId { get; set; }
         public int? amount { get; set; }
-        public string? type { get; set; }
     }
 
-    public class GetAccountTransactionDTO : AccountTransactionDTO
+    public class CreateTopUpRequestDTO : TopUpRequestDTO
+    {
+        public string? status = TopUpRequestStatusEnum.PENDING.ToString();
+        public DateTime createDate = DateTime.Now;
+    }
+
+    public class UpdateTopUpRequestDTO : TopUpRequestDTO
+    {
+        public DateTime? updateDate = DateTime.Now;
+    }
+
+    public class GetTopUpRequestDTO : TopUpRequestDTO
     {
         public Guid? id { get; set; }
 
@@ -27,6 +36,6 @@ namespace Vouchee.Data.Models.DTOs
         public DateTime? createDate { get; set; }
         public Guid? createBy { get; set; }
         public DateTime? updateDate { get; set; }
-        public Guid? updateBy { get; set; }
+        public Guid? UupdateBy { get; set; }
     }
 }
