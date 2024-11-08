@@ -41,6 +41,7 @@ namespace Vouchee.Business.Services.Impls
             }
 
             TopUpRequest topUpRequest = _mapper.Map<TopUpRequest>(createTopUpRequestDTO);
+            topUpRequest.CreateBy = thisUserObj.userId;
             topUpRequest.WalletTransaction = new()
             {
                 CreateBy = thisUserObj.userId,
