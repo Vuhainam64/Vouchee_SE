@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vouchee.Data.Helpers;
 
@@ -11,9 +12,11 @@ using Vouchee.Data.Helpers;
 namespace Vouchee.Data.Migrations
 {
     [DbContext(typeof(VoucheeContext))]
-    partial class VoucheeContextModelSnapshot : ModelSnapshot
+    [Migration("20241107192838_InitWallet")]
+    partial class InitWallet
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -65,6 +68,50 @@ namespace Vouchee.Data.Migrations
                     b.HasIndex("VouchersId");
 
                     b.ToTable("PromotionVoucher");
+                });
+
+            modelBuilder.Entity("Vouchee.Data.Models.Entities.AccountTransaction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("CreateBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("FromUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("ToUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("UpdateBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "FromUserId" }, "IX_AccountTransaction_FromUserId");
+
+                    b.HasIndex(new[] { "ToUserId" }, "IX_AccountTransaction_ToUserId");
+
+                    b.ToTable("AccountTransaction");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Address", b =>
@@ -283,7 +330,7 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<DateOnly?>("EndDate")
+                    b.Property<DateTime?>("EndDate")
                         .HasColumnType("date");
 
                     b.Property<string>("Image")
@@ -301,7 +348,7 @@ namespace Vouchee.Data.Migrations
                     b.Property<int>("SellPrice")
                         .HasColumnType("int");
 
-                    b.Property<DateOnly?>("StartDate")
+                    b.Property<DateTime?>("StartDate")
                         .HasColumnType("date");
 
                     b.Property<string>("Status")
@@ -636,37 +683,6 @@ namespace Vouchee.Data.Migrations
                     b.ToTable("Supplier");
                 });
 
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.TopUpRequest", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWID()");
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("CreateBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("UpdateBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TopUpRequest");
-                });
-
             modelBuilder.Entity("Vouchee.Data.Models.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -674,10 +690,16 @@ namespace Vouchee.Data.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("NEWID()");
 
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("BankAccount")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("BankName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("CreateBy")
@@ -686,8 +708,17 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime");
 
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("date");
+
+                    b.Property<string>("District")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Email")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Gender")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HashPassword")
@@ -915,6 +946,9 @@ namespace Vouchee.Data.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("NEWID()");
 
+                    b.Property<Guid?>("AccountTransactionId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Amount")
                         .HasColumnType("int");
 
@@ -937,9 +971,6 @@ namespace Vouchee.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("TopUpRequestId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -948,55 +979,25 @@ namespace Vouchee.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BuyerWalletId");
+                    b.HasIndex("AccountTransactionId")
+                        .IsUnique()
+                        .HasFilter("[AccountTransactionId] IS NOT NULL");
 
                     b.HasIndex("OrderId")
                         .IsUnique()
                         .HasFilter("[OrderId] IS NOT NULL");
 
-                    b.HasIndex("SellerWalletId");
+                    b.HasIndex(new[] { "AccountTransactionId" }, "IX_WalletTransaction_AccountTransactionId")
+                        .HasDatabaseName("IX_WalletTransaction_AccountTransactionId1");
 
-                    b.HasIndex("TopUpRequestId")
-                        .IsUnique()
-                        .HasFilter("[TopUpRequestId] IS NOT NULL");
+                    b.HasIndex(new[] { "BuyerWalletId" }, "IX_WalletTransaction_BuyerWalletId");
+
+                    b.HasIndex(new[] { "OrderId" }, "IX_WalletTransaction_OrderId")
+                        .HasDatabaseName("IX_WalletTransaction_OrderId1");
+
+                    b.HasIndex(new[] { "SellerWalletId" }, "IX_WalletTransaction_SellerWalletId");
 
                     b.ToTable("WalletTransaction");
-                });
-
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.WithdrawRequest", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWID()");
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("CreateBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("UpdateBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("WithdrawRequest");
                 });
 
             modelBuilder.Entity("AddressBrand", b =>
@@ -1042,6 +1043,21 @@ namespace Vouchee.Data.Migrations
                         .HasForeignKey("VouchersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Vouchee.Data.Models.Entities.AccountTransaction", b =>
+                {
+                    b.HasOne("Vouchee.Data.Models.Entities.User", "FromUser")
+                        .WithMany()
+                        .HasForeignKey("FromUserId");
+
+                    b.HasOne("Vouchee.Data.Models.Entities.User", "ToUser")
+                        .WithMany()
+                        .HasForeignKey("ToUserId");
+
+                    b.Navigation("FromUser");
+
+                    b.Navigation("ToUser");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Cart", b =>
@@ -1222,6 +1238,10 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.WalletTransaction", b =>
                 {
+                    b.HasOne("Vouchee.Data.Models.Entities.AccountTransaction", "AccountTransaction")
+                        .WithOne("WalletTransaction")
+                        .HasForeignKey("Vouchee.Data.Models.Entities.WalletTransaction", "AccountTransactionId");
+
                     b.HasOne("Vouchee.Data.Models.Entities.Wallet", "BuyerWallet")
                         .WithMany("BuyerWalletTransactions")
                         .HasForeignKey("BuyerWalletId");
@@ -1234,26 +1254,18 @@ namespace Vouchee.Data.Migrations
                         .WithMany("SellerWalletTransactions")
                         .HasForeignKey("SellerWalletId");
 
-                    b.HasOne("Vouchee.Data.Models.Entities.TopUpRequest", "TopUpRequest")
-                        .WithOne("WalletTransaction")
-                        .HasForeignKey("Vouchee.Data.Models.Entities.WalletTransaction", "TopUpRequestId");
+                    b.Navigation("AccountTransaction");
 
                     b.Navigation("BuyerWallet");
 
                     b.Navigation("Order");
 
                     b.Navigation("SellerWallet");
-
-                    b.Navigation("TopUpRequest");
                 });
 
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.WithdrawRequest", b =>
+            modelBuilder.Entity("Vouchee.Data.Models.Entities.AccountTransaction", b =>
                 {
-                    b.HasOne("Vouchee.Data.Models.Entities.User", "User")
-                        .WithMany("WithdrawRequests")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
+                    b.Navigation("WalletTransaction");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Brand", b =>
@@ -1299,11 +1311,6 @@ namespace Vouchee.Data.Migrations
                     b.Navigation("Vouchers");
                 });
 
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.TopUpRequest", b =>
-                {
-                    b.Navigation("WalletTransaction");
-                });
-
             modelBuilder.Entity("Vouchee.Data.Models.Entities.User", b =>
                 {
                     b.Navigation("Carts");
@@ -1319,8 +1326,6 @@ namespace Vouchee.Data.Migrations
                     b.Navigation("Vouchers");
 
                     b.Navigation("Wallets");
-
-                    b.Navigation("WithdrawRequests");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Voucher", b =>

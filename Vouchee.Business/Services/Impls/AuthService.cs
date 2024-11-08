@@ -24,15 +24,18 @@ namespace Vouchee.Business.Services.Impls
         private readonly AppSettings _appSettings;
         private readonly IBaseRepository<Role> _roleRepository;
         private readonly IBaseRepository<User> _userRepository;
+        private readonly IBaseRepository<Wallet> _walletRepository;
         private readonly IMapper _mapper;
         private readonly IDistributedCache _cache;
 
         public AuthService(IOptions<AppSettings> appSettings, 
                             IBaseRepository<User> userRepository,
                             IBaseRepository<Role> roleRepository,
+                            IBaseRepository<Wallet> walletRepository,
                             IDistributedCache cache,
                             IMapper mapper)
         {
+            _walletRepository = walletRepository;
             _cache = cache;
             _appSettings = appSettings.Value;
             _userRepository = userRepository;
@@ -57,10 +60,23 @@ namespace Vouchee.Business.Services.Impls
                                                                         includeProperties: x => x.Include(x => x.Role));
             GetUserDTO useDTO = _mapper.Map<GetUserDTO>(user);
 
-            // trường hợp người dùng mới, mặc định là buyer
             if (useDTO == null)
             {
                 Guid roleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.USER.ToString()));
+
+                Wallet buyerWallet = new()
+                {
+                    CreateDate = DateTime.Now,
+                    Status = ObjectStatusEnum.ACTIVE.ToString(),
+                    Type = WalletTypeEnum.BUYER.ToString(),
+                };
+
+                Wallet sellerWallet = new()
+                {
+                    CreateDate = DateTime.Now,
+                    Status = ObjectStatusEnum.ACTIVE.ToString(),
+                    Type = WalletTypeEnum.SELLER.ToString(),
+                };
 
                 User newBuyer = new()
                 {
@@ -69,18 +85,19 @@ namespace Vouchee.Business.Services.Impls
                     RoleId = roleId,
                     Name = lastName,
                     Status = ObjectStatusEnum.ACTIVE.ToString(),
-                    CreateDate = DateTime.Now
+                    CreateDate = DateTime.Now,
+                    Wallets = new List<Wallet> { buyerWallet, sellerWallet }
                 };
 
-                Guid? newBuyerId = await _userRepository.AddAsync(newBuyer);
-                if (newBuyerId == null)
+                Guid? newUserId = await _userRepository.AddAsync(newBuyer);
+                if (newUserId == null)
                 {
-                    throw new RegisterException("Đăng ký người mua mới không thành công");
+                    throw new RegisterException("Đăng ký tài khoản mới không thành công");
                 }
 
                 //response.buyerId = newBuyerId.ToString();
                 response.email = email;
-                response.id = newBuyerId.ToString();
+                response.id = newUserId.ToString();
                 response.uid = uid;
                 response.image = imageUrl;
                 response.phoneNumber = phoneNumber;

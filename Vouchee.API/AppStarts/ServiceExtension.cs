@@ -19,61 +19,27 @@ namespace Vouchee.API.AppStarts
         public static void AddDependencyInjection(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped(typeof(VoucheeContext));
-
             services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-
             services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
-
-            // FILE UPLOAD
             services.AddScoped<IFileUploadService, FileUploadService>();
-
-            // AUTH
             services.AddScoped<IAuthService, AuthService>();
-
-            // VOUCHER
             services.AddScoped<IVoucherService, VoucherService>();
-
-            // ORDER
             services.AddScoped<IOrderService, OrderService>();
-
-            // ROLE
             services.AddScoped<IRoleService, RoleService>();
-
-            // SHOP
             services.AddScoped<IAddressService, AddressService>();
-
-            // SUPPLIER
             services.AddScoped<ISupplierService, SupplierService>();
-
-            // USER
             services.AddScoped<IUserService, UserService>();
-
-            // VOUCHER
             services.AddScoped<IVoucherService, VoucherService>();
-
-            // VOUCHER TYPE
             services.AddScoped<IVoucherTypeService, VoucherTypeService>();
-
-            // PROMOTION
             services.AddScoped<IPromotionService, PromotionService>();
-
-            // VOUCHER CODE
             services.AddScoped<IVoucherCodeService, VoucherCodeService>();
-
-            // CATEGORY
             services.AddScoped<ICategoryService, CategoryService>();
-
-            // BRAND
             services.AddScoped<IBrandService, BrandService>();
-
-            // SUB VOUCHER
             services.AddScoped<IModalService, ModalService>();
-
-            // CART
             services.AddScoped<ICartService, CartService>();
-
-            // NOTIFICATIOn
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IWalletService, WalletService>();
+            services.AddScoped<ITopUpRequestService, TopUpRequestService>();
         }
 
         public static void AddSwaggerServices(this IServiceCollection services, IConfiguration configuration)

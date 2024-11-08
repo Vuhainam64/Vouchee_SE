@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Constants.Enum.Other
 {
-    public enum PaymentTypeEnum
+    public enum TopUpRequestStatusEnum
     {
-        MOMO
+        PENDING,
+        DONE,
+        ERROR
     }
 }

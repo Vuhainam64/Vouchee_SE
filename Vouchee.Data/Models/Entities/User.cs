@@ -21,6 +21,8 @@ namespace Vouchee.Data.Models.Entities
             Carts = [];
             ReceiverNotifications = [];
             SenderNotifications = [];
+            Wallets = [];
+            WithdrawRequests = [];
         }
 
         [InverseProperty(nameof(Order.User))]
@@ -33,6 +35,10 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<Notification> ReceiverNotifications { get; set; }
         [InverseProperty(nameof(Notification.Sender))]
         public virtual ICollection<Notification> SenderNotifications { get; set; }
+        [InverseProperty(nameof(Wallet.User))]
+        public virtual ICollection<Wallet> Wallets { get; set; }
+        [InverseProperty(nameof(WithdrawRequest.User))]
+        public virtual ICollection<WithdrawRequest> WithdrawRequests { get; set; }
 
         public Guid? RoleId { get; set; }
         [ForeignKey(nameof(RoleId))]
@@ -49,12 +55,7 @@ namespace Vouchee.Data.Models.Entities
         [StringLength(10)]
         public string? PhoneNumber { get; set; }
         public required string Email { get; set; }
-        public string? Gender { get; set; }
-        public DateOnly? DateOfBirth { get; set; }
         public string? HashPassword { get; set; }
-        public string? City { get; set; }
-        public string? District { get; set; }
-        public string? Address { get; set; }
         public string? Image { get; set; }
         public string? BankName { get; set; }
         public string? BankAccount { get; set; }

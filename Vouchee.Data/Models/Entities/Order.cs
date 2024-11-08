@@ -33,6 +33,9 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty("Orders")]
         public virtual Promotion? Promotion { get; set; }
 
+        [InverseProperty("Order")]
+        public virtual WalletTransaction? WalletTransaction { get; set; }
+
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }

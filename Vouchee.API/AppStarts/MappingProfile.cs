@@ -116,7 +116,9 @@ namespace Vouchee.API.AppStarts
 
             // SUPPLIER
             CreateMap<Supplier, CreateSupplierDTO>().ReverseMap();
-            CreateMap<Supplier, UpdateSupplierDTO>().ReverseMap();
+            CreateMap<Supplier, UpdateSupplierDTO>()
+                
+                .ReverseMap();
             CreateMap<Supplier, GetSupplierDTO>().ReverseMap();
             CreateMap<GetSupplierDTO, SupplierFilter>().ReverseMap();
             CreateMap<Supplier, BestSuppleriDTO>().ReverseMap();
@@ -204,6 +206,19 @@ namespace Vouchee.API.AppStarts
             CreateMap<Notification, UpdateNotificationDTO>().ReverseMap();
             CreateMap<Notification, GetNotificationDTO>().ReverseMap();
             CreateMap<GetNotificationDTO, NotifcationFilter>().ReverseMap();
+
+            // WALLET
+            CreateMap<Wallet, WalletDTO>().ReverseMap();
+            CreateMap<Wallet, GetWalletDTO>().ReverseMap();
+
+            // TOP UP REQUEST
+            CreateMap<TopUpRequest, TopUpRequestDTO>().ReverseMap();
+            CreateMap<TopUpRequest, CreateTopUpRequestDTO>().ReverseMap();
+            CreateMap<TopUpRequest, GetTopUpRequestDTO>().ReverseMap();
+
+            // WALLET TRANSACTION
+            CreateMap<WalletTransaction, WalletTransactionDTO>().ReverseMap();
+            CreateMap<WalletTransaction, GetWalletTransactionDTO>().ReverseMap();
         }
     }
 }

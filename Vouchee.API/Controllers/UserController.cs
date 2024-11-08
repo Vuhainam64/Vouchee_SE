@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Vouchee.API.Helpers;
 using Vouchee.Business.Models;
@@ -24,24 +25,6 @@ namespace Vouchee.API.Controllers
             _roleService = roleService;
         }
 
-        // CREATE (Commented out for now)
-        //[HttpPost("create_user")]
-        //public async Task<IActionResult> CreateUser([FromForm] CreateUserDTO createUserDTO)
-        //{
-        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
-        //
-        //    if (currentUser.roleId.Equals(currentUser.adminRoleId)
-        //        || currentUser.roleId.Equals(currentUser.sellerRoleId)
-        //        || currentUser.roleId.Equals(currentUser.buyerRoleId)
-        //        || currentUser.roleId.Equals(currentUser.staffRoleId))
-        //    {
-        //        var result = await _userService.CreateUserAsync(createUserDTO, currentUser);
-        //        return CreatedAtAction(nameof(GetUserById), new { id = result.UserId }, result);
-        //    }
-        //    return Forbid("Unauthorized to create user");
-        //}
-
-        // READ: Get all users with filtering, sorting, and paging
         [HttpGet("get_all_user")]
         public async Task<IActionResult> GetUsers()
         {
@@ -49,15 +32,14 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        // READ: Get user by ID
-        [HttpGet("get_user{id}")]
+        [HttpGet("get_user_by_id/{id}")]
         public async Task<IActionResult> GetUserById(Guid id)
         {
             var user = await _userService.GetUserByIdAsync(id);
             return Ok(user);
         }
 
-        // UPDATE: Update a user by ID
+        [Authorize]
         [HttpPut("update_user/{id}")]
         public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUserDTO updateUserDTO)
         {
@@ -66,7 +48,6 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        // DELETE: Delete a user by ID
         [HttpDelete("delete_user/{id}")]
         public async Task<IActionResult> DeleteUser(Guid id)
         {

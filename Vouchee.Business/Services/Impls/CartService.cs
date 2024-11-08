@@ -190,7 +190,8 @@ namespace Vouchee.Business.Services.Impls
 
                 if (cartVoucher.Quantity <= 1)
                 {
-
+                    await GetCartsAsync(thisUserObj, false, usePoint);
+                    return _cartDTO;
                 }
                 else
                 {
