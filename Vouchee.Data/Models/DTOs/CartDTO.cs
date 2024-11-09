@@ -16,8 +16,8 @@ namespace Vouchee.Data.Models.DTOs
             sellers = [];
         }
 
-        public int? totalQuantity { get; set; }
-        public int? totalPrice { get; set; }
+        public int? totalQuantity { get; set; } = 0;
+        public int? totalPrice { get; set; } = 0;
         public int? discountPrice { get; set; } = 0;
         public int? vPoint { get; set; } = 0;
         public int? finalPrice => totalPrice - discountPrice - vPoint;
