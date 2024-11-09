@@ -15,5 +15,8 @@ namespace Vouchee.Business.Services
 
         // READ
         public Task<GetTopUpRequestDTO> GetTopUpRequestById(Guid id);
+
+        // UPDATE
+        public Task<ResponseMessage<GetWalletDTO>> UpdateTopUpRequest(Guid id, bool success = false, string description = null, ThisUserObj currentUser = null); 
     }
 }

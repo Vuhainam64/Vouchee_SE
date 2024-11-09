@@ -62,7 +62,8 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<GetTopUpRequestDTO> GetTopUpRequestById(Guid id)
         {
-            var existedTopUpRequest = await _topUpRequestRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.WalletTransaction));
+            var existedTopUpRequest = await _topUpRequestRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.WalletTransaction)
+                                                                                                                                .ThenInclude(x => x.BuyerWallet));
 
             if (existedTopUpRequest == null)
             {
@@ -70,6 +71,46 @@ namespace Vouchee.Business.Services.Impls
             }
 
             return _mapper.Map<GetTopUpRequestDTO>(existedTopUpRequest);
+        }
+
+        public async Task<ResponseMessage<GetWalletDTO>> UpdateTopUpRequest(Guid id, bool success = false, string description = null, ThisUserObj currentUser = null)
+        {
+            var existedTopUpRequest = await _topUpRequestRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.WalletTransaction)
+                                                                                                                                .ThenInclude(x => x.BuyerWallet), isTracking: true);
+
+            if (existedTopUpRequest == null)
+            {
+                throw new NotFoundException("Không tìm thấy request này");
+            }
+
+            if (existedTopUpRequest.WalletTransaction.BuyerWallet == null)
+            {
+                throw new NotFoundException("Người này chưa có ví người mua");
+            }
+
+            existedTopUpRequest.Status = success ? TopUpRequestStatusEnum.DONE.ToString() : TopUpRequestStatusEnum.ERROR.ToString();
+            existedTopUpRequest.Description = description;
+            existedTopUpRequest.UpdateDate = DateTime.Now;
+            existedTopUpRequest.UpdateBy = currentUser.userId;
+            existedTopUpRequest.WalletTransaction.UpdateDate = DateTime.Now;
+            existedTopUpRequest.WalletTransaction.UpdateBy = currentUser.userId; 
+
+            if (success)
+            {
+                existedTopUpRequest.WalletTransaction.BuyerWallet.Balance += existedTopUpRequest.Amount;
+                existedTopUpRequest.WalletTransaction.Status = TopUpRequestStatusEnum.DONE.ToString();
+                existedTopUpRequest.WalletTransaction.BuyerWallet.UpdateDate = DateTime.Now;
+                existedTopUpRequest.WalletTransaction.BuyerWallet.UpdateBy = currentUser.userId;
+            }
+
+            var result = await _topUpRequestRepository.UpdateAsync(existedTopUpRequest);
+
+            return new ResponseMessage<GetWalletDTO>
+            {
+                message = $"Cập nhật ví {(success ? "Thành công" : "Thất bại")}",
+                result = success,
+                value = _mapper.Map<GetWalletDTO>(existedTopUpRequest.WalletTransaction.BuyerWallet)
+            };
         }
     }
 }

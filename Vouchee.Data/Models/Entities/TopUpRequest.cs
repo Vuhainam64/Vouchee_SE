@@ -17,6 +17,7 @@ namespace Vouchee.Data.Models.Entities
         public Guid Id { get; set; }
 
         public int Amount { get; set; }
+        public string? Description { get; set; }
 
         public virtual WalletTransaction? WalletTransaction { get; set; }
 
