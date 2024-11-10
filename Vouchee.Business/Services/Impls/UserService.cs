@@ -69,26 +69,28 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<GetUserDTO> GetUserByIdAsync(Guid id)
         {
-            try
-            {
-                var user = await _userRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Carts)
-                                                                                                .Include(x => x.Wallets)
-                                                                                                .Include(x => x.Role));
-                if (user != null)
-                {
-                    GetUserDTO userDTO = _mapper.Map<GetUserDTO>(user);
-                    return userDTO;
-                }
-                else
-                {
-                    throw new NotFoundException($"Không tìm thấy user với id {id}");
-                }
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new LoadException(ex.Message);
-            }
+            return null;
+
+            //try
+            //{
+            //    var user = await _userRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Carts)
+            //                                                                                    .Include(x => x.Wallets)
+            //                                                                                    .Include(x => x.Role));
+            //    if (user != null)
+            //    {
+            //        GetUserDTO userDTO = _mapper.Map<GetUserDTO>(user);
+            //        return userDTO;
+            //    }
+            //    else
+            //    {
+            //        throw new NotFoundException($"Không tìm thấy user với id {id}");
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    LoggerService.Logger(ex.Message);
+            //    throw new LoadException(ex.Message);
+            //}
         }
 
         public async Task<IList<GetUserDTO>> GetUsersAsync()

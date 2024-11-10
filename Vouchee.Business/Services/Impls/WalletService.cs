@@ -12,6 +12,7 @@ using Vouchee.Data.Helpers;
 using Vouchee.Data.Helpers.Base;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Status;
+using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 
 namespace Vouchee.Business.Services.Impls
@@ -31,30 +32,36 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<ResponseMessage<GetUserDTO>> CreateWalletAsync(ThisUserObj currenUser, WalletTypeEnum walletTypeEnum)
+        public async Task<ResponseMessage<GetUserDTO>> CreateWalletAsync(ThisUserObj currenUser)
         {
             try
             {
-                var existedUser = await _userRepository.GetByIdAsync(currenUser.userId, 
-                                                                        includeProperties: x => x.Include(x => x.Wallets),
+                var existedUser = await _userRepository.GetByIdAsync(currenUser.userId,
+                                                                        includeProperties: x => x.Include(x => x.BuyerWallet)
+                                                                                                    .Include(x => x.SellerWallet),
                                                                         isTracking: true);
 
                 if (existedUser == null)
                 {
                     throw new NotFoundException("Không tìm thấy user này");
                 }
-                if (existedUser.Wallets.FirstOrDefault(x => x.Type == walletTypeEnum.ToString()) != null)
-                {
-                    throw new ConflictException($"User đã có wallet {walletTypeEnum.ToString()} rồi");
-                }
 
-                existedUser.Wallets.Add(new()
+                if (existedUser.BuyerWallet == null)
                 {
-                    Type = walletTypeEnum.ToString(),
-                    CreateDate = DateTime.Now,
-                    Status = ObjectStatusEnum.ACTIVE.ToString(),
-                    CreateBy = currenUser.userId,
-                });
+                    existedUser.BuyerWallet = new()
+                    {
+                        CreateDate = DateTime.Now,
+                        Status = ObjectStatusEnum.ACTIVE.ToString()
+                    };
+                }
+                if (existedUser.SellerWallet == null)
+                {
+                    existedUser.SellerWallet = new()
+                    {
+                        CreateDate = DateTime.Now,
+                        Status = ObjectStatusEnum.ACTIVE.ToString()
+                    };
+                }
 
                 var result = await _userRepository.SaveChanges();
 
@@ -75,6 +82,16 @@ namespace Vouchee.Business.Services.Impls
                 LoggerService.Logger(ex.Message);
                 throw new Exception(ex.Message);
             }
+        }
+
+        public async Task<GetWalletDTO> GetWalletByIdAsync(Guid id)
+        {
+            var existedWallet = await _walletRepository.GetByIdAsync(id);
+            if (existedWallet == null)
+            {
+                throw new NotFoundException("Không tìm thấy ví với id này");
+            }
+            return _mapper.Map<GetWalletDTO>(existedWallet);
         }
     }
 }

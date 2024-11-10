@@ -9,12 +9,14 @@ using Vouchee.Business.Models.ViewModels;
 using Vouchee.Data.Helpers;
 using Vouchee.Data.Helpers.Base;
 using Vouchee.Data.Models.Constants.Dictionary;
+using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Constants.Number;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
+using static Google.Cloud.Firestore.V1.StructuredAggregationQuery.Types.Aggregation.Types;
 
 namespace Vouchee.Business.Services.Impls
 {
@@ -98,107 +100,148 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<ResponseMessage<Guid>> CreateOrderAsync(ThisUserObj thisUserObj, bool usingPoint = false)
         {
-            var user = await _userRepository.GetByIdAsync(thisUserObj.userId, isTracking: true);
+            return null;
 
-            CartDTO cartDTO = await _cartService.GetCartsAsync(thisUserObj, false);
+            //var user = await _userRepository.GetByIdAsync(thisUserObj.userId, includeProperties: x => x.Include(x => x.Wallets), isTracking: true);
 
-            if (cartDTO == null)
-            {
-                throw new NotFoundException("Giỏ hàng đang trống");
-            }
+            //if (user == null)
+            //{
+            //    throw new NotFoundException("Không tìm thấy user này");
+            //}
 
-            Order order = new()
-            {
-                PaymentType = "BANKING",
-                Status = OrderStatusEnum.PENDING.ToString(),
-                CreateBy = thisUserObj.userId,
-                CreateDate = DateTime.Now,
-                OrderDetails = new List<OrderDetail>()
-            };
+            //var buyerWallet = user.Wallets.FirstOrDefault(x => x.Type == WalletTypeEnum.BUYER.ToString());
 
-            // duyet tung seller
-            foreach (var seller in cartDTO.sellers)
-            {
-                var result = false;
-                var groupedModals = seller.modals.GroupBy(x => x.voucherId);
+            //if (buyerWallet == null)
+            //{
+            //    throw new NotFoundException("Người dùng này chưa có ví buyer");
+            //}
 
-                // gop tung modal co cung voucher id
-                foreach (var modals in groupedModals)
-                {
-                    var existedVoucher = await _voucherRepository.GetByIdAsync(modals.Key, 
-                                                                                    isTracking: true,
-                                                                                    includeProperties: x => x.Include(x => x.Modals)
-                                                                                                                .ThenInclude(x => x.Carts));
+            //CartDTO cartDTO = await _cartService.GetCartsAsync(thisUserObj, false, usingPoint);
 
-                    if (existedVoucher != null)
-                    {
-                        // duyet tung modal 
-                        foreach (var cartModal in modals)
-                        {
-                            var existedModal = existedVoucher.Modals.FirstOrDefault(x => x.Id == cartModal.id);
+            //if (cartDTO == null)
+            //{
+            //    throw new NotFoundException("Giỏ hàng đang trống");
+            //}
 
-                            // kiem tra ton kho cua modal
-                            if (cartModal.quantity > existedModal?.Stock)
-                            {
-                                throw new ConflictException($"Bạn đặt {cartModal.quantity} {cartModal.title} nhưng trong khi chỉ còn {existedModal.Stock}");
-                            }
+            //if (buyerWallet.Balance < cartDTO.finalPrice)
+            //{
+            //    throw new Exception("Số dư trong ví không đủ");
+            //}
 
-                            existedModal.Stock -= cartModal.quantity;
-                            existedVoucher.Stock -= cartModal.quantity;
+            //Order order = new()
+            //{
+            //    PaymentType = "BANKING",
+            //    Status = OrderStatusEnum.PENDING.ToString(),
+            //    CreateBy = thisUserObj.userId,
+            //    CreateDate = DateTime.Now,
+            //    OrderDetails = new List<OrderDetail>()
+            //};
 
-                            existedModal.Carts.Remove(existedModal.Carts.FirstOrDefault(c => c.BuyerId == thisUserObj.userId));
+            //// duyet tung seller
+            //var amountSellers = new Dictionary<Guid, int>();
+            //foreach (var seller in cartDTO.sellers)
+            //{
+            //    var result = false;
+            //    var groupedModals = seller.modals.GroupBy(x => x.voucherId);
 
-                            order.OrderDetails.Add(new OrderDetail
-                            {
-                                ModalId = existedModal.Id,
-                                Quantity = cartModal.quantity,
-                                UnitPrice = existedModal.SellPrice,
-                                Status = OrderStatusEnum.PENDING.ToString(),
-                                CreateDate = DateTime.Now,
-                                CreateBy = thisUserObj.userId,
-                                PromotionId = cartModal.promotionId
-                            });
-                        }
-                    }
+            //    // gop tung modal co cung voucher id
+            //    foreach (var modals in groupedModals)
+            //    {
+            //        var existedVoucher = await _voucherRepository.GetByIdAsync(modals.Key, 
+            //                                                                        isTracking: true,
+            //                                                                        includeProperties: x => x.Include(x => x.Modals)
+            //                                                                                                    .ThenInclude(x => x.Carts));
 
-                    result = await _voucherRepository.UpdateAsync(existedVoucher);
-                }
-            }
+            //        if (existedVoucher != null)
+            //        {
+            //            // duyet tung modal 
+            //            foreach (var cartModal in modals)
+            //            {
+            //                var existedModal = existedVoucher.Modals.FirstOrDefault(x => x.Id == cartModal.id);
 
-            order.TotalPrice = order.OrderDetails.Sum(x => x.TotalPrice);
-            order.PointUp = order.FinalPrice / 1000;
+            //                // kiem tra ton kho cua modal
+            //                if (cartModal.quantity > existedModal?.Stock)
+            //                {
+            //                    throw new ConflictException($"Bạn đặt {cartModal.quantity} {cartModal.title} nhưng trong khi chỉ còn {existedModal.Stock}");
+            //                }
 
-            if (usingPoint)
-            {
-                if (user.VPoint != 0)
-                {
-                    order.PointDown = user.VPoint;
-                    user.VPoint = order.PointUp;
-                }
-                else
-                {
-                    user.VPoint += order.FinalPrice / 1000;
-                }
-            }
-            else
-            {
-                user.VPoint += order.FinalPrice / 1000;
-            }
+            //                existedModal.Stock -= cartModal.quantity;
+            //                existedVoucher.Stock -= cartModal.quantity;
 
-            var userUpdate = await _userRepository.UpdateAsync(user);
+            //                existedModal.Carts.Remove(existedModal.Carts.FirstOrDefault(c => c.BuyerId == thisUserObj.userId));
 
-            var orderId = await _orderRepository.AddAsync(order);
-            if (orderId == Guid.Empty)
-            {
-                throw new Exception("Failed to create order.");
-            }
+            //                order.OrderDetails.Add(new OrderDetail
+            //                {
+            //                    ModalId = existedModal.Id,
+            //                    Quantity = cartModal.quantity,
+            //                    UnitPrice = existedModal.SellPrice,
+            //                    Status = OrderStatusEnum.PENDING.ToString(),
+            //                    CreateDate = DateTime.Now,
+            //                    CreateBy = thisUserObj.userId,
+            //                    PromotionId = cartModal.promotionId
+            //                });
+            //            }
+            //        }
 
-            return new ResponseMessage<Guid>
-            {
-                message = "Tạo order thành công",
-                result = true,
-                value = (Guid)orderId
-            };
+            //        result = await _voucherRepository.UpdateAsync(existedVoucher);
+            //    }
+
+            //    // chuyen tiền từ ví người mua sang ví nhà bán hàng;
+            //    var amount = seller.modals.Sum(x => x.finalPrice);
+            //    amountSellers[seller.sellerId.Value] = amount.Value;
+            //}
+
+            //order.TotalPrice = order.OrderDetails.Sum(x => x.TotalPrice);
+            //order.PointUp = order.FinalPrice / 1000;
+
+            //if (usingPoint)
+            //{
+            //    if (user.VPoint != 0)
+            //    {
+            //        order.PointDown = user.VPoint;
+            //        user.VPoint = order.PointUp;
+            //    }
+            //    else
+            //    {
+            //        user.VPoint += order.FinalPrice / 1000;
+            //    }
+            //}
+            //else
+            //{
+            //    user.VPoint += order.FinalPrice / 1000;
+            //}
+
+            //await _userRepository.UpdateAsync(user);
+
+            //var orderId = await _orderRepository.AddAsync(order);
+
+            //if (orderId == Guid.Empty)
+            //{
+            //    throw new Exception("Failed to create order.");
+            //}
+
+            //// Phải chắc chắn order được tạo
+            //foreach (var seller in amountSellers)
+            //{
+            //    var existedSeller = await _userRepository.GetByIdAsync(seller, includeProperties: x => x.Include(x => x.Wallets), isTracking: true);
+
+            //    WalletTransaction walletTransaction = new()
+            //    {
+            //        CreateBy = thisUserObj.userId,
+            //        CreateDate = DateTime.Now,
+            //        Status = WalletTransactionStatusEnum.DONE.ToString(),
+            //        Amount = seller.Value,
+            //        OrderId = orderId,
+            //        BuyerWalletId = user.Wallets.
+            //    };
+            //}
+
+            //return new ResponseMessage<Guid>
+            //{
+            //    message = "Tạo order thành công",
+            //    result = true,
+            //    value = (Guid)orderId
+            //};
         }
 
         public async Task<bool> DeleteOrderAsync(Guid id)

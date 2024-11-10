@@ -219,6 +219,11 @@ namespace Vouchee.API.AppStarts
             // WALLET TRANSACTION
             CreateMap<WalletTransaction, WalletTransactionDTO>().ReverseMap();
             CreateMap<WalletTransaction, GetWalletTransactionDTO>().ReverseMap();
+
+            // TOP UP REQUEST
+            CreateMap<TopUpRequest, TopUpRequestDTO>().ReverseMap();
+            CreateMap<TopUpRequest, GetTopUpRequestDTO>().ReverseMap();
+            CreateMap<GetTopUpRequestDTO, TopUpRequestFilter>().ReverseMap();
         }
     }
 }
