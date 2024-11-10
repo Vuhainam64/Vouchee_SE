@@ -37,12 +37,13 @@ namespace Vouchee.Business.Models.DTOs
             carts = [];
             notificationFromUser = [];
             notificationToUser = [];
-            wallets = [];
         }
 
         public Guid? id { get; set; }
         public Guid? roleId { get; set; }
         public string? email { get; set; }
+        public GetWalletDTO buyerWallet { get; set; }
+        public GetWalletDTO sellerWallet { get; set; }
 
         public string? roleName { get; set; }
         public string? status { get; set; }
@@ -57,7 +58,6 @@ namespace Vouchee.Business.Models.DTOs
         public virtual ICollection<GetNotificationDTO> notificationToUser { get; set; }
         [InverseProperty(nameof(Notification.Sender))]
         public virtual ICollection<GetNotificationDTO> notificationFromUser { get; set; }
-        public virtual ICollection<GetWalletDTO> wallets { get; set; }
     }
 
     public class RegisterDTO
