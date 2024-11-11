@@ -44,8 +44,10 @@ namespace Vouchee.Data.Models.DTOs
     {
         public Guid? id { get; set; }
         public Guid? voucherId { get; set; }
-
         public Guid? promotionId { get; set; }
+        public Guid? brandId { get; set; }
+        public string? brandName { get; set; }
+        public string? brandImage { get; set; }
         public string? title { get; set; }
         public int? originalPrice { get; set; }
         public int? sellPrice { get; set; }

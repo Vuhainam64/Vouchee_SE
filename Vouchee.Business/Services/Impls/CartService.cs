@@ -58,6 +58,9 @@ namespace Vouchee.Business.Services.Impls
                                                             .Include(x => x.Carts)
                                                                 .ThenInclude(cart => cart.Modal)
                                                                     .ThenInclude(voucher => voucher.Voucher.Promotions)
+                                                            .Include(x => x.Carts)
+                                                                .ThenInclude(cart => cart.Modal)
+                                                                    .ThenInclude(voucher => voucher.Voucher.Brand)
                                                                     , isTracking);
 
             CartDTO cartDTO = new();
