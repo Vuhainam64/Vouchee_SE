@@ -61,13 +61,13 @@ namespace Vouchee.Business.Services.Impls
                                                             .Include(x => x.Carts)
                                                                 .ThenInclude(cart => cart.Modal)
                                                                     .ThenInclude(voucher => voucher.Voucher.Brand)
+                                                            .Include(x => x.BuyerWallet)
                                                                     , isTracking);
 
             CartDTO cartDTO = new();
 
             if (_user.Carts.Count() != 0)
             {
-
                 var groupedCarts = _user.Carts.GroupBy(cartItem => cartItem.Modal.Voucher.Seller?.Id).ToList();
                 foreach (var carts in groupedCarts)
                 {
@@ -87,6 +87,7 @@ namespace Vouchee.Business.Services.Impls
                     cartDTO.totalQuantity = cartDTO.sellers.Sum(x => x.modals.Sum(x => x.quantity));
                     cartDTO.totalPrice = cartDTO.sellers.Sum(s => s.modals.Sum(x => x.finalPrice));
                     cartDTO.vPoint = _user.VPoint;
+                    cartDTO.balance = _user.BuyerWallet.Balance;
                 }
             }
 

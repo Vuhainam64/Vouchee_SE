@@ -34,14 +34,19 @@ namespace Vouchee.API.Controllers
             _voucherCodeSerivce = voucherCodeSerivce;
         }
 
+        public class ModalList
+        {
+            public IList<Guid> modalIds;
+        }
+
         // CREATE
         [HttpPost("create_order")]
         [Authorize]
-        public async Task<IActionResult> CreateOrder([FromQuery] bool usingPoint, [FromQuery] PayTypeEnum payTypeEnum)
+        public async Task<IActionResult> CreateOrder([FromQuery] bool usingPoint, [FromQuery] PayTypeEnum payTypeEnum, [FromBody] ModalList modalList)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            var result = await _orderService.CreateOrderAsync(currentUser, usingPoint, payTypeEnum);
+            var result = await _orderService.CreateOrderAsync(currentUser, usingPoint, payTypeEnum, modalList.modalIds);
             return Ok(result);
 
         }

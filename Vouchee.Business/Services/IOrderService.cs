@@ -11,7 +11,7 @@ namespace Vouchee.Business.Services
     {
         // CREATE
         // public Task<Guid?> CreateOrderAsync(CreateOrderDTO createOrderDTO, ThisUserObj thisUserObj);
-        public Task<ResponseMessage<Guid>> CreateOrderAsync(ThisUserObj thisUserObj, bool usingPoint = false, PayTypeEnum payTypeEnum = PayTypeEnum.BANK);
+        public Task<ResponseMessage<Guid>> CreateOrderAsync(ThisUserObj thisUserObj, bool usingPoint = false, PayTypeEnum payTypeEnum = PayTypeEnum.BANK, IList<Guid> modalIds = null);
 
         // READ
         public Task<GetOrderDTO> GetOrderByIdAsync(Guid id);
