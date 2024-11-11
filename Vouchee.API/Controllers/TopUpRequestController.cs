@@ -6,6 +6,7 @@ using Vouchee.Business.Models;
 using Vouchee.Business.Services;
 using Vouchee.Business.Services.Impls;
 using Vouchee.Data.Models.DTOs;
+using Vouchee.Data.Models.Filters;
 
 namespace Vouchee.API.Controllers
 {
@@ -40,6 +41,25 @@ namespace Vouchee.API.Controllers
         public async Task<IActionResult> GetTopUpRequestById(Guid id)
         {
             var result = await _topUpRequestService.GetTopUpRequestById(id);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpGet("get_top_up_requests")]
+        public async Task<IActionResult> GetTopUpRequests([FromQuery] PagingRequest pagingRequest,
+                                                            [FromQuery] TopUpRequestFilter topUpRequestFilter) 
+        {
+            var result = await _topUpRequestService.GetTopUpRequestsAsync(pagingRequest, topUpRequestFilter);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpPut("update_top_up_request/{id}")]
+        public async Task<IActionResult> UpdateTopUpRequest(Guid id, [FromQuery] bool success, [FromQuery] string description)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+
+            var result = await _topUpRequestService.UpdateTopUpRequest(id, success, description, currentUser);
             return Ok(result);
         }
     }

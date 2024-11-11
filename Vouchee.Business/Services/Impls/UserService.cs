@@ -72,7 +72,8 @@ namespace Vouchee.Business.Services.Impls
             try
             {
                 var user = await _userRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Carts)
-                                                                                                .Include(x => x.Wallets)
+                                                                                                .Include(x => x.BuyerWallet)
+                                                                                                .Include(x => x.SellerWallet)
                                                                                                 .Include(x => x.Role));
                 if (user != null)
                 {

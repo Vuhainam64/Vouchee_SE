@@ -113,8 +113,8 @@ namespace Vouchee.Data.Helpers.Base
             }
             catch (Exception ex)
             {
-                LoggerService.Logger(ex.InnerException?.Message);
-                throw new Exception(ex.InnerException?.Message);
+                LoggerService.Logger(ex.Message);
+                throw new Exception(ex.Message);
             }
         }
 

@@ -64,20 +64,6 @@ namespace Vouchee.Business.Services.Impls
             {
                 Guid roleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.USER.ToString()));
 
-                Wallet buyerWallet = new()
-                {
-                    CreateDate = DateTime.Now,
-                    Status = ObjectStatusEnum.ACTIVE.ToString(),
-                    Type = WalletTypeEnum.BUYER.ToString(),
-                };
-
-                Wallet sellerWallet = new()
-                {
-                    CreateDate = DateTime.Now,
-                    Status = ObjectStatusEnum.ACTIVE.ToString(),
-                    Type = WalletTypeEnum.SELLER.ToString(),
-                };
-
                 User newBuyer = new()
                 {
                     Email = email,
@@ -86,7 +72,16 @@ namespace Vouchee.Business.Services.Impls
                     Name = lastName,
                     Status = ObjectStatusEnum.ACTIVE.ToString(),
                     CreateDate = DateTime.Now,
-                    Wallets = new List<Wallet> { buyerWallet, sellerWallet }
+                    BuyerWallet = new() 
+                    { 
+                        CreateDate = DateTime.Now,
+                        Status = ObjectStatusEnum.ACTIVE.ToString(),
+                    },
+                    SellerWallet = new()
+                    {
+                        CreateDate = DateTime.Now,
+                        Status = ObjectStatusEnum.ACTIVE.ToString(),
+                    }
                 };
 
                 Guid? newUserId = await _userRepository.AddAsync(newBuyer);

@@ -28,11 +28,18 @@ namespace Vouchee.API.Controllers
 
         [Authorize]
         [HttpPost("create_wallet")]
-        public async Task<IActionResult> CreateWallet([FromQuery] WalletTypeEnum walletTypeEnum)
+        public async Task<IActionResult> CreateWallet()
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            var result = await _walletService.CreateWalletAsync(currentUser, walletTypeEnum);
+            var result = await _walletService.CreateWalletAsync(currentUser);
+            return Ok(result);
+        }
+
+        [HttpGet("get_wallet_by_id/{id}")]
+        public async Task<IActionResult> GetWalletById(Guid id)
+        {
+            var result = await _walletService.GetWalletByIdAsync(id);
             return Ok(result);
         }
     }
