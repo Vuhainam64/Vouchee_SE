@@ -180,7 +180,9 @@ namespace Vouchee.API.AppStarts
             
 
             // CART
-            CreateMap<Cart,CartDTO>().ReverseMap();
+            CreateMap<Cart,CartDTO>()
+                .ForMember(dest => dest.balance, opt => opt.MapFrom(src => src.Buyer.BuyerWallet.Balance))
+                .ReverseMap();
 
             // MODAL
             CreateMap<Modal, CreateModalDTO>().ReverseMap();
