@@ -265,6 +265,7 @@ namespace Vouchee.Business.Services.Impls
                 transaction.Amount = seller.Value;
                 transaction.BuyerWalletId = user.BuyerWallet.Id;
                 transaction.SellerWalletId = existedSeller.Id;
+                transaction.OrderId = orderId;
 
                 existedSeller.SellerWallet.SellerWalletTransactions.Add(transaction);
                 existedSeller.SellerWallet.Balance += seller.Value;

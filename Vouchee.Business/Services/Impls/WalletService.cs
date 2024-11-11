@@ -86,7 +86,8 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<GetWalletDTO> GetWalletByIdAsync(Guid id)
         {
-            var existedWallet = await _walletRepository.GetByIdAsync(id);
+            var existedWallet = await _walletRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.SellerWalletTransactions)
+                                                                                                    .Include(x => x.BuyerWalletTransactions));
             if (existedWallet == null)
             {
                 throw new NotFoundException("Không tìm thấy ví với id này");

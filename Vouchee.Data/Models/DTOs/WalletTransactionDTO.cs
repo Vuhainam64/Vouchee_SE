@@ -33,6 +33,7 @@ namespace Vouchee.Data.Models.DTOs
         public Guid? sellerWalletId { get; set; }
         public Guid? buyerWalletId { get; set; }
         public Guid? topUpRequestId { get; set; }
+        public Guid? partnerTransactionId { get; set; }
 
         public int? amount { get; set; }
 
