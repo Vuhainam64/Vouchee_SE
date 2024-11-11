@@ -94,7 +94,7 @@ namespace Vouchee.Business.Services.Impls
             return _cartDTO;
         }
 
-        public async Task<CartDTO> AddItemAsync(Guid modalId, ThisUserObj thisUserObj, bool usePoint = false)
+        public async Task<CartDTO> AddItemAsync(Guid modalId, ThisUserObj thisUserObj, bool usePoint = false, int quantity = 1)
         {
             await GetCartsAsync(thisUserObj, true, usePoint);
 
@@ -102,14 +102,6 @@ namespace Vouchee.Business.Services.Impls
             var cartModal = _user.Carts.FirstOrDefault(x => x.ModalId == modalId);
             if (cartModal != null)
             {
-                foreach (var cart in _user.Carts)
-                {
-                    var state = _modalRepository.GetEntityState(cart.Modal);
-                    if (state == EntityState.Modified)
-                    {
-                        _userRepository.Attach(cart.Modal);
-                    }
-                }
                 // Nào fix xong thì mở
                 if (cartModal.Modal.Voucher.SellerID == thisUserObj.userId)
                 {
@@ -126,7 +118,7 @@ namespace Vouchee.Business.Services.Impls
                 }
                 else
                 {
-                    cartModal.Quantity += 1;
+                    cartModal.Quantity += quantity;
                     cartModal.UpdateBy = thisUserObj.userId;
                     cartModal.UpdateDate = DateTime.Now;
 
@@ -159,7 +151,7 @@ namespace Vouchee.Business.Services.Impls
                 {
                     CreateBy = thisUserObj.userId,
                     CreateDate = DateTime.Now,
-                    Quantity = 1,
+                    Quantity = quantity,
                     Modal = existedModal,
                 });
 

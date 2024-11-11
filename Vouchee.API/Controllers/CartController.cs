@@ -35,13 +35,23 @@ namespace Vouchee.API.Controllers
         }
 
         // CREATE
+        //[HttpPost("add_item/{modalId}")]
+        //[Authorize]
+        //public async Task<IActionResult> AddItem(Guid modalId, [FromQuery] bool usingPoint)
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+
+        //    var result = await _cartService.AddItemAsync(modalId, currentUser, usingPoint);
+        //    return Ok(result);
+        //}
+
         [HttpPost("add_item/{modalId}")]
         [Authorize]
-        public async Task<IActionResult> AddItem(Guid modalId, [FromQuery] bool usingPoint)
+        public async Task<IActionResult> AddItem(Guid modalId, [FromQuery] bool usingPoint, [FromQuery] int quantity)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            var result = await _cartService.AddItemAsync(modalId, currentUser, usingPoint);
+            var result = await _cartService.AddItemAsync(modalId, currentUser, usingPoint, quantity);
             return Ok(result);
         }
 

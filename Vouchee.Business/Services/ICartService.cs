@@ -12,7 +12,7 @@ namespace Vouchee.Business.Services
     public interface ICartService
     {
         // CREATE
-        public Task<CartDTO> AddItemAsync(Guid modalId, ThisUserObj thisUserObj, bool usePoint = false);
+        public Task<CartDTO> AddItemAsync(Guid modalId, ThisUserObj thisUserObj, bool usePoint = false, int quantity = 1);
 
         // READ
         public Task<CartDTO> GetCartsAsync(ThisUserObj thisUserObj, bool isTracking = false, bool usePoint = false);
