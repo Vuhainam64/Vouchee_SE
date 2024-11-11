@@ -7,6 +7,7 @@ using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Models.ViewModels;
 using Vouchee.Business.Services;
+using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Filters;
 
@@ -36,11 +37,11 @@ namespace Vouchee.API.Controllers
         // CREATE
         [HttpPost("create_order")]
         [Authorize]
-        public async Task<IActionResult> CreateOrder([FromQuery] bool usingPoint)
+        public async Task<IActionResult> CreateOrder([FromQuery] bool usingPoint, [FromQuery] PayTypeEnum payTypeEnum)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            var result = await _orderService.CreateOrderAsync(currentUser, usingPoint);
+            var result = await _orderService.CreateOrderAsync(currentUser, usingPoint, payTypeEnum);
             return Ok(result);
 
         }
