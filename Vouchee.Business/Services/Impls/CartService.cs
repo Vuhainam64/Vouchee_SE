@@ -66,6 +66,10 @@ namespace Vouchee.Business.Services.Impls
 
             CartDTO cartDTO = new();
 
+            cartDTO.vPoint = _user.VPoint;
+            cartDTO.balance = _user.BuyerWallet.Balance;
+            cartDTO.buyerId = _user.Id;
+
             if (_user.Carts.Count() != 0)
             {
                 var groupedCarts = _user.Carts.GroupBy(cartItem => cartItem.Modal.Voucher.Seller?.Id).ToList();
@@ -86,8 +90,6 @@ namespace Vouchee.Business.Services.Impls
 
                     cartDTO.totalQuantity = cartDTO.sellers.Sum(x => x.modals.Sum(x => x.quantity));
                     cartDTO.totalPrice = cartDTO.sellers.Sum(s => s.modals.Sum(x => x.finalPrice));
-                    cartDTO.vPoint = _user.VPoint;
-                    cartDTO.balance = _user.BuyerWallet.Balance;
                 }
             }
 

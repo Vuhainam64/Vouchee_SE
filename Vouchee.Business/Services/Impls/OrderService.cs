@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
@@ -98,7 +99,10 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<ResponseMessage<Guid>> CreateOrderAsync(ThisUserObj thisUserObj, bool usingPoint = false, PayTypeEnum payTypeEnum = PayTypeEnum.BANK, IList<Guid> modalIds = null)
+        public async Task<ResponseMessage<Guid>> CreateOrderAsync(ThisUserObj thisUserObj, 
+                                                                    bool usingPoint = false, 
+                                                                    PayTypeEnum payTypeEnum = PayTypeEnum.BANK, 
+                                                                    IList<Guid> modalIds = null)
         {
             var user = await _userRepository.GetByIdAsync(thisUserObj.userId, includeProperties: x => x.Include(x => x.BuyerWallet), isTracking: true);
 
@@ -113,6 +117,26 @@ namespace Vouchee.Business.Services.Impls
             }
 
             CartDTO cartDTO = await _cartService.GetCartsAsync(thisUserObj, false);
+
+            if (modalIds != null && modalIds.Any())
+            {
+                var cartModalIds = cartDTO.sellers.SelectMany(seller => seller.modals.Select(modal => modal.id)).ToHashSet();
+                var missingModals = modalIds.Where(id => !cartModalIds.Contains(id)).ToList();
+
+                if (missingModals.Any())
+                {
+                    throw new NotFoundException($"Giỏ hàng đang không chứa các modal: {string.Join(", ", missingModals)}");
+                }
+
+                cartDTO.sellers = cartDTO.sellers
+                    .Select(seller => new SellerCartDTO
+                    {
+                        sellerId = seller.sellerId,
+                        modals = seller.modals.Where(modal => modalIds.Contains((Guid) modal.id)).ToList()
+                    })
+                    .Where(seller => seller.modals.Any()) // Keep only sellers with matching modals
+                    .ToList();
+            }
 
             if (cartDTO == null)
             {
@@ -164,7 +188,7 @@ namespace Vouchee.Business.Services.Impls
                             existedModal.Stock -= cartModal.quantity;
                             existedVoucher.Stock -= cartModal.quantity;
 
-                            existedModal.Carts.Remove(existedModal.Carts.FirstOrDefault(c => c.BuyerId == thisUserObj.userId));
+                            existedModal.Carts.Remove(existedModal.Carts.FirstOrDefault(c => c.ModalId == cartModal.id));
 
                             order.OrderDetails.Add(new OrderDetail
                             {
@@ -245,6 +269,9 @@ namespace Vouchee.Business.Services.Impls
                 existedSeller.SellerWallet.SellerWalletTransactions.Add(transaction);
                 existedSeller.SellerWallet.Balance += seller.Value;
 
+                user.BuyerWallet.BuyerWalletTransactions.Add(transaction);
+                user.BuyerWallet.Balance -= seller.Value;
+
                 await _userRepository.SaveChanges();
             }
 
@@ -254,7 +281,6 @@ namespace Vouchee.Business.Services.Impls
                 result = true,
                 value = (Guid) orderId
             };
-
         }
 
         public async Task<bool> DeleteOrderAsync(Guid id)
