@@ -198,6 +198,9 @@ namespace Vouchee.API.AppStarts
                                                                                                                     && DateTime.Now <= p.EndDate).PercentDiscount))
                 .ForMember(dest => dest.promotionId, opt => opt.MapFrom(src => src.Voucher.Promotions.FirstOrDefault(p => p.StartDate <= DateTime.Now
                                                                 && DateTime.Now <= p.EndDate).Id))
+                .ForMember(dest => dest.brandId, opt => opt.MapFrom(src => src.Voucher.Brand.Id))
+                .ForMember(dest => dest.brandName, opt => opt.MapFrom(src => src.Voucher.Brand.Name))
+                .ForMember(dest => dest.brandImage, opt => opt.MapFrom(src => src.Voucher.Brand.Image))
                 .ReverseMap();
 
             // NOTIFICATION
