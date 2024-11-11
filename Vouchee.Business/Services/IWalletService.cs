@@ -16,6 +16,6 @@ namespace Vouchee.Business.Services
         public Task<ResponseMessage<GetUserDTO>> CreateWalletAsync(ThisUserObj currenUser);
 
         // GET
-        public Task<GetWalletDTO> GetWalletByIdAsync(Guid id);
+        public Task<GetSellerWallet> GetWalletByIdAsync(Guid id);
     }
 }

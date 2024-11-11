@@ -122,7 +122,8 @@ namespace Vouchee.Business.Models.DTOs
 
     public class GetVoucherSellerDTO : VoucherDTO
     {
-        public GetVoucherSellerDTO() {
+        public GetVoucherSellerDTO() 
+        {
             modals = [];
         }
 

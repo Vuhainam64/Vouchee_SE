@@ -192,6 +192,9 @@ namespace Vouchee.API.AppStarts
                                                                                                     && DateTime.Now <= p.EndDate).PercentDiscount))
                 .ForMember(dest => dest.promotionId, opt => opt.MapFrom(src => src.Voucher.Promotions.FirstOrDefault(p => p.StartDate <= DateTime.Now
                                                                                     && DateTime.Now <= p.EndDate).Id))
+                .ForMember(dest => dest.brandId, opt => opt.MapFrom(src => src.Voucher.Brand.Id))
+                .ForMember(dest => dest.brandName, opt => opt.MapFrom(src => src.Voucher.Brand.Name))
+                .ForMember(dest => dest.brandImage, opt => opt.MapFrom(src => src.Voucher.Brand.Image))
                 .ReverseMap();
             CreateMap<Modal, GetDetailModalDTO>().ReverseMap();
             CreateMap<GetModalDTO, ModalFilter>().ReverseMap();
@@ -215,6 +218,8 @@ namespace Vouchee.API.AppStarts
             // WALLET
             CreateMap<Wallet, WalletDTO>().ReverseMap();
             CreateMap<Wallet, GetWalletDTO>().ReverseMap();
+            CreateMap<Wallet, GetBuyerWallet>().ReverseMap();
+            CreateMap<Wallet, GetSellerWallet>().ReverseMap();
 
             // TOP UP REQUEST
             CreateMap<TopUpRequest, TopUpRequestDTO>().ReverseMap();
@@ -223,7 +228,7 @@ namespace Vouchee.API.AppStarts
 
             // WALLET TRANSACTION
             CreateMap<WalletTransaction, WalletTransactionDTO>().ReverseMap();
-            CreateMap<WalletTransaction, GetWalletTransactionDTO>().ReverseMap();
+            CreateMap<WalletTransaction, GetSellerWalletTransaction>().ReverseMap();
 
             // TOP UP REQUEST
             CreateMap<TopUpRequest, TopUpRequestDTO>().ReverseMap();
@@ -232,8 +237,8 @@ namespace Vouchee.API.AppStarts
 
             // WALLET TRANSACTION
             CreateMap<WalletTransaction, WalletTransactionDTO>().ReverseMap();
-            CreateMap<WalletTransaction, GetWalletTransactionDTO>().ReverseMap();
-            CreateMap<GetWalletTransactionDTO, WalletTransactionFilter>().ReverseMap();
+            CreateMap<WalletTransaction, GetSellerWalletTransaction>().ReverseMap();
+            CreateMap<GetSellerWalletTransaction, WalletTransactionFilter>().ReverseMap();
         }
     }
 }

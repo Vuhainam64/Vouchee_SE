@@ -231,8 +231,6 @@ namespace Vouchee.Business.Services.Impls
                 user.VPoint += order.FinalPrice / 1000;
             }
 
-            await _userRepository.UpdateAsync(user);
-
             var orderId = await _orderRepository.AddAsync(order);
 
             if (orderId == Guid.Empty)
@@ -272,9 +270,9 @@ namespace Vouchee.Business.Services.Impls
 
                 user.BuyerWallet.BuyerWalletTransactions.Add(transaction);
                 user.BuyerWallet.Balance -= seller.Value;
-
-                await _userRepository.SaveChanges();
             }
+
+            await _userRepository.SaveChanges();
 
             return new ResponseMessage<Guid>
             {

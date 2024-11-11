@@ -11,12 +11,7 @@ namespace Vouchee.Data.Models.DTOs
 {
     public class WalletDTO
     {
-        public WalletDTO()
-        {
-            sellerWalletTransactions = [];
-            buyerWalletTransactions = [];
-        }
-
+        public Guid Id { get; set; }
         public int balance { get; set; }
 
         public required string status { get; set; }
@@ -24,14 +19,30 @@ namespace Vouchee.Data.Models.DTOs
         public Guid createBy { get; set; }
         public DateTime? updateDate { get; set; }
         public Guid? updateBy { get; set; }
-
-        public virtual ICollection<GetWalletTransactionDTO> sellerWalletTransactions { get; set; }
-
-        public virtual ICollection<GetWalletTransactionDTO> buyerWalletTransactions { get; set; }
     }
 
     public class GetWalletDTO : WalletDTO
     {
-        public Guid Id { get; set; }
+
+    }
+
+    public class GetSellerWallet : GetWalletDTO
+    {
+        public GetSellerWallet()
+        {
+            sellerWalletTransactions = [];
+        }
+
+        public virtual ICollection<GetSellerWalletTransaction> sellerWalletTransactions { get; set; }
+    }
+
+    public class GetBuyerWallet : WalletDTO
+    {
+        public GetBuyerWallet()
+        {
+            buyerWalletTransactions = [];
+        }
+
+        public virtual ICollection<GetBuyerWalletTransactionDTO> buyerWalletTransactions { get; set; }
     }
 }

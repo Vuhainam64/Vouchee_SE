@@ -31,18 +31,18 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<DynamicResponseModel<GetWalletTransactionDTO>> GetWalletTransactionsAsync(PagingRequest pagingRequest, 
+        public async Task<DynamicResponseModel<GetSellerWalletTransaction>> GetWalletTransactionsAsync(PagingRequest pagingRequest, 
                                                                                                 WalletTransactionFilter walletTransactionFilter, 
                                                                                                 ThisUserObj currentUser, 
                                                                                                 WalletTransactionTypeEnum walletTransactionTypeEnum)
         {
-            (int, IQueryable<GetWalletTransactionDTO>) result;
+            (int, IQueryable<GetSellerWalletTransaction>) result;
             try
             {
                 result = _walletTransaction.GetTable()
                             .Where(x => x.SellerWalletId == currentUser.userRoleId)
-                            .ProjectTo<GetWalletTransactionDTO>(_mapper.ConfigurationProvider)
-                            .DynamicFilter(_mapper.Map<GetWalletTransactionDTO>(walletTransactionFilter))
+                            .ProjectTo<GetSellerWalletTransaction>(_mapper.ConfigurationProvider)
+                            .DynamicFilter(_mapper.Map<GetSellerWalletTransaction>(walletTransactionFilter))
                             .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
             }
             catch (Exception ex)
@@ -50,7 +50,7 @@ namespace Vouchee.Business.Services.Impls
                 LoggerService.Logger(ex.Message);
                 throw new LoadException(ex.Message);
             }
-            return new DynamicResponseModel<GetWalletTransactionDTO>()
+            return new DynamicResponseModel<GetSellerWalletTransaction>()
             {
                 metaData = new MetaData()
                 {

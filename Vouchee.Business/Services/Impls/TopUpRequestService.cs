@@ -104,7 +104,7 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<ResponseMessage<GetWalletDTO>> UpdateTopUpRequest(Guid id, bool success = false, string description = null, ThisUserObj currentUser = null)
+        public async Task<ResponseMessage<GetSellerWallet>> UpdateTopUpRequest(Guid id, bool success = false, string description = null, ThisUserObj currentUser = null)
         {
             var existedTopUpRequest = await _topUpRequestRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.WalletTransaction)
                                                                                                                                 .ThenInclude(x => x.BuyerWallet), isTracking: true);
@@ -136,11 +136,11 @@ namespace Vouchee.Business.Services.Impls
 
             var result = await _topUpRequestRepository.UpdateAsync(existedTopUpRequest);
 
-            return new ResponseMessage<GetWalletDTO>
+            return new ResponseMessage<GetSellerWallet>
             {
                 message = $"Cập nhật ví {(success ? "Thành công" : "Thất bại")}",
                 result = success,
-                value = _mapper.Map<GetWalletDTO>(existedTopUpRequest.WalletTransaction.BuyerWallet)
+                value = _mapper.Map<GetSellerWallet>(existedTopUpRequest.WalletTransaction.BuyerWallet)
             };
         }
     }

@@ -42,8 +42,8 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? id { get; set; }
         public Guid? roleId { get; set; }
         public string? email { get; set; }
-        public GetWalletDTO buyerWallet { get; set; }
-        public GetWalletDTO sellerWallet { get; set; }
+        public GetBuyerWallet buyerWallet { get; set; }
+        public GetSellerWallet sellerWallet { get; set; }
 
         public string? roleName { get; set; }
         public string? status { get; set; }

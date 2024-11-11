@@ -382,6 +382,7 @@ namespace Vouchee.Business.Services.Impls
             (int, IQueryable<GetVoucherSellerDTO>) result;
 
             result = _voucherRepository.GetTable().Include(x => x.Seller)
+                                                    .Include(x => x.Brand)
                                                     .Where(x => (categoryIds == null || !categoryIds.Any() || x.Categories.Any(c => categoryIds.Contains(c.Id)))
                                                             && x.SellerID == sellerId)
                                                     .ProjectTo<GetVoucherSellerDTO>(_mapper.ConfigurationProvider)
