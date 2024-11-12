@@ -27,6 +27,14 @@ namespace Vouchee.Data.Helpers
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Brand> Brands { get; set; }
         public virtual DbSet<Cart> Carts { get; set; }
+        public virtual DbSet<Modal> Modals { get; set; }
+        public virtual DbSet<Notification> Notifications { get; set; }
+        public virtual DbSet<TopUpRequest> TopUpRequests { get; set; }
+        public virtual DbSet<Wallet> Wallets { get; set; }
+        public virtual DbSet<WalletTransaction> WalletTransactions { get; set; }
+        public virtual DbSet<WithdrawRequest> WithdrawRequests { get; set; }
+        public virtual DbSet<PartnerTransaction> PartnerTransactions { get; set; }
+        public virtual DbSet<Media> Medias { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -59,11 +67,11 @@ namespace Vouchee.Data.Helpers
             modelBuilder.Entity<Cart>().HasKey(c => new { c.BuyerId, c.ModalId });
             modelBuilder.Entity<Modal>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Notification>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
-            modelBuilder.Entity<Notification>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<TopUpRequest>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Wallet>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<WalletTransaction>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<WithdrawRequest>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            modelBuilder.Entity<PartnerTransaction>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
 
             // modelBuilder.Seed();
             modelBuilder.Entity<User>()
