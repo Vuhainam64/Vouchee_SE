@@ -12,7 +12,7 @@ namespace Vouchee.Data.Models.Entities
 {
     [Table("Voucher")]
     [Index(nameof(SupplierId), Name = "IX_Voucher_SupplierId")]
-    [Index(nameof(SellerID), Name = "IX_Voucher_SellerId")]
+    [Index(nameof(SellerId), Name = "IX_Voucher_SellerId")]
     [Index(nameof(BrandId), Name = "IX_Voucher_BrandId")]
     public partial class Voucher
     {
@@ -43,8 +43,8 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty("Vouchers")]
         public required virtual Supplier? Supplier { get; set; }
 
-        public Guid SellerID { get; set; }
-        [ForeignKey(nameof(SellerID))]
+        public Guid SellerId { get; set; }
+        [ForeignKey(nameof(SellerId))]
         [InverseProperty("Vouchers")]
         public required virtual User? Seller { get; set; }
 

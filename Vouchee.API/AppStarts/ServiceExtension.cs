@@ -41,6 +41,7 @@ namespace Vouchee.API.AppStarts
             services.AddScoped<IWalletService, WalletService>();
             services.AddScoped<ITopUpRequestService, TopUpRequestService>();
             services.AddScoped<IWalletTransactionService, WalletTransactionService>();
+            services.AddScoped<IPartnerTransactionService, PartnerTransactionService>();
         }
 
         public static void AddSwaggerServices(this IServiceCollection services, IConfiguration configuration)

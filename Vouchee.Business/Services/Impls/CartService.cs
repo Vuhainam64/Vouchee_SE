@@ -77,10 +77,10 @@ namespace Vouchee.Business.Services.Impls
                 {
                     SellerCartDTO sellerCartDTO = new();
                     sellerCartDTO.sellerId = carts.Key;
-                    sellerCartDTO.sellerName = carts.First(x => x.Modal.Voucher.SellerID == carts.Key).Modal.Voucher.Seller.Name;
-                    sellerCartDTO.sellerImage = carts.First(x => x.Modal.Voucher.SellerID == carts.Key).Modal.Voucher.Seller.Image;
+                    sellerCartDTO.sellerName = carts.First(x => x.Modal.Voucher.SellerId == carts.Key).Modal.Voucher.Seller.Name;
+                    sellerCartDTO.sellerImage = carts.First(x => x.Modal.Voucher.SellerId == carts.Key).Modal.Voucher.Seller.Image;
 
-                    foreach (var cart in _user.Carts.Where(x => x.Modal.Voucher.SellerID == sellerCartDTO.sellerId))
+                    foreach (var cart in _user.Carts.Where(x => x.Modal.Voucher.SellerId == sellerCartDTO.sellerId))
                     {
                         sellerCartDTO.modals.Add(_mapper.Map<CartModalDTO>(cart.Modal));
                         sellerCartDTO.modals.FirstOrDefault(x => x.id == cart.ModalId).quantity = cart.Quantity;
@@ -142,7 +142,7 @@ namespace Vouchee.Business.Services.Impls
                     throw new NotFoundException("Không tìm thấy modal này");
                 }
 
-                if (existedModal.Voucher.SellerID == thisUserObj.userId)
+                if (existedModal.Voucher.SellerId == thisUserObj.userId)
                 {
                     throw new ConflictException($"{cartModal.ModalId} là modal của shop bạn. Bạn không thể order chính modal của mình");
                 }

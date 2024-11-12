@@ -237,6 +237,13 @@ namespace Vouchee.API.AppStarts
             CreateMap<TopUpRequest, TopUpRequestDTO>().ReverseMap();
             CreateMap<TopUpRequest, GetTopUpRequestDTO>().ReverseMap();
             CreateMap<GetTopUpRequestDTO, TopUpRequestFilter>().ReverseMap();
+
+            // PARTNER TRANSACTION
+            CreateMap<PartnerTransaction, SePayTransactionDTO>().ReverseMap();
+            CreateMap<PartnerTransaction, CreateSePayPartnerInTransactionDTO>()
+                .ForMember(dest => dest.id, opt => opt.Ignore())
+                .ReverseMap()
+                .ForMember(src => src.Id, opt => opt.Ignore());
         }
     }
 }

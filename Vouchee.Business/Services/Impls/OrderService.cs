@@ -261,15 +261,18 @@ namespace Vouchee.Business.Services.Impls
                 }
 
                 transaction.Amount = seller.Value;
-                transaction.BuyerWalletId = user.BuyerWallet.Id;
                 transaction.SellerWalletId = existedSeller.Id;
                 transaction.OrderId = orderId;
 
                 existedSeller.SellerWallet.SellerWalletTransactions.Add(transaction);
                 existedSeller.SellerWallet.Balance += seller.Value;
 
-                user.BuyerWallet.BuyerWalletTransactions.Add(transaction);
-                user.BuyerWallet.Balance -= seller.Value;
+                if (payTypeEnum == PayTypeEnum.WALLET)
+                {
+                    transaction.BuyerWalletId = user.BuyerWallet.Id;
+                    user.BuyerWallet.BuyerWalletTransactions.Add(transaction);
+                    user.BuyerWallet.Balance -= seller.Value;
+                }
             }
 
             await _userRepository.SaveChanges();

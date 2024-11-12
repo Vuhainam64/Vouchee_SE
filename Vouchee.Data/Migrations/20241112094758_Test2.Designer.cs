@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vouchee.Data.Helpers;
 
@@ -11,9 +12,11 @@ using Vouchee.Data.Helpers;
 namespace Vouchee.Data.Migrations
 {
     [DbContext(typeof(VoucheeContext))]
-    partial class VoucheeContextModelSnapshot : ModelSnapshot
+    [Migration("20241112094758_Test2")]
+    partial class Test2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -483,9 +486,9 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.PartnerTransaction", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("TestId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("NEWID()");
 
                     b.Property<string>("AccountNumber")
@@ -531,7 +534,7 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime?>("TransactionDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("Id");
+                    b.HasKey("TestId");
 
                     b.ToTable("PartnerTransaction");
                 });
@@ -992,8 +995,8 @@ namespace Vouchee.Data.Migrations
                     b.Property<Guid?>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("PartnerTransactionId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("PartnerTransactionId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("SellerWalletId")
                         .HasColumnType("uniqueidentifier");

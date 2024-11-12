@@ -86,7 +86,7 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException($"Không tìm thấy supplier với id {createVoucherDTO.supplierId}");
             }
 
-            voucher.SellerID = thisUserObj.userId;
+            voucher.SellerId = thisUserObj.userId;
 
             // MODAL 
 
@@ -384,7 +384,7 @@ namespace Vouchee.Business.Services.Impls
             result = _voucherRepository.GetTable().Include(x => x.Seller)
                                                     .Include(x => x.Brand)
                                                     .Where(x => (categoryIds == null || !categoryIds.Any() || x.Categories.Any(c => categoryIds.Contains(c.Id)))
-                                                            && x.SellerID == sellerId)
+                                                            && x.SellerId == sellerId)
                                                     .ProjectTo<GetVoucherSellerDTO>(_mapper.ConfigurationProvider)
                                                     .DynamicFilter(_mapper.Map<GetVoucherSellerDTO>(voucherFilter))
                                                     .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);

@@ -26,7 +26,6 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty(nameof(OrderDetail.Promotion))]
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
 
