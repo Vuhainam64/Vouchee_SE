@@ -84,24 +84,27 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<GetBuyerWallet> GetBuyerWalletByIdAsync(Guid id)
+        public async Task<GetBuyerWallet> GetBuyerWalletAsync(ThisUserObj currentuser)
         {
-            var existedWallet = await _walletRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.BuyerWalletTransactions));
-            if (existedWallet == null)
+            var user = await _userRepository.GetByIdAsync(currentuser.userId, includeProperties: x => x.Include(x => x.BuyerWallet.BuyerWalletTransactions));
+
+            if (user.BuyerWallet == null)
             {
-                throw new NotFoundException("Không tìm thấy ví với id này");
+                throw new NotFoundException("Người dùng này chưa có ví buyer");
             }
-            return _mapper.Map<GetBuyerWallet>(existedWallet);
+
+            return _mapper.Map<GetBuyerWallet>(user.BuyerWallet);
         }
 
-        public async Task<GetSellerWallet> GetSellerWalletByIdAsync(Guid id)
+        public async Task<GetSellerWallet> GetSellerWalletAsync(ThisUserObj currentUser)
         {
-            var existedWallet = await _walletRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.SellerWalletTransactions));
-            if (existedWallet == null)
+            var user = await _userRepository.GetByIdAsync(currentUser.userId, includeProperties: x => x.Include(x => x.SellerWallet.SellerWalletTransactions));
+            
+            if (user.SellerWallet == null)
             {
-                throw new NotFoundException("Không tìm thấy ví với id này");
+                throw new NotFoundException("Người dùng này chưa có ví seller");
             }
-            return _mapper.Map<GetSellerWallet>(existedWallet);
+            return _mapper.Map<GetSellerWallet>(user.SellerWallet);
         }
     }
 }
