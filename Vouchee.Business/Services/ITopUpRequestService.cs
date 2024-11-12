@@ -20,6 +20,6 @@ namespace Vouchee.Business.Services
         public Task<DynamicResponseModel<GetTopUpRequestDTO>> GetTopUpRequestsAsync(PagingRequest pagingRequest, TopUpRequestFilter topUpRequestFilter);
 
         // UPDATE
-        public Task<ResponseMessage<GetWalletDTO>> UpdateTopUpRequest(Guid id, bool success = false, string description = null, ThisUserObj currentUser = null); 
+        public Task<ResponseMessage<GetSellerWallet>> UpdateTopUpRequest(Guid id, Guid partTransactionId, ThisUserObj currentUser = null); 
     }
 }

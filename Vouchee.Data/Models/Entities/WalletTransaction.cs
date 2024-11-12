@@ -36,6 +36,11 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty(nameof(TopUpRequest.WalletTransaction))]
         public virtual TopUpRequest? TopUpRequest { get; set; }
 
+        public Guid? PartnerTransactionId { get; set; }
+        [ForeignKey(nameof(PartnerTransactionId))]
+        [InverseProperty(nameof(PartnerTransaction.WalletTransactions))]
+        public virtual PartnerTransaction? PartnerTransaction { get; set; }
+
         public int Amount { get; set; }
 
         public required string Status { get; set; }

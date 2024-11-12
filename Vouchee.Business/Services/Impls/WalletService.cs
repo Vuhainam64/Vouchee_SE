@@ -84,14 +84,24 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<GetWalletDTO> GetWalletByIdAsync(Guid id)
+        public async Task<GetBuyerWallet> GetBuyerWalletByIdAsync(Guid id)
         {
-            var existedWallet = await _walletRepository.GetByIdAsync(id);
+            var existedWallet = await _walletRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.BuyerWalletTransactions));
             if (existedWallet == null)
             {
                 throw new NotFoundException("Không tìm thấy ví với id này");
             }
-            return _mapper.Map<GetWalletDTO>(existedWallet);
+            return _mapper.Map<GetBuyerWallet>(existedWallet);
+        }
+
+        public async Task<GetSellerWallet> GetSellerWalletByIdAsync(Guid id)
+        {
+            var existedWallet = await _walletRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.SellerWalletTransactions));
+            if (existedWallet == null)
+            {
+                throw new NotFoundException("Không tìm thấy ví với id này");
+            }
+            return _mapper.Map<GetSellerWallet>(existedWallet);
         }
     }
 }

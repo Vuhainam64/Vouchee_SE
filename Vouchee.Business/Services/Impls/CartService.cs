@@ -66,6 +66,10 @@ namespace Vouchee.Business.Services.Impls
 
             CartDTO cartDTO = new();
 
+            cartDTO.vPoint = _user.VPoint;
+            cartDTO.balance = _user.BuyerWallet.Balance;
+            cartDTO.buyerId = _user.Id;
+
             if (_user.Carts.Count() != 0)
             {
                 var groupedCarts = _user.Carts.GroupBy(cartItem => cartItem.Modal.Voucher.Seller?.Id).ToList();
@@ -73,10 +77,10 @@ namespace Vouchee.Business.Services.Impls
                 {
                     SellerCartDTO sellerCartDTO = new();
                     sellerCartDTO.sellerId = carts.Key;
-                    sellerCartDTO.sellerName = carts.First(x => x.Modal.Voucher.SellerID == carts.Key).Modal.Voucher.Seller.Name;
-                    sellerCartDTO.sellerImage = carts.First(x => x.Modal.Voucher.SellerID == carts.Key).Modal.Voucher.Seller.Image;
+                    sellerCartDTO.sellerName = carts.First(x => x.Modal.Voucher.SellerId == carts.Key).Modal.Voucher.Seller.Name;
+                    sellerCartDTO.sellerImage = carts.First(x => x.Modal.Voucher.SellerId == carts.Key).Modal.Voucher.Seller.Image;
 
-                    foreach (var cart in _user.Carts.Where(x => x.Modal.Voucher.SellerID == sellerCartDTO.sellerId))
+                    foreach (var cart in _user.Carts.Where(x => x.Modal.Voucher.SellerId == sellerCartDTO.sellerId))
                     {
                         sellerCartDTO.modals.Add(_mapper.Map<CartModalDTO>(cart.Modal));
                         sellerCartDTO.modals.FirstOrDefault(x => x.id == cart.ModalId).quantity = cart.Quantity;
@@ -86,8 +90,6 @@ namespace Vouchee.Business.Services.Impls
 
                     cartDTO.totalQuantity = cartDTO.sellers.Sum(x => x.modals.Sum(x => x.quantity));
                     cartDTO.totalPrice = cartDTO.sellers.Sum(s => s.modals.Sum(x => x.finalPrice));
-                    cartDTO.vPoint = _user.VPoint;
-                    cartDTO.balance = _user.BuyerWallet.Balance;
                 }
             }
 
@@ -101,13 +103,10 @@ namespace Vouchee.Business.Services.Impls
 
             // Voucher exist in cart already
             var cartModal = _user.Carts.FirstOrDefault(x => x.ModalId == modalId);
+
             if (cartModal != null)
             {
                 // Nào fix xong thì mở
-                if (cartModal.Modal.Voucher.SellerID == thisUserObj.userId)
-                {
-                    throw new ConflictException($"{cartModal.ModalId} là modal của shop bạn. Bạn không thể order chính modal của mình");
-                }
                 var modal = await _modalRepository.FindAsync(modalId, false);
                 if (cartModal.Quantity >= modal.Stock)
                 {
@@ -136,11 +135,16 @@ namespace Vouchee.Business.Services.Impls
             }
             else
             {
-                var existedModal = await _modalRepository.FindAsync(modalId, false);
+                var existedModal = await _modalRepository.GetByIdAsync(modalId, includeProperties: x => x.Include(x => x.Voucher));
 
                 if (existedModal == null)
                 {
                     throw new NotFoundException("Không tìm thấy modal này");
+                }
+
+                if (existedModal.Voucher.SellerId == thisUserObj.userId)
+                {
+                    throw new ConflictException($"{cartModal.ModalId} là modal của shop bạn. Bạn không thể order chính modal của mình");
                 }
 
                 if (existedModal.Stock == 0)

@@ -34,19 +34,14 @@ namespace Vouchee.API.Controllers
             _voucherCodeSerivce = voucherCodeSerivce;
         }
 
-        public class ModalList
-        {
-            public IList<Guid> modalIds;
-        }
-
         // CREATE
         [HttpPost("create_order")]
         [Authorize]
-        public async Task<IActionResult> CreateOrder([FromQuery] bool usingPoint, [FromQuery] PayTypeEnum payTypeEnum, [FromBody] ModalList modalList)
+        public async Task<IActionResult> CreateOrder([FromQuery] bool usingPoint, [FromQuery] PayTypeEnum payTypeEnum, [FromBody] IList<Guid> modalIds)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            var result = await _orderService.CreateOrderAsync(currentUser, usingPoint, payTypeEnum, modalList.modalIds);
+            var result = await _orderService.CreateOrderAsync(currentUser, usingPoint, payTypeEnum, modalIds);
             return Ok(result);
 
         }
@@ -84,6 +79,16 @@ namespace Vouchee.API.Controllers
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
             var result = await _orderService.UpdateOrderAsync(id, updateOrderDTO, currentUser);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpPut("update_order_transaction/{id}")]
+        public async Task<IActionResult> UpdateOrderTransaction(Guid id, Guid partnerTransactionId)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+
+            var result = await _orderService.UpdateOrderTransactionAsync(id, partnerTransactionId, currentUser);
             return Ok(result);
         }
 

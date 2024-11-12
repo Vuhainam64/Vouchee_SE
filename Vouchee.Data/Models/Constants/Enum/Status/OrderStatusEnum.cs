@@ -10,6 +10,8 @@ namespace Vouchee.Data.Models.Constants.Enum.Status
     {
         SUSPICIOUS,
         PENDING,
-        DONE
+        DONE,
+        ERROR_AT_TRANSACTION,
+        FINISH_TRANSACTION
     }
 }

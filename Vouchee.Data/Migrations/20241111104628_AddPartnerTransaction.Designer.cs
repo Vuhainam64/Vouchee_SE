@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vouchee.Data.Helpers;
 
@@ -11,9 +12,11 @@ using Vouchee.Data.Helpers;
 namespace Vouchee.Data.Migrations
 {
     [DbContext(typeof(VoucheeContext))]
-    partial class VoucheeContextModelSnapshot : ModelSnapshot
+    [Migration("20241111104628_AddPartnerTransaction")]
+    partial class AddPartnerTransaction
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -483,9 +486,9 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.PartnerTransaction", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("NEWID()");
 
                     b.Property<string>("AccountNumber")
@@ -500,32 +503,26 @@ namespace Vouchee.Data.Migrations
                     b.Property<int?>("AmountOut")
                         .HasColumnType("int");
 
-                    b.Property<string>("Code")
+                    b.Property<string>("Body")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Content")
+                    b.Property<string>("Code")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Gateway")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PartnerName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("PartnerTransactionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ReferenceCode")
+                    b.Property<string>("ReferenceNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SubAccount")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TransactionContent")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("TransactionDate")
@@ -809,7 +806,7 @@ namespace Vouchee.Data.Migrations
                     b.Property<decimal>("Rating")
                         .HasColumnType("decimal(10,5)");
 
-                    b.Property<Guid>("SellerId")
+                    b.Property<Guid>("SellerID")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
@@ -839,7 +836,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasIndex(new[] { "BrandId" }, "IX_Voucher_BrandId");
 
-                    b.HasIndex(new[] { "SellerId" }, "IX_Voucher_SellerId");
+                    b.HasIndex(new[] { "SellerID" }, "IX_Voucher_SellerId");
 
                     b.HasIndex(new[] { "SupplierId" }, "IX_Voucher_SupplierId");
 
@@ -992,8 +989,8 @@ namespace Vouchee.Data.Migrations
                     b.Property<Guid?>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("PartnerTransactionId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("PartnerTransactionId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("SellerWalletId")
                         .HasColumnType("uniqueidentifier");
@@ -1244,7 +1241,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasOne("Vouchee.Data.Models.Entities.User", "Seller")
                         .WithMany("Vouchers")
-                        .HasForeignKey("SellerId")
+                        .HasForeignKey("SellerID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

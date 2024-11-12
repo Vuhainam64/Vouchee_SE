@@ -36,10 +36,17 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("get_wallet_by_id/{id}")]
-        public async Task<IActionResult> GetWalletById(Guid id)
+        [HttpGet("get_seller_wallet_by_id/{id}")]
+        public async Task<IActionResult> GetSellerWalletById(Guid id)
         {
-            var result = await _walletService.GetWalletByIdAsync(id);
+            var result = await _walletService.GetSellerWalletByIdAsync(id);
+            return Ok(result);
+        }
+
+        [HttpGet("get_buyer_wallet_by_id/{id}")]
+        public async Task<IActionResult> GetBuyerWalletById(Guid id)
+        {
+            var result = await _walletService.GetBuyerWalletByIdAsync(id);
             return Ok(result);
         }
     }

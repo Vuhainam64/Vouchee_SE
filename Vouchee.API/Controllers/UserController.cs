@@ -40,6 +40,16 @@ namespace Vouchee.API.Controllers
         }
 
         [Authorize]
+        [HttpGet("get_user")]
+        public async Task<IActionResult> GetUser()
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+
+            var user = await _userService.GetUserByIdAsync(currentUser.userId);
+            return Ok(user);
+        }
+
+        [Authorize]
         [HttpPut("update_user/{id}")]
         public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUserDTO updateUserDTO)
         {
