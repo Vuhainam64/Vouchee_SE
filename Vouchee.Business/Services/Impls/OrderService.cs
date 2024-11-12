@@ -17,7 +17,6 @@ using Vouchee.Data.Models.Constants.Number;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
-using static Google.Cloud.Firestore.V1.StructuredAggregationQuery.Types.Aggregation.Types;
 
 namespace Vouchee.Business.Services.Impls
 {
@@ -101,7 +100,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<ResponseMessage<Guid>> CreateOrderAsync(ThisUserObj thisUserObj, 
                                                                     bool usingPoint = false, 
-                                                                    PayTypeEnum payTypeEnum = PayTypeEnum.BANK, 
+                                                                    PayTypeEnum payTypeEnum = PayTypeEnum.WALLET, 
                                                                     IList<Guid> modalIds = null)
         {
             var user = await _userRepository.GetByIdAsync(thisUserObj.userId, includeProperties: x => x.Include(x => x.BuyerWallet), isTracking: true);
@@ -238,44 +237,45 @@ namespace Vouchee.Business.Services.Impls
                 throw new Exception("Failed to create order.");
             }
 
-            WalletTransaction transaction = new()
-            {
-                CreateBy = user.Id,
-                CreateDate = DateTime.Now,
-                Status = WalletTransactionStatusEnum.DONE.ToString(),
-            };
-
             // Phải chắc chắn order được tạo
-            foreach (var seller in amountSellers)
+
+            if (payTypeEnum == PayTypeEnum.WALLET)
             {
-                var existedSeller = await _userRepository.GetByIdAsync(seller.Key, includeProperties: x => x.Include(x => x.SellerWallet), isTracking: true);
-
-                if (existedSeller == null)
+                WalletTransaction transaction = new()
                 {
-                    throw new NotFoundException($"Không tìm thấy seller {seller.Key}");
-                }
+                    CreateBy = user.Id,
+                    CreateDate = DateTime.Now,
+                    Status = WalletTransactionStatusEnum.DONE.ToString(),
+                };
 
-                if (existedSeller.SellerWallet == null)
+                foreach (var seller in amountSellers)
                 {
-                    throw new NotFoundException($"Không tìm thấy wallet của seller {seller.Key}");
-                }
+                    var existedSeller = await _userRepository.GetByIdAsync(seller.Key, includeProperties: x => x.Include(x => x.SellerWallet), isTracking: true);
 
-                transaction.Amount = seller.Value;
-                transaction.SellerWalletId = existedSeller.Id;
-                transaction.OrderId = orderId;
+                    if (existedSeller == null)
+                    {
+                        throw new NotFoundException($"Không tìm thấy seller {seller.Key}");
+                    }
 
-                existedSeller.SellerWallet.SellerWalletTransactions.Add(transaction);
-                existedSeller.SellerWallet.Balance += seller.Value;
+                    if (existedSeller.SellerWallet == null)
+                    {
+                        throw new NotFoundException($"Không tìm thấy wallet của seller {seller.Key}");
+                    }
 
-                if (payTypeEnum == PayTypeEnum.WALLET)
-                {
+                    transaction.Amount = seller.Value;
+                    transaction.SellerWalletId = existedSeller.Id;
+                    transaction.OrderId = orderId;
+
+                    existedSeller.SellerWallet.SellerWalletTransactions.Add(transaction);
+                    existedSeller.SellerWallet.Balance += seller.Value;
+
                     transaction.BuyerWalletId = user.BuyerWallet.Id;
                     user.BuyerWallet.BuyerWalletTransactions.Add(transaction);
                     user.BuyerWallet.Balance -= seller.Value;
                 }
-            }
 
-            await _userRepository.SaveChanges();
+                await _userRepository.SaveChanges();
+            }
 
             return new ResponseMessage<Guid>
             {
@@ -357,6 +357,75 @@ namespace Vouchee.Business.Services.Impls
                 {
                     throw new NotFoundException("Không tìm thấy order");
                 }
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.Message);
+                throw new UpdateObjectException(ex.Message);
+            }
+        }
+
+        public async Task<ResponseMessage<bool>> UpdateOrderTransactionAsync(Guid id, Guid partnerTransactionId, ThisUserObj thisUserObj)
+        {
+            try
+            {
+                var existedOrder = await _orderRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.OrderDetails)
+                                                                                                        .ThenInclude(x => x.Modal)
+                                                                                                            .ThenInclude(x => x.Voucher)
+                                                                                                                .ThenInclude(x => x.Seller)
+                                                                                                                    .ThenInclude(x => x.SellerWallet)
+                                                                        , isTracking: true);
+
+                if (existedOrder == null)
+                {
+                    throw new NotFoundException("Không tìm thấy order này");
+                }
+
+                var groupedModals = existedOrder.OrderDetails.GroupBy(x => x.Modal.Voucher.SellerId);
+                foreach (var groupedModal in groupedModals)
+                {
+                    var existedSeller = await _userRepository.GetByIdAsync(groupedModal.Key, includeProperties: x => x.Include(x => x.SellerWallet)
+                                                                                                                        .ThenInclude(x => x.SellerWalletTransactions)                                    
+                                                                            , isTracking: true);
+
+                    if (existedSeller == null)
+                    {
+                        throw new NotFoundException($"Không tìm thấy seller {groupedModal.Key}");
+                    }
+
+                    if (existedSeller.SellerWallet == null)
+                    {
+                        throw new NotFiniteNumberException($"Không tìm thấy ví seller này");
+                    }
+
+                    WalletTransaction walletTransaction = new()
+                    {
+                        CreateBy = thisUserObj.userId,
+                        CreateDate = DateTime.Now,
+                        Status = WalletTransactionStatusEnum.DONE.ToString(),
+                        Amount = groupedModal.Sum(x => x.FinalPrice),
+                        OrderId = existedOrder.Id,
+                        PartnerTransactionId = partnerTransactionId,
+                        SellerWalletId = existedSeller.Id,
+                    };
+
+                    existedSeller.SellerWallet.SellerWalletTransactions.Add(walletTransaction);
+                    existedSeller.SellerWallet.Balance += groupedModal.Sum(x => x.FinalPrice);
+
+                    await _userRepository.UpdateAsync(existedSeller);
+                }
+
+                existedOrder.Status = partnerTransactionId == Guid.Empty ? OrderStatusEnum.ERROR_AT_TRANSACTION.ToString() : OrderStatusEnum.FINISH_TRANSACTION.ToString();
+                existedOrder.PaymentType = PayTypeEnum.BANK.ToString();
+
+                var result = await _orderRepository.UpdateAsync(existedOrder);
+
+                return new ResponseMessage<bool>()
+                {
+                    message = "Cập nhật trạng thái thành công",
+                    result = result,
+                    value = result
+                };
             }
             catch (Exception ex)
             {

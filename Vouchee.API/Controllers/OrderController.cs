@@ -82,6 +82,16 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
+        [Authorize]
+        [HttpPut("update_order_transaction/{id}")]
+        public async Task<IActionResult> UpdateOrderTransaction(Guid id, Guid partnerTransactionId)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+
+            var result = await _orderService.UpdateOrderTransactionAsync(id, partnerTransactionId, currentUser);
+            return Ok(result);
+        }
+
         // Assign Voucher Code
         [HttpPut("voucher/assign_voucher_code_to_order")]
         [Authorize]
