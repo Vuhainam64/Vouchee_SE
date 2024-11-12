@@ -411,9 +411,9 @@ namespace Vouchee.Business.Services.Impls
 
                     existedSeller.SellerWallet.SellerWalletTransactions.Add(walletTransaction);
                     existedSeller.SellerWallet.Balance += groupedModal.Sum(x => x.FinalPrice);
-
-                    await _userRepository.UpdateAsync(existedSeller);
                 }
+
+                await _userRepository.SaveChanges();
 
                 existedOrder.Status = partnerTransactionId == Guid.Empty ? OrderStatusEnum.ERROR_AT_TRANSACTION.ToString() : OrderStatusEnum.FINISH_TRANSACTION.ToString();
                 existedOrder.PaymentType = PayTypeEnum.BANK.ToString();
