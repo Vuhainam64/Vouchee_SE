@@ -395,7 +395,7 @@ namespace Vouchee.Business.Services.Impls
 
                     if (existedSeller.SellerWallet == null)
                     {
-                        throw new NotFiniteNumberException($"Không tìm thấy ví seller này");
+                        throw new NotFiniteNumberException($"Không tìm thấy ví seller {groupedModal.Key}");
                     }
 
                     WalletTransaction walletTransaction = new()
