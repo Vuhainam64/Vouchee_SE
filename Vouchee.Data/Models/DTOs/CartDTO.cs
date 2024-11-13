@@ -19,13 +19,20 @@ namespace Vouchee.Data.Models.DTOs
         public Guid buyerId { get; set; }
         public int? balance { get; set; } = 0;
         public int? totalQuantity { get; set; } = 0;
-        public int? totalPrice { get; set; } = 0;
-        public int? discountPrice { get; set; } = 0;
-        public int? finalPrice => totalPrice - discountPrice;
         public int? vPoint { get; set; } = 0;
-        public int? appliedVPointPrice => finalPrice - vPoint;
 
         public virtual ICollection<SellerCartDTO>? sellers { get; set; }
+    }
+
+    public class DetailCartDTO : CartDTO
+    {
+        public int? totalPrice { get; set; } = 0;
+        public int? discountPrice { get; set; } = 0;
+        public int? useVPoint { get; set;} = 0;
+        public int? useBalance { get; set; } = 0;
+        public int? finalPrice => totalPrice - discountPrice - useVPoint - useBalance;
+        public int? vPointUp => finalPrice / 1000;
+        public string? giftEmail { get; set; }
     }
 
     public class SellerCartDTO

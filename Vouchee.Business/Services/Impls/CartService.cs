@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
+using Vouchee.Business.Models.ViewModels;
 using Vouchee.Business.Services.Extensions.Filebase;
 using Vouchee.Data.Helpers;
 using Vouchee.Data.Helpers.Base;
@@ -68,6 +69,7 @@ namespace Vouchee.Business.Services.Impls
 
             cartDTO.vPoint = _user.VPoint;
             cartDTO.balance = _user.BuyerWallet.Balance;
+
             cartDTO.buyerId = _user.Id;
 
             if (_user.Carts.Count() != 0)
@@ -89,7 +91,6 @@ namespace Vouchee.Business.Services.Impls
                     cartDTO.sellers.Add(sellerCartDTO);
 
                     cartDTO.totalQuantity = cartDTO.sellers.Sum(x => x.modals.Sum(x => x.quantity));
-                    cartDTO.totalPrice = cartDTO.sellers.Sum(s => s.modals.Sum(x => x.finalPrice));
                 }
             }
 
@@ -326,6 +327,58 @@ namespace Vouchee.Business.Services.Impls
             }
 
             return null;
+        }
+
+        public async Task<DetailCartDTO> GetCheckoutCartsAsync(ThisUserObj thisUserObj, CheckOutViewModel checkOutViewModel)
+        {
+            await GetCartsAsync(thisUserObj);
+
+            if (_cartDTO == null || _cartDTO.sellers == null || _cartDTO.sellers.Count == 0)
+            {
+                throw new NotFoundException("Giỏ hàng đang trống");
+            }
+
+            if (checkOutViewModel.item_brief.modalId.Count == 0)
+            {
+                throw new NotFoundException("Chưa có món hàng nào được chọn trong cart");
+            }
+
+            var cartModalIds = _cartDTO.sellers
+                                        .SelectMany(seller => seller.modals)
+                                        .Select(modal => modal.id)
+                                        .ToHashSet();
+            var missingModalIds = checkOutViewModel.item_brief.modalId
+                .Where(inputModalId => !cartModalIds.Contains(inputModalId))
+                .ToList();
+
+            if (missingModalIds.Any())
+            {
+                throw new NotFoundException($"Những món hàng này không tồn tại trong cart: {string.Join(", ", missingModalIds)}");
+            }
+
+            _cartDTO.sellers = _cartDTO.sellers
+                                   .Select(seller => new SellerCartDTO
+                                   {
+                                       sellerId = seller.sellerId,
+                                       modals = seller.modals.Where(modal => checkOutViewModel.item_brief.modalId.Contains((Guid) modal.id)).ToList()
+                                   })
+                                   .Where(seller => seller.modals.Any())
+                                   .ToList();
+
+            DetailCartDTO detailCartDTO = new()
+            {
+                sellers = _cartDTO.sellers,
+                balance = _cartDTO.balance,
+                buyerId = _cartDTO.buyerId,
+                discountPrice = 0,
+                totalPrice = _cartDTO.sellers.Sum(x => x.modals.Sum(x => x.finalPrice)),
+                giftEmail = checkOutViewModel.gift_email,
+                vPoint = _cartDTO.vPoint,
+                useVPoint = checkOutViewModel.use_VPoint,
+                totalQuantity = _cartDTO.sellers.Sum(x => x.modals.Sum(x => x.quantity)),
+            };
+
+            return detailCartDTO;
         }
     }
 }
