@@ -45,14 +45,13 @@ namespace Vouchee.API.Controllers
 
         // READ
         [HttpGet("get_all_modal")]
-        [Authorize]
+       /* [Authorize]*/
         public async Task<IActionResult> GetModals([FromQuery] PagingRequest pagingRequest,
                                                             [FromQuery] ModalFilter modalFilter)
         {
             var result = await _modalService.GetModalsAsync(pagingRequest, modalFilter);
             return Ok(result);
         }
-
         // GET BY ID
         [HttpGet("get_modal/{id}")]
         [Authorize]
@@ -74,6 +73,12 @@ namespace Vouchee.API.Controllers
         public async Task<IActionResult> UpdateModalStatus(Guid id, VoucherStatusEnum modalStatus)
         {
             var result = await _modalService.UpdateModalStatusAsync(id, modalStatus);
+            return Ok(result);
+        }
+        [HttpPut("update_many_modals_status")]
+        public async Task<IActionResult> UpdateManyModalStatus([FromBody] List<Guid> Modals)
+        {
+            var result = await _modalService.UpdateManyModalStatusAsync(Modals);
             return Ok(result);
         }
         [HttpPut("update_modal_isActive/{id}")]
