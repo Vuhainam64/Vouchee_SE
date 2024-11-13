@@ -92,38 +92,24 @@ namespace Vouchee.Data.Models.DTOs
 
     public class GetPromotionDTO
     {
-        //public GetPromotionDTO()
-        //{
-        //    vouchers = new HashSet<GetAllVoucherDTO>();
-        //    orders = new HashSet<GetOrderDTO>();
-        //    orderDetails = new HashSet<GetOrderDetailDTO>();
-        //}
+        public Guid id { get; set; }
 
-        public Guid? id { get; set; }
-
-        public string? name { get; set; }
+        public required string name { get; set; }
         public string? description { get; set; }
-        public DateTime? startDate { get; set; }
-        public DateTime? endDate { get; set; }
-        public int? quantity { get; set; } = null;
-        public string? code { get; set; } = null;
-        public PromotionTypeEnum? type { get; set; }
+        public DateTime startDate { get; set; }
+        public DateTime endDate { get; set; }
+        public int? stock { get; set; }
+        public string? code { get; set; }
+        public required string type { get; set; }
         public string? policy { get; set; }
         public string? image { get; set; }
-        public decimal? percentDiscount { get; set; }
-        public decimal? moneyDiscount { get; set; }
+        public int? percentDiscount { get; set; }
+        public int? moneyDiscount { get; set; }
+        public int? maxMoneyToDiscount { get; set; }
+        public int? minMoneyToAppy { get; set; }
+        public int? requiredQuantity { get; set; }
 
-        //public string? status { get; set; }
-        //[Column(TypeName = "datetime")]
-        public DateTime? createDate { get; set; }
-        public Guid? createBy { get; set; }
-        //[Column(TypeName = "datetime")]
-        //public DateTime? updateDate { get; set; }
-        //public Guid? updateBy { get; set; }
-
-        //public virtual ICollection<GetAllVoucherDTO>? vouchers { get; set; }
-        //public virtual ICollection<GetOrderDTO>? orders { get; set; }
-        //public virtual ICollection<GetOrderDetailDTO>? orderDetails { get; set; }
+        public required string status { get; set; }
     }
 
     public class GetDetailPromotionDTO
@@ -151,5 +137,15 @@ namespace Vouchee.Data.Models.DTOs
         public Guid? createBy { get; set; }
 
         public virtual ICollection<GetVoucherDTO>? vouchers { get; set; }
+    }
+
+    public class GetModalPromotionDTO : GetPromotionDTO
+    {
+        public GetModalPromotionDTO()
+        {
+            modals = [];
+        }
+
+        public virtual ICollection<GetModalDTO>? modals { get; set; }
     }
 }

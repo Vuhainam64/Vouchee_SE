@@ -14,7 +14,7 @@ using Vouchee.Business.Services.Impls;
 namespace Vouchee.API.Controllers
 {
     [ApiController]
-    [Route("api/promotion/v1")]
+    [Route("api/v1/promotion")]
     [EnableCors("MyAllowSpecificOrigins")]
     public class PromotionController : ControllerBase
     {
@@ -64,6 +64,16 @@ namespace Vouchee.API.Controllers
         public async Task<IActionResult> GetPromotionById(Guid id)
         {
             var promotion = await _promotionService.GetPromotionByIdAsync(id);
+            return Ok(promotion);
+        }
+
+        [Authorize]
+        [HttpGet("get_seller_promotion")]
+        public async Task<IActionResult> GetSellerPromotion()
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+
+            var promotion = await _promotionService.GetPromotionBySeller(currentUser);
             return Ok(promotion);
         }
 

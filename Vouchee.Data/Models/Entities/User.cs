@@ -16,7 +16,36 @@ namespace Vouchee.Data.Models.Entities
             ReceiverNotifications = new List<Notification>();
             SenderNotifications = new List<Notification>();
             WithdrawRequests = new List<WithdrawRequest>();
+            Promotions = [];
         }
+
+        public Guid? RoleId { get; set; }
+        [ForeignKey(nameof(RoleId))]
+        public virtual Role? Role { get; set; }
+
+        [InverseProperty(nameof(Wallet.Buyer))]
+        public virtual Wallet? BuyerWallet { get; set; }
+
+        [InverseProperty(nameof(Wallet.Seller))]
+        public virtual Wallet? SellerWallet { get; set; }
+
+        [InverseProperty(nameof(Supplier.User))]
+        public virtual Supplier? Supplier { get; set; }
+
+        [InverseProperty(nameof(Order.User))]
+        public virtual ICollection<Order> Orders { get; set; }
+        [InverseProperty(nameof(Voucher.Seller))]
+        public virtual ICollection<Voucher> Vouchers { get; set; }
+        [InverseProperty(nameof(Cart.Buyer))]
+        public virtual ICollection<Cart> Carts { get; set; }
+        [InverseProperty(nameof(Notification.Receiver))]
+        public virtual ICollection<Notification> ReceiverNotifications { get; set; }
+        [InverseProperty(nameof(Notification.Sender))]
+        public virtual ICollection<Notification> SenderNotifications { get; set; }
+        [InverseProperty(nameof(WithdrawRequest.User))]
+        public virtual ICollection<WithdrawRequest> WithdrawRequests { get; set; }
+        [InverseProperty(nameof(Promotion.Seller))]
+        public virtual ICollection<Promotion> Promotions { get; set; }
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -36,25 +65,5 @@ namespace Vouchee.Data.Models.Entities
         public Guid CreateBy { get; set; }
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
-
-        public Guid? RoleId { get; set; }
-        [ForeignKey(nameof(RoleId))]
-        public virtual Role? Role { get; set; }
-
-        // Separate navigation properties for buyer and seller wallets
-        [InverseProperty(nameof(Wallet.Buyer))]
-        public virtual Wallet? BuyerWallet { get; set; }
-
-        [InverseProperty(nameof(Wallet.Seller))]
-        public virtual Wallet? SellerWallet { get; set; }
-
-        public virtual Supplier? Supplier { get; set; }
-
-        public virtual ICollection<Order> Orders { get; set; }
-        public virtual ICollection<Voucher> Vouchers { get; set; }
-        public virtual ICollection<Cart> Carts { get; set; }
-        public virtual ICollection<Notification> ReceiverNotifications { get; set; }
-        public virtual ICollection<Notification> SenderNotifications { get; set; }
-        public virtual ICollection<WithdrawRequest> WithdrawRequests { get; set; }
     }
 }

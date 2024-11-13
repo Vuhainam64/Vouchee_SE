@@ -98,10 +98,7 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<ResponseMessage<Guid>> CreateOrderAsync(ThisUserObj thisUserObj, 
-                                                                    bool usingPoint = false, 
-                                                                    PayTypeEnum payTypeEnum = PayTypeEnum.WALLET, 
-                                                                    IList<Guid> modalIds = null)
+        public async Task<ResponseMessage<Guid>> CreateOrderAsync(ThisUserObj thisUserObj, CheckOutViewModel checkOutViewModel)
         {
             var user = await _userRepository.GetByIdAsync(thisUserObj.userId, includeProperties: x => x.Include(x => x.BuyerWallet), isTracking: true);
 
@@ -115,32 +112,7 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Người dùng này chưa có ví buyer");
             }
 
-            CartDTO cartDTO = await _cartService.GetCartsAsync(thisUserObj, false);
-
-            if (modalIds != null && modalIds.Any())
-            {
-                var cartModalIds = cartDTO.sellers.SelectMany(seller => seller.modals.Select(modal => modal.id)).ToHashSet();
-                var missingModals = modalIds.Where(id => !cartModalIds.Contains(id)).ToList();
-
-                if (missingModals.Any())
-                {
-                    throw new NotFoundException($"Giỏ hàng đang không chứa các modal: {string.Join(", ", missingModals)}");
-                }
-
-                cartDTO.sellers = cartDTO.sellers
-                    .Select(seller => new SellerCartDTO
-                    {
-                        sellerId = seller.sellerId,
-                        modals = seller.modals.Where(modal => modalIds.Contains((Guid) modal.id)).ToList()
-                    })
-                    .Where(seller => seller.modals.Any()) // Keep only sellers with matching modals
-                    .ToList();
-            }
-
-            if (cartDTO == null)
-            {
-                throw new NotFoundException("Giỏ hàng đang trống");
-            }
+            CartDTO cartDTO = await _cartService.GetCheckoutCartsAsync(thisUserObj, checkOutViewModel);
 
             if (user.BuyerWallet.Balance < cartDTO.sellers.Sum(x => x.modals.Sum(x => x.finalPrice)))
             {
@@ -149,7 +121,7 @@ namespace Vouchee.Business.Services.Impls
 
             Order order = new()
             {
-                PaymentType = payTypeEnum.ToString(),
+                PaymentType = PayTypeEnum.BANK.ToString(),
                 Status = OrderStatusEnum.PENDING.ToString(),
                 CreateBy = thisUserObj.userId,
                 CreateDate = DateTime.Now,
@@ -213,7 +185,7 @@ namespace Vouchee.Business.Services.Impls
             order.TotalPrice = order.OrderDetails.Sum(x => x.TotalPrice);
             order.PointUp = order.FinalPrice / 1000;
 
-            if (usingPoint)
+            if (checkOutViewModel.use_VPoint != 0)
             {
                 if (user.VPoint != 0)
                 {
@@ -238,44 +210,40 @@ namespace Vouchee.Business.Services.Impls
             }
 
             // Phải chắc chắn order được tạo
-
-            if (payTypeEnum == PayTypeEnum.WALLET)
+            WalletTransaction transaction = new()
             {
-                WalletTransaction transaction = new()
+                CreateBy = user.Id,
+                CreateDate = DateTime.Now,
+                Status = WalletTransactionStatusEnum.DONE.ToString(),
+            };
+
+            foreach (var seller in amountSellers)
+            {
+                var existedSeller = await _userRepository.GetByIdAsync(seller.Key, includeProperties: x => x.Include(x => x.SellerWallet), isTracking: true);
+
+                if (existedSeller == null)
                 {
-                    CreateBy = user.Id,
-                    CreateDate = DateTime.Now,
-                    Status = WalletTransactionStatusEnum.DONE.ToString(),
-                };
-
-                foreach (var seller in amountSellers)
-                {
-                    var existedSeller = await _userRepository.GetByIdAsync(seller.Key, includeProperties: x => x.Include(x => x.SellerWallet), isTracking: true);
-
-                    if (existedSeller == null)
-                    {
-                        throw new NotFoundException($"Không tìm thấy seller {seller.Key}");
-                    }
-
-                    if (existedSeller.SellerWallet == null)
-                    {
-                        throw new NotFoundException($"Không tìm thấy wallet của seller {seller.Key}");
-                    }
-
-                    transaction.Amount = seller.Value;
-                    transaction.SellerWalletId = existedSeller.Id;
-                    transaction.OrderId = orderId;
-
-                    existedSeller.SellerWallet.SellerWalletTransactions.Add(transaction);
-                    existedSeller.SellerWallet.Balance += seller.Value;
-
-                    transaction.BuyerWalletId = user.BuyerWallet.Id;
-                    user.BuyerWallet.BuyerWalletTransactions.Add(transaction);
-                    user.BuyerWallet.Balance -= seller.Value;
+                    throw new NotFoundException($"Không tìm thấy seller {seller.Key}");
                 }
 
-                await _userRepository.SaveChanges();
+                if (existedSeller.SellerWallet == null)
+                {
+                    throw new NotFoundException($"Không tìm thấy wallet của seller {seller.Key}");
+                }
+
+                transaction.Amount = seller.Value;
+                transaction.SellerWalletId = existedSeller.Id;
+                transaction.OrderId = orderId;
+
+                existedSeller.SellerWallet.SellerWalletTransactions.Add(transaction);
+                existedSeller.SellerWallet.Balance += seller.Value;
+
+                transaction.BuyerWalletId = user.BuyerWallet.Id;
+                user.BuyerWallet.BuyerWalletTransactions.Add(transaction);
+                user.BuyerWallet.Balance -= seller.Value;
             }
+
+            await _userRepository.SaveChanges();
 
             return new ResponseMessage<Guid>
             {

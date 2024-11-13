@@ -12,8 +12,8 @@ using Vouchee.Data.Helpers;
 namespace Vouchee.Data.Migrations
 {
     [DbContext(typeof(VoucheeContext))]
-    [Migration("20241112100209_ConvertToInt2")]
-    partial class ConvertToInt2
+    [Migration("20241113091950_AddModal")]
+    partial class AddModal
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,6 +53,21 @@ namespace Vouchee.Data.Migrations
                     b.HasIndex("VouchersId");
 
                     b.ToTable("CategoryVoucher");
+                });
+
+            modelBuilder.Entity("ModalPromotion", b =>
+                {
+                    b.Property<Guid>("ModalsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PromotionsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ModalsId", "PromotionsId");
+
+                    b.HasIndex("PromotionsId");
+
+                    b.ToTable("ModalPromotion");
                 });
 
             modelBuilder.Entity("PromotionVoucher", b =>
@@ -486,9 +501,9 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.PartnerTransaction", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("NEWID()");
 
                     b.Property<string>("AccountNumber")
@@ -564,6 +579,12 @@ namespace Vouchee.Data.Migrations
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("MaxMoneyToDiscount")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MinMoneyToAppy")
+                        .HasColumnType("int");
+
                     b.Property<int?>("MoneyDiscount")
                         .HasColumnType("int");
 
@@ -577,7 +598,7 @@ namespace Vouchee.Data.Migrations
                     b.Property<string>("Policy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("Quantity")
+                    b.Property<int?>("RequiredQuantity")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartDate")
@@ -586,6 +607,9 @@ namespace Vouchee.Data.Migrations
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Stock")
+                        .HasColumnType("int");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -995,8 +1019,8 @@ namespace Vouchee.Data.Migrations
                     b.Property<Guid?>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("PartnerTransactionId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("PartnerTransactionId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("SellerWalletId")
                         .HasColumnType("uniqueidentifier");
@@ -1095,6 +1119,21 @@ namespace Vouchee.Data.Migrations
                     b.HasOne("Vouchee.Data.Models.Entities.Voucher", null)
                         .WithMany()
                         .HasForeignKey("VouchersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ModalPromotion", b =>
+                {
+                    b.HasOne("Vouchee.Data.Models.Entities.Modal", null)
+                        .WithMany()
+                        .HasForeignKey("ModalsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Vouchee.Data.Models.Entities.Promotion", null)
+                        .WithMany()
+                        .HasForeignKey("PromotionsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

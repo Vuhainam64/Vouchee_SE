@@ -155,6 +155,24 @@ namespace Vouchee.Business.Services.Impls
             return null;
         }
 
+        public async Task<IList<GetPromotionDTO>> GetPromotionBySeller(ThisUserObj thisUserObj)
+        {
+            try
+            {
+                DateTime dateTime = DateTime.Now;
+                var promotions = await _promotionRepository.GetTable()
+                                           .Where(promotion => promotion.StartDate <= dateTime && dateTime <= promotion.EndDate)
+                                           .Include(x => x.Modals)
+                                           .ProjectTo<GetPromotionDTO>(_mapper.ConfigurationProvider)
+                                           .ToListAsync();
+                return promotions;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<DynamicResponseModel<GetPromotionDTO>> GetPromotionsAsync(PagingRequest pagingRequest, PromotionFilter promotionFilter)
         {
             (int, IQueryable<GetPromotionDTO>) result;
