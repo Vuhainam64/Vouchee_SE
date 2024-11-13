@@ -359,6 +359,8 @@ namespace Vouchee.Business.Services.Impls
             _cartDTO.sellers = _cartDTO.sellers
                                    .Select(seller => new SellerCartDTO
                                    {
+                                       sellerImage = seller.sellerImage,
+                                       sellerName = seller.sellerName,
                                        sellerId = seller.sellerId,
                                        modals = seller.modals.Where(modal => checkOutViewModel.item_brief.modalId.Contains((Guid) modal.id)).ToList()
                                    })
@@ -375,6 +377,7 @@ namespace Vouchee.Business.Services.Impls
                 giftEmail = checkOutViewModel.gift_email,
                 vPoint = _cartDTO.vPoint,
                 useVPoint = checkOutViewModel.use_VPoint,
+                useBalance = checkOutViewModel.use_balance,
                 totalQuantity = _cartDTO.sellers.Sum(x => x.modals.Sum(x => x.quantity)),
             };
 
