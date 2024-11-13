@@ -142,7 +142,7 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Giỏ hàng đang trống");
             }
 
-            if (user.BuyerWallet.Balance < cartDTO.finalPrice)
+            if (user.BuyerWallet.Balance < cartDTO.sellers.Sum(x => x.modals.Sum(x => x.finalPrice)))
             {
                 throw new Exception("Số dư trong ví không đủ");
             }

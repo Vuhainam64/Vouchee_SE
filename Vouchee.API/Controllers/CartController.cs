@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Vouchee.API.Helpers;
 using Vouchee.Business.Models;
+using Vouchee.Business.Models.ViewModels;
 using Vouchee.Business.Services;
 using Vouchee.Business.Services.Impls;
 using Vouchee.Data.Models.DTOs;
@@ -35,16 +36,6 @@ namespace Vouchee.API.Controllers
         }
 
         // CREATE
-        //[HttpPost("add_item/{modalId}")]
-        //[Authorize]
-        //public async Task<IActionResult> AddItem(Guid modalId, [FromQuery] bool usingPoint)
-        //{
-        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
-
-        //    var result = await _cartService.AddItemAsync(modalId, currentUser, usingPoint);
-        //    return Ok(result);
-        //}
-
         [HttpPost("add_item/{modalId}")]
         [Authorize]
         public async Task<IActionResult> AddItem(Guid modalId, [FromQuery] int quantity)
@@ -52,6 +43,16 @@ namespace Vouchee.API.Controllers
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
             var result = await _cartService.AddItemAsync(modalId, currentUser, quantity);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpPost("checkout")]
+        public async Task<IActionResult> CheckOut([FromBody] CheckOutViewModel checkOutViewModel)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+
+            var result = await _cartService.GetCheckoutCartsAsync(currentUser, checkOutViewModel);
             return Ok(result);
         }
 

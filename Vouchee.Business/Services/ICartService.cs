@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Vouchee.Business.Models;
+using Vouchee.Business.Models.ViewModels;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Filters;
 
@@ -16,6 +17,7 @@ namespace Vouchee.Business.Services
 
         // READ
         public Task<CartDTO> GetCartsAsync(ThisUserObj thisUserObj, bool isTracking = false);
+        public Task<DetailCartDTO> GetCheckoutCartsAsync(ThisUserObj thisUserObj, CheckOutViewModel checkOutViewModel);
 
         // UPDATE
         public Task<CartDTO> IncreaseQuantityAsync(Guid modalId, ThisUserObj thisUserObj);
