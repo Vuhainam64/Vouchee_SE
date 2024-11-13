@@ -21,5 +21,8 @@ namespace Vouchee.Business.Services
 
         // DELETE
         public Task<bool> DeleteSupplierAsync(Guid id);
+
+        public Task<byte[]> GenerateVoucherTemplateAsync();
+
     }
 }
