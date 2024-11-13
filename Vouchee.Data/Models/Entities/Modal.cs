@@ -18,6 +18,7 @@ namespace Vouchee.Data.Models.Entities
             Carts = [];
             VoucherCodes = [];
             OrderDetails = [];
+            Promotions = [];
         }
 
         [InverseProperty(nameof(Cart.Modal))]
@@ -26,6 +27,8 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<VoucherCode> VoucherCodes { get; set; }
         [InverseProperty(nameof(OrderDetail.Modal))]
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
+        [InverseProperty(nameof(Promotion.Modals))]
+        public virtual ICollection<Promotion> Promotions { get; set; }
 
         public Guid VoucherId { get; set; }
         [ForeignKey(nameof(VoucherId))]
