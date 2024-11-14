@@ -145,13 +145,14 @@ namespace Vouchee.Business.Services.Impls
 
                 if (existedModal.Voucher.SellerId == thisUserObj.userId)
                 {
-                    throw new ConflictException($"{cartModal.ModalId} là modal của shop bạn. Bạn không thể order chính modal của mình");
+                    throw new ConflictException($"{existedModal.Id} là modal của shop bạn. Bạn không thể order chính modal của mình");
                 }
 
-                if (existedModal.Stock == 0)
-                {
-                    throw new NotFoundException("Modal này không có code nào để sử dụng");
-                }
+                // tam thoi comment lai
+                //if (existedModal.Stock == 0)
+                //{
+                //    throw new NotFoundException("Modal này không có code nào để sử dụng");
+                //}
 
                 _user.Carts.Add(new()
                 {

@@ -21,25 +21,32 @@ namespace Vouchee.Business.Services.Impls
 {
     public class WalletTransactionService : IWalletTransactionService
     {
-        private readonly IBaseRepository<WalletTransaction> _walletTransaction;
+        private readonly IBaseRepository<Order> _orderRepository;
+        private readonly IBaseRepository<WalletTransaction> _walletTransactionRepository;
         private readonly IMapper _mapper;
 
-        public WalletTransactionService(IBaseRepository<WalletTransaction> walletTransaction,
+        public WalletTransactionService(IBaseRepository<Order> orderRepository, 
+                                            IBaseRepository<WalletTransaction> walletTransactionRepository, 
                                             IMapper mapper)
         {
-            _walletTransaction = walletTransaction;
+            _orderRepository = orderRepository;
+            _walletTransactionRepository = walletTransactionRepository;
             _mapper = mapper;
         }
 
+        public Task<bool> CreateTopUpWalletTransactionAsync(int amount, ThisUserObj currenUser)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<DynamicResponseModel<GetSellerWalletTransaction>> GetWalletTransactionsAsync(PagingRequest pagingRequest, 
-                                                                                                WalletTransactionFilter walletTransactionFilter, 
-                                                                                                ThisUserObj currentUser, 
-                                                                                                WalletTransactionTypeEnum walletTransactionTypeEnum)
+                                                                                                        WalletTransactionFilter walletTransactionFilter, 
+                                                                                                        ThisUserObj currentUser)
         {
             (int, IQueryable<GetSellerWalletTransaction>) result;
             try
             {
-                result = _walletTransaction.GetTable()
+                result = _walletTransactionRepository.GetTable()
                             .Where(x => x.SellerWalletId == currentUser.userRoleId)
                             .ProjectTo<GetSellerWalletTransaction>(_mapper.ConfigurationProvider)
                             .DynamicFilter(_mapper.Map<GetSellerWalletTransaction>(walletTransactionFilter))

@@ -37,7 +37,7 @@ namespace Vouchee.API.Controllers
         // CREATE
         [HttpPost("create_order")]
         [Authorize]
-        public async Task<IActionResult> CreateOrder([FromQuery] CheckOutViewModel checkOutViewModel)
+        public async Task<IActionResult> CreateOrder([FromBody] CheckOutViewModel checkOutViewModel)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 

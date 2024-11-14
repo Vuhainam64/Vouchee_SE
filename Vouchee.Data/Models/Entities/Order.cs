@@ -25,15 +25,20 @@ namespace Vouchee.Data.Models.Entities
 
         public Guid CreateBy { get; set; }
         [ForeignKey(nameof(CreateBy))]
-        [InverseProperty("Orders")]
-        public virtual User? User { get; set; }
+        [InverseProperty(nameof(Buyer.Orders))]
+        public virtual User? Buyer { get; set; }
 
         public Guid? PromotionId { get; set; }
         [ForeignKey(nameof(PromotionId))]
-        [InverseProperty("Orders")]
+        [InverseProperty(nameof(Promotion.Orders))]
         public virtual Promotion? Promotion { get; set; }
 
-        [InverseProperty("Order")]
+        public Guid? PartnerTransactionId { get; set; }
+        [ForeignKey(nameof(PartnerTransactionId))]
+        [InverseProperty(nameof(PartnerTransaction.Orders))]
+        public virtual PartnerTransaction? PartnerTransaction { get; set; }
+
+        [InverseProperty(nameof(WalletTransaction.Order))]
         public virtual WalletTransaction? WalletTransaction { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -44,9 +49,10 @@ namespace Vouchee.Data.Models.Entities
         public int DiscountValue { get; set; } = 0;
         public int TotalPrice { get; set; }
         public int DiscountPrice => TotalPrice * DiscountValue;
-        public int PointDown { get; set; }
-        public int FinalPrice => TotalPrice - DiscountPrice - PointDown;
-        public int PointUp { get; set; }
+        public int UsedVPoint { get; set; }
+        public int UsedBalance { get; set; }
+        public int FinalPrice => TotalPrice - DiscountPrice - UsedVPoint - UsedBalance;
+        public string? GiftEmail { get; set; }
 
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]

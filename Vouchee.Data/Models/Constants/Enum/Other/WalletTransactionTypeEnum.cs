@@ -8,7 +8,7 @@ namespace Vouchee.Data.Models.Constants.Enum.Other
 {
     public enum WalletTransactionTypeEnum
     {
-        SELLER,
-        BUYER
+        UP,
+        DOWN
     }
 }
