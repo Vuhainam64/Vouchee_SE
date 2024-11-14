@@ -39,6 +39,7 @@ namespace Vouchee.Data.Models.Entities
         public int? MinMoneyToAppy { get; set; }
         public int? RequiredQuantity { get; set; }
 
+        public bool IsActive { get; set; }
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; } = DateTime.Now;
