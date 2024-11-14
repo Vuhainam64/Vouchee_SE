@@ -46,14 +46,14 @@ namespace Vouchee.Business.Services.Impls
 
             TopUpRequest topUpRequest = _mapper.Map<TopUpRequest>(createTopUpRequestDTO);
             topUpRequest.CreateBy = thisUserObj.userId;
-            //topUpRequest.WalletTransaction = new()
-            //{
-            //    CreateBy = thisUserObj.userId,
-            //    CreateDate = DateTime.Now,
-            //    Status = WalletTransactionStatusEnum.PENDING.ToString(),
-            //    Amount = topUpRequest.Amount,
-            //    BuyerWalletId = user.BuyerWallet.Id
-            //};
+            topUpRequest.WalletTransaction = new()
+            {
+                CreateBy = thisUserObj.userId,
+                CreateDate = DateTime.Now,
+                Status = WalletTransactionStatusEnum.PENDING.ToString(),
+                Amount = topUpRequest.Amount,
+                BuyerWalletId = user.BuyerWallet.Id,
+            };
 
             var result = await _topUpRequestRepository.AddAsync(topUpRequest);
             return new ResponseMessage<Guid>()

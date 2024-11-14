@@ -10,6 +10,7 @@ namespace Vouchee.Data.Models.Constants.Enum.Status
     {
         PENDING,
         ERROR,
-        DONE
+        DONE,
+        PAID
     }
 }
