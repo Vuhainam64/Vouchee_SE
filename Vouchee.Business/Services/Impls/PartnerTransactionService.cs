@@ -123,15 +123,14 @@ namespace Vouchee.Business.Services.Impls
 
                         await _userRepository.SaveChanges();
 
-                        if (await _orderRepository.SaveChanges())
+                        await _orderRepository.SaveChanges();
+
+                        return new ResponseMessage<Guid>()
                         {
-                            return new ResponseMessage<Guid>()
-                            {
-                                message = "Tạo transaction thành công",
-                                result = true,
-                                value = (Guid)partnerTransactionId,
-                            };
-                        }
+                            message = "Tạo transaction thành công",
+                            result = true,
+                            value = (Guid)partnerTransactionId,
+                        };
                     }
                 }
 
