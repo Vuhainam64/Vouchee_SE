@@ -31,7 +31,7 @@ namespace Vouchee.API.AppStarts
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IVoucherService, VoucherService>();
             services.AddScoped<IVoucherTypeService, VoucherTypeService>();
-            services.AddScoped<IPromotionService, PromotionService>();
+            services.AddScoped<IShopPromotionService, ShopPromotionService>();
             services.AddScoped<IVoucherCodeService, VoucherCodeService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IBrandService, BrandService>();

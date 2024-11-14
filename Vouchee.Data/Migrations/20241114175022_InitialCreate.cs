@@ -557,7 +557,7 @@ namespace Vouchee.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    ModalPromotionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ModalPromotionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     VoucherId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     OriginalPrice = table.Column<int>(type: "int", nullable: false),
@@ -581,8 +581,7 @@ namespace Vouchee.Data.Migrations
                         name: "FK_Modal_ModalPromotion_ModalPromotionId",
                         column: x => x.ModalPromotionId,
                         principalTable: "ModalPromotion",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Modal_Voucher_VoucherId",
                         column: x => x.VoucherId,
@@ -836,9 +835,7 @@ namespace Vouchee.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_WalletTransaction_OrderId",
                 table: "WalletTransaction",
-                column: "OrderId",
-                unique: true,
-                filter: "[OrderId] IS NOT NULL");
+                column: "OrderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WalletTransaction_PartnerTransactionId",

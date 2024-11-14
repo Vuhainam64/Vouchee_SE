@@ -147,13 +147,13 @@ namespace Vouchee.API.AppStarts
             CreateMap<GetVoucherTypeDTO, VoucherTypeFilter>().ReverseMap();
 
             // PROMOTION
-            CreateMap<ModalPromotion, CreatePromotionDTO>().ReverseMap();
-            CreateMap<ModalPromotion, UpdatePromotionDTO>().ReverseMap();
-            CreateMap<ModalPromotion, GetPromotionDTO>()
+            CreateMap<ModalPromotion, CreateShopPromotionDTO>().ReverseMap();
+            CreateMap<ModalPromotion, UpdateShopPromotionDTO>().ReverseMap();
+            CreateMap<ModalPromotion, GetShopPromotionDTO>()
                 .ReverseMap();
-            CreateMap<ModalPromotion, GetDetailPromotionDTO>()
+            CreateMap<ModalPromotion, GetDetailShopPromotionDTO>()
                 .ReverseMap();
-            CreateMap<GetPromotionDTO, PromotionFilter>().ReverseMap();
+            CreateMap<GetShopPromotionDTO, PromotionFilter>().ReverseMap();
             CreateMap<ModalPromotion, GetModalPromotionDTO>();
 
             // CATEGORY
@@ -187,10 +187,6 @@ namespace Vouchee.API.AppStarts
             CreateMap<Modal, CreateModalDTO>().ReverseMap();
             CreateMap<Modal, UpdateModalDTO>().ReverseMap();
             CreateMap<Modal, GetModalDTO>()
-                .ForMember(dest => dest, opt => opt.MapFrom(src => src.Voucher.Seller.ShopPromotions.FirstOrDefault(p => p.StartDate <= DateTime.Now
-                                                                                                    && DateTime.Now <= p.EndDate).PercentDiscount))
-                //.ForMember(dest => dest.shopPromotionId, opt => opt.MapFrom(src => src.Voucher.Seller.Promotions.FirstOrDefault(p => p.StartDate <= DateTime.Now
-                //                                                                    && DateTime.Now <= p.EndDate).Id))
                 .ForMember(dest => dest.brandId, opt => opt.MapFrom(src => src.Voucher.Brand.Id))
                 .ForMember(dest => dest.brandName, opt => opt.MapFrom(src => src.Voucher.Brand.Name))
                 .ForMember(dest => dest.brandImage, opt => opt.MapFrom(src => src.Voucher.Brand.Image))

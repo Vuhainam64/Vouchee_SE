@@ -147,6 +147,7 @@ namespace Vouchee.Business.Services.Impls
         public async Task<IList<GetVoucherDTO>> GetNewestVouchers(int numberOfVoucher)
         {
             var result = _voucherRepository.GetTable()
+                                .Include(x => x.Seller.ShopPromotions)
                                 .OrderByDescending(v => v.CreateDate)
                                 .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
                                 .Where(x => x.stock > 0 && x.status == VoucherStatusEnum.NONE.ToString() && x.isActive == true)

@@ -24,14 +24,14 @@ using Vouchee.Data.Models.Filters;
 
 namespace Vouchee.Business.Services.Impls
 {
-    public class PromotionService : IPromotionService
+    public class ShopPromotionService : IShopPromotionService
     {
         private readonly IBaseRepository<Voucher> _voucherRepository;
         private readonly IFileUploadService _fileUploadService;
         private readonly IBaseRepository<ModalPromotion> _promotionRepository;
         private readonly IMapper _mapper;
 
-        public PromotionService(IBaseRepository<Voucher> voucherRepository,
+        public ShopPromotionService(IBaseRepository<Voucher> voucherRepository,
                                     IFileUploadService fileUploadService,
                                     IBaseRepository<ModalPromotion> promotionRepository,
                                     IMapper mapper)
@@ -42,7 +42,7 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<Guid?> CreatePromotionAsync(CreatePromotionDTO createPromotionDTO, ThisUserObj thisUserObj)
+        public async Task<Guid?> CreatePromotionAsync(CreateShopPromotionDTO createPromotionDTO, ThisUserObj thisUserObj)
         {
 
             var promotion = _mapper.Map<ModalPromotion>(createPromotionDTO);
@@ -77,15 +77,15 @@ namespace Vouchee.Business.Services.Impls
 
         }
 
-        public async Task<DynamicResponseModel<GetPromotionDTO>> GetActivePromotion(PagingRequest pagingRequest, PromotionFilter promotionFilter)
+        public async Task<DynamicResponseModel<GetShopPromotionDTO>> GetActivePromotion(PagingRequest pagingRequest, PromotionFilter promotionFilter)
         {
-            (int, IQueryable<GetPromotionDTO>) result;
+            (int, IQueryable<GetShopPromotionDTO>) result;
             try
             {
                 DateTime dateTime = DateTime.Now;
                 result = _promotionRepository.GetTable().Where(x => x.StartDate <= dateTime && dateTime <= x.EndDate)
-                            .ProjectTo<GetPromotionDTO>(_mapper.ConfigurationProvider)
-                            .DynamicFilter(_mapper.Map<GetPromotionDTO>(promotionFilter))
+                            .ProjectTo<GetShopPromotionDTO>(_mapper.ConfigurationProvider)
+                            .DynamicFilter(_mapper.Map<GetShopPromotionDTO>(promotionFilter))
                             .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAGE);
             }
             catch (Exception ex)
@@ -93,7 +93,7 @@ namespace Vouchee.Business.Services.Impls
                 LoggerService.Logger(ex.Message);
                 throw new LoadException(ex.Message);
             }
-            return new DynamicResponseModel<GetPromotionDTO>()
+            return new DynamicResponseModel<GetShopPromotionDTO>()
             {
                 metaData = new MetaData()
                 {
@@ -119,7 +119,7 @@ namespace Vouchee.Business.Services.Impls
         //    }
         //}
 
-        public async Task<GetDetailPromotionDTO> GetPromotionByIdAsync(Guid id)
+        public async Task<GetDetailShopPromotionDTO> GetPromotionByIdAsync(Guid id)
         {
             //var promotion = await _promotionRepository.GetByIdAsync(id, includeProperties: query =>
             //    query.Include(x => x.Vouchers) // Include Vouchers
@@ -153,7 +153,7 @@ namespace Vouchee.Business.Services.Impls
             return null;
         }
 
-        public async Task<IList<GetPromotionDTO>> GetPromotionBySeller(ThisUserObj thisUserObj)
+        public async Task<IList<GetShopPromotionDTO>> GetPromotionBySeller(ThisUserObj thisUserObj)
         {
             try
             {
@@ -161,7 +161,7 @@ namespace Vouchee.Business.Services.Impls
                 var promotions = await _promotionRepository.GetTable()
                                            .Where(promotion => promotion.StartDate <= dateTime && dateTime <= promotion.EndDate)
                                            .Include(x => x.Modals)
-                                           .ProjectTo<GetPromotionDTO>(_mapper.ConfigurationProvider)
+                                           .ProjectTo<GetShopPromotionDTO>(_mapper.ConfigurationProvider)
                                            .ToListAsync();
                 return promotions;
             }
@@ -171,15 +171,15 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<DynamicResponseModel<GetPromotionDTO>> GetPromotionsAsync(PagingRequest pagingRequest, PromotionFilter promotionFilter)
+        public async Task<DynamicResponseModel<GetShopPromotionDTO>> GetPromotionsAsync(PagingRequest pagingRequest, PromotionFilter promotionFilter)
         {
-            (int, IQueryable<GetPromotionDTO>) result;
+            (int, IQueryable<GetShopPromotionDTO>) result;
             try
             {
                 DateTime dateTime = DateTime.Now;
                 result = _promotionRepository.GetTable()
-                            .ProjectTo<GetPromotionDTO>(_mapper.ConfigurationProvider)
-                            .DynamicFilter(_mapper.Map<GetPromotionDTO>(promotionFilter))
+                            .ProjectTo<GetShopPromotionDTO>(_mapper.ConfigurationProvider)
+                            .DynamicFilter(_mapper.Map<GetShopPromotionDTO>(promotionFilter))
                             .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAGE);
             }
             catch (Exception ex)
@@ -187,7 +187,7 @@ namespace Vouchee.Business.Services.Impls
                 LoggerService.Logger(ex.Message);
                 throw new LoadException(ex.Message);
             }
-            return new DynamicResponseModel<GetPromotionDTO>()
+            return new DynamicResponseModel<GetShopPromotionDTO>()
             {
                 metaData = new MetaData()
                 {
@@ -199,7 +199,7 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<bool> UpdatePromotionAsync(Guid id, UpdatePromotionDTO updatePromotionDTO, ThisUserObj thisUserObj)
+        public async Task<bool> UpdatePromotionAsync(Guid id, UpdateShopPromotionDTO updatePromotionDTO, ThisUserObj thisUserObj)
         {
             var existedPromotion = await _promotionRepository.GetByIdAsync(id);
             if (existedPromotion != null)

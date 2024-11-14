@@ -18,11 +18,11 @@ namespace Vouchee.API.Controllers
     [EnableCors("MyAllowSpecificOrigins")]
     public class PromotionController : ControllerBase
     {
-        private readonly IPromotionService _promotionService;
+        private readonly IShopPromotionService _promotionService;
         private readonly IUserService _userService;
         private readonly IRoleService _roleService;
 
-        public PromotionController(IPromotionService promotionService,
+        public PromotionController(IShopPromotionService promotionService,
                                     IUserService userService,
                                     IRoleService roleService)
         {
@@ -34,7 +34,7 @@ namespace Vouchee.API.Controllers
         // CREATE
         [HttpPost("create_promotion")]
         [Authorize]
-        public async Task<IActionResult> CreatePromotion([FromForm] CreatePromotionDTO createPromotionDTO)
+        public async Task<IActionResult> CreatePromotion([FromForm] CreateShopPromotionDTO createPromotionDTO)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
@@ -88,7 +88,7 @@ namespace Vouchee.API.Controllers
         // UPDATE
         [HttpPut("update_promotion/{id}")]
         [Authorize]
-        public async Task<IActionResult> UpdatePromotion(Guid id, [FromBody] UpdatePromotionDTO updatePromotionDTO)
+        public async Task<IActionResult> UpdatePromotion(Guid id, [FromBody] UpdateShopPromotionDTO updatePromotionDTO)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 

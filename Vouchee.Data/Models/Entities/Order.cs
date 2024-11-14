@@ -15,11 +15,14 @@ namespace Vouchee.Data.Models.Entities
     {
         public Order()
         {
+            WalletTransactions = [];
             OrderDetails = [];
         }
 
         [InverseProperty(nameof(OrderDetail.Order))]
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
+        [InverseProperty(nameof(WalletTransaction.Order))]
+        public virtual ICollection<WalletTransaction> WalletTransactions { get; set; }
 
         public Guid CreateBy { get; set; }
         [ForeignKey(nameof(CreateBy))]
@@ -30,9 +33,6 @@ namespace Vouchee.Data.Models.Entities
         [ForeignKey(nameof(PartnerTransactionId))]
         [InverseProperty(nameof(PartnerTransaction.Orders))]
         public virtual PartnerTransaction? PartnerTransaction { get; set; }
-
-        [InverseProperty(nameof(WalletTransaction.Order))]
-        public virtual WalletTransaction? WalletTransaction { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]

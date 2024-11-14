@@ -12,8 +12,8 @@ using Vouchee.Data.Helpers;
 namespace Vouchee.Data.Migrations
 {
     [DbContext(typeof(VoucheeContext))]
-    [Migration("20241114171152_ModalPromotionAllowNul")]
-    partial class ModalPromotionAllowNul
+    [Migration("20241114175022_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1075,9 +1075,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasIndex("BuyerWalletId");
 
-                    b.HasIndex("OrderId")
-                        .IsUnique()
-                        .HasFilter("[OrderId] IS NOT NULL");
+                    b.HasIndex("OrderId");
 
                     b.HasIndex("PartnerTransactionId");
 
@@ -1366,8 +1364,8 @@ namespace Vouchee.Data.Migrations
                         .HasForeignKey("BuyerWalletId");
 
                     b.HasOne("Vouchee.Data.Models.Entities.Order", "Order")
-                        .WithOne("WalletTransaction")
-                        .HasForeignKey("Vouchee.Data.Models.Entities.WalletTransaction", "OrderId");
+                        .WithMany("WalletTransactions")
+                        .HasForeignKey("OrderId");
 
                     b.HasOne("Vouchee.Data.Models.Entities.PartnerTransaction", "PartnerTransaction")
                         .WithMany("WalletTransactions")
@@ -1426,7 +1424,7 @@ namespace Vouchee.Data.Migrations
                 {
                     b.Navigation("OrderDetails");
 
-                    b.Navigation("WalletTransaction");
+                    b.Navigation("WalletTransactions");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.OrderDetail", b =>

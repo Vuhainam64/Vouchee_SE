@@ -18,7 +18,7 @@ namespace Vouchee.Data.Models.Entities
 
         public Guid? OrderId { get; set; }
         [ForeignKey(nameof(OrderId))]
-        [InverseProperty(nameof(Order.WalletTransaction))]
+        [InverseProperty(nameof(Order.WalletTransactions))]
         public virtual Order? Order { get; set; }
 
         public Guid? SellerWalletId { get; set; }

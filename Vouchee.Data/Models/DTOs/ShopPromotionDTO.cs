@@ -13,9 +13,9 @@ using Vouchee.Data.Helpers.DateAnnotations;
 
 namespace Vouchee.Data.Models.DTOs
 {
-    public class CreatePromotionDTO
+    public class CreateShopPromotionDTO
     {
-        public CreatePromotionDTO()
+        public CreateShopPromotionDTO()
         {
             voucherCodeId = new List<Guid>();
         }
@@ -55,7 +55,7 @@ namespace Vouchee.Data.Models.DTOs
         public virtual IList<Guid> voucherCodeId { get; set; }
     }
 
-    public class UpdatePromotionDTO
+    public class UpdateShopPromotionDTO
     {
         [Required(ErrorMessage = "Name is required.")]
         [StringLength(100, ErrorMessage = "Name can't be longer than 100 characters.")]
@@ -90,7 +90,7 @@ namespace Vouchee.Data.Models.DTOs
         public DateTime updateDate = DateTime.Now;
     }
 
-    public class GetPromotionDTO
+    public class GetShopPromotionDTO
     {
         public Guid id { get; set; }
 
@@ -112,11 +112,10 @@ namespace Vouchee.Data.Models.DTOs
         public required string status { get; set; }
     }
 
-    public class GetDetailPromotionDTO
+    public class GetDetailShopPromotionDTO
     {
-        public GetDetailPromotionDTO()
+        public GetDetailShopPromotionDTO()
         {
-            vouchers = [];
         }
 
         public Guid? id { get; set; }
@@ -135,17 +134,5 @@ namespace Vouchee.Data.Models.DTOs
 
         public DateTime? createDate { get; set; }
         public Guid? createBy { get; set; }
-
-        public virtual ICollection<GetVoucherDTO>? vouchers { get; set; }
-    }
-
-    public class GetModalPromotionDTO : GetPromotionDTO
-    {
-        public GetModalPromotionDTO()
-        {
-            modals = [];
-        }
-
-        public virtual ICollection<GetModalDTO>? modals { get; set; }
     }
 }
