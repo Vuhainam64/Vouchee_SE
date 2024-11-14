@@ -53,14 +53,14 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        [Authorize]
-        [HttpPut("update_top_up_request/{id}")]
-        public async Task<IActionResult> UpdateTopUpRequest(Guid id, Guid partnerTransactionId)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+        //[Authorize]
+        //[HttpPut("update_top_up_request/{id}")]
+        //public async Task<IActionResult> UpdateTopUpRequest(Guid id, Guid partnerTransactionId)
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            var result = await _topUpRequestService.UpdateTopUpRequest(id, partnerTransactionId, currentUser);
-            return Ok(result);
-        }
+        //    var result = await _topUpRequestService.UpdateTopUpRequest(id, partnerTransactionId, currentUser);
+        //    return Ok(result);
+        //}
     }
 }

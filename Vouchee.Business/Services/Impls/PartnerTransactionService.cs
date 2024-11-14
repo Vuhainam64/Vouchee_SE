@@ -20,16 +20,22 @@ namespace Vouchee.Business.Services.Impls
 {
     public class PartnerTransactionService : IPartnerTransactionService
     {
+        private readonly IBaseRepository<TopUpRequest> _topUpRequest;
+        private readonly IBaseRepository<Wallet> _wallerRepository;
         private readonly IBaseRepository<User> _userRepository;
         private readonly IBaseRepository<Order> _orderRepository;
         private readonly IBaseRepository<PartnerTransaction> _partnerTransactionRepository;
         private readonly IMapper _mapper;
 
-        public PartnerTransactionService(IBaseRepository<User> userRepository, 
-                                            IBaseRepository<Order> orderRepository, 
-                                            IBaseRepository<PartnerTransaction> partnerTransactionRepository, 
-                                            IMapper mapper)
+        public PartnerTransactionService(IBaseRepository<TopUpRequest> topUpRequest,
+                                         IBaseRepository<Wallet> wallerRepository,
+                                         IBaseRepository<User> userRepository,
+                                         IBaseRepository<Order> orderRepository,
+                                         IBaseRepository<PartnerTransaction> partnerTransactionRepository,
+                                         IMapper mapper)
         {
+            _topUpRequest = topUpRequest;
+            _wallerRepository = wallerRepository;
             _userRepository = userRepository;
             _orderRepository = orderRepository;
             _partnerTransactionRepository = partnerTransactionRepository;
@@ -71,7 +77,7 @@ namespace Vouchee.Business.Services.Impls
                             var existedOrder = await _orderRepository.GetByIdAsync(Guid.Parse(orderId), includeProperties: x => x.Include(x => x.OrderDetails)
                                                                                                                                         .ThenInclude(x => x.Modal.Voucher.Seller)
                                                                                                                                     .Include(x => x.Buyer)
-                                                                                                                                        .ThenInclude(x => x.BuyerWallet), 
+                                                                                                                                        .ThenInclude(x => x.BuyerWallet),
                                                                                                                                     isTracking: true);
 
                             if (existedOrder == null)
@@ -119,21 +125,65 @@ namespace Vouchee.Business.Services.Impls
                                     OrderId = existedOrder.Id,
                                 });
                             }
+
+                            await _userRepository.SaveChanges();
+
+                            await _orderRepository.SaveChanges();
+
+                            return new ResponseMessage<Guid>()
+                            {
+                                message = "Tạo transaction thành công",
+                                result = true,
+                                value = (Guid)partnerTransactionId,
+                            };
+                        }
+                    }
+
+                    Match topUpMatch = topupRegex.Match(createPartnerTransaction.content);
+
+                    if (topUpMatch.Success && topUpMatch.Groups.Count > 1)
+                    {
+                        string topUpRequestId = topUpMatch.Groups[1].Value;
+
+                        if (topUpRequestId == null)
+                        {
+                            throw new NotFoundException($"Không tìm thấy mã top up {topUpRequestId} trong content");
                         }
 
-                        await _userRepository.SaveChanges();
+                        var existedTopUpRequest = await _topUpRequest.GetByIdAsync(Guid.Parse(topUpRequestId), includeProperties: x => x.Include(x => x.WalletTransaction)
+                                                                                                                                .ThenInclude(x => x.BuyerWallet), 
+                                                                                                                                isTracking: true);
 
-                        await _orderRepository.SaveChanges();
+                        if (existedTopUpRequest == null)
+                        {
+                            throw new NotFoundException($"Không tìm thấy top up request của người này");
+                        }
+
+                        if (existedTopUpRequest.WalletTransaction != null && existedTopUpRequest.WalletTransaction.BuyerWallet == null)
+                        {
+                            throw new NotFoundException("$Không tìm thấy ví buyer của người này");
+                        }
+
+                        existedTopUpRequest.Status = WalletTransactionStatusEnum.PAID.ToString();
+                        existedTopUpRequest.UpdateDate = DateTime.Now;
+
+                        existedTopUpRequest.WalletTransaction.PartnerTransactionId = partnerTransactionId;
+                        existedTopUpRequest.WalletTransaction.UpdateDate = DateTime.Now;
+                        existedTopUpRequest.WalletTransaction.Status = WalletTransactionStatusEnum.PAID.ToString();
+
+                        existedTopUpRequest.WalletTransaction.BuyerWallet.Balance += (int) partnerTransaction.AmountIn;
+                        existedTopUpRequest.WalletTransaction.BuyerWallet.UpdateDate = DateTime.Now;
+
+                        await _topUpRequest.SaveChanges();
 
                         return new ResponseMessage<Guid>()
                         {
                             message = "Tạo transaction thành công",
                             result = true,
-                            value = (Guid)partnerTransactionId,
+                            value = (Guid) partnerTransactionId,
                         };
                     }
                 }
-
                 return null;
             }
             catch (Exception ex)
