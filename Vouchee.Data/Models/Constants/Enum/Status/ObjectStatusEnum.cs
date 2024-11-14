@@ -9,6 +9,7 @@ namespace Vouchee.Data.Models.Constants.Enum.Status
     public enum ObjectStatusEnum
     {
         INACTIVE,
-        ACTIVE
+        ACTIVE,
+        NONE
     }
 }

@@ -14,19 +14,20 @@ namespace Vouchee.Business.Services
     public interface IShopPromotionService
     {
         // CREATE
-        public Task<Guid?> CreatePromotionAsync(CreateShopPromotionDTO createPromotionDTO, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<Guid>> CreateShopPromotionAsync(CreateShopPromotionDTO createPromotionDTO, ThisUserObj thisUserObj);
 
         // READ
-        public Task<IList<GetShopPromotionDTO>> GetPromotionBySeller(ThisUserObj thisUserObj);
-        public Task<GetDetailShopPromotionDTO> GetPromotionByIdAsync(Guid id);
-        public Task<DynamicResponseModel<GetShopPromotionDTO>> GetPromotionsAsync(PagingRequest pagingRequest, PromotionFilter promotionFilter);
-        public Task<DynamicResponseModel<GetShopPromotionDTO>> GetActivePromotion(PagingRequest pagingRequest, PromotionFilter promotionFilter);
-        //public Task<IList<GetPromotionDTO>> GetPromotionByBuyerId(Guid buyerId);
+        // public Task<IList<GetShopPromotionDTO>> GetShopPromotionBySeller(ThisUserObj thisUserObj);
+        public Task<GetShopPromotionDTO> GetPromotionByIdAsync(Guid id);
+        public Task<DynamicResponseModel<GetShopPromotionDTO>> GetPromotionsAsync(PagingRequest pagingRequest, ShopPromotionFilter promotionFilter);
+        public Task<GetShopPromotionDTO> GetActiveShopPromotion(ThisUserObj thisUserObj);
+        // public Task<DynamicResponseModel<GetShopPromotionDTO>> GetActivePromotion(PagingRequest pagingRequest, ShopPromotionFilter promotionFilter);
+        // public Task<IList<GetPromotionDTO>> GetPromotionByBuyerId(Guid buyerId);
 
         // UPDATE
-        public Task<bool> UpdatePromotionAsync(Guid id, UpdateShopPromotionDTO updatePromotionDTO, ThisUserObj thisUserObj);
+        // public Task<bool> UpdatePromotionAsync(Guid id, UpdateShopPromotionDTO updatePromotionDTO, ThisUserObj thisUserObj);
 
         // DELETE
-        public Task<bool> DeletePromotionAsync(Guid id, ThisUserObj thisUserObj);
+        // public Task<bool> DeletePromotionAsync(Guid id, ThisUserObj thisUserObj);
     }
 }

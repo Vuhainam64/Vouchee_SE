@@ -148,12 +148,9 @@ namespace Vouchee.API.AppStarts
 
             // PROMOTION
             CreateMap<ModalPromotion, CreateShopPromotionDTO>().ReverseMap();
-            CreateMap<ModalPromotion, UpdateShopPromotionDTO>().ReverseMap();
-            CreateMap<ModalPromotion, GetShopPromotionDTO>()
-                .ReverseMap();
-            CreateMap<ModalPromotion, GetDetailShopPromotionDTO>()
-                .ReverseMap();
-            CreateMap<GetShopPromotionDTO, PromotionFilter>().ReverseMap();
+            // CreateMap<ModalPromotion, UpdateShopPromotionDTO>().ReverseMap();
+            CreateMap<ModalPromotion, GetShopPromotionDTO>().ReverseMap();
+            CreateMap<GetShopPromotionDTO, ShopPromotionFilter>().ReverseMap();
             CreateMap<ModalPromotion, GetModalPromotionDTO>();
 
             // CATEGORY
@@ -239,6 +236,11 @@ namespace Vouchee.API.AppStarts
                 .ForMember(dest => dest.id, opt => opt.Ignore())
                 .ReverseMap()
                 .ForMember(src => src.Id, opt => opt.Ignore());
+
+            // SHOP PROMOTION
+            CreateMap<ShopPromotion, CreateShopPromotionDTO>().ReverseMap();
+            CreateMap<ShopPromotion, GetShopPromotionDTO>().ReverseMap();
+            CreateMap<GetShopPromotionDTO, ShopPromotionFilter>().ReverseMap();
         }
     }
 }

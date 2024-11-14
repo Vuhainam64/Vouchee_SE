@@ -37,55 +37,55 @@ namespace Vouchee.API.Controllers
         }
 
         // CREATE
-        [Authorize]
-        [HttpPost("create_new_address")]
-        public async Task<IActionResult> CreateAddress([FromForm] CreateAddressDTO createAddressDTO)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
-            if (currentUser.roleId.Equals(currentUser.adminRoleId))
-            {
-                var result = await _addressRepository.CreateAddressAsync(createAddressDTO, currentUser);
-                return Ok(result);
-            }
+        //[Authorize]
+        //[HttpPost("create_new_address")]
+        //public async Task<IActionResult> CreateAddress([FromForm] CreateAddressDTO createAddressDTO)
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+        //    if (currentUser.roleId.Equals(currentUser.adminRoleId))
+        //    {
+        //        var result = await _addressRepository.CreateAddressAsync(createAddressDTO, currentUser);
+        //        return Ok(result);
+        //    }
 
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                code = HttpStatusCode.Forbidden,
-                message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
-            });
-        }
+        //    return StatusCode((int)HttpStatusCode.Forbidden, new
+        //    {
+        //        code = HttpStatusCode.Forbidden,
+        //        message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
+        //    });
+        //}
 
         // READ
-        [HttpGet("get_all_address")]
-        public async Task<IActionResult> GetAddresses([FromQuery] PagingRequest pagingRequest,
-                                                        [FromQuery] AddressFilter addressFilter)
-        {
-            var result = await _addressRepository.GetAddressesAsync(pagingRequest, addressFilter);
-            return Ok(result);
-        }
+        //[HttpGet("get_all_address")]
+        //public async Task<IActionResult> GetAddresses([FromQuery] PagingRequest pagingRequest,
+        //                                                [FromQuery] AddressFilter addressFilter)
+        //{
+        //    var result = await _addressRepository.GetAddressesAsync(pagingRequest, addressFilter);
+        //    return Ok(result);
+        //}
 
-        [HttpGet("get_address/{id}")]
-        public async Task<IActionResult> GetAddressById(Guid id)
-        {
-            var address = await _addressRepository.GetAddressByIdAsync(id);
-            return Ok(address);
-        }
+        //[HttpGet("get_address/{id}")]
+        //public async Task<IActionResult> GetAddressById(Guid id)
+        //{
+        //    var address = await _addressRepository.GetAddressByIdAsync(id);
+        //    return Ok(address);
+        //}
 
         // UPDATE
-        [HttpPut("update_address/{id}")]
-        public async Task<IActionResult> UpdateAddress(Guid id, [FromBody] UpdateAddressDTO updateAddressDTO)
-        {
-            var result = await _addressRepository.UpdateAddressAsync(id, updateAddressDTO);
-            return Ok(result);
-        }
+        //[HttpPut("update_address/{id}")]
+        //public async Task<IActionResult> UpdateAddress(Guid id, [FromBody] UpdateAddressDTO updateAddressDTO)
+        //{
+        //    var result = await _addressRepository.UpdateAddressAsync(id, updateAddressDTO);
+        //    return Ok(result);
+        //}
 
         // DELETE
-        [HttpDelete("delete_address/{id}")]
-        public async Task<IActionResult> DeleteAddress(Guid id)
-        {
-            var result = await _addressRepository.DeleteAddressAsync(id);
-            return Ok(result);
-        }
+        //[HttpDelete("delete_address/{id}")]
+        //public async Task<IActionResult> DeleteAddress(Guid id)
+        //{
+        //    var result = await _addressRepository.DeleteAddressAsync(id);
+        //    return Ok(result);
+        //}
     }
 }
 
