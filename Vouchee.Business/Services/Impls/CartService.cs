@@ -136,7 +136,7 @@ namespace Vouchee.Business.Services.Impls
             }
             else
             {
-                var existedModal = await _modalRepository.GetByIdAsync(modalId, includeProperties: x => x.Include(x => x.Voucher));
+                var existedModal = await _modalRepository.GetByIdAsync(modalId, includeProperties: x => x.Include(x => x.Voucher), isTracking: true);
 
                 if (existedModal == null)
                 {
