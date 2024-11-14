@@ -178,10 +178,10 @@ namespace Vouchee.Business.Services.Impls
                                                                 .Include(x => x.Categories)
                                                                     .ThenInclude(x => x.VoucherType)
                                                                 .Include(x => x.Seller)
+                                                                    .ThenInclude(x => x.Promotions)
                                                                 .Include(x => x.Modals)
                                                                     .ThenInclude(x => x.VoucherCodes)
-                                                                .Include(x => x.Medias)
-                                                                .Include(x => x.Promotions));
+                                                                .Include(x => x.Medias));
 
             if (existedVoucher != null)
             {
@@ -359,9 +359,11 @@ namespace Vouchee.Business.Services.Impls
         public async Task<IList<GetVoucherDTO>> GetSalestVouchers(int numberOfVoucher)
         {
             var result = _voucherRepository.GetTable()
+                    .Include(x => x.Seller)
+                        .ThenInclude(x => x.Promotions)
                     .OrderByDescending(v => v.CreateDate)
                     .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
-                    .Where(x => x.stock > 0 && x.status == VoucherStatusEnum.NONE.ToString() && x.isActive == true && x.percentDiscount != null )
+                    //.Where(x => x.stock > 0 && x.status == VoucherStatusEnum.NONE.ToString() && x.isActive == true && x.percentDiscount != null)
                     .OrderByDescending(x => x.percentDiscount);
 
             return await result.ToListAsync();

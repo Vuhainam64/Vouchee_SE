@@ -58,7 +58,7 @@ namespace Vouchee.Business.Services.Impls
                                                                     .ThenInclude(voucher => voucher.Voucher.Seller)
                                                             .Include(x => x.Carts)
                                                                 .ThenInclude(cart => cart.Modal)
-                                                                    .ThenInclude(voucher => voucher.Voucher.Promotions)
+                                                                    .ThenInclude(voucher => voucher.Voucher.Seller.Promotions)
                                                             .Include(x => x.Carts)
                                                                 .ThenInclude(cart => cart.Modal)
                                                                     .ThenInclude(voucher => voucher.Voucher.Brand)

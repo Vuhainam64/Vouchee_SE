@@ -19,7 +19,6 @@ namespace Vouchee.Data.Models.Entities
         public Voucher()
         {
             Medias = [];
-            Promotions = [];
             Categories = [];
             Modals = [];
         }
@@ -28,8 +27,6 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<Modal> Modals { get; set; }
         [InverseProperty(nameof(Media.Voucher))]
         public virtual ICollection<Media> Medias { get; set; }
-        [InverseProperty(nameof(Promotion.Vouchers))]
-        public virtual ICollection<Promotion> Promotions { get; set; }
         [InverseProperty(nameof(Category.Vouchers))]
         public virtual ICollection<Category> Categories { get; set; }
 

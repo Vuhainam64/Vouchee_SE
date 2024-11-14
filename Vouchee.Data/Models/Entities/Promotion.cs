@@ -9,19 +9,15 @@ using System.Threading.Tasks;
 namespace Vouchee.Data.Models.Entities
 {
     [Table("Promotion")]
-
     public partial class Promotion
     {
         public Promotion()
         {
-            Vouchers = [];
             Orders = [];
             OrderDetails = [];
             Modals = [];
         }
 
-        [InverseProperty(nameof(Voucher.Promotions))]
-        public virtual ICollection<Voucher> Vouchers { get; set; }
         [InverseProperty(nameof(Modal.Promotions))]
         public virtual ICollection<Modal> Modals { get; set; }
         [InverseProperty(nameof(Order.Promotion))]
@@ -31,7 +27,7 @@ namespace Vouchee.Data.Models.Entities
 
         public Guid? SellerId { get; set; }
         [ForeignKey(nameof(SellerId))]
-        [InverseProperty("Promotions")]
+        [InverseProperty(nameof(Seller.Promotions))]
         public required virtual User? Seller { get; set; }
 
         [Key]

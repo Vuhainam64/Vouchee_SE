@@ -10,12 +10,12 @@ namespace Vouchee.Data.Models.Entities
     {
         public User()
         {
-            Orders = new List<Order>();
-            Vouchers = new List<Voucher>();
-            Carts = new List<Cart>();
-            ReceiverNotifications = new List<Notification>();
-            SenderNotifications = new List<Notification>();
-            WithdrawRequests = new List<WithdrawRequest>();
+            Orders = [];
+            Vouchers = [];
+            Carts = [];
+            ReceiverNotifications = [];
+            SenderNotifications = [];
+            WithdrawRequests = [];
             Promotions = [];
         }
 
