@@ -27,13 +27,10 @@ namespace Vouchee.API.Controllers
             _roleService = roleService;
         }
 
-        [Authorize]
         [HttpPost("create_partner_transaction")]
         public async Task<IActionResult> CreatePartnerTransaction([FromBody] CreateSePayPartnerInTransactionDTO createPartnerInTransactionDTO)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
-
-            var result = await _partnerTransactionService.CreatePartnerTransactionAsync(createPartnerInTransactionDTO, currentUser);
+            var result = await _partnerTransactionService.CreatePartnerTransactionAsync(createPartnerInTransactionDTO);
             return Ok(result);
         }
     }

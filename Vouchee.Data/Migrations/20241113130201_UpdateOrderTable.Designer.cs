@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vouchee.Data.Helpers;
 
@@ -11,9 +12,11 @@ using Vouchee.Data.Helpers;
 namespace Vouchee.Data.Migrations
 {
     [DbContext(typeof(VoucheeContext))]
-    partial class VoucheeContextModelSnapshot : ModelSnapshot
+    [Migration("20241113130201_UpdateOrderTable")]
+    partial class UpdateOrderTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1014,13 +1017,7 @@ namespace Vouchee.Data.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("NEWID()");
 
-                    b.Property<int>("AfterBalance")
-                        .HasColumnType("int");
-
                     b.Property<int>("Amount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BeforeBalance")
                         .HasColumnType("int");
 
                     b.Property<Guid?>("BuyerWalletId")
@@ -1047,9 +1044,6 @@ namespace Vouchee.Data.Migrations
 
                     b.Property<Guid?>("TopUpRequestId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("Type")
-                        .HasColumnType("bit");
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
@@ -1239,7 +1233,7 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Order", b =>
                 {
-                    b.HasOne("Vouchee.Data.Models.Entities.User", "Buyer")
+                    b.HasOne("Vouchee.Data.Models.Entities.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("CreateBy")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1253,11 +1247,11 @@ namespace Vouchee.Data.Migrations
                         .WithMany("Orders")
                         .HasForeignKey("PromotionId");
 
-                    b.Navigation("Buyer");
-
                     b.Navigation("PartnerTransaction");
 
                     b.Navigation("Promotion");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.OrderDetail", b =>

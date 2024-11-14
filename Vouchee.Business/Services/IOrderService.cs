@@ -21,6 +21,7 @@ namespace Vouchee.Business.Services
         public Task<bool> UpdateOrderAsync(Guid id, UpdateOrderDTO updateOrderDTO, ThisUserObj thisUserObj);
         public Task<ResponseMessage<bool>> UpdateOrderTransactionAsync(Guid id, Guid orderTransactionId, ThisUserObj thisUserObj);
         public Task<bool> AssignCodeToOrderAsync(Guid orderDetailId, VoucherCodeList voucherCodeId);
+        public Task<bool> UpdateUserPointAsync(Guid orderId);
 
         // DELETE
         public Task<bool> DeleteOrderAsync(Guid id);

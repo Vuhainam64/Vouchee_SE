@@ -12,6 +12,8 @@ namespace Vouchee.Data.Models.Constants.Enum.Status
         PENDING,
         DONE,
         ERROR_AT_TRANSACTION,
-        FINISH_TRANSACTION
+        FINISH_TRANSACTION,
+        PAID,
+        UN_PAID
     }
 }

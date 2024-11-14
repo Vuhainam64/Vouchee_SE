@@ -32,7 +32,7 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty(nameof(Supplier.User))]
         public virtual Supplier? Supplier { get; set; }
 
-        [InverseProperty(nameof(Order.User))]
+        [InverseProperty(nameof(Order.Buyer))]
         public virtual ICollection<Order> Orders { get; set; }
         [InverseProperty(nameof(Voucher.Seller))]
         public virtual ICollection<Voucher> Vouchers { get; set; }

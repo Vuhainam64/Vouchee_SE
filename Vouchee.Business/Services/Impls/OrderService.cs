@@ -114,11 +114,6 @@ namespace Vouchee.Business.Services.Impls
 
             CartDTO cartDTO = await _cartService.GetCheckoutCartsAsync(thisUserObj, checkOutViewModel);
 
-            if (user.BuyerWallet.Balance < cartDTO.sellers.Sum(x => x.modals.Sum(x => x.finalPrice)))
-            {
-                throw new Exception("Số dư trong ví không đủ");
-            }
-
             Order order = new()
             {
                 PaymentType = PayTypeEnum.BANK.ToString(),
@@ -177,30 +172,32 @@ namespace Vouchee.Business.Services.Impls
                     result = await _voucherRepository.UpdateAsync(existedVoucher);
                 }
 
-                // chuyen tiền từ ví người mua sang ví nhà bán hàng;
-                var amount = seller.modals.Sum(x => x.finalPrice);
-                amountSellers[seller.sellerId.Value] = amount.Value;
+                //// chuyen tiền từ ví người mua sang ví nhà bán hàng;
+                //var amount = seller.modals.Sum(x => x.finalPrice);
+                //amountSellers[seller.sellerId.Value] = amount.Value;
             }
 
             order.TotalPrice = order.OrderDetails.Sum(x => x.TotalPrice);
-            order.PointUp = order.FinalPrice / 1000;
+            order.UsedBalance = checkOutViewModel.use_balance;
+            order.UsedVPoint = checkOutViewModel.use_VPoint;
+            order.GiftEmail = checkOutViewModel.gift_email;
 
-            if (checkOutViewModel.use_VPoint != 0)
-            {
-                if (user.VPoint != 0)
-                {
-                    order.PointDown = user.VPoint;
-                    user.VPoint = order.PointUp;
-                }
-                else
-                {
-                    user.VPoint += order.FinalPrice / 1000;
-                }
-            }
-            else
-            {
-                user.VPoint += order.FinalPrice / 1000;
-            }
+            //if (checkOutViewModel.use_VPoint != 0)
+            //{
+            //    if (user.VPoint != 0)
+            //    {
+            //        order.PointDown = user.VPoint;
+            //        user.VPoint = order.PointUp;
+            //    }
+            //    else
+            //    {
+            //        user.VPoint += order.FinalPrice / 1000;
+            //    }
+            //}
+            //else
+            //{
+            //    user.VPoint += order.FinalPrice / 1000;
+            //}
 
             var orderId = await _orderRepository.AddAsync(order);
 
@@ -209,41 +206,41 @@ namespace Vouchee.Business.Services.Impls
                 throw new Exception("Failed to create order.");
             }
 
-            // Phải chắc chắn order được tạo
-            WalletTransaction transaction = new()
-            {
-                CreateBy = user.Id,
-                CreateDate = DateTime.Now,
-                Status = WalletTransactionStatusEnum.DONE.ToString(),
-            };
+            //// Phải chắc chắn order được tạo
+            //WalletTransaction transaction = new()
+            //{
+            //    CreateBy = user.Id,
+            //    CreateDate = DateTime.Now,
+            //    Status = WalletTransactionStatusEnum.DONE.ToString(),
+            //};
 
-            foreach (var seller in amountSellers)
-            {
-                var existedSeller = await _userRepository.GetByIdAsync(seller.Key, includeProperties: x => x.Include(x => x.SellerWallet), isTracking: true);
+            //foreach (var seller in amountSellers)
+            //{
+            //    var existedSeller = await _userRepository.GetByIdAsync(seller.Key, includeProperties: x => x.Include(x => x.SellerWallet), isTracking: true);
 
-                if (existedSeller == null)
-                {
-                    throw new NotFoundException($"Không tìm thấy seller {seller.Key}");
-                }
+            //    if (existedSeller == null)
+            //    {
+            //        throw new NotFoundException($"Không tìm thấy seller {seller.Key}");
+            //    }
 
-                if (existedSeller.SellerWallet == null)
-                {
-                    throw new NotFoundException($"Không tìm thấy wallet của seller {seller.Key}");
-                }
+            //    if (existedSeller.SellerWallet == null)
+            //    {
+            //        throw new NotFoundException($"Không tìm thấy wallet của seller {seller.Key}");
+            //    }
 
-                transaction.Amount = seller.Value;
-                transaction.SellerWalletId = existedSeller.Id;
-                transaction.OrderId = orderId;
+            //    transaction.Amount = seller.Value;
+            //    transaction.SellerWalletId = existedSeller.Id;
+            //    transaction.OrderId = orderId;
 
-                existedSeller.SellerWallet.SellerWalletTransactions.Add(transaction);
-                existedSeller.SellerWallet.Balance += seller.Value;
+            //    existedSeller.SellerWallet.SellerWalletTransactions.Add(transaction);
+            //    existedSeller.SellerWallet.Balance += seller.Value;
 
-                transaction.BuyerWalletId = user.BuyerWallet.Id;
-                user.BuyerWallet.BuyerWalletTransactions.Add(transaction);
-                user.BuyerWallet.Balance -= seller.Value;
-            }
+            //    transaction.BuyerWalletId = user.BuyerWallet.Id;
+            //    user.BuyerWallet.BuyerWalletTransactions.Add(transaction);
+            //    user.BuyerWallet.Balance -= seller.Value;
+            //}
 
-            await _userRepository.SaveChanges();
+            //await _userRepository.SaveChanges();
 
             return new ResponseMessage<Guid>
             {
@@ -400,6 +397,11 @@ namespace Vouchee.Business.Services.Impls
                 LoggerService.Logger(ex.Message);
                 throw new UpdateObjectException(ex.Message);
             }
+        }
+
+        public Task<bool> UpdateUserPointAsync(Guid orderId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

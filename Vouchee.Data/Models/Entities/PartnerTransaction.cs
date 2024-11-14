@@ -14,8 +14,11 @@ namespace Vouchee.Data.Models.Entities
         public PartnerTransaction()
         {
             WalletTransactions = [];
+            Orders = [];
         }
 
+        [InverseProperty(nameof(Order.PartnerTransaction))]
+        public virtual ICollection<Order> Orders { get; set; }
         [InverseProperty(nameof(WalletTransaction.PartnerTransaction))]
         public virtual ICollection<WalletTransaction> WalletTransactions { get; set; }
 
