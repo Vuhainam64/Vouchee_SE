@@ -91,7 +91,6 @@ namespace Vouchee.Business.Services.Impls
                             // trừ tiền của người mua 
                             if (existedOrder.UsedBalance > 0)
                             {
-
                                 existedOrder.Buyer.BuyerWallet.Balance -= existedOrder.UsedBalance;
                                 existedOrder.Buyer.BuyerWallet.BuyerWalletTransactions.Add(new()
                                 {
@@ -100,6 +99,7 @@ namespace Vouchee.Business.Services.Impls
                                     CreateDate = DateTime.Now,
                                     Status = WalletTransactionStatusEnum.DONE.ToString(),
                                     Amount = existedOrder.Buyer.BuyerWallet.Balance,
+                                    OrderId = existedOrder.Id
                                 });
                             }
 
