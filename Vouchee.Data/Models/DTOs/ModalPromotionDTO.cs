@@ -36,6 +36,12 @@ namespace Vouchee.Data.Models.DTOs
 
     }
 
+    public class CartModalPromotionDTO : ModalPromotionDTO
+    {
+        public bool isAppliable { get; set; } = false;
+        public string? note { get; set; }
+    }
+
     public class GetDetailModalPromotionDTO : ModalPromotionDTO
     {
         public GetDetailModalPromotionDTO()

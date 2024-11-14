@@ -16,7 +16,7 @@ namespace Vouchee.Business.Services
 
         // READ
         public Task<GetDetailModalPromotionDTO> GetModalPromotionById(Guid id);
-        public Task<IList<GetDetailModalPromotionDTO>> GetModalPromotionBySeller(ThisUserObj thisUserObj);
+        public Task<IList<GetDetailModalPromotionDTO>> GetModalPromotionBySeller(Guid sellerId);
 
         // UPDATE
         

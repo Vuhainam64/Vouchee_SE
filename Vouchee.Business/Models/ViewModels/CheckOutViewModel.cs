@@ -8,7 +8,12 @@ namespace Vouchee.Business.Models.ViewModels
 {
     public class CheckOutViewModel
     {
-        public Item? item_brief { get; set; }
+        public CheckOutViewModel()
+        {
+            item_brief = [];
+        }
+
+        public IList<Item>? item_brief { get; set; }
         public int use_VPoint { get; set; }
         public int use_balance { get; set; }
         public string? gift_email { get; set; }

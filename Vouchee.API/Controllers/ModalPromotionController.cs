@@ -49,7 +49,7 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            var modalPromotion = await _modalPromotionService.GetModalPromotionBySeller(currentUser);
+            var modalPromotion = await _modalPromotionService.GetModalPromotionBySeller(currentUser.userId);
             return Ok(modalPromotion);
         }
     }

@@ -44,15 +44,19 @@ namespace Vouchee.Data.Models.DTOs
     {
         public Guid? id { get; set; }
         public Guid? voucherId { get; set; }
-        public Guid? promotionId { get; set; }
+        public Guid? shopPromotionId { get; set; }
+        public Guid? modalPromotionId { get; set; }
         public Guid? brandId { get; set; }
         public string? brandName { get; set; }
         public string? brandImage { get; set; }
         public string? title { get; set; }
         public int? originalPrice { get; set; }
         public int? sellPrice { get; set; }
-        public int? salePrice => sellPrice - (sellPrice * (shopDiscount / 100));
-        public int? shopDiscount { get; set; }
+        public int? shopDiscount { get; set; } = 0;
+        public int? modalDiscountPercent { get; set; } = 0;
+        public int? modalDiscountMoney { get; set; } = 0;
+        public int? discountPrice => (sellPrice * shopDiscount / 100) + (sellPrice * modalDiscountPercent / 100) + modalDiscountMoney;
+        public int? salePrice => sellPrice - discountPrice;
         public string? image { get; set; }
         public int? index { get; set; }
         public DateOnly? startDate { get; set; }
@@ -81,8 +85,8 @@ namespace Vouchee.Data.Models.DTOs
     {
         public int quantity { get; set; }
 
-        public int? totalPrice => quantity * sellPrice;
-        public int? discountPrice { get; set; } = 0;
-        public int? finalPrice => totalPrice - discountPrice;
+        public int? totalUnitPrice => quantity * sellPrice;
+        public int? totalDiscountPrice => quantity * discountPrice;
+        public int? totalFinalPrice => totalUnitPrice - totalDiscountPrice;
     }
 }

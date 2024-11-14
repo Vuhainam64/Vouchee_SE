@@ -82,12 +82,17 @@ namespace Vouchee.Business.Services.Impls
             return _mapper.Map<GetDetailModalPromotionDTO>(existedModal);
         }
 
-        public async Task<IList<GetDetailModalPromotionDTO>> GetModalPromotionBySeller(ThisUserObj thisUserObj)
+        public async Task<IList<GetDetailModalPromotionDTO>> GetModalPromotionBySeller(Guid sellerId)
         {
             IQueryable<GetDetailModalPromotionDTO> result;
             try
             {
-                result = _modalPromotionRepository.GetTable().ProjectTo<GetDetailModalPromotionDTO>(_mapper.ConfigurationProvider);
+                DateTime currentDate = DateTime.Now;
+
+                result = _modalPromotionRepository.GetTable()
+                                                  .Where(mp => mp.Modals.Any(modal => modal.Voucher.SellerId == sellerId))
+                                                  .Where(x => x.StartDate <= currentDate && currentDate <= x.EndDate)
+                                                  .ProjectTo<GetDetailModalPromotionDTO>(_mapper.ConfigurationProvider);
             }
             catch (Exception ex)
             {

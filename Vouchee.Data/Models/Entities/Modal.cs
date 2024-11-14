@@ -25,11 +25,8 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<VoucherCode> VoucherCodes { get; set; }
         [InverseProperty(nameof(OrderDetail.Modal))]
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
-
-        public Guid? ModalPromotionId { get; set; }
-        [ForeignKey(nameof(ModalPromotionId))]
         [InverseProperty(nameof(ModalPromotion.Modals))]
-        public required virtual ModalPromotion ModalPromotion { get; set; }
+        public required virtual ICollection<ModalPromotion> ModalPromotions { get; set; }
 
         public Guid VoucherId { get; set; }
         [ForeignKey(nameof(VoucherId))]

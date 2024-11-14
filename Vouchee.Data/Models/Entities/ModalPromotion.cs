@@ -19,7 +19,7 @@ namespace Vouchee.Data.Models.Entities
 
         [InverseProperty(nameof(OrderDetail.ModalPromotion))]
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
-        [InverseProperty(nameof(Modal.ModalPromotion))]
+        [InverseProperty(nameof(Modal.ModalPromotions))]
         public virtual ICollection<Modal> Modals { get; set; }
 
         [Key]

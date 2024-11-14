@@ -24,6 +24,9 @@ namespace Vouchee.Business.Services.Impls
 {
     public class CartService : ICartService
     {
+        private readonly IModalPromotionService _modalPromotionService;
+
+        private readonly IBaseRepository<ModalPromotion> _modalPromotoinRepository;
         private readonly IBaseRepository<Modal> _modalRepository;
         private readonly IBaseRepository<Voucher> _voucherRepository;
         private readonly IBaseRepository<User> _userRepository;
@@ -32,11 +35,15 @@ namespace Vouchee.Business.Services.Impls
         private User? _user;
         private CartDTO? _cartDTO;
 
-        public CartService(IBaseRepository<Modal> modalRepository,
-                            IBaseRepository<Voucher> voucherRepository,
-                            IBaseRepository<User> userRepository, 
-                            IMapper mapper)
+        public CartService(IModalPromotionService modalPromotionService,
+                           IBaseRepository<ModalPromotion> modalPromotoinRepository,
+                           IBaseRepository<Modal> modalRepository,
+                           IBaseRepository<Voucher> voucherRepository,
+                           IBaseRepository<User> userRepository,
+                           IMapper mapper)
         {
+            _modalPromotionService = modalPromotionService;
+            _modalPromotoinRepository = modalPromotoinRepository;
             _modalRepository = modalRepository;
             _voucherRepository = voucherRepository;
             _userRepository = userRepository;
@@ -339,34 +346,106 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Giỏ hàng đang trống");
             }
 
-            if (checkOutViewModel.item_brief.modalId.Count == 0)
+            if (checkOutViewModel.item_brief.Count == 0)
             {
                 throw new NotFoundException("Chưa có món hàng nào được chọn trong cart");
             }
 
-            var cartModalIds = _cartDTO.sellers
-                                        .SelectMany(seller => seller.modals)
-                                        .Select(modal => modal.id)
-                                        .ToHashSet();
-            var missingModalIds = checkOutViewModel.item_brief.modalId
-                .Where(inputModalId => !cartModalIds.Contains(inputModalId))
-                .ToList();
+            var selectedModalIds = checkOutViewModel.item_brief
+                                                   .SelectMany(item => item.modalId)
+                                                   .ToList();
 
-            if (missingModalIds.Any())
+            // Filter sellers to only those who have modals matching selectedModalIds
+            _cartDTO.sellers = _cartDTO.sellers
+                                       .Select(seller => new SellerCartDTO
+                                       {
+                                           sellerImage = seller.sellerImage,
+                                           sellerName = seller.sellerName,
+                                           sellerId = seller.sellerId,
+                                           modals = seller.modals
+                                                          .Where(modal => selectedModalIds.Contains((Guid)modal.id))
+                                                          .ToList()
+                                       })
+                                       .Where(seller => seller.modals.Any())
+                                       .ToList();
+
+            foreach (var seller in _cartDTO.sellers)
             {
-                throw new NotFoundException($"Những món hàng này không tồn tại trong cart: {string.Join(", ", missingModalIds)}");
+                var activeModalPromotion = await _modalPromotionService.GetModalPromotionBySeller(seller.sellerId.Value);
+
+                if (activeModalPromotion != null && activeModalPromotion.Any())
+                {
+                    var applicablePromotions = activeModalPromotion
+                        .Where(promotion => promotion.modals
+                            .Any(promoModal => seller.modals.Any(cartModal => cartModal.id == promoModal.id)))
+                        .ToList();
+
+                    seller.promotions = _mapper.Map<IList<CartModalPromotionDTO>>(applicablePromotions);
+
+                    foreach (var promotion in seller.promotions)
+                    {
+                        if (promotion.requiredQuantity != null)
+                        {
+                            int totalQuantity = seller.modals.Sum(x => x.quantity);
+                            if (totalQuantity >= promotion.requiredQuantity)
+                            {
+                                promotion.isAppliable = true;
+                            }
+                            else
+                            {
+                                promotion.isAppliable = false;
+                                promotion.note = $"Bạn cần mua {promotion.requiredQuantity} món đồ để áp dụng mã này";
+                            }
+                        }
+
+                        if (promotion.minMoneyToAppy != null)
+                        {
+                            int totalUnitPrice = seller.modals.Sum(x => x.totalUnitPrice ?? 0);
+                            if (totalUnitPrice >= promotion.minMoneyToAppy)
+                            {
+                                promotion.isAppliable = true;
+                            }
+                            else
+                            {
+                                promotion.isAppliable = false;
+                                promotion.note = $"Bạn cần chi thêm {promotion.minMoneyToAppy - totalUnitPrice} để áp dụng mã này";
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    seller.promotions = new List<CartModalPromotionDTO>();
+                }
             }
 
-            _cartDTO.sellers = _cartDTO.sellers
-                                   .Select(seller => new SellerCartDTO
-                                   {
-                                       sellerImage = seller.sellerImage,
-                                       sellerName = seller.sellerName,
-                                       sellerId = seller.sellerId,
-                                       modals = seller.modals.Where(modal => checkOutViewModel.item_brief.modalId.Contains((Guid) modal.id)).ToList()
-                                   })
-                                   .Where(seller => seller.modals.Any())
-                                   .ToList();
+            foreach (var item in checkOutViewModel.item_brief)
+            {
+                if (item.promotionId != null)
+                {
+                    var existedPromotion = await _modalPromotoinRepository.GetByIdAsync(item.promotionId.Value,
+                                                                                            includeProperties: x => x.Include(x => x.Modals));
+                    if (existedPromotion == null)
+                    {
+                        throw new NotFoundException($"Không tìm thấy promotion với id {item.promotionId}");
+                    }
+
+                    foreach (var seller in _cartDTO.sellers)
+                    {
+                        var applicableModals = seller.modals
+                            .Where(modal => existedPromotion.Modals.Any(promoModal => promoModal.VoucherId == modal.voucherId))
+                            .ToList();
+
+                        foreach (var modal in applicableModals)
+                        {
+                            modal.modalPromotionId = existedPromotion.Id;
+                            modal.modalDiscountPercent = existedPromotion.MoneyDiscount;
+                            modal.modalDiscountPercent = existedPromotion.PercentDiscount;
+                        }
+                    }
+                }
+            }
+
 
             DetailCartDTO detailCartDTO = new()
             {
