@@ -51,8 +51,8 @@ namespace Vouchee.Data.Models.DTOs
         public string? title { get; set; }
         public int? originalPrice { get; set; }
         public int? sellPrice { get; set; }
-        public int? salePrice => sellPrice - (sellPrice * (percentDiscount / 100));
-        public int? percentDiscount { get; set; }
+        public int? salePrice => sellPrice - (sellPrice * (shopDiscount / 100));
+        public int? shopDiscount { get; set; }
         public string? image { get; set; }
         public int? index { get; set; }
         public DateOnly? startDate { get; set; }

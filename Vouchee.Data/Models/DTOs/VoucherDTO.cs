@@ -91,10 +91,10 @@ namespace Vouchee.Business.Models.DTOs
         public DateTime? createDate { get; set; }
         public Guid? sellerId { get; set; }
 
-        public int? percentDiscount = 0;
+        public int? shopDiscount = 0;
         public int? originalPrice { get; set; }
         public int? sellPrice { get; set; }
-        public int? salePrice => sellPrice - ((sellPrice * percentDiscount) / 100);
+        public int? salePrice => sellPrice - ((sellPrice * shopDiscount) / 100);
 
         public string? image { get; set; }
 

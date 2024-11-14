@@ -28,12 +28,12 @@ namespace Vouchee.Business.Services.Impls
     {
         private readonly IBaseRepository<Voucher> _voucherRepository;
         private readonly IFileUploadService _fileUploadService;
-        private readonly IBaseRepository<Promotion> _promotionRepository;
+        private readonly IBaseRepository<ModalPromotion> _promotionRepository;
         private readonly IMapper _mapper;
 
         public PromotionService(IBaseRepository<Voucher> voucherRepository,
                                     IFileUploadService fileUploadService,
-                                    IBaseRepository<Promotion> promotionRepository,
+                                    IBaseRepository<ModalPromotion> promotionRepository,
                                     IMapper mapper)
         {
             _voucherRepository = voucherRepository;
@@ -45,7 +45,7 @@ namespace Vouchee.Business.Services.Impls
         public async Task<Guid?> CreatePromotionAsync(CreatePromotionDTO createPromotionDTO, ThisUserObj thisUserObj)
         {
 
-            var promotion = _mapper.Map<Promotion>(createPromotionDTO);
+            var promotion = _mapper.Map<ModalPromotion>(createPromotionDTO);
 
             promotion.CreateBy = thisUserObj.userId;
 
@@ -53,8 +53,6 @@ namespace Vouchee.Business.Services.Impls
 
             if (createPromotionDTO.image != null && promotionId != null)
             {
-                promotion.Image = await _fileUploadService.UploadImageToFirebase(createPromotionDTO.image, thisUserObj.userId.ToString(), StoragePathEnum.PROMOTION);
-
                 await _promotionRepository.UpdateAsync(promotion);
             }
 
@@ -206,7 +204,7 @@ namespace Vouchee.Business.Services.Impls
             var existedPromotion = await _promotionRepository.GetByIdAsync(id);
             if (existedPromotion != null)
             {
-                var entity = _mapper.Map<Promotion>(updatePromotionDTO);
+                var entity = _mapper.Map<ModalPromotion>(updatePromotionDTO);
                 return await _promotionRepository.UpdateAsync(entity);
             }
             else

@@ -10,10 +10,7 @@ using Vouchee.Data.Helpers;
 
 namespace Vouchee.Data.Models.Entities
 {
-    [Table("Voucher")]
-    [Index(nameof(SupplierId), Name = "IX_Voucher_SupplierId")]
-    [Index(nameof(SellerId), Name = "IX_Voucher_SellerId")]
-    [Index(nameof(BrandId), Name = "IX_Voucher_BrandId")]
+    [Table(nameof(Voucher))]
     public partial class Voucher
     {
         public Voucher()
@@ -32,17 +29,17 @@ namespace Vouchee.Data.Models.Entities
 
         public Guid BrandId { get; set; }
         [ForeignKey(nameof(BrandId))]
-        [InverseProperty("Vouchers")]
+        [InverseProperty(nameof(Brand.Vouchers))]
         public required virtual Brand Brand { get; set; }
 
         public Guid SupplierId { get; set; }
         [ForeignKey(nameof(SupplierId))]
-        [InverseProperty("Vouchers")]
+        [InverseProperty(nameof(Supplier.Vouchers))]
         public required virtual Supplier? Supplier { get; set; }
 
         public Guid SellerId { get; set; }
         [ForeignKey(nameof(SellerId))]
-        [InverseProperty("Vouchers")]
+        [InverseProperty(nameof(Seller.Vouchers))]
         public required virtual User? Seller { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -59,7 +56,7 @@ namespace Vouchee.Data.Models.Entities
         public bool IsActive { get; set; }
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime CreateDate { get; set; }
+        public DateTime? CreateDate { get; set; } = DateTime.Now;
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }

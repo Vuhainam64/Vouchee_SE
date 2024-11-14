@@ -35,8 +35,8 @@ namespace Vouchee.Data.Models.Entities
         public int Balance { get; set; }
 
         public required string Status { get; set; }
-        public required DateTime CreateDate { get; set; }
-        public Guid CreateBy { get; set; }
+        public DateTime? CreateDate { get; set; } = DateTime.Now;
+        public Guid? CreateBy { get; set; }
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
 

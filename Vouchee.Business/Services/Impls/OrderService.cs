@@ -164,7 +164,6 @@ namespace Vouchee.Business.Services.Impls
                                 Status = OrderStatusEnum.PENDING.ToString(),
                                 CreateDate = DateTime.Now,
                                 CreateBy = thisUserObj.userId,
-                                PromotionId = cartModal.promotionId
                             });
                         }
                     }
@@ -365,6 +364,7 @@ namespace Vouchee.Business.Services.Impls
 
                     WalletTransaction walletTransaction = new()
                     {
+                        Type = "AMOUNT_OUT",
                         CreateBy = thisUserObj.userId,
                         CreateDate = DateTime.Now,
                         Status = WalletTransactionStatusEnum.DONE.ToString(),

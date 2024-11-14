@@ -58,7 +58,7 @@ namespace Vouchee.Business.Services.Impls
                                                                     .ThenInclude(voucher => voucher.Voucher.Seller)
                                                             .Include(x => x.Carts)
                                                                 .ThenInclude(cart => cart.Modal)
-                                                                    .ThenInclude(voucher => voucher.Voucher.Seller.Promotions)
+                                                                    .ThenInclude(voucher => voucher.Voucher.Seller.ShopPromotions)
                                                             .Include(x => x.Carts)
                                                                 .ThenInclude(cart => cart.Modal)
                                                                     .ThenInclude(voucher => voucher.Voucher.Brand)
@@ -373,8 +373,6 @@ namespace Vouchee.Business.Services.Impls
                 sellers = _cartDTO.sellers,
                 balance = _cartDTO.balance,
                 buyerId = _cartDTO.buyerId,
-                discountPrice = 0,
-                totalPrice = _cartDTO.sellers.Sum(x => x.modals.Sum(x => x.finalPrice)),
                 giftEmail = checkOutViewModel.gift_email,
                 vPoint = _cartDTO.vPoint,
                 useVPoint = checkOutViewModel.use_VPoint,

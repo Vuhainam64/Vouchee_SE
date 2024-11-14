@@ -9,13 +9,12 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Entities
 {
-    [Table("Media")]
-    [Index(nameof(VoucherId), Name = "IX_Media_VoucherId")]
+    [Table(nameof(Media))]
     public class Media
     {
         public Guid? VoucherId { get; set; }
         [ForeignKey(nameof(VoucherId))]
-        [InverseProperty("Medias")]
+        [InverseProperty(nameof(Voucher.Medias))]
         public virtual Voucher? Voucher { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -27,8 +26,8 @@ namespace Vouchee.Data.Models.Entities
 
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime CreateDate { get; set; }
-        public Guid CreateBy { get; set; }
+        public DateTime? CreateDate { get; set; } = DateTime.Now;
+        public Guid? CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }

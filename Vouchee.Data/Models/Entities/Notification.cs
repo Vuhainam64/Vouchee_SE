@@ -9,9 +9,7 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Entities
 {
-    [Table("Notification")]
-    [Index(nameof(SenderId), Name = "IX_Notification_SenderId")]
-    [Index(nameof(ReceiverId), Name = "IX_Notification_ReceiverId")]
+    [Table(nameof(Notification))]
     public class Notification
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -34,8 +32,8 @@ namespace Vouchee.Data.Models.Entities
 
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime CreateDate { get; set; }
-        public Guid CreateBy { get; set; }
+        public DateTime? CreateDate { get; set; } = DateTime.Now;
+        public Guid? CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }

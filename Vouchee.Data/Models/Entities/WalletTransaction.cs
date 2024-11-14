@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Entities
 {
-    [Table("WalletTransaction")]
+    [Table(nameof(WalletTransaction))]
     public class WalletTransaction
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -18,7 +18,7 @@ namespace Vouchee.Data.Models.Entities
 
         public Guid? OrderId { get; set; }
         [ForeignKey(nameof(OrderId))]
-        [InverseProperty("WalletTransaction")]
+        [InverseProperty(nameof(Order.WalletTransaction))]
         public virtual Order? Order { get; set; }
 
         public Guid? SellerWalletId { get; set; }
@@ -41,14 +41,14 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty(nameof(PartnerTransaction.WalletTransactions))]
         public virtual PartnerTransaction? PartnerTransaction { get; set; }
 
-        public bool Type { get; set; }
+        public required string Type { get; set; }
         public int BeforeBalance { get; set; }
         public int Amount { get; set; }
         public int AfterBalance { get; set; }
 
         public required string Status { get; set; }
-        public required DateTime CreateDate { get; set; }
-        public required Guid CreateBy { get; set; }
+        public DateTime? CreateDate { get; set; } = DateTime.Now;
+        public Guid? CreateBy { get; set; }
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
     }

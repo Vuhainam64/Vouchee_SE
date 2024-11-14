@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Entities
 {
-    [Table("PartnerTransaction")]
+    [Table(nameof(PartnerTransaction))]
     public class PartnerTransaction
     {
         public PartnerTransaction()
@@ -39,6 +39,6 @@ namespace Vouchee.Data.Models.Entities
         public string? Description { get; set; }
         public string? PartnerName { get; set; }
         public int? PartnerTransactionId { get; set; }
-        public required DateTime CreatedAt { get; set; }
+        public DateTime? CreateDate { get; set; } = DateTime.Now;
     }
 }

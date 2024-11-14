@@ -22,6 +22,6 @@ namespace Vouchee.Business.Models.ViewModels
         }
 
         public IList<Guid> modalId { get; set; }
-        public Guid? voucherId { get; set; }
+        public Guid? promotionId { get; set; }
     }
 }

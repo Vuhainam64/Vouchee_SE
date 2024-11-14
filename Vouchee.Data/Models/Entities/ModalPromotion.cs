@@ -8,40 +8,31 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Entities
 {
-    [Table("Promotion")]
-    public partial class Promotion
+    [Table(nameof(ModalPromotion))]
+    public partial class ModalPromotion
     {
-        public Promotion()
+        public ModalPromotion()
         {
-            Orders = [];
             OrderDetails = [];
             Modals = [];
         }
 
-        [InverseProperty(nameof(Modal.Promotions))]
-        public virtual ICollection<Modal> Modals { get; set; }
-        [InverseProperty(nameof(Order.Promotion))]
-        public virtual ICollection<Order> Orders { get; set; }
-        [InverseProperty(nameof(OrderDetail.Promotion))]
+        [InverseProperty(nameof(OrderDetail.ModalPromotion))]
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
-
-        public Guid? SellerId { get; set; }
-        [ForeignKey(nameof(SellerId))]
-        [InverseProperty(nameof(Seller.Promotions))]
-        public required virtual User? Seller { get; set; }
+        [InverseProperty(nameof(Modal.ModalPromotion))]
+        public virtual ICollection<Modal> Modals { get; set; }
 
         [Key]
         public Guid Id { get; set; }
 
         public required string Name { get; set; }
         public string? Description { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime? StartDate { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime? EndDate { get; set; }
         public int? Stock { get; set; }
         public string? Code { get; set; }
-        public required string Type { get; set; }
-        public string? Policy { get; set; }
-        public string? Image { get; set; }
         public int? PercentDiscount { get; set; }
         public int? MoneyDiscount { get; set; }
         public int? MaxMoneyToDiscount { get; set; }
@@ -50,8 +41,8 @@ namespace Vouchee.Data.Models.Entities
 
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public required DateTime CreateDate { get; set; }
-        public required Guid CreateBy { get; set; }
+        public DateTime? CreateDate { get; set; } = DateTime.Now;
+        public Guid? CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }

@@ -30,7 +30,7 @@ namespace Vouchee.Business.Services.Impls
         private readonly IBaseRepository<Media> _mediaRepository;
         private readonly IBaseRepository<Supplier> _supplierRepository;
         private readonly IBaseRepository<Brand> _brandReposiroty;
-        private readonly IBaseRepository<Promotion> _promotionRepository;
+        private readonly IBaseRepository<ModalPromotion> _promotionRepository;
         private readonly IBaseRepository<Category> _categoryRepository;
         private readonly IFileUploadService _fileUploadService;
         private readonly IBaseRepository<Voucher> _voucherRepository;
@@ -41,7 +41,7 @@ namespace Vouchee.Business.Services.Impls
                                 IBaseRepository<Media> mediaRepository,
                                 IBaseRepository<Supplier> supplierRepository,
                                 IBaseRepository<Brand> brandReposiroty,
-                                IBaseRepository<Promotion> promotionRepository,
+                                IBaseRepository<ModalPromotion> promotionRepository,
                                 IBaseRepository<Category> categoryRepository,
                                 IFileUploadService fileUploadService,
                                 IBaseRepository<Voucher> voucherRepository,
@@ -178,7 +178,7 @@ namespace Vouchee.Business.Services.Impls
                                                                 .Include(x => x.Categories)
                                                                     .ThenInclude(x => x.VoucherType)
                                                                 .Include(x => x.Seller)
-                                                                    .ThenInclude(x => x.Promotions)
+                                                                    .ThenInclude(x => x.ShopPromotions)
                                                                 .Include(x => x.Modals)
                                                                     .ThenInclude(x => x.VoucherCodes)
                                                                 .Include(x => x.Medias));
@@ -360,11 +360,11 @@ namespace Vouchee.Business.Services.Impls
         {
             var result = _voucherRepository.GetTable()
                     .Include(x => x.Seller)
-                        .ThenInclude(x => x.Promotions)
+                        .ThenInclude(x => x.ShopPromotions)
                     .OrderByDescending(v => v.CreateDate)
                     .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
-                    //.Where(x => x.stock > 0 && x.status == VoucherStatusEnum.NONE.ToString() && x.isActive == true && x.percentDiscount != null)
-                    .OrderByDescending(x => x.percentDiscount);
+                    .Where(x => x.stock > 0 && x.status == VoucherStatusEnum.NONE.ToString() && x.isActive == true && x.shopDiscount != null)
+                    .OrderByDescending(x => x.shopDiscount);
 
             return await result.ToListAsync();
         }
