@@ -48,6 +48,7 @@ namespace Vouchee.Business.Services.Impls
             topUpRequest.CreateBy = thisUserObj.userId;
             topUpRequest.WalletTransaction = new()
             {
+                Type = "AMOUNT_IN",
                 CreateBy = thisUserObj.userId,
                 CreateDate = DateTime.Now,
                 Status = WalletTransactionStatusEnum.PENDING.ToString(),
@@ -120,7 +121,6 @@ namespace Vouchee.Business.Services.Impls
             }
 
             existedTopUpRequest.Status = partnerTransactionId != Guid.Empty ? TopUpRequestStatusEnum.DONE.ToString() : TopUpRequestStatusEnum.ERROR.ToString();
-            existedTopUpRequest.Description = partnerTransactionId != Guid.Empty ? "Nạp ví thành công" : "Nạp ví thất bại";
             existedTopUpRequest.UpdateDate = DateTime.Now;
             existedTopUpRequest.UpdateBy = currentUser.userId;
             existedTopUpRequest.WalletTransaction.UpdateDate = DateTime.Now;

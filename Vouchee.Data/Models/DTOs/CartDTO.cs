@@ -26,11 +26,11 @@ namespace Vouchee.Data.Models.DTOs
 
     public class DetailCartDTO : CartDTO
     {
-        public int? totalPrice { get; set; } = 0;
-        public int? discountPrice { get; set; } = 0;
+        public int? totalPrice => sellers.Sum(x => x.modals.Sum(x => x.totalUnitPrice));
+        public int? shopDiscountPrice => sellers.Sum(x => x.modals.Sum(x => x.totalDiscountPrice));
         public int? useVPoint { get; set;} = 0;
         public int? useBalance { get; set; } = 0;
-        public int? finalPrice => totalPrice - discountPrice - useVPoint - useBalance;
+        public int? finalPrice => totalPrice - shopDiscountPrice - useVPoint - useBalance;
         public int? vPointUp => finalPrice / 1000;
         public string? giftEmail { get; set; }
     }
@@ -39,6 +39,7 @@ namespace Vouchee.Data.Models.DTOs
     {
         public SellerCartDTO()
         {
+            promotions = [];
             modals = [];
         }
 
@@ -46,6 +47,7 @@ namespace Vouchee.Data.Models.DTOs
         public string? sellerName { get; set; }
         public string? sellerImage { get; set; }
 
+        public virtual ICollection<CartModalPromotionDTO> promotions { get; set; }
         public virtual ICollection<CartModalDTO> modals { get; set; }
     }
 }

@@ -9,8 +9,7 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Entities
 {
-    [Table("Modal")]
-    [Index(nameof(VoucherId), Name = "IX_Modal_VoucherId")]
+    [Table(nameof(Modal))]
     public class Modal
     {
         public Modal()
@@ -18,7 +17,6 @@ namespace Vouchee.Data.Models.Entities
             Carts = [];
             VoucherCodes = [];
             OrderDetails = [];
-            Promotions = [];
         }
 
         [InverseProperty(nameof(Cart.Modal))]
@@ -27,12 +25,12 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<VoucherCode> VoucherCodes { get; set; }
         [InverseProperty(nameof(OrderDetail.Modal))]
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
-        [InverseProperty(nameof(Promotion.Modals))]
-        public virtual ICollection<Promotion> Promotions { get; set; }
+        [InverseProperty(nameof(ModalPromotion.Modals))]
+        public required virtual ICollection<ModalPromotion> ModalPromotions { get; set; }
 
         public Guid VoucherId { get; set; }
         [ForeignKey(nameof(VoucherId))]
-        [InverseProperty("Modals")]
+        [InverseProperty(nameof(Voucher.Modals))]
         public required virtual Voucher Voucher { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -51,8 +49,8 @@ namespace Vouchee.Data.Models.Entities
         public bool IsActive { get; set; }
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime CreateDate { get; set; }
-        public Guid CreateBy { get; set; }
+        public DateTime? CreateDate { get; set; } = DateTime.Now;
+        public Guid? CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }

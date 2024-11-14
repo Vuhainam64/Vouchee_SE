@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vouchee.Data.Helpers;
 
@@ -11,9 +12,11 @@ using Vouchee.Data.Helpers;
 namespace Vouchee.Data.Migrations
 {
     [DbContext(typeof(VoucheeContext))]
-    partial class VoucheeContextModelSnapshot : ModelSnapshot
+    [Migration("20241114175022_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,21 +53,6 @@ namespace Vouchee.Data.Migrations
                     b.HasIndex("VouchersId");
 
                     b.ToTable("CategoryVoucher");
-                });
-
-            modelBuilder.Entity("ModalModalPromotion", b =>
-                {
-                    b.Property<Guid>("ModalPromotionsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ModalsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ModalPromotionsId", "ModalsId");
-
-                    b.HasIndex("ModalsId");
-
-                    b.ToTable("ModalModalPromotion");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Address", b =>
@@ -293,6 +281,9 @@ namespace Vouchee.Data.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<Guid?>("ModalPromotionId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("OriginalPrice")
                         .HasColumnType("int");
 
@@ -324,6 +315,8 @@ namespace Vouchee.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ModalPromotionId");
+
                     b.HasIndex("VoucherId");
 
                     b.ToTable("Modal");
@@ -350,9 +343,6 @@ namespace Vouchee.Data.Migrations
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
 
                     b.Property<int?>("MaxMoneyToDiscount")
                         .HasColumnType("int");
@@ -669,9 +659,6 @@ namespace Vouchee.Data.Migrations
 
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1167,21 +1154,6 @@ namespace Vouchee.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ModalModalPromotion", b =>
-                {
-                    b.HasOne("Vouchee.Data.Models.Entities.ModalPromotion", null)
-                        .WithMany()
-                        .HasForeignKey("ModalPromotionsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Vouchee.Data.Models.Entities.Modal", null)
-                        .WithMany()
-                        .HasForeignKey("ModalsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Cart", b =>
                 {
                     b.HasOne("Vouchee.Data.Models.Entities.User", "Buyer")
@@ -1223,11 +1195,17 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Modal", b =>
                 {
+                    b.HasOne("Vouchee.Data.Models.Entities.ModalPromotion", "ModalPromotion")
+                        .WithMany("Modals")
+                        .HasForeignKey("ModalPromotionId");
+
                     b.HasOne("Vouchee.Data.Models.Entities.Voucher", "Voucher")
                         .WithMany("Modals")
                         .HasForeignKey("VoucherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ModalPromotion");
 
                     b.Navigation("Voucher");
                 });
@@ -1437,6 +1415,8 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.ModalPromotion", b =>
                 {
+                    b.Navigation("Modals");
+
                     b.Navigation("OrderDetails");
                 });
 

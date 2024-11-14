@@ -10,36 +10,29 @@ using Vouchee.Data.Helpers;
 
 namespace Vouchee.Data.Models.Entities
 {
-    [Table("Order")]
-    [Index(nameof(CreateBy), Name = "IX_Order_UserId")]
-    [Index(nameof(PromotionId), Name = "IX_Order_PromotionId")]
+    [Table(nameof(Order))]
     public partial class Order
     {
         public Order()
         {
+            WalletTransactions = [];
             OrderDetails = [];
         }
 
         [InverseProperty(nameof(OrderDetail.Order))]
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
+        [InverseProperty(nameof(WalletTransaction.Order))]
+        public virtual ICollection<WalletTransaction> WalletTransactions { get; set; }
 
         public Guid CreateBy { get; set; }
         [ForeignKey(nameof(CreateBy))]
         [InverseProperty(nameof(Buyer.Orders))]
         public virtual User? Buyer { get; set; }
 
-        public Guid? PromotionId { get; set; }
-        [ForeignKey(nameof(PromotionId))]
-        [InverseProperty(nameof(Promotion.Orders))]
-        public virtual Promotion? Promotion { get; set; }
-
         public Guid? PartnerTransactionId { get; set; }
         [ForeignKey(nameof(PartnerTransactionId))]
         [InverseProperty(nameof(PartnerTransaction.Orders))]
         public virtual PartnerTransaction? PartnerTransaction { get; set; }
-
-        [InverseProperty(nameof(WalletTransaction.Order))]
-        public virtual WalletTransaction? WalletTransaction { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
@@ -56,7 +49,7 @@ namespace Vouchee.Data.Models.Entities
 
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime CreateDate { get; set; }
+        public DateTime? CreateDate { get; set; } = DateTime.Now;
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }

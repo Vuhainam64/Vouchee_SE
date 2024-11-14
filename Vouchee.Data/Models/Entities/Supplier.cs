@@ -9,8 +9,7 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Entities
 {
-    [Table("Supplier")]
-    [Index(nameof(UserId), Name = "IX_Supplier_UserId")]
+    [Table(nameof(Supplier))]
     public partial class Supplier
     {
         public Supplier()
@@ -23,7 +22,7 @@ namespace Vouchee.Data.Models.Entities
 
         public Guid? UserId { get; set; }
         [ForeignKey(nameof(UserId))]
-        [InverseProperty("Supplier")]
+        [InverseProperty(nameof(User.Supplier))]
         public required virtual User? User { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -37,8 +36,8 @@ namespace Vouchee.Data.Models.Entities
 
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime CreateDate { get; set; }
-        public Guid CreateBy { get; set; }
+        public DateTime? CreateDate { get; set; } = DateTime.Now;
+        public Guid? CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }

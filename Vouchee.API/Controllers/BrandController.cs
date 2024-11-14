@@ -32,24 +32,24 @@ namespace Vouchee.API.Controllers
         }
 
         // CREATE
-        [HttpPost("create_new_brand")]
-        [Authorize]
-        public async Task<IActionResult> CreateBrand([FromForm] CreateBrandDTO createBrandDTO)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+        //[HttpPost("create_new_brand")]
+        //[Authorize]
+        //public async Task<IActionResult> CreateBrand([FromForm] CreateBrandDTO createBrandDTO)
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            if (currentUser.roleId.Equals(currentUser.adminRoleId))
-            {
-                var result = await _brandService.CreateBrandAsync(createBrandDTO, currentUser);
-                return Ok(result);
-            }
+        //    if (currentUser.roleId.Equals(currentUser.adminRoleId))
+        //    {
+        //        var result = await _brandService.CreateBrandAsync(createBrandDTO, currentUser);
+        //        return Ok(result);
+        //    }
 
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                code = HttpStatusCode.Forbidden,
-                message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
-            });
-        }
+        //    return StatusCode((int)HttpStatusCode.Forbidden, new
+        //    {
+        //        code = HttpStatusCode.Forbidden,
+        //        message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
+        //    });
+        //}
 
         // READ
         [HttpGet("get_all_brand")]
@@ -72,51 +72,53 @@ namespace Vouchee.API.Controllers
             }
             return Ok(brand);
         }
-        [HttpGet("get_brand_by_name")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetBrandsbyname(string name)
-        {
-            var result = await _brandService.GetBrandsbynameAsync(name);
-            return Ok(result);
-        }
-        // UPDATE
-        [HttpPut("update_brand/{id}")]
-        [Authorize]
-        public async Task<IActionResult> UpdateBrand(Guid id, [FromBody] UpdateBrandDTO updateBrandDTO)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            if (currentUser.roleId.Equals(currentUser.adminRoleId))
-            {
-                var result = await _brandService.UpdateBrandAsync(id, updateBrandDTO);
-                return Ok(result);
-            }
+        //[HttpGet("get_brand_by_name")]
+        //[AllowAnonymous]
+        //public async Task<IActionResult> GetBrandsbyname(string name)
+        //{
+        //    var result = await _brandService.GetBrandsbynameAsync(name);
+        //    return Ok(result);
+        //}
 
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                code = HttpStatusCode.Forbidden,
-                message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
-            });
-        }
+        //// UPDATE
+        //[HttpPut("update_brand/{id}")]
+        //[Authorize]
+        //public async Task<IActionResult> UpdateBrand(Guid id, [FromBody] UpdateBrandDTO updateBrandDTO)
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+
+        //    if (currentUser.roleId.Equals(currentUser.adminRoleId))
+        //    {
+        //        var result = await _brandService.UpdateBrandAsync(id, updateBrandDTO);
+        //        return Ok(result);
+        //    }
+
+        //    return StatusCode((int)HttpStatusCode.Forbidden, new
+        //    {
+        //        code = HttpStatusCode.Forbidden,
+        //        message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
+        //    });
+        //}
 
         // DELETE
-        [HttpDelete("delete_brand/{id}")]
-        [Authorize]
-        public async Task<IActionResult> DeleteBrand(Guid id)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+        //[HttpDelete("delete_brand/{id}")]
+        //[Authorize]
+        //public async Task<IActionResult> DeleteBrand(Guid id)
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            if (currentUser.roleId.Equals(currentUser.adminRoleId))
-            {
-                var result = await _brandService.DeleteBrandAsync(id);
-                return Ok(result);
-            }
+        //    if (currentUser.roleId.Equals(currentUser.adminRoleId))
+        //    {
+        //        var result = await _brandService.DeleteBrandAsync(id);
+        //        return Ok(result);
+        //    }
 
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                code = HttpStatusCode.Forbidden,
-                message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
-            });
-        }
+        //    return StatusCode((int)HttpStatusCode.Forbidden, new
+        //    {
+        //        code = HttpStatusCode.Forbidden,
+        //        message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
+        //    });
+        //}
     }
 }

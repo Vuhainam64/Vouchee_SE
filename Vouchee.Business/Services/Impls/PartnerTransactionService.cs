@@ -94,7 +94,7 @@ namespace Vouchee.Business.Services.Impls
                                 existedOrder.Buyer.BuyerWallet.Balance -= existedOrder.UsedBalance;
                                 existedOrder.Buyer.BuyerWallet.BuyerWalletTransactions.Add(new()
                                 {
-                                    Type = false,
+                                    Type = "AMOUNT_OUT",
                                     CreateBy = existedOrder.Buyer.Id,
                                     CreateDate = DateTime.Now,
                                     Status = WalletTransactionStatusEnum.DONE.ToString(),
@@ -117,7 +117,7 @@ namespace Vouchee.Business.Services.Impls
                                 existedSeller.SellerWallet.Balance += amount;
                                 existedSeller.SellerWallet.SellerWalletTransactions.Add(new()
                                 {
-                                    Type = true,
+                                    Type = "AMOUNT_IN",
                                     CreateBy = existedOrder.Buyer.Id,
                                     CreateDate = DateTime.Now,
                                     Status = WalletTransactionStatusEnum.DONE.ToString(),

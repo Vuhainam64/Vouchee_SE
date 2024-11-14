@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Entities
 {
-    [Table("TopUpRequest")]
+    [Table(nameof(TopUpRequest))]
     public class TopUpRequest
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -17,13 +17,12 @@ namespace Vouchee.Data.Models.Entities
         public Guid Id { get; set; }
 
         public int Amount { get; set; }
-        public string? Description { get; set; }
 
         public virtual WalletTransaction? WalletTransaction { get; set; }
 
         public required string Status { get; set; }
-        public required DateTime CreateDate { get; set; }
-        public required Guid CreateBy { get; set; }
+        public DateTime? CreateDate { get; set; } = DateTime.Now;
+        public Guid? CreateBy { get; set; }
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
     }

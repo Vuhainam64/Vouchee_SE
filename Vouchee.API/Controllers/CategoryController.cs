@@ -31,24 +31,24 @@ namespace Vouchee.API.Controllers
         }
 
         // CREATE
-        [HttpPost("create_category")]
-        [Authorize]
-        public async Task<IActionResult> CreateCategory(Guid voucherTypeId, [FromForm] CreateCategoryDTO createPromotionDTO)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+        //[HttpPost("create_category")]
+        //[Authorize]
+        //public async Task<IActionResult> CreateCategory(Guid voucherTypeId, [FromForm] CreateCategoryDTO createPromotionDTO)
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            if (currentUser.roleId.Equals(currentUser.adminRoleId))
-            {
-                var result = await _categoryService.CreateCategoryAsync(voucherTypeId, createPromotionDTO, currentUser);
-                return Ok(result);
-            }
+        //    if (currentUser.roleId.Equals(currentUser.adminRoleId))
+        //    {
+        //        var result = await _categoryService.CreateCategoryAsync(voucherTypeId, createPromotionDTO, currentUser);
+        //        return Ok(result);
+        //    }
 
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                code = HttpStatusCode.Forbidden,
-                message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
-            });
-        }
+        //    return StatusCode((int)HttpStatusCode.Forbidden, new
+        //    {
+        //        code = HttpStatusCode.Forbidden,
+        //        message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
+        //    });
+        //}
 
         // READ
         [HttpGet("get_all_category")]
@@ -69,43 +69,43 @@ namespace Vouchee.API.Controllers
         }
 
         // UPDATE
-        [HttpPut("update_category/{id}")]
-        [Authorize]
-        public async Task<IActionResult> UpdateCategory(Guid id, [FromBody] UpdateCategoryDTO updateCategoryDTO)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+        //[HttpPut("update_category/{id}")]
+        //[Authorize]
+        //public async Task<IActionResult> UpdateCategory(Guid id, [FromBody] UpdateCategoryDTO updateCategoryDTO)
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            if (currentUser.roleId.Equals(currentUser.adminRoleId))
-            {
-                var result = await _categoryService.UpdateCategoryAsync(id, updateCategoryDTO);
-                return Ok(result);
-            }
+        //    if (currentUser.roleId.Equals(currentUser.adminRoleId))
+        //    {
+        //        var result = await _categoryService.UpdateCategoryAsync(id, updateCategoryDTO);
+        //        return Ok(result);
+        //    }
 
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                code = HttpStatusCode.Forbidden,
-                message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
-            });
-        }
+        //    return StatusCode((int)HttpStatusCode.Forbidden, new
+        //    {
+        //        code = HttpStatusCode.Forbidden,
+        //        message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
+        //    });
+        //}
 
         // DELETE
-        [HttpDelete("delete_category/{id}")]
-        [Authorize]
-        public async Task<IActionResult> DeleteCategory(Guid id)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+        //[HttpDelete("delete_category/{id}")]
+        //[Authorize]
+        //public async Task<IActionResult> DeleteCategory(Guid id)
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            if (currentUser.roleId.Equals(currentUser.adminRoleId))
-            {
-                var result = await _categoryService.DeleteCategoryAsync(id);
-                return Ok(result);
-            }
+        //    if (currentUser.roleId.Equals(currentUser.adminRoleId))
+        //    {
+        //        var result = await _categoryService.DeleteCategoryAsync(id);
+        //        return Ok(result);
+        //    }
 
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                code = HttpStatusCode.Forbidden,
-                message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
-            });
-        }
+        //    return StatusCode((int)HttpStatusCode.Forbidden, new
+        //    {
+        //        code = HttpStatusCode.Forbidden,
+        //        message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
+        //    });
+        //}
     }
 }

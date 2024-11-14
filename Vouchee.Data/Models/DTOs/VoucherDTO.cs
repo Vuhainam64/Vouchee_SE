@@ -89,12 +89,11 @@ namespace Vouchee.Business.Models.DTOs
         public string? video { get; set; }
         public int stock { get; set; }
         public DateTime? createDate { get; set; }
-        public Guid? sellerId { get; set; }
 
-        public int? percentDiscount { get; set; }
+        public int? shopDiscount = 0;
         public int? originalPrice { get; set; }
         public int? sellPrice { get; set; }
-        public int? salePrice => sellPrice - (sellPrice * (percentDiscount / 100));
+        public int? salePrice => sellPrice - ((sellPrice * shopDiscount) / 100);
 
         public string? image { get; set; }
 
@@ -106,7 +105,7 @@ namespace Vouchee.Business.Models.DTOs
         public string? supplierName { get; set; }
         public string? supplierImage { get; set; }
 
-        public Guid? sellerID { get; set; }
+        public Guid? sellerId { get; set; }
         public string? sellerName { get; set; }
         public string? sellerImage { get; set; }
 

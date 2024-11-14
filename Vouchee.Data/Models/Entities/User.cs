@@ -5,18 +5,18 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Vouchee.Data.Models.Entities
 {
-    [Table("User")]
+    [Table(nameof(User))]
     public partial class User
     {
         public User()
         {
-            Orders = new List<Order>();
-            Vouchers = new List<Voucher>();
-            Carts = new List<Cart>();
-            ReceiverNotifications = new List<Notification>();
-            SenderNotifications = new List<Notification>();
-            WithdrawRequests = new List<WithdrawRequest>();
-            Promotions = [];
+            Orders = [];
+            Vouchers = [];
+            Carts = [];
+            ReceiverNotifications = [];
+            SenderNotifications = [];
+            WithdrawRequests = [];
+            ShopPromotions = [];
         }
 
         public Guid? RoleId { get; set; }
@@ -44,8 +44,8 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<Notification> SenderNotifications { get; set; }
         [InverseProperty(nameof(WithdrawRequest.User))]
         public virtual ICollection<WithdrawRequest> WithdrawRequests { get; set; }
-        [InverseProperty(nameof(Promotion.Seller))]
-        public virtual ICollection<Promotion> Promotions { get; set; }
+        [InverseProperty(nameof(ShopPromotion.Seller))]
+        public virtual ICollection<ShopPromotion> ShopPromotions { get; set; }
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -61,8 +61,8 @@ namespace Vouchee.Data.Models.Entities
         public int ResponsibilityScore { get; set; }
         public int VPoint { get; set; }
         public required string Status { get; set; }
-        public DateTime CreateDate { get; set; }
-        public Guid CreateBy { get; set; }
+        public DateTime? CreateDate { get; set; } = DateTime.Now;
+        public Guid? CreateBy { get; set; }
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
     }

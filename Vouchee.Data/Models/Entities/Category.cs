@@ -9,8 +9,7 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Entities
 {
-    [Table("Category")]
-    [Index(nameof(VoucherTypeId), Name = "IX_Category_VoucherTypeId")]
+    [Table(nameof(Category))]
     public class Category
     {
         public Category()
@@ -20,7 +19,7 @@ namespace Vouchee.Data.Models.Entities
 
         public Guid VoucherTypeId { get; set; }
         [ForeignKey(nameof(VoucherTypeId))]
-        [InverseProperty("Categories")]
+        [InverseProperty(nameof(VoucherType.Categories))]
         public required virtual VoucherType VoucherType { get; set; }
 
         [InverseProperty(nameof(Voucher.Categories))]
@@ -35,8 +34,8 @@ namespace Vouchee.Data.Models.Entities
 
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime CreateDate { get; set; }
-        public Guid CreateBy { get; set; }
+        public DateTime? CreateDate { get; set; } = DateTime.Now;
+        public Guid? CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
