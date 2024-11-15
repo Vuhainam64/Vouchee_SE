@@ -116,7 +116,6 @@ namespace Vouchee.Business.Services.Impls
 
             Order order = new()
             {
-                PaymentType = PayTypeEnum.BANK.ToString(),
                 Status = OrderStatusEnum.PENDING.ToString(),
                 CreateBy = thisUserObj.userId,
                 CreateDate = DateTime.Now,
@@ -181,6 +180,7 @@ namespace Vouchee.Business.Services.Impls
                 //amountSellers[seller.sellerId.Value] = amount.Value;
             }
 
+            order.DiscountPrice = order.OrderDetails.Sum(x => x.DiscountPrice);
             order.TotalPrice = order.OrderDetails.Sum(x => x.TotalPrice);
             order.UsedBalance = checkOutViewModel.use_balance;
             order.UsedVPoint = checkOutViewModel.use_VPoint;
@@ -386,7 +386,6 @@ namespace Vouchee.Business.Services.Impls
                 await _userRepository.SaveChanges();
 
                 existedOrder.Status = partnerTransactionId == Guid.Empty ? OrderStatusEnum.ERROR_AT_TRANSACTION.ToString() : OrderStatusEnum.FINISH_TRANSACTION.ToString();
-                existedOrder.PaymentType = PayTypeEnum.BANK.ToString();
 
                 var result = await _orderRepository.UpdateAsync(existedOrder);
 
