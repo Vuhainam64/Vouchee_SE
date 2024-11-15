@@ -38,10 +38,8 @@ namespace Vouchee.Data.Models.Entities
         [Key]
         public Guid Id { get; set; }
 
-        public required string PaymentType { get; set; }
-        public int DiscountValue { get; set; } = 0;
         public int TotalPrice { get; set; }
-        public int DiscountPrice => TotalPrice * DiscountValue;
+        public int DiscountPrice { get; set; }
         public int UsedVPoint { get; set; }
         public int UsedBalance { get; set; }
         public int FinalPrice => TotalPrice - DiscountPrice - UsedVPoint - UsedBalance;
