@@ -413,10 +413,6 @@ namespace Vouchee.Business.Services.Impls
                         }
                     }
                 }
-                else
-                {
-                    seller.promotions = new List<CartModalPromotionDTO>();
-                }
             }
 
             foreach (var item in checkOutViewModel.item_brief)

@@ -164,6 +164,11 @@ namespace Vouchee.Business.Services.Impls
                                 Status = OrderStatusEnum.PENDING.ToString(),
                                 CreateDate = DateTime.Now,
                                 CreateBy = thisUserObj.userId,
+                                ModalDiscountMoney = (int) cartModal.modalDiscountMoney,
+                                ModalDiscountPercent = (int) cartModal.modalDiscountPercent,
+                                ModalPromotionId = cartModal.modalPromotionId,
+                                ShopDiscountPercent = (int) cartModal.shopDiscount,
+                                ShopPromotionId = cartModal.shopPromotionId,
                             });
                         }
                     }
