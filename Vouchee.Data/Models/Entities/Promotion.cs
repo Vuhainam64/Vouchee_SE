@@ -8,20 +8,25 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Entities
 {
-    [Table(nameof(ShopPromotion))]
-    public class ShopPromotion
+    [Table(nameof(Promotion))]
+    public class Promotion
     {
-        public ShopPromotion()
+        public Promotion()
         {
-            OrderDetails = [];
+            ModalPromotionOrderDetails = [];
+            ShopPromotionOrderDetails = [];
+            Modals = [];
         }
 
         [InverseProperty(nameof(OrderDetail.ShopPromotion))]
-        public virtual ICollection<OrderDetail> OrderDetails { get; set; }
+        public virtual ICollection<OrderDetail> ShopPromotionOrderDetails { get; set; }
+        [InverseProperty(nameof(OrderDetail.ModalPromotion))]
+        public virtual ICollection<OrderDetail> ModalPromotionOrderDetails { get; set; }
+        [InverseProperty(nameof(Modal.Promotions))]
+        public virtual ICollection<Modal> Modals { get; set; }
 
         public Guid? SellerId { get; set; }
         [ForeignKey(nameof(SellerId))]
-        [InverseProperty(nameof(Seller.ShopPromotions))]
         public required virtual User? Seller { get; set; }
 
         [Key]
@@ -35,6 +40,13 @@ namespace Vouchee.Data.Models.Entities
         public DateTime? EndDate { get; set; }
         public string? Image { get; set; }
         public int? PercentDiscount { get; set; }
+        public int? Stock { get; set; }
+        public string? Code { get; set; }
+        public int? MoneyDiscount { get; set; }
+        public int? MaxMoneyToDiscount { get; set; }
+        public int? MinMoneyToAppy { get; set; }
+        public int? RequiredQuantity { get; set; }
+        public string? Type { get; set; }
 
         public bool IsActive { get; set; }
         public required string Status { get; set; }

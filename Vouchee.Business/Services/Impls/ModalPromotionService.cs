@@ -22,15 +22,15 @@ namespace Vouchee.Business.Services.Impls
     public class ModalPromotionService : IModalPromotionService
     {
         private readonly IBaseRepository<Modal> _modalRepository;
-        private readonly IBaseRepository<ModalPromotion> _modalPromotionRepository;
+        private readonly IBaseRepository<Promotion> _promotionRepository;
         private readonly IMapper _mapper;
 
         public ModalPromotionService(IBaseRepository<Modal> modalRepository,
-                                        IBaseRepository<ModalPromotion> modalPromotionRepository, 
+                                        IBaseRepository<Promotion> promotionRepository, 
                                         IMapper mapper)
         {
             _modalRepository = modalRepository;
-            _modalPromotionRepository = modalPromotionRepository;
+            _promotionRepository = promotionRepository;
             _mapper = mapper;
         }
 
@@ -38,7 +38,7 @@ namespace Vouchee.Business.Services.Impls
         {
             try
             {
-                ModalPromotion modalPromotion = _mapper.Map<ModalPromotion>(createModalPromotionDTO);
+                Promotion modalPromotion = _mapper.Map<Promotion>(createModalPromotionDTO);
 
                 foreach (var modalId in createModalPromotionDTO.modal_id)
                 {
@@ -55,7 +55,7 @@ namespace Vouchee.Business.Services.Impls
                     modalPromotion.Modals.Add(existedModal);
                 }
 
-                var modalPromotionId = await _modalPromotionRepository.AddAsync(modalPromotion);
+                var modalPromotionId = await _promotionRepository.AddAsync(modalPromotion);
 
                 return new ResponseMessage<Guid>()
                 {
@@ -72,7 +72,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<GetDetailModalPromotionDTO> GetModalPromotionById(Guid id)
         {
-            var existedModal = await _modalPromotionRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Modals));
+            var existedModal = await _promotionRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Modals));
 
             if (existedModal == null)
             {
@@ -89,7 +89,7 @@ namespace Vouchee.Business.Services.Impls
             {
                 DateTime currentDate = DateTime.Now;
 
-                result = _modalPromotionRepository.GetTable()
+                result = _promotionRepository.GetTable()
                                                   .Where(mp => mp.Modals.Any(modal => modal.Voucher.SellerId == sellerId))
                                                   .Where(x => x.StartDate <= currentDate && currentDate <= x.EndDate)
                                                   .ProjectTo<GetDetailModalPromotionDTO>(_mapper.ConfigurationProvider);

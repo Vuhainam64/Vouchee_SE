@@ -23,11 +23,11 @@ namespace Vouchee.Business.Services.Impls
     public class TopUpRequestService : ITopUpRequestService
     {
         private readonly IBaseRepository<User> _userRepository;
-        private readonly IBaseRepository<TopUpRequest> _topUpRequestRepository;
+        private readonly IBaseRepository<MoneyRequest> _topUpRequestRepository;
         private readonly IMapper _mapper;
 
         public TopUpRequestService(IBaseRepository<User> userRepository,
-                                    IBaseRepository<TopUpRequest> topUpRequestRepository, 
+                                    IBaseRepository<MoneyRequest> topUpRequestRepository, 
                                     IMapper mapper)
         {
             _userRepository = userRepository;
@@ -44,9 +44,9 @@ namespace Vouchee.Business.Services.Impls
                 throw new Exception("User này chưa có ví người mua");
             }
 
-            TopUpRequest topUpRequest = _mapper.Map<TopUpRequest>(createTopUpRequestDTO);
+            MoneyRequest topUpRequest = _mapper.Map<MoneyRequest>(createTopUpRequestDTO);
             topUpRequest.CreateBy = thisUserObj.userId;
-            topUpRequest.WalletTransaction = new()
+            topUpRequest.TopUpWalletTransaction = new()
             {
                 Type = "AMOUNT_IN",
                 CreateBy = thisUserObj.userId,
@@ -67,7 +67,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<GetTopUpRequestDTO> GetTopUpRequestById(Guid id)
         {
-            var existedTopUpRequest = await _topUpRequestRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.WalletTransaction)
+            var existedTopUpRequest = await _topUpRequestRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.TopUpWalletTransaction)
                                                                                                                                 .ThenInclude(x => x.BuyerWallet));
 
             if (existedTopUpRequest == null)
@@ -107,7 +107,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<ResponseMessage<GetSellerWallet>> UpdateTopUpRequest(Guid id, Guid partnerTransactionId ,ThisUserObj currentUser = null)
         {
-            var existedTopUpRequest = await _topUpRequestRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.WalletTransaction)
+            var existedTopUpRequest = await _topUpRequestRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.TopUpWalletTransaction)
                                                                                                                                 .ThenInclude(x => x.BuyerWallet), isTracking: true);
 
             if (existedTopUpRequest == null)
@@ -115,7 +115,7 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Không tìm thấy request này");
             }
 
-            if (existedTopUpRequest.WalletTransaction.BuyerWallet == null)
+            if (existedTopUpRequest.TopUpWalletTransaction.BuyerWallet == null)
             {
                 throw new NotFoundException("Người này chưa có ví người mua");
             }
@@ -123,16 +123,16 @@ namespace Vouchee.Business.Services.Impls
             existedTopUpRequest.Status = partnerTransactionId != Guid.Empty ? TopUpRequestStatusEnum.DONE.ToString() : TopUpRequestStatusEnum.ERROR.ToString();
             existedTopUpRequest.UpdateDate = DateTime.Now;
             existedTopUpRequest.UpdateBy = currentUser.userId;
-            existedTopUpRequest.WalletTransaction.UpdateDate = DateTime.Now;
-            existedTopUpRequest.WalletTransaction.UpdateBy = currentUser.userId; 
+            existedTopUpRequest.TopUpWalletTransaction.UpdateDate = DateTime.Now;
+            existedTopUpRequest.TopUpWalletTransaction.UpdateBy = currentUser.userId; 
 
             if (partnerTransactionId != Guid.Empty)
             {
-                existedTopUpRequest.WalletTransaction.BuyerWallet.Balance += existedTopUpRequest.Amount;
-                existedTopUpRequest.WalletTransaction.Status = TopUpRequestStatusEnum.DONE.ToString();
-                existedTopUpRequest.WalletTransaction.BuyerWallet.UpdateDate = DateTime.Now;
-                existedTopUpRequest.WalletTransaction.BuyerWallet.UpdateBy = currentUser.userId;
-                existedTopUpRequest.WalletTransaction.PartnerTransactionId = partnerTransactionId;
+                existedTopUpRequest.TopUpWalletTransaction.BuyerWallet.Balance += existedTopUpRequest.Amount;
+                existedTopUpRequest.TopUpWalletTransaction.Status = TopUpRequestStatusEnum.DONE.ToString();
+                existedTopUpRequest.TopUpWalletTransaction.BuyerWallet.UpdateDate = DateTime.Now;
+                existedTopUpRequest.TopUpWalletTransaction.BuyerWallet.UpdateBy = currentUser.userId;
+                existedTopUpRequest.TopUpWalletTransaction.PartnerTransactionId = partnerTransactionId;
             }
 
             var result = await _topUpRequestRepository.UpdateAsync(existedTopUpRequest);
@@ -141,7 +141,7 @@ namespace Vouchee.Business.Services.Impls
             {
                 message = $"Cập nhật ví {(partnerTransactionId != Guid.Empty ? "Thành công" : "Thất bại")}",
                 result = partnerTransactionId != Guid.Empty,
-                value = _mapper.Map<GetSellerWallet>(existedTopUpRequest.WalletTransaction.BuyerWallet)
+                value = _mapper.Map<GetSellerWallet>(existedTopUpRequest.TopUpWalletTransaction.BuyerWallet)
             };
         }
     }

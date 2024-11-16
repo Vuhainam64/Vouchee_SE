@@ -15,22 +15,19 @@ namespace Vouchee.API.Controllers
     {
         private readonly IModalPromotionService _modalPromotionService;
         private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
 
         public ModalPromotionController(IModalPromotionService modalPromotionService, 
-                                            IUserService userService, 
-                                            IRoleService roleService)
+                                            IUserService userService)
         {
             _modalPromotionService = modalPromotionService;
             _userService = userService;
-            _roleService = roleService;
         }
 
         [Authorize]
         [HttpPost("create_modal_promotion")]
         public async Task<IActionResult> CreateModalPromotion([FromBody] CreateModalPromotionDTO createModalPromotionDTO)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var modalPromotion = await _modalPromotionService.CreateModalPromotionAsync(createModalPromotionDTO, currentUser);
             return Ok(modalPromotion);
@@ -47,7 +44,7 @@ namespace Vouchee.API.Controllers
         [HttpGet("get_modal_promotion_by_seller")]
         public async Task<IActionResult> GetModalPromotionBySeller()
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var modalPromotion = await _modalPromotionService.GetModalPromotionBySeller(currentUser.userId);
             return Ok(modalPromotion);

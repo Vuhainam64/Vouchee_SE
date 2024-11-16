@@ -16,15 +16,12 @@ namespace Vouchee.API.Controllers
     {
         private readonly IPartnerTransactionService _partnerTransactionService;
         private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
 
         public PartnerTransactionController(IPartnerTransactionService partnerTransactionService, 
-                                                IUserService userService, 
-                                                IRoleService roleService)
+                                                IUserService userService)
         {
             _partnerTransactionService = partnerTransactionService;
             _userService = userService;
-            _roleService = roleService;
         }
 
         [HttpPost("create_partner_transaction")]

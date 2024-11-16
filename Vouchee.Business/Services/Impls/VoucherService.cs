@@ -30,7 +30,7 @@ namespace Vouchee.Business.Services.Impls
         private readonly IBaseRepository<Media> _mediaRepository;
         private readonly IBaseRepository<Supplier> _supplierRepository;
         private readonly IBaseRepository<Brand> _brandReposiroty;
-        private readonly IBaseRepository<ModalPromotion> _promotionRepository;
+        private readonly IBaseRepository<Promotion> _promotionRepository;
         private readonly IBaseRepository<Category> _categoryRepository;
         private readonly IFileUploadService _fileUploadService;
         private readonly IBaseRepository<Voucher> _voucherRepository;
@@ -41,7 +41,7 @@ namespace Vouchee.Business.Services.Impls
                                 IBaseRepository<Media> mediaRepository,
                                 IBaseRepository<Supplier> supplierRepository,
                                 IBaseRepository<Brand> brandReposiroty,
-                                IBaseRepository<ModalPromotion> promotionRepository,
+                                IBaseRepository<Promotion> promotionRepository,
                                 IBaseRepository<Category> categoryRepository,
                                 IFileUploadService fileUploadService,
                                 IBaseRepository<Voucher> voucherRepository,

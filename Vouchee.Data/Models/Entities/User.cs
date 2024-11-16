@@ -15,13 +15,9 @@ namespace Vouchee.Data.Models.Entities
             Carts = [];
             ReceiverNotifications = [];
             SenderNotifications = [];
-            WithdrawRequests = [];
+            MoneyRequests = [];
             ShopPromotions = [];
         }
-
-        public Guid? RoleId { get; set; }
-        [ForeignKey(nameof(RoleId))]
-        public virtual Role? Role { get; set; }
 
         [InverseProperty(nameof(Wallet.Buyer))]
         public virtual Wallet? BuyerWallet { get; set; }
@@ -42,10 +38,10 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<Notification> ReceiverNotifications { get; set; }
         [InverseProperty(nameof(Notification.Sender))]
         public virtual ICollection<Notification> SenderNotifications { get; set; }
-        [InverseProperty(nameof(WithdrawRequest.User))]
-        public virtual ICollection<WithdrawRequest> WithdrawRequests { get; set; }
-        [InverseProperty(nameof(ShopPromotion.Seller))]
-        public virtual ICollection<ShopPromotion> ShopPromotions { get; set; }
+        [InverseProperty(nameof(MoneyRequest.User))]
+        public virtual ICollection<MoneyRequest> MoneyRequests { get; set; }
+        [InverseProperty(nameof(Promotion.Seller))]
+        public virtual ICollection<Promotion> ShopPromotions { get; set; }
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -60,6 +56,9 @@ namespace Vouchee.Data.Models.Entities
         public string? BankAccount { get; set; }
         public int ResponsibilityScore { get; set; }
         public int VPoint { get; set; }
+        public string? Role { get; set; }
+
+        public bool IsActive { get; set; }
         public required string Status { get; set; }
         public DateTime? CreateDate { get; set; } = DateTime.Now;
         public Guid? CreateBy { get; set; }

@@ -16,15 +16,12 @@ namespace Vouchee.API.Controllers
     {
         private readonly IFileUploadService _fileUploadService;
         private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
 
         public FileController(IFileUploadService fileUploadService, 
-                                IUserService userService, 
-                                IRoleService roleService)
+                                IUserService userService)
         {
             _fileUploadService = fileUploadService;
             _userService = userService;
-            _roleService = roleService;
         }
 
         //[HttpPost("upload-image")]

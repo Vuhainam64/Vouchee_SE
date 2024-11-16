@@ -24,6 +24,7 @@ namespace Vouchee.Data.Models.Entities
         public required string Url { get; set; }
         public int Index { get; set; }
 
+        public bool IsActive = true;
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; } = DateTime.Now;

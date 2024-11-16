@@ -47,7 +47,6 @@ namespace Vouchee.Business.Services.Impls
             try
             {
                 result = _walletTransactionRepository.GetTable()
-                            .Where(x => x.SellerWalletId == currentUser.userRoleId)
                             .ProjectTo<GetSellerWalletTransaction>(_mapper.ConfigurationProvider)
                             .DynamicFilter(_mapper.Map<GetSellerWalletTransaction>(walletTransactionFilter))
                             .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);

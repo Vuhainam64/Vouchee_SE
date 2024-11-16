@@ -22,17 +22,14 @@ namespace Vouchee.API.Controllers
         private readonly ICartService _cartService;
         private readonly IUserService _userService;
         private readonly IVoucherService _voucherService;
-        private readonly IRoleService _roleService;
 
         public CartController(ICartService cartService, 
                                 IUserService userService, 
-                                IVoucherService voucherService, 
-                                IRoleService roleService)
+                                IVoucherService voucherService)
         {
             _cartService = cartService;
             _userService = userService;
             _voucherService = voucherService;
-            _roleService = roleService;
         }
 
         // CREATE
@@ -40,7 +37,7 @@ namespace Vouchee.API.Controllers
         [Authorize]
         public async Task<IActionResult> AddItem(Guid modalId, [FromQuery] int quantity)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _cartService.AddItemAsync(modalId, currentUser, quantity);
             return Ok(result);
@@ -50,7 +47,7 @@ namespace Vouchee.API.Controllers
         [HttpPost("checkout")]
         public async Task<IActionResult> CheckOut([FromBody] CheckOutViewModel checkOutViewModel)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _cartService.GetCheckoutCartsAsync(currentUser, checkOutViewModel);
             return Ok(result);
@@ -61,7 +58,7 @@ namespace Vouchee.API.Controllers
         [Authorize]
         public async Task<IActionResult> GetAllItemFromCart()
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _cartService.GetCartsAsync(currentUser, isTracking: false);
             return Ok(result);
@@ -72,7 +69,7 @@ namespace Vouchee.API.Controllers
         [Authorize]
         public async Task<IActionResult> IncreaseQuantity(Guid modalId)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _cartService.IncreaseQuantityAsync(modalId, currentUser);
             return Ok(result);
@@ -81,7 +78,7 @@ namespace Vouchee.API.Controllers
         [HttpPut("decrease_quantity/{modalId}")]
         public async Task<IActionResult> DecreaseQuantity(Guid modalId)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _cartService.DecreaseQuantityAsync(modalId, currentUser);
             return Ok(result);
@@ -90,7 +87,7 @@ namespace Vouchee.API.Controllers
         [HttpPut("update_quantity/{modalId}")]
         public async Task<IActionResult> UpdateQuantity(Guid modalId, int quantity)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _cartService.UpdateQuantityAsync(modalId, quantity, currentUser);
             return Ok(result);
@@ -101,7 +98,7 @@ namespace Vouchee.API.Controllers
         [Authorize]
         public async Task<IActionResult> RemoveItem(Guid modalId)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
             var result = await _cartService.RemoveItemAsync(modalId, currentUser);
             return Ok(result);
         }

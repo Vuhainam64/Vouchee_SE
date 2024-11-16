@@ -29,6 +29,7 @@ namespace Vouchee.Data.Models.Entities
         [Column(TypeName = "decimal(38, 20)")]
         public decimal? Lat { get; set; }
         public bool IsVerfied { get; set; }
+        public bool IsActive = true;
 
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]

@@ -33,8 +33,13 @@ namespace Vouchee.Data.Models.Entities
 
         public Guid? TopUpRequestId { get; set; }
         [ForeignKey(nameof(TopUpRequestId))]
-        [InverseProperty(nameof(TopUpRequest.WalletTransaction))]
-        public virtual TopUpRequest? TopUpRequest { get; set; }
+        [InverseProperty(nameof(MoneyRequest.TopUpWalletTransaction))]
+        public virtual MoneyRequest? TopUpRequest { get; set; }
+
+        public Guid? WithdrawRequestId { get; set; }
+        [ForeignKey(nameof(WithdrawRequestId))]
+        [InverseProperty(nameof(MoneyRequest.WithdrawWalletTransaction))]
+        public virtual MoneyRequest? WithDrawRequest { get; set; }
 
         public Guid? PartnerTransactionId { get; set; }
         [ForeignKey(nameof(PartnerTransactionId))]

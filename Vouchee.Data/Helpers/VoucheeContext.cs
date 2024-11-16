@@ -17,25 +17,22 @@ namespace Vouchee.Data.Helpers
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<OrderDetail> OrderDetails { get; set; }
-        public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<Address> Address { get; set; }
         public virtual DbSet<Supplier> Suppliers { get; set; }
         public virtual DbSet<VoucherType> VoucherTypes { get; set; }
         public virtual DbSet<Voucher> Vouchers { get; set; }
         public virtual DbSet<VoucherCode> VoucherCodes { get; set; }
-        public virtual DbSet<ModalPromotion> ModalPromotions { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Brand> Brands { get; set; }
         public virtual DbSet<Cart> Carts { get; set; }
         public virtual DbSet<Modal> Modals { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
-        public virtual DbSet<TopUpRequest> TopUpRequests { get; set; }
+        public virtual DbSet<MoneyRequest> MoneyRequests { get; set; }
         public virtual DbSet<Wallet> Wallets { get; set; }
         public virtual DbSet<WalletTransaction> WalletTransactions { get; set; }
-        public virtual DbSet<WithdrawRequest> WithdrawRequests { get; set; }
         public virtual DbSet<PartnerTransaction> PartnerTransactions { get; set; }
         public virtual DbSet<Media> Medias { get; set; }
-        public virtual DbSet<ShopPromotion> ShopPromotions { get; set; }
+        public virtual DbSet<Promotion> Promotions { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -54,25 +51,22 @@ namespace Vouchee.Data.Helpers
         {
             modelBuilder.Entity<Order>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<OrderDetail>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
-            modelBuilder.Entity<Role>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Address>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Supplier>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<User>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Voucher>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<VoucherCode>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<VoucherType>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
-            modelBuilder.Entity<ModalPromotion>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
-            modelBuilder.Entity<ShopPromotion>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            modelBuilder.Entity<Promotion>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Category>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Brand>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Media>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Cart>().HasKey(c => new { c.BuyerId, c.ModalId });
             modelBuilder.Entity<Modal>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Notification>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
-            modelBuilder.Entity<TopUpRequest>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            modelBuilder.Entity<MoneyRequest>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Wallet>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<WalletTransaction>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
-            modelBuilder.Entity<WithdrawRequest>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<PartnerTransaction>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
 
             // modelBuilder.Seed();

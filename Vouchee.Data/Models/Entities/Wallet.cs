@@ -14,6 +14,12 @@ namespace Vouchee.Data.Models.Entities
             BuyerWalletTransactions = new List<WalletTransaction>();
         }
 
+        [InverseProperty(nameof(WalletTransaction.SellerWallet))]
+        public virtual ICollection<WalletTransaction> SellerWalletTransactions { get; set; }
+
+        [InverseProperty(nameof(WalletTransaction.BuyerWallet))]
+        public virtual ICollection<WalletTransaction> BuyerWalletTransactions { get; set; }
+
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
@@ -34,16 +40,11 @@ namespace Vouchee.Data.Models.Entities
 
         public int Balance { get; set; }
 
+        public bool IsActive = true;
         public required string Status { get; set; }
         public DateTime? CreateDate { get; set; } = DateTime.Now;
         public Guid? CreateBy { get; set; }
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
-
-        [InverseProperty(nameof(WalletTransaction.SellerWallet))]
-        public virtual ICollection<WalletTransaction> SellerWalletTransactions { get; set; }
-
-        [InverseProperty(nameof(WalletTransaction.BuyerWallet))]
-        public virtual ICollection<WalletTransaction> BuyerWalletTransactions { get; set; }
     }
 }

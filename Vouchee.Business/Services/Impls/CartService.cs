@@ -26,7 +26,7 @@ namespace Vouchee.Business.Services.Impls
     {
         private readonly IModalPromotionService _modalPromotionService;
 
-        private readonly IBaseRepository<ModalPromotion> _modalPromotoinRepository;
+        private readonly IBaseRepository<Promotion> _promotionRepository;
         private readonly IBaseRepository<Modal> _modalRepository;
         private readonly IBaseRepository<Voucher> _voucherRepository;
         private readonly IBaseRepository<User> _userRepository;
@@ -36,14 +36,14 @@ namespace Vouchee.Business.Services.Impls
         private CartDTO? _cartDTO;
 
         public CartService(IModalPromotionService modalPromotionService,
-                           IBaseRepository<ModalPromotion> modalPromotoinRepository,
+                           IBaseRepository<Promotion> promotionRepository,
                            IBaseRepository<Modal> modalRepository,
                            IBaseRepository<Voucher> voucherRepository,
                            IBaseRepository<User> userRepository,
                            IMapper mapper)
         {
             _modalPromotionService = modalPromotionService;
-            _modalPromotoinRepository = modalPromotoinRepository;
+            _promotionRepository = promotionRepository;
             _modalRepository = modalRepository;
             _voucherRepository = voucherRepository;
             _userRepository = userRepository;
@@ -419,7 +419,7 @@ namespace Vouchee.Business.Services.Impls
             {
                 if (item.promotionId != null)
                 {
-                    var existedPromotion = await _modalPromotoinRepository.GetByIdAsync(item.promotionId.Value,
+                    var existedPromotion = await _promotionRepository.GetByIdAsync(item.promotionId.Value,
                                                                                             includeProperties: x => x.Include(x => x.Modals));
                     if (existedPromotion == null)
                     {

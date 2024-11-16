@@ -17,20 +17,18 @@ namespace Vouchee.API.Controllers
     {
         private readonly ITopUpRequestService _topUpRequestService;
         private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
 
-        public TopUpRequestController(ITopUpRequestService topUpRequestService, IUserService userService, IRoleService roleService)
+        public TopUpRequestController(ITopUpRequestService topUpRequestService, IUserService userService)
         {
             _topUpRequestService = topUpRequestService;
             _userService = userService;
-            _roleService = roleService;
         }
 
         [Authorize]
         [HttpPost("create_top_up_request")]
         public async Task<IActionResult> CreateTopUpRequest([FromBody] CreateTopUpRequestDTO createTopUpRequestDTO)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _topUpRequestService.CreateTopUpRequest(createTopUpRequestDTO, currentUser);
             return Ok(result);

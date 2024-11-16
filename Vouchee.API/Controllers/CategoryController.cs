@@ -19,15 +19,12 @@ namespace Vouchee.API.Controllers
     {
         private readonly ICategoryService _categoryService;
         private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
 
         public CategoryController(ICategoryService categoryService,
-                                  IUserService userService,
-                                  IRoleService roleService)
+                                  IUserService userService)
         {
             _categoryService = categoryService;
             _userService = userService;
-            _roleService = roleService;
         }
 
         // CREATE

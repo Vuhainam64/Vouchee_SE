@@ -23,17 +23,14 @@ namespace Vouchee.API.Controllers
         private readonly IBrandService _brandService;
         private readonly IAddressService _addressRepository;
         private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
 
         public AddressController(IBrandService brandService,
                                     IAddressService addressService, 
-                                    IUserService userService, 
-                                    IRoleService roleService)
+                                    IUserService userService)
         {
             _brandService = brandService;
             _addressRepository = addressService;
             _userService = userService;
-            _roleService = roleService;
         }
 
         // CREATE

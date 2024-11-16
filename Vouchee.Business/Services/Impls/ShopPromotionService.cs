@@ -27,10 +27,10 @@ namespace Vouchee.Business.Services.Impls
 {
     public class ShopPromotionService : IShopPromotionService
     {
-        private readonly IBaseRepository<ShopPromotion> _shopPromotionRepository;
+        private readonly IBaseRepository<Promotion> _shopPromotionRepository;
         private readonly IMapper _mapper;
 
-        public ShopPromotionService(IBaseRepository<ShopPromotion> shopPromotionRepository, 
+        public ShopPromotionService(IBaseRepository<Promotion> shopPromotionRepository, 
                                     IMapper mapper)
         {
             _shopPromotionRepository = shopPromotionRepository;
@@ -57,7 +57,7 @@ namespace Vouchee.Business.Services.Impls
                 throw new ConflictException($"Hiện tại có khuyên mãi bị trùng là: {overlappingDetails}");
             }
 
-            var promotion = _mapper.Map<ShopPromotion>(createShopPromotionDto);
+            var promotion = _mapper.Map<Promotion>(createShopPromotionDto);
             promotion.CreateBy = thisUserObj.userId;
             promotion.SellerId = thisUserObj.userId;
 

@@ -21,17 +21,14 @@ namespace Vouchee.API.Controllers
     public class VoucherCodeController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
         private readonly IVoucherCodeService _voucherCodeService;
         private readonly IVoucherService _voucherService;
 
         public VoucherCodeController(IUserService userService,
-                                        IRoleService roleService,
                                         IVoucherCodeService voucherCodeService,
                                         IVoucherService voucherService)
         {
             _userService = userService;
-            _roleService = roleService;
             _voucherCodeService = voucherCodeService;
             _voucherService = voucherService;
         }
@@ -41,7 +38,7 @@ namespace Vouchee.API.Controllers
         [Authorize]
         public async Task<IActionResult> CreateVoucherCode(Guid modalId, [FromBody] IList<CreateVoucherCodeDTO> createVoucherCodeDTOs)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
             var result = await _voucherCodeService.CreateVoucherCodeAsync(modalId, createVoucherCodeDTOs, currentUser);
             return Ok(result);
         }

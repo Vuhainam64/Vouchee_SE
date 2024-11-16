@@ -34,6 +34,7 @@ namespace Vouchee.Data.Models.Entities
         public bool IsVerfied { get; set; }
         public string? Image { get; set; }
 
+        public bool IsActive = true;
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; } = DateTime.Now;

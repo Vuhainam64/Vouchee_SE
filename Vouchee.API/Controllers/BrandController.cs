@@ -20,15 +20,12 @@ namespace Vouchee.API.Controllers
     {
         private readonly IBrandService _brandService;
         private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
 
         public BrandController(IBrandService brandService,
-                               IUserService userService,
-                               IRoleService roleService)
+                               IUserService userService)
         {
             _brandService = brandService;
             _userService = userService;
-            _roleService = roleService;
         }
 
         // CREATE

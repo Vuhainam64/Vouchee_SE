@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Entities
 {
-    [Table("WithdrawRequest")]
-    public class WithdrawRequest
+    [Table(nameof(MoneyRequest))]
+    public class MoneyRequest
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
@@ -17,10 +17,17 @@ namespace Vouchee.Data.Models.Entities
 
         public Guid? UserId { get; set; }
         [ForeignKey(nameof(UserId))]
-        [InverseProperty(nameof(User.WithdrawRequests))]
+        [InverseProperty(nameof(User.MoneyRequests))]
         public virtual User? User { get; set; }
 
         public int Amount { get; set; }
+        public string? Type { get; set; }
+
+        [InverseProperty(nameof(WalletTransaction.TopUpRequest))]
+        public virtual WalletTransaction? TopUpWalletTransaction { get; set; }
+
+        [InverseProperty(nameof(WalletTransaction.WithDrawRequest))]
+        public virtual WalletTransaction? WithdrawWalletTransaction { get; set; }
 
         public required string Status { get; set; }
         public DateTime? CreateDate { get; set; } = DateTime.Now;

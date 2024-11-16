@@ -99,13 +99,6 @@ namespace Vouchee.API.AppStarts
             CreateMap<Order, GetOrderDTO>().ReverseMap();
             CreateMap<GetOrderDTO, OrderFilter>().ReverseMap();
 
-            // ROLE
-            CreateMap<Role, RoleDTO>().ReverseMap();
-            CreateMap<Role, CreateRoleDTO>().ReverseMap();
-            CreateMap<Role, UpdateRoleDTO>().ReverseMap();
-            CreateMap<Role, GetRoleDTO>().ReverseMap();
-            CreateMap<GetRoleDTO, RoleFilter>().ReverseMap();
-
             // ADDRESS
             CreateMap<Address, CreateAddressDTO>().ReverseMap();
             CreateMap<Address, UpdateAddressDTO>().ReverseMap();
@@ -127,9 +120,7 @@ namespace Vouchee.API.AppStarts
             CreateMap<User, UserDTO>().ReverseMap();
             CreateMap<User, CreateUserDTO>().ReverseMap();
             CreateMap<User, UpdateUserDTO>().ReverseMap();
-            CreateMap<User, GetUserDTO>()
-                .ForMember(x => x.roleName, dest => dest.MapFrom(opt => opt.Role.Name))
-                .ReverseMap();
+            CreateMap<User, GetUserDTO>().ReverseMap();
             CreateMap<GetUserDTO, UserFilter>().ReverseMap();
             CreateMap<User, RegisterDTO>().ReverseMap();
 
@@ -210,11 +201,6 @@ namespace Vouchee.API.AppStarts
             CreateMap<Wallet, GetBuyerWallet>().ReverseMap();
             CreateMap<Wallet, GetSellerWallet>().ReverseMap();
 
-            // TOP UP REQUEST
-            CreateMap<TopUpRequest, TopUpRequestDTO>().ReverseMap();
-            CreateMap<TopUpRequest, CreateTopUpRequestDTO>().ReverseMap();
-            CreateMap<TopUpRequest, GetTopUpRequestDTO>().ReverseMap();
-
             // WALLET TRANSACTION
             CreateMap<WalletTransaction, WalletTransactionDTO>().ReverseMap();
             CreateMap<WalletTransaction, GetSellerWalletTransaction>().ReverseMap();
@@ -222,10 +208,9 @@ namespace Vouchee.API.AppStarts
             CreateMap<GetSellerWalletTransaction, WalletTransactionFilter>().ReverseMap();
             CreateMap<GetBuyerWalletTransactionDTO, WalletTransactionFilter>().ReverseMap();
 
-            // TOP UP REQUEST
-            CreateMap<TopUpRequest, TopUpRequestDTO>().ReverseMap();
-            CreateMap<TopUpRequest, GetTopUpRequestDTO>().ReverseMap();
-            CreateMap<GetTopUpRequestDTO, TopUpRequestFilter>().ReverseMap();
+            // MONEY REQUEST
+            CreateMap<MoneyRequest, CreateTopUpRequestDTO>().ReverseMap();
+            CreateMap<MoneyRequest, GetTopUpRequestDTO>().ReverseMap();
 
             // PARTNER TRANSACTION
             CreateMap<PartnerTransaction, SePayTransactionDTO>().ReverseMap();
@@ -234,16 +219,11 @@ namespace Vouchee.API.AppStarts
                 .ReverseMap()
                 .ForMember(src => src.Id, opt => opt.Ignore());
 
-            // SHOP PROMOTION
-            CreateMap<ShopPromotion, CreateShopPromotionDTO>().ReverseMap();
-            CreateMap<ShopPromotion, GetShopPromotionDTO>().ReverseMap();
-            CreateMap<GetShopPromotionDTO, ShopPromotionFilter>().ReverseMap();
-
-            // MODAL PROMOTION
-            CreateMap<ModalPromotion, CreateModalPromotionDTO>().ReverseMap();
-            CreateMap<ModalPromotion, GetModalPromotionDTO>().ReverseMap();
-            CreateMap<ModalPromotion, GetDetailModalPromotionDTO>().ReverseMap();
-            CreateMap<GetDetailModalPromotionDTO, CartModalPromotionDTO>().ReverseMap();
+            // PROMOTION
+            CreateMap<Promotion, CreateShopPromotionDTO>().ReverseMap();
+            CreateMap<Promotion, CreateModalPromotionDTO>().ReverseMap();
+            CreateMap<Promotion, GetShopPromotionDTO>().ReverseMap();
+            CreateMap<Promotion, GetModalPromotionDTO>().ReverseMap();
         }
     }
 }

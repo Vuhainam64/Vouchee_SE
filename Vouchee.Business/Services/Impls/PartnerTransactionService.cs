@@ -20,21 +20,21 @@ namespace Vouchee.Business.Services.Impls
 {
     public class PartnerTransactionService : IPartnerTransactionService
     {
-        private readonly IBaseRepository<TopUpRequest> _topUpRequest;
+        private readonly IBaseRepository<MoneyRequest> _topUpRequestRepository;
         private readonly IBaseRepository<Wallet> _wallerRepository;
         private readonly IBaseRepository<User> _userRepository;
         private readonly IBaseRepository<Order> _orderRepository;
         private readonly IBaseRepository<PartnerTransaction> _partnerTransactionRepository;
         private readonly IMapper _mapper;
 
-        public PartnerTransactionService(IBaseRepository<TopUpRequest> topUpRequest,
+        public PartnerTransactionService(IBaseRepository<MoneyRequest> topUpRequestRepository,
                                          IBaseRepository<Wallet> wallerRepository,
                                          IBaseRepository<User> userRepository,
                                          IBaseRepository<Order> orderRepository,
                                          IBaseRepository<PartnerTransaction> partnerTransactionRepository,
                                          IMapper mapper)
         {
-            _topUpRequest = topUpRequest;
+            _topUpRequestRepository = topUpRequestRepository;
             _wallerRepository = wallerRepository;
             _userRepository = userRepository;
             _orderRepository = orderRepository;
@@ -150,7 +150,7 @@ namespace Vouchee.Business.Services.Impls
                             throw new NotFoundException($"Không tìm thấy mã top up {topUpRequestId} trong content");
                         }
 
-                        var existedTopUpRequest = await _topUpRequest.GetByIdAsync(Guid.Parse(topUpRequestId), includeProperties: x => x.Include(x => x.WalletTransaction)
+                        var existedTopUpRequest = await _topUpRequestRepository.GetByIdAsync(Guid.Parse(topUpRequestId), includeProperties: x => x.Include(x => x.TopUpWalletTransaction)
                                                                                                                                 .ThenInclude(x => x.BuyerWallet), 
                                                                                                                                 isTracking: true);
 
@@ -159,7 +159,7 @@ namespace Vouchee.Business.Services.Impls
                             throw new NotFoundException($"Không tìm thấy top up request của người này");
                         }
 
-                        if (existedTopUpRequest.WalletTransaction != null && existedTopUpRequest.WalletTransaction.BuyerWallet == null)
+                        if (existedTopUpRequest.TopUpWalletTransaction != null && existedTopUpRequest.TopUpWalletTransaction.BuyerWallet == null)
                         {
                             throw new NotFoundException("$Không tìm thấy ví buyer của người này");
                         }
@@ -167,14 +167,14 @@ namespace Vouchee.Business.Services.Impls
                         existedTopUpRequest.Status = WalletTransactionStatusEnum.PAID.ToString();
                         existedTopUpRequest.UpdateDate = DateTime.Now;
 
-                        existedTopUpRequest.WalletTransaction.PartnerTransactionId = partnerTransactionId;
-                        existedTopUpRequest.WalletTransaction.UpdateDate = DateTime.Now;
-                        existedTopUpRequest.WalletTransaction.Status = WalletTransactionStatusEnum.PAID.ToString();
+                        existedTopUpRequest.TopUpWalletTransaction.PartnerTransactionId = partnerTransactionId;
+                        existedTopUpRequest.TopUpWalletTransaction.UpdateDate = DateTime.Now;
+                        existedTopUpRequest.TopUpWalletTransaction.Status = WalletTransactionStatusEnum.PAID.ToString();
 
-                        existedTopUpRequest.WalletTransaction.BuyerWallet.Balance += (int) partnerTransaction.AmountIn;
-                        existedTopUpRequest.WalletTransaction.BuyerWallet.UpdateDate = DateTime.Now;
+                        existedTopUpRequest.TopUpWalletTransaction.BuyerWallet.Balance += (int) partnerTransaction.AmountIn;
+                        existedTopUpRequest.TopUpWalletTransaction.BuyerWallet.UpdateDate = DateTime.Now;
 
-                        await _topUpRequest.SaveChanges();
+                        await _topUpRequestRepository.SaveChanges();
 
                         return new ResponseMessage<Guid>()
                         {

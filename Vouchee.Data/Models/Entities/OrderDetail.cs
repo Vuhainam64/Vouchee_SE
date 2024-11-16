@@ -32,13 +32,13 @@ namespace Vouchee.Data.Models.Entities
 
         public Guid? ModalPromotionId { get; set; }
         [ForeignKey(nameof(ModalPromotionId))]
-        [InverseProperty(nameof(ModalPromotion.OrderDetails))]
-        public virtual ModalPromotion? ModalPromotion { get; set; }
+        [InverseProperty(nameof(ModalPromotion.ModalPromotionOrderDetails))]
+        public virtual Promotion? ModalPromotion { get; set; }
 
         public Guid? ShopPromotionId { get; set; }
         [ForeignKey(nameof(ShopPromotionId))]
-        [InverseProperty(nameof(ShopPromotion.OrderDetails))]
-        public virtual ShopPromotion? ShopPromotion { get; set; }
+        [InverseProperty(nameof(ShopPromotion.ShopPromotionOrderDetails))]
+        public virtual Promotion? ShopPromotion { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
