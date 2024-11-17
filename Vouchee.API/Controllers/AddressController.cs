@@ -99,8 +99,17 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _addresService.VerifyAddressAsync(id, isVerify, currentUser);
-            return Ok(result);
+            if (currentUser.role.Equals(RoleEnum.ADMIN.ToString()))
+            {
+                var result = await _addresService.VerifyAddressAsync(id, isVerify, currentUser);
+                return Ok(result);
+            }
+
+            return StatusCode((int)HttpStatusCode.Forbidden, new
+            {
+                code = HttpStatusCode.Forbidden,
+                message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
+            });
         }
 
         // DELETE
