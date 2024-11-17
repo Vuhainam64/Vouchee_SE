@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
@@ -33,6 +34,10 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<ResponseMessage<Guid>> CreateAddressAsync(Guid brandId,  CreateAddressDTO createAddressDTO, ThisUserObj thisUserObj)
         {
+            Guid? addressId = Guid.Empty;
+
+            var existedAddress = await _addressRepository.GetFirstOrDefaultAsync(x => x.Lon == createAddressDTO.lon && x.Lat == createAddressDTO.lat, isTracking: true);
+
             var existedBrand = await _brandRepository.GetByIdAsync(brandId, isTracking: true);
 
             if (existedBrand == null)
@@ -40,12 +45,20 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Không tìm thấy brand");
             }
 
-            Address address = _mapper.Map<Address>(createAddressDTO);
-            address.CreateBy = thisUserObj.userId;
-            address.IsVerfied = false;
-            address.Brands.Add(existedBrand);
+            if (existedAddress != null)
+            {
+                existedBrand.Addresses.Add(existedAddress);
+                addressId = existedAddress.Id;
+            }
+            else
+            {
+                Address newAddress = _mapper.Map<Address>(createAddressDTO);
+                newAddress.CreateBy = thisUserObj.userId;
+                newAddress.IsVerified = false;
+                newAddress.Brands.Add(existedBrand);
+                addressId = await _addressRepository.AddAsync(newAddress);
+            }
 
-            var addressId = await _addressRepository.AddAsync(address);
             return new ResponseMessage<Guid>()
             {
                 message = "Tạo địa chỉ thành công",
@@ -108,6 +121,37 @@ namespace Vouchee.Business.Services.Impls
                 },
                 results = result.Item2.ToList() // Return the paged voucher list with nearest address and distance
             };
+        }
+
+        public async Task<ResponseMessage<bool>> RemoveAddressFromBrandAsync(Guid addressId, Guid brandId, ThisUserObj thisUserObj)
+        {
+            var existedBrand = await _brandRepository.GetByIdAsync(brandId, includeProperties: x => x.Include(x => x.Addresses), isTracking: true);
+
+            if (existedBrand == null)
+            {
+                throw new NotFoundException("Không tìm thấy brand này");
+            }
+
+            existedBrand.UpdateDate = DateTime.Now;
+            existedBrand.UpdateBy = thisUserObj.userId;
+
+            var existedAddress = existedBrand.Addresses.FirstOrDefault(x => x.Id == addressId);
+            if (existedAddress == null)
+            {
+                throw new NotFoundException("Không tìm thấy địa chỉ trong brand");
+            }
+            else
+            {
+                existedBrand.Addresses.Remove(existedAddress);
+                await _brandRepository.SaveChanges();
+
+                return new ResponseMessage<bool>()
+                {
+                    message = "Xóa địa chỉ khỏi brand thành công",
+                    result = true,
+                    value = true
+                };
+            }
         }
 
         public async Task<bool> UpdateAddressAsync(Guid id, UpdateAddressDTO updateAddressDTO)
@@ -197,7 +241,7 @@ namespace Vouchee.Business.Services.Impls
 
             existedAddress.VerifiedBy = thisUserObj.userId;
             existedAddress.VerifiedDate = DateTime.Now;
-            existedAddress.IsVerfied = isVerify;
+            existedAddress.IsVerified = isVerify;
             existedAddress.UpdateDate = DateTime.Now;
             existedAddress.UpdateBy = thisUserObj.userId;
 

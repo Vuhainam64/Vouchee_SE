@@ -28,7 +28,7 @@ namespace Vouchee.Data.Models.Entities
         public decimal? Lon { get; set; }
         [Column(TypeName = "decimal(38, 20)")]
         public decimal? Lat { get; set; }
-        public bool IsVerfied { get; set; }
+        public bool IsVerified { get; set; }
         public DateTime? VerifiedDate { get; set; }
         public Guid? VerifiedBy { get; set; }
 

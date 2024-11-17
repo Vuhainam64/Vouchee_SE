@@ -23,5 +23,6 @@ namespace Vouchee.Business.Services
 
         // DELETE
         public Task<ResponseMessage<bool>> DeleteAddressAsync(Guid id);
+        public Task<ResponseMessage<bool>> RemoveAddressFromBrandAsync(Guid addressId, Guid brandId, ThisUserObj thisUserObj);
     }
 }

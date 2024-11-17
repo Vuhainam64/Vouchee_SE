@@ -29,6 +29,7 @@ namespace Vouchee.Data.Models.Entities
         public string? Code { get; set; }
         public string? Image { get; set; }
 
+        public bool IsVerified { get; set; }
         public bool IsActive { get; set; }
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]
@@ -37,5 +38,7 @@ namespace Vouchee.Data.Models.Entities
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
+        public DateTime? VerifiedDate {get; set; }
+        public Guid? VerifiedBy { get; set; }
     }
 }

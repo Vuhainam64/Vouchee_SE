@@ -14,29 +14,39 @@ namespace Vouchee.Data.Models.DTOs
 {
     public class CreateBrandDTO
     {
+        public CreateBrandDTO()
+        {
+            addresses = [];
+        }
+
         [Required(ErrorMessage = "Tên là bắt buộc")]
         public string? name { get; set; }
-
-        public string? description { get; set; }
-
-        [Range(0, 100, ErrorMessage = "Phần trăm phải nằm trong khoảng từ 0 đến 100")]
-        public decimal? percentShow { get; set; }
-        public IFormFile? image { get; set; }
-        public string? status = ObjectStatusEnum.ACTIVE.ToString();
+        public string? image { get; set; }
+        public bool? isVerified = false;
+        public ObjectStatusEnum? status = ObjectStatusEnum.NONE;
         public DateTime? createDate = DateTime.Now;
+        public bool? isActive = false;
+
+        public IList<CreateAddressDTO> addresses { get; set; }
     }
 
     public class UpdateBrandDTO
     {
-
+        [Required(ErrorMessage = "Tên là bắt buộc")]
+        public string? name { get; set; }
+        public string? image { get; set; }
+        public DateTime? updateDate = DateTime.Now;
     }
 
-    public class BrandDTO 
+    public class BrandDTO
     {
         public Guid? id { get; set; }
 
-        public string? image { get; set; }
         public string? name { get; set; }
+        public string? image { get; set; }
+        public bool? isVerified { get; set; }
+        public bool? isActive { get; set; }
+        public string? status { get; set; }
     }
 
     public class GetDetalBrandDTO : BrandDTO

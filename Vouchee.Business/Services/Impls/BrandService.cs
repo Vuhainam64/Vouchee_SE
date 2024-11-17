@@ -15,6 +15,7 @@ using Vouchee.Data.Helpers;
 using Vouchee.Data.Helpers.Base;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
+using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Constants.Number;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
@@ -24,79 +25,88 @@ namespace Vouchee.Business.Services.Impls
 {
     public class BrandService : IBrandService
     {
+        private readonly IBaseRepository<Address> _addressRepository;
         private readonly IBaseRepository<Brand> _brandRepository;
         private readonly IFileUploadService _fileUploadService;
         private readonly IMapper _mapper;
 
-        public BrandService(IBaseRepository<Brand> brandRepository,
+        public BrandService(IBaseRepository<Address> addressRepository,
+                                IBaseRepository<Brand> brandRepository,
                                 IFileUploadService fileUploadService, 
                                 IMapper mapper)
         {
+            _addressRepository = addressRepository;
             _brandRepository = brandRepository;
             _fileUploadService = fileUploadService;
             _mapper = mapper;
         }
 
-        public async Task<Guid?> CreateBrandAsync(CreateBrandDTO createBrandDTO, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<Guid>> CreateBrandAsync(CreateBrandDTO createBrandDTO, ThisUserObj thisUserObj)
         {
             var brand = _mapper.Map<Brand>(createBrandDTO);
             brand.CreateBy = thisUserObj.userId;
 
-            var brandId = await _brandRepository.AddAsync(brand);
+            var duplicateAddresses = createBrandDTO.addresses?.GroupBy(a => new { a.lon, a.lat })
+                                                        .Where(g => g.Count() > 1)
+                                                        .Select(g => g.Key)
+                                                        .ToList();
 
-            if (brandId != null && createBrandDTO.image != null)
+            if (duplicateAddresses != null && duplicateAddresses.Any())
             {
-                brand.Image = await _fileUploadService.UploadImageToFirebase(createBrandDTO.image, thisUserObj.userId.ToString(), StoragePathEnum.BRAND);
+                var duplicateCoordinates = string.Join(", ",
+                        duplicateAddresses.Select(d => $"({d.lon}, {d.lat})"));
 
-                await _brandRepository.UpdateAsync(brand);
+                throw new ConflictException($"Tọa độ trùng là {duplicateCoordinates}");
             }
 
-            return brandId;
-        }
+            foreach (var address in createBrandDTO.addresses)
+            {
+                var existedAddress = await _addressRepository.GetFirstOrDefaultAsync(x => x.Lon == address.lon && x.Lat == address.lat, isTracking: true);
+                if (existedAddress != null)
+                {
+                    brand.Addresses.Add(existedAddress);
+                }
+                else
+                {
+                    var newAddess = _mapper.Map<Address>(address);
+                    brand.Addresses.Add(newAddess);
+                }
+            }
 
-        public Task<bool> DeleteBrandAsync(Guid id)
-        {
-            throw new NotImplementedException();
+            var brandId = await _brandRepository.AddAsync(brand);
+
+            return new ResponseMessage<Guid>()
+            {
+                message = "Tạo thương hiệu thành công",
+                result = true,
+                value = (Guid)brandId
+            };
         }
 
         public async Task<GetDetalBrandDTO> GetBrandByIdAsync(Guid id)
         {
-            try
+            var brand = await _brandRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Addresses));
+            if (brand != null)
             {
-                var brand = await _brandRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Addresses));
-                if (brand != null)
-                {
-                    var brandDTO = _mapper.Map<GetDetalBrandDTO>(brand);
-                    return brandDTO;
-                }
-                else
-                {
-                    throw new NotFoundException($"Không tìm thấy brand với id {id}");
-                }
+                var brandDTO = _mapper.Map<GetDetalBrandDTO>(brand);
+                return brandDTO;
             }
-            catch (Exception ex)
+            else
             {
-                LoggerService.Logger(ex.Message);
-                throw new LoadException(ex.Message);
+                throw new NotFoundException($"Không tìm thấy thương hiệu với id {id}");
             }
         }
 
-        public async Task<DynamicResponseModel<GetDetalBrandDTO>> GetBrandsAsync(PagingRequest pagingRequest, BrandFilter brandFilter)
+        public async Task<DynamicResponseModel<GetBrandDTO>> GetBrandsAsync(PagingRequest pagingRequest, BrandFilter brandFilter)
         {
-            (int, IQueryable<GetDetalBrandDTO>) result;
-            try
-            {
-                result = _brandRepository.GetTable()
-                            .ProjectTo<GetDetalBrandDTO>(_mapper.ConfigurationProvider)
-                            .DynamicFilter(_mapper.Map<GetDetalBrandDTO>(brandFilter))
-                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new LoadException(ex.Message);
-            }
-            return new DynamicResponseModel<GetDetalBrandDTO>()
+            (int, IQueryable<GetBrandDTO>) result;
+
+            result = _brandRepository.GetTable()
+                        .ProjectTo<GetBrandDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetBrandDTO>(brandFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            return new DynamicResponseModel<GetBrandDTO>()
             {
                 metaData = new MetaData()
                 {
@@ -104,7 +114,7 @@ namespace Vouchee.Business.Services.Impls
                     size = pagingRequest.pageSize,
                     total = result.Item1 // Total vouchers count for metadata
                 },
-                results = result.Item2.ToList() // Return the paged voucher list with nearest address and distance
+                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
             };
         }
 
@@ -114,12 +124,98 @@ namespace Vouchee.Business.Services.Impls
             result = _brandRepository.GetTable()
                         .Where(b => b.Name.ToLower().Contains(name.ToLower()))
                         .ProjectTo<GetBrandDTO>(_mapper.ConfigurationProvider);
-            return result.ToList();
+            return await result.ToListAsync();
         }
 
-        public Task<bool> UpdateBrandAsync(Guid id, UpdateBrandDTO updateBrandDTO)
+        public async Task<ResponseMessage<bool>> UpdateBrandAsync(Guid id, UpdateBrandDTO updateBrandDTO, ThisUserObj thisUserObj)
         {
-            throw new NotImplementedException();
+            var existedBrand = await _brandRepository.GetByIdAsync(id, isTracking: true);
+
+            if (existedBrand == null)
+            {
+                throw new NotFoundException("Không tìm thấy thương hiệu này");
+            }
+
+            existedBrand = _mapper.Map(updateBrandDTO, existedBrand);
+            existedBrand.UpdateBy = thisUserObj.userId;
+
+            await _brandRepository.UpdateAsync(existedBrand);
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Cập nhật thương hiệu thành công",
+                result = true,
+                value = true
+            };
+        }
+
+        public async Task<ResponseMessage<bool>> UpdateBrandStateAsync(Guid id, bool isActive, ThisUserObj thisUserObj)
+        {
+            var existedBrand = await _brandRepository.GetByIdAsync(id, isTracking: true);
+
+            if (existedBrand == null)
+            {
+                throw new NotFoundException("Không tìm thấy thương hiệu này");
+            }
+
+            existedBrand.UpdateDate = DateTime.Now;
+            existedBrand.UpdateBy = thisUserObj.userId;
+            existedBrand.IsActive = isActive;
+
+            await _brandRepository.UpdateAsync(existedBrand);
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Cập nhật thương hiệu thành công",
+                result = true,
+                value = true
+            };
+        }
+
+        public async Task<ResponseMessage<bool>> UpdateBrandStatusAsync(Guid id, ObjectStatusEnum status, ThisUserObj thisUserObj)
+        {
+            var existedBrand = await _brandRepository.GetByIdAsync(id, isTracking: true);
+
+            if (existedBrand == null)
+            {
+                throw new NotFoundException("Không tìm thấy thương hiệu này");
+            }
+
+            existedBrand.UpdateDate = DateTime.Now;
+            existedBrand.UpdateBy = thisUserObj.userId;
+            existedBrand.Status = status.ToString();
+
+            await _brandRepository.UpdateAsync(existedBrand);
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Cập nhật thương hiệu thành công",
+                result = true,
+                value = true
+            };
+        }
+
+        public async Task<ResponseMessage<bool>> VerifyBrand(Guid id, ThisUserObj thisUserObj)
+        {
+            var existedBrand = await _brandRepository.GetByIdAsync(id, isTracking: true);
+
+            if (existedBrand == null)
+            {
+                throw new NotFoundException("Không tìm thấy thương hiệu này");
+            }
+
+            existedBrand.VerifiedBy = thisUserObj.userId;
+            existedBrand.VerifiedDate = DateTime.Now;
+            existedBrand.IsVerified = true;
+
+            await _brandRepository.UpdateAsync(existedBrand);
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Cập nhật thương hiệu thành công",
+                result = true,
+                value = true
+            };
         }
     }
 }

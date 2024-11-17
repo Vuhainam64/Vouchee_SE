@@ -73,10 +73,6 @@ namespace Vouchee.Business.Helpers
                                 source = source.OrderBy(sort[0]);
                             }
                         }
-                        //else
-                        //{
-                        //    source = source.Where($"{item.Name} = @0", propertyVal);
-                        //}
                     }
                 }
                 return source;

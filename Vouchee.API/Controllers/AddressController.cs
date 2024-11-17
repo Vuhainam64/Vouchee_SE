@@ -37,7 +37,7 @@ namespace Vouchee.API.Controllers
 
         // CREATE
         [Authorize]
-        [HttpPost("create_new_address")]
+        [HttpPost("create_address")]
         public async Task<IActionResult> CreateAddress(Guid brandId, [FromBody] CreateAddressDTO createAddressDTO)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
@@ -120,6 +120,16 @@ namespace Vouchee.API.Controllers
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _addresService.DeleteAddressAsync(id);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpDelete("remove_address_from_brand")]
+        public async Task<IActionResult> RemoveAddressFromBrand(Guid addressId, Guid brandId)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _addresService.RemoveAddressFromBrandAsync(addressId, brandId, currentUser);
             return Ok(result);
         }
     }
