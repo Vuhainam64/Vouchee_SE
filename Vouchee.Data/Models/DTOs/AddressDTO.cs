@@ -17,11 +17,9 @@ namespace Vouchee.Business.Models.DTOs
     {
         [Required(ErrorMessage = "Tên không được để trống.")]
         public string? name { get; set; }
-
         [Required(ErrorMessage = "Kinh độ không được để trống.")]
         [Range(-180, 180, ErrorMessage = "Kinh độ phải nằm trong khoảng từ -180 đến 180.")]
         public decimal? lon { get; set; }
-
         [Required(ErrorMessage = "Vĩ độ không được để trống.")]
         [Range(-90, 90, ErrorMessage = "Vĩ độ phải nằm trong khoảng từ -90 đến 90.")]
         public decimal? lat { get; set; }
@@ -48,6 +46,9 @@ namespace Vouchee.Business.Models.DTOs
         public string? name { get; set; }
         public decimal? lon { get; set; }
         public decimal? lat { get; set; }
+        public bool? isVerfied { get; set; }
+        public bool? isActive { get; set; }
+        public string? status { get; set; }
     }
 
     public class GetAddressDTO : AddressDTO

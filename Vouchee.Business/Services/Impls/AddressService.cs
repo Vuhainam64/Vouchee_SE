@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
@@ -17,37 +18,40 @@ namespace Vouchee.Business.Services.Impls
 {
     public class AddressService : IAddressService
     {
+        private readonly IBaseRepository<Brand> _brandRepository;
         private readonly IBaseRepository<Address> _addressRepository;
         private readonly IMapper _mapper;
 
-        public AddressService(IBaseRepository<Address> addressRepository,
-                            IMapper mapper)
+        public AddressService(IBaseRepository<Brand> brandRepository,
+                                IBaseRepository<Address> addressRepository,
+                                IMapper mapper)
         {
+            _brandRepository = brandRepository;
             _addressRepository = addressRepository;
             _mapper = mapper;
         }
 
-        public async Task<ResponseMessage<Guid>> CreateAddressAsync(CreateAddressDTO createAddressDTO, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<Guid>> CreateAddressAsync(Guid brandId,  CreateAddressDTO createAddressDTO, ThisUserObj thisUserObj)
         {
-            try
-            {
-                Address address = _mapper.Map<Address>(createAddressDTO);
+            var existedBrand = await _brandRepository.GetByIdAsync(brandId, isTracking: true);
 
-                address.CreateBy = thisUserObj.userId;
-
-                var addressId = await _addressRepository.AddAsync(address);
-                return new ResponseMessage<Guid>()
-                {
-                    message = "Tạo địa chỉ thành công",
-                    result =  true,
-                    value = (Guid) addressId
-                };
-            }
-            catch (Exception ex)
+            if (existedBrand == null)
             {
-                LoggerService.Logger(ex.Message);
-                throw new CreateObjectException(ex.Message);
+                throw new NotFoundException("Không tìm thấy brand");
             }
+
+            Address address = _mapper.Map<Address>(createAddressDTO);
+            address.CreateBy = thisUserObj.userId;
+            address.IsVerfied = false;
+            address.Brands.Add(existedBrand);
+
+            var addressId = await _addressRepository.AddAsync(address);
+            return new ResponseMessage<Guid>()
+            {
+                message = "Tạo địa chỉ thành công",
+                result =  true,
+                value = (Guid) addressId
+            };
         }
 
         public async Task<ResponseMessage<bool>> DeleteAddressAsync(Guid id)
@@ -74,35 +78,27 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<GetDetailAddressDTO> GetAddressByIdAsync(Guid id)
         {
-            try
+            var address = await _addressRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Brands));
+            if (address != null)
             {
-                var address = await _addressRepository.GetByIdAsync(id);
-                if (address != null)
-                {
-                    GetDetailAddressDTO addressDTO = _mapper.Map<GetDetailAddressDTO>(address);
-                    return addressDTO;
-                }
-                else
-                {
-                    throw new NotFoundException($"Không tìm thấy address với id {id}");
-                }
+                GetDetailAddressDTO addressDTO = _mapper.Map<GetDetailAddressDTO>(address);
+                return addressDTO;
             }
-            catch (Exception ex)
+            else
             {
-                LoggerService.Logger(ex.Message);
-                throw new LoadException(ex.Message);
+                throw new NotFoundException($"Không tìm thấy address với id {id}");
             }
         }
 
-        public async Task<DynamicResponseModel<GetDetailAddressDTO>> GetAddressesAsync(PagingRequest pagingRequest, AddressFilter addressFilter)
+        public async Task<DynamicResponseModel<GetAddressDTO>> GetAddressesAsync(PagingRequest pagingRequest, AddressFilter addressFilter)
         {
-            (int, IQueryable<GetDetailAddressDTO>) result;
+            (int, IQueryable<GetAddressDTO>) result;
             result = _addressRepository.GetTable()
-                        .ProjectTo<GetDetailAddressDTO>(_mapper.ConfigurationProvider)
-                        .DynamicFilter(_mapper.Map<GetDetailAddressDTO>(addressFilter))
+                        .ProjectTo<GetAddressDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetAddressDTO>(addressFilter))
                         .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
-            return new DynamicResponseModel<GetDetailAddressDTO>()
+            return new DynamicResponseModel<GetAddressDTO>()
             {
                 metaData = new MetaData()
                 {
@@ -199,6 +195,7 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Không tìm thấy địa chỉ");
             }
 
+            existedAddress.VerifiedBy = thisUserObj.userId;
             existedAddress.VerifiedDate = DateTime.Now;
             existedAddress.IsVerfied = isVerify;
             existedAddress.UpdateDate = DateTime.Now;

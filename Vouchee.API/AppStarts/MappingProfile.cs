@@ -105,13 +105,11 @@ namespace Vouchee.API.AppStarts
             CreateMap<Address, GetDistanceAddressDTO>().ReverseMap();
             CreateMap<Address, GetAddressDTO>().ReverseMap();
             CreateMap<Address, GetDetailAddressDTO>().ReverseMap();
-            CreateMap<GetDetailAddressDTO, AddressFilter>().ReverseMap();
+            CreateMap<GetAddressDTO, AddressFilter>().ReverseMap();
 
             // SUPPLIER
             CreateMap<Supplier, CreateSupplierDTO>().ReverseMap();
-            CreateMap<Supplier, UpdateSupplierDTO>()
-                
-                .ReverseMap();
+            CreateMap<Supplier, UpdateSupplierDTO>().ReverseMap();
             CreateMap<Supplier, GetSupplierDTO>().ReverseMap();
             CreateMap<GetSupplierDTO, SupplierFilter>().ReverseMap();
             CreateMap<Supplier, BestSuppleriDTO>().ReverseMap();

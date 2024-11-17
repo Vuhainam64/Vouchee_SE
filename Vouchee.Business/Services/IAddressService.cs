@@ -9,11 +9,11 @@ namespace Vouchee.Business.Services
     public interface IAddressService
     {
         // CREATE
-        public Task<ResponseMessage<Guid>?> CreateAddressAsync(CreateAddressDTO createAddressDTO, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<Guid>?> CreateAddressAsync(Guid brandId, CreateAddressDTO createAddressDTO, ThisUserObj thisUserObj);
 
         // READ
         public Task<GetDetailAddressDTO> GetAddressByIdAsync(Guid id);
-        public Task<DynamicResponseModel<GetDetailAddressDTO>> GetAddressesAsync(PagingRequest pagingRequest, AddressFilter addressFilter);
+        public Task<DynamicResponseModel<GetAddressDTO>> GetAddressesAsync(PagingRequest pagingRequest, AddressFilter addressFilter);
 
         // UPDATE
         public Task<ResponseMessage<bool>> UpdateAddressAsync(Guid id, UpdateAddressDTO updateAddressDTO, ThisUserObj thisUserObj);

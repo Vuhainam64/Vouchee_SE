@@ -18,7 +18,7 @@ using Vouchee.Data.Models.Filters;
 namespace Vouchee.API.Controllers
 {
     [ApiController]
-    [Route("api/address")]
+    [Route("api/v1/address")]
     [EnableCors("MyAllowSpecificOrigins")]
     public class AddressController : ControllerBase
     {
@@ -35,14 +35,14 @@ namespace Vouchee.API.Controllers
             _userService = userService;
         }
 
-       // CREATE
-       [Authorize]
-       [HttpPost("create_new_address")]
+        // CREATE
+        [Authorize]
+        [HttpPost("create_new_address")]
         public async Task<IActionResult> CreateAddress(Guid brandId, [FromBody] CreateAddressDTO createAddressDTO)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _addresService.CreateAddressAsync(createAddressDTO, currentUser);
+            var result = await _addresService.CreateAddressAsync(brandId, createAddressDTO, currentUser);
             return Ok(result);
         }
 
@@ -63,6 +63,7 @@ namespace Vouchee.API.Controllers
         }
 
         // UPDATE
+        [Authorize]
         [HttpPut("update_address/{id}")]
         public async Task<IActionResult> UpdateAddress(Guid id, [FromBody] UpdateAddressDTO updateAddressDTO)
         {
@@ -72,6 +73,7 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpPut("update_address_state/{id}")]
         public async Task<IActionResult> UpdateAddressState(Guid id, bool isActive)
         {
@@ -81,15 +83,17 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpPut("update_address_status/{id}")]
-        public async Task<IActionResult> UpdateAddressStatus(Guid id, ObjectStatusEnum objectStatusEnum)
+        public async Task<IActionResult> UpdateAddressStatus(Guid id, ObjectStatusEnum status)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _addresService.UpdateAddressStatusAsync(id, objectStatusEnum, currentUser);
+            var result = await _addresService.UpdateAddressStatusAsync(id, status, currentUser);
             return Ok(result);
         }
 
+        [Authorize]
         [HttpPut("verify_address/{id}")]
         public async Task<IActionResult> VerifyAddress(Guid id, bool isVerify)
         {
@@ -100,6 +104,7 @@ namespace Vouchee.API.Controllers
         }
 
         // DELETE
+        [Authorize]
         [HttpDelete("delete_address/{id}")]
         public async Task<IActionResult> DeleteAddress(Guid id)
         {
