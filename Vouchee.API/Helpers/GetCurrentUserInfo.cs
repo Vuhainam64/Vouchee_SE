@@ -20,14 +20,14 @@ namespace Vouchee.API.Helpers
             {
                 currentUser.userId = Guid.Empty;
                 currentUser.email = "";
-                currentUser.roleName = "";
+                currentUser.role = "";
                 currentUser.fullName = "";
             }
             else
             {
                 currentUser.userId = Guid.Parse(httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value);
                 currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
-                currentUser.roleName = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+                currentUser.role = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
                 currentUser.fullName = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Actor).Value;
             }
 

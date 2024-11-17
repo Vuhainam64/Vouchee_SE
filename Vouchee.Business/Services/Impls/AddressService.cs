@@ -27,17 +27,21 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<Guid?> CreateAddressAsync(CreateAddressDTO createAddressDTO, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<Guid>> CreateAddressAsync(CreateAddressDTO createAddressDTO, ThisUserObj thisUserObj)
         {
             try
             {
                 Address address = _mapper.Map<Address>(createAddressDTO);
 
                 address.CreateBy = thisUserObj.userId;
-                address.Status = ObjectStatusEnum.ACTIVE.ToString();
 
                 var addressId = await _addressRepository.AddAsync(address);
-                return addressId;
+                return new ResponseMessage<Guid>()
+                {
+                    message = "Tạo địa chỉ thành công",
+                    result =  true,
+                    value = (Guid) addressId
+                };
             }
             catch (Exception ex)
             {
@@ -46,20 +50,26 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<bool> DeleteAddressAsync(Guid id)
+        public async Task<ResponseMessage<bool>> DeleteAddressAsync(Guid id)
         {
-            bool result = false;
-            var address = await _addressRepository.GetByIdAsync(id);
-            if (address != null)
-            {
-                result = await _addressRepository.DeleteAsync(address);
-            }
-            else
-            {
-                throw new NotFoundException($"Không tìm thấy address với id {id}");
-            }
-            return result;
+            var existedAddress = await _addressRepository.GetByIdAsync(id, isTracking: true);
 
+            if (existedAddress == null)
+            {
+                throw new NotFoundException("Không tìm thấy địa chỉ này");
+            }
+
+            if (await _addressRepository.DeleteAsync(existedAddress))
+            {
+                return new ResponseMessage<bool>()
+                {
+                    message = "Xóa địa chỉ thầnh công",
+                    result = true,
+                    value = true
+                };
+            }
+
+            return null;
         }
 
         public async Task<GetDetailAddressDTO> GetAddressByIdAsync(Guid id)
@@ -116,6 +126,92 @@ namespace Vouchee.Business.Services.Impls
             {
                 throw new NotFoundException("Không tìm thấy addess");
             }
+        }
+
+        public async Task<ResponseMessage<bool>> UpdateAddressAsync(Guid id, UpdateAddressDTO updateAddressDTO, ThisUserObj thisUserObj)
+        {
+            var existedAddress = await _addressRepository.GetByIdAsync(id, isTracking: true);
+            if (existedAddress == null)
+            {
+                throw new NotFoundException("Không tìm thấy địa chỉ");
+            }
+
+            existedAddress = _mapper.Map(updateAddressDTO, existedAddress);
+            await _addressRepository.UpdateAsync(existedAddress);
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Cập nhật địa chỉ thành công",
+                result = true,
+                value = true
+            };
+        }
+
+        public async Task<ResponseMessage<bool>> UpdateAddressStateAsync(Guid id, bool isActive, ThisUserObj thisUserObj)
+        {
+            var existedAddress = await _addressRepository.GetByIdAsync(id, isTracking: true);
+            if (existedAddress == null)
+            {
+                throw new NotFoundException("Không tìm thấy địa chỉ");
+            }
+
+            existedAddress.IsActive = isActive;
+            existedAddress.UpdateDate = DateTime.Now;
+            existedAddress.UpdateBy = thisUserObj.userId;
+
+            await _addressRepository.UpdateAsync(existedAddress);
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Cập nhật địa chỉ thành công",
+                result = true,
+                value = true
+            };
+        }
+
+        public async Task<ResponseMessage<bool>> UpdateAddressStatusAsync(Guid id, ObjectStatusEnum statusEnum, ThisUserObj thisUserObj)
+        {
+            var existedAddress = await _addressRepository.GetByIdAsync(id, isTracking: true);
+            if (existedAddress == null)
+            {
+                throw new NotFoundException("Không tìm thấy địa chỉ");
+            }
+
+            existedAddress.Status = statusEnum.ToString();
+            existedAddress.UpdateDate = DateTime.Now;
+            existedAddress.UpdateBy = thisUserObj.userId;
+
+            await _addressRepository.UpdateAsync(existedAddress);
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Cập nhật địa chỉ thành công",
+                result = true,
+                value = true
+            };
+        }
+
+        public async Task<ResponseMessage<bool>> VerifyAddressAsync(Guid id, bool isVerify, ThisUserObj thisUserObj)
+        {
+            var existedAddress = await _addressRepository.GetByIdAsync(id, isTracking: true);
+            if (existedAddress == null)
+            {
+                throw new NotFoundException("Không tìm thấy địa chỉ");
+            }
+
+            existedAddress.VerifiedDate = DateTime.Now;
+            existedAddress.IsVerfied = isVerify;
+            existedAddress.UpdateDate = DateTime.Now;
+            existedAddress.UpdateBy = thisUserObj.userId;
+
+            await _addressRepository.UpdateAsync(existedAddress);
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Cập nhật địa chỉ thành công",
+                result = true,
+                value = true
+            };
         }
     }
 }

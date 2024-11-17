@@ -47,7 +47,7 @@ namespace Vouchee.Data.Models.Entities
 
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; } = DateTime.Now;
+        public DateTime? CreateDate { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }

@@ -24,16 +24,12 @@ namespace Vouchee.Data.Models.Entities
         [Key]
         public Guid Id { get; set; }
 
-        // Foreign Key for Buyer Wallet
         public Guid? BuyerId { get; set; }
-
         [ForeignKey(nameof(BuyerId))]
         [InverseProperty(nameof(User.BuyerWallet))]
         public virtual User? Buyer { get; set; }
 
-        // Foreign Key for Seller Wallet
         public Guid? SellerId { get; set; }
-
         [ForeignKey(nameof(SellerId))]
         [InverseProperty(nameof(User.SellerWallet))]
         public virtual User? Seller { get; set; }
@@ -42,7 +38,7 @@ namespace Vouchee.Data.Models.Entities
 
         public bool IsActive = true;
         public required string Status { get; set; }
-        public DateTime? CreateDate { get; set; } = DateTime.Now;
+        public DateTime? CreateDate { get; set; } 
         public Guid? CreateBy { get; set; }
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }

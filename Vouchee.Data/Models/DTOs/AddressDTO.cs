@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 
@@ -14,12 +15,19 @@ namespace Vouchee.Business.Models.DTOs
 {
     public class CreateAddressDTO
     {
+        [Required(ErrorMessage = "Tên không được để trống.")]
         public string? name { get; set; }
+
+        [Required(ErrorMessage = "Kinh độ không được để trống.")]
+        [Range(-180, 180, ErrorMessage = "Kinh độ phải nằm trong khoảng từ -180 đến 180.")]
         public decimal? lon { get; set; }
+
+        [Required(ErrorMessage = "Vĩ độ không được để trống.")]
+        [Range(-90, 90, ErrorMessage = "Vĩ độ phải nằm trong khoảng từ -90 đến 90.")]
         public decimal? lat { get; set; }
-        public decimal? percentShow { get; set; }
-        public IFormFile? image { get; set; }
-        public DateTime? createDate = DateTime.Now;
+        public bool isVerfied = false;
+        public bool isActive = false;
+        public ObjectStatusEnum status = ObjectStatusEnum.NONE;
     }
 
     public class UpdateAddressDTO
@@ -30,8 +38,6 @@ namespace Vouchee.Business.Models.DTOs
         public decimal? lon { get; set; }
         [Column(TypeName = "decimal")]
         public decimal? lat { get; set; }
-        [Column(TypeName = "decimal")]
-        public decimal? percentShow { get; set; }
         public DateTime? updateDate = DateTime.Now;
     }
 

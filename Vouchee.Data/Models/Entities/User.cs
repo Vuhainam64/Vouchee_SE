@@ -60,7 +60,7 @@ namespace Vouchee.Data.Models.Entities
 
         public bool IsActive { get; set; }
         public required string Status { get; set; }
-        public DateTime? CreateDate { get; set; } = DateTime.Now;
+        public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
