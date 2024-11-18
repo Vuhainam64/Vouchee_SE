@@ -96,6 +96,10 @@ namespace Vouchee.Business.Services.Impls
                     {
                         sellerCartDTO.modals.Add(_mapper.Map<CartModalDTO>(cart.Modal));
                         sellerCartDTO.modals.FirstOrDefault(x => x.id == cart.ModalId).quantity = cart.Quantity;
+
+                        var existedPromotions = await _shopPromotionRepository.GetWhereAsync(x => x.SellerId == sellerCartDTO.sellerId);
+
+                        sellerCartDTO.promotions = _mapper.Map<IList<GetShopPromotionDTO>>(existedPromotions);
                     }
 
                     cartDTO.sellers.Add(sellerCartDTO);
@@ -103,6 +107,32 @@ namespace Vouchee.Business.Services.Impls
                     cartDTO.totalQuantity = cartDTO.sellers.Sum(x => x.modals.Sum(x => x.quantity));
                 }
             }
+
+            //    var existedShopPromotion = await _shopPromotionRepository.GetByIdAsync(item.promotionId.Value);
+
+            //    if (existedShopPromotion == null)
+            //    {
+            //        throw new NotFoundException($"Không tìm thấy promotion với id {item.promotionId}");
+            //    }
+
+            //    foreach (var seller in _cartDTO.sellers)
+            //    {
+            //        foreach (var modal in seller.modals)
+            //        {
+            //            modal.shopDiscount = existedShopPromotion.PercentDiscount;
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    foreach (var seller in _cartDTO.sellers)
+            //    {
+            //        foreach (var modal in seller.modals)
+            //        {
+            //            modal.shopDiscount = 0;
+            //        }
+            //    }
+            //}
 
             _cartDTO = cartDTO;
             return _cartDTO;
@@ -378,73 +408,24 @@ namespace Vouchee.Business.Services.Impls
                                        .Where(seller => seller.modals.Any())
                                        .ToList();
 
-            //foreach (var seller in _cartDTO.sellers)
-            //{
-            //    var activeModalPromotion = await _modalPromotionService.GetModalPromotionBySeller(seller.sellerId.Value);
-
-            //    if (activeModalPromotion != null && activeModalPromotion.Any())
-            //    {
-            //        var applicablePromotions = activeModalPromotion
-            //            .Where(promotion => promotion.modals
-            //                .Any(promoModal => seller.modals.Any(cartModal => cartModal.id == promoModal.id)))
-            //            .ToList();
-
-            //        seller.promotions = _mapper.Map<IList<CartModalPromotionDTO>>(applicablePromotions);
-
-            //        foreach (var promotion in seller.promotions)
-            //        {
-            //            if (promotion.requiredQuantity != null)
-            //            {
-            //                int totalQuantity = seller.modals.Sum(x => x.quantity);
-            //                if (totalQuantity >= promotion.requiredQuantity)
-            //                {
-            //                    promotion.isAppliable = true;
-            //                }
-            //                else
-            //                {
-            //                    promotion.isAppliable = false;
-            //                    promotion.note = $"Bạn cần mua {promotion.requiredQuantity} món đồ để áp dụng mã này";
-            //                }
-            //            }
-
-            //            if (promotion.minMoneyToAppy != null)
-            //            {
-            //                int totalUnitPrice = seller.modals.Sum(x => x.totalUnitPrice ?? 0);
-            //                if (totalUnitPrice >= promotion.minMoneyToAppy)
-            //                {
-            //                    promotion.isAppliable = true;
-            //                }
-            //                else
-            //                {
-            //                    promotion.isAppliable = false;
-            //                    promotion.note = $"Bạn cần chi thêm {promotion.minMoneyToAppy - totalUnitPrice} để áp dụng mã này";
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
-
             foreach (var item in checkOutViewModel.item_brief)
             {
                 if (item.promotionId != null)
                 {
-                    var existedShopPromotion = await _shopPromotionRepository.GetByIdAsync(item.promotionId.Value);
+                    var appliedPromotion = await _shopPromotionRepository.GetByIdAsync(item.promotionId,
+                                                                                includeProperties: x => x.Include(x => x.Seller));
 
-                    if (existedShopPromotion == null)
-                    {
-                        throw new NotFoundException($"Không tìm thấy promotion với id {item.promotionId}");
-                    }
+                    _cartDTO.sellers.FirstOrDefault(x => x.sellerId == appliedPromotion.SellerId).appliedPromotion = _mapper.Map<GetShopPromotionDTO>(appliedPromotion);
 
-                    foreach (var seller in _cartDTO.sellers)
+                    foreach (var seller in _cartDTO.sellers.Where(x => x.sellerId == appliedPromotion.SellerId))
                     {
                         foreach (var modal in seller.modals)
                         {
-                            modal.shopDiscount = existedShopPromotion.PercentDiscount;
+                            modal.shopDiscount = appliedPromotion.PercentDiscount;
                         }
                     }
                 }
             }
-
 
             DetailCartDTO detailCartDTO = new()
             {
