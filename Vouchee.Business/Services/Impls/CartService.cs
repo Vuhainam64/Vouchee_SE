@@ -169,16 +169,22 @@ namespace Vouchee.Business.Services.Impls
                     Modal = existedModal,
                 });
 
-                _userRepository.SetEntityState(_user, EntityState.Modified);
-                var result = await _userRepository.SaveChanges();
-                if (result)
+                try
                 {
-                    _userRepository.Attach(_user);
-                    await GetCartsAsync(thisUserObj, false);
-                    return _cartDTO;
+                    var result = await _userRepository.SaveChanges();
+                    if (result)
+                    {
+                        await GetCartsAsync(thisUserObj, false);
+                        return _cartDTO;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message);
                 }
             }
-            return null;
+
+            throw new Exception("Lỗi không xác định");
         }
 
         public async Task<CartDTO> DecreaseQuantityAsync(Guid modalId, ThisUserObj thisUserObj)

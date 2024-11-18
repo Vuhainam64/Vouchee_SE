@@ -27,6 +27,7 @@ namespace Vouchee.Data.Models.DTOs
         public string? image { get; set; }
         [Required(ErrorMessage = "Phần trăm giảm là cần thiết")]
         public int? percentDiscount { get; set; }
+        public int? stock { get; set; }
 
         public bool isActive { get; set; }
         public string? status = ObjectStatusEnum.NONE.ToString();
@@ -77,7 +78,7 @@ namespace Vouchee.Data.Models.DTOs
         public DateTime? endDate { get; set; }
         public string? image { get; set; }
         public int? percentDiscount { get; set; }
-
+        public int? stock { get; set; }
         public string? status { get; set; }
     }
 
