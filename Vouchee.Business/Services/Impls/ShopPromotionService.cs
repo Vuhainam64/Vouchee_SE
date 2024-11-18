@@ -189,6 +189,12 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
+        public async Task<IList<GetShopPromotionDTO>> GetShopPromotionByShopId(Guid shopId)
+        {
+            var promotions = await _shopPromotionRepository.GetWhereAsync(x => x.SellerId == shopId);
+            return _mapper.Map<IList<GetShopPromotionDTO>>(promotions);
+        }
+
         //public async Task<bool> UpdatePromotionAsync(Guid id, UpdateShopPromotionDTO updatePromotionDTO, ThisUserObj thisUserObj)
         //{
         //    var existedPromotion = await _promotionRepository.GetByIdAsync(id);
