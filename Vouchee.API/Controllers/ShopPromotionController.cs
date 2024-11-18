@@ -68,6 +68,13 @@ namespace Vouchee.API.Controllers
             return Ok(promotion);
         }
 
+        [HttpGet("get_promotions_by_shop_id")]
+        public async Task<IActionResult> GetShopPromotions(Guid shopId)
+        {
+            var promotion = await _shopPromotionService.GetShopPromotionByShopId(shopId);
+            return Ok(promotion);
+        }
+
         //[Authorize]
         //[HttpGet("get_shop_promotion")]
         //public async Task<IActionResult> GetShopPromotion()
