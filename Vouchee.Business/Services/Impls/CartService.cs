@@ -78,6 +78,12 @@ namespace Vouchee.Business.Services.Impls
             CartDTO cartDTO = new();
 
             cartDTO.vPoint = _user.VPoint;
+
+            if (_user.BuyerWallet == null)
+            {
+                throw new ConflictException("Người này chưa có ví");
+            }
+
             cartDTO.balance = _user.BuyerWallet.Balance;
 
             cartDTO.buyerId = _user.Id;
