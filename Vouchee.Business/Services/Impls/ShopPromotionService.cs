@@ -40,22 +40,6 @@ namespace Vouchee.Business.Services.Impls
         public async Task<ResponseMessage<Guid>> CreateShopPromotionAsync(CreateShopPromotionDTO createShopPromotionDto, ThisUserObj thisUserObj)
         {
             var currentTime = DateTime.Now;
-            var checkOverlappintPromotions = _shopPromotionRepository.GetTable()
-                                                            .Where(p => p.SellerId == thisUserObj.userId
-                                                                        && p.IsActive == true
-                                                                        && p.Status == ObjectStatusEnum.NONE.ToString()
-                                                                        && ((p.StartDate <= createShopPromotionDto.startDate 
-                                                                                && createShopPromotionDto.startDate <= p.EndDate)
-                                                                                    || (p.StartDate <= createShopPromotionDto.endDate 
-                                                                                        && createShopPromotionDto.endDate <= p.EndDate)  
-                                                                                            || (createShopPromotionDto.startDate <= p.StartDate 
-                                                                                                && p.EndDate <= createShopPromotionDto.endDate)));
-
-            if (checkOverlappintPromotions.Any())
-            {
-                var overlappingDetails = string.Join(", ", checkOverlappintPromotions.Select(p => $"ID: {p.Id}, Start: {p.StartDate}, End: {p.EndDate}"));
-                throw new ConflictException($"Hiện tại có khuyên mãi bị trùng là: {overlappingDetails}");
-            }
 
             var promotion = _mapper.Map<ShopPromotion>(createShopPromotionDto);
             promotion.CreateBy = thisUserObj.userId;
