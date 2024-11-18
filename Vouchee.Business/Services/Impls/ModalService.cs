@@ -107,7 +107,6 @@ namespace Vouchee.Business.Services.Impls
             {
                 result = _modalRepository.GetTable()
                             .Include(x => x.VoucherCodes)
-                                .ThenInclude(x => x.OrderDetail)
                             .ProjectTo<GetModalDTO>(_mapper.ConfigurationProvider)
                             .DynamicFilter(_mapper.Map<GetModalDTO>(modalFilter))
                             .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);

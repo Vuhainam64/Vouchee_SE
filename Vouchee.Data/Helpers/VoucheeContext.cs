@@ -43,13 +43,12 @@ namespace Vouchee.Data.Helpers
                                     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
                 IConfigurationRoot configuration = builder.Build();
                 optionsBuilder.EnableSensitiveDataLogging();
-                optionsBuilder.UseSqlServer(configuration.GetConnectionString("PROD"));
+                optionsBuilder.UseSqlServer(configuration.GetConnectionString("DEV"));
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Order>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<OrderDetail>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Address>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Supplier>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
@@ -71,9 +70,12 @@ namespace Vouchee.Data.Helpers
 
             // modelBuilder.Seed();
             modelBuilder.Entity<User>()
-                           .HasOne(u => u.Supplier)
-                           .WithOne(s => s.User)
-                           .HasForeignKey<Supplier>(s => s.UserId);
+                            .HasOne(u => u.Supplier)
+                            .WithOne(s => s.User)
+                            .HasForeignKey<Supplier>(s => s.UserId);
+
+            modelBuilder.Entity<OrderDetail>()
+                            .HasKey(od => new { od.OrderId, od.ModalId });
 
             base.OnModelCreating(modelBuilder);
         }

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Vouchee.Data.Models.Entities
 {
-    [Table("Wallet")]
+    [Table(nameof(Wallet))]
     public class Wallet
     {
         public Wallet()

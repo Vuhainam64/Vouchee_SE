@@ -79,8 +79,6 @@ namespace Vouchee.Business.Services.Impls
                         throw new ConflictException("Voucher code này không thuộc voucher đang đặt");
                     }
 
-                    existedOrderDetail.VoucherCodes.Add(existedVoucherCode);
-
                     existedVoucherCode.Status = "ASSIGNED";
                     await _voucherCodeRepository.UpdateAsync(existedVoucherCode);
                 }
@@ -163,9 +161,6 @@ namespace Vouchee.Business.Services.Impls
                                 Status = OrderStatusEnum.PENDING.ToString(),
                                 CreateDate = DateTime.Now,
                                 CreateBy = thisUserObj.userId,
-                                ModalDiscountMoney = (int) cartModal.modalDiscountMoney,
-                                ModalDiscountPercent = (int) cartModal.modalDiscountPercent,
-                                ModalPromotionId = cartModal.modalPromotionId,
                                 ShopDiscountPercent = (int) cartModal.shopDiscount,
                                 ShopPromotionId = cartModal.shopPromotionId,
                             });
@@ -279,7 +274,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<GetOrderDTO> GetOrderByIdAsync(Guid id)
         {
-            var order = await _orderRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.OrderDetails).ThenInclude(x => x.VoucherCodes));
+            var order = await _orderRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.OrderDetails));
             if (order != null)
             {
                 var orderDTO = _mapper.Map<GetOrderDTO>(order);
@@ -374,7 +369,6 @@ namespace Vouchee.Business.Services.Impls
                         CreateDate = DateTime.Now,
                         Status = WalletTransactionStatusEnum.DONE.ToString(),
                         Amount = groupedModal.Sum(x => x.FinalPrice),
-                        OrderId = existedOrder.Id,
                         PartnerTransactionId = partnerTransactionId,
                         SellerWalletId = existedSeller.Id,
                     };

@@ -12,15 +12,15 @@ namespace Vouchee.Data.Models.Entities
     [Table("VoucherCode")]
     public partial class VoucherCode
     {
-        public Guid ModalId { get; set; }
+        public string? OrderId { get; set; }
+        [ForeignKey(nameof(OrderId))]
+        [InverseProperty(nameof(Order.VoucherCodes))]
+        public required virtual Order Order { get; set; }
+
+        public Guid? ModalId { get; set; }
         [ForeignKey(nameof(ModalId))]
         [InverseProperty(nameof(Modal.VoucherCodes))]
         public required virtual Modal Modal { get; set; }
-
-        public Guid? OrderDetailId { get; set; }
-        [ForeignKey(nameof(OrderDetailId))]
-        [InverseProperty(nameof(OrderDetail.VoucherCodes))]
-        public virtual OrderDetail? OrderDetail { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]

@@ -12,28 +12,17 @@ namespace Vouchee.Data.Models.Entities
     [Table(nameof(OrderDetail))]
     public partial class OrderDetail
     {
-        public OrderDetail()
-        {
-            VoucherCodes = [];
-        }
-
-        [InverseProperty(nameof(VoucherCode.OrderDetail))]
-        public virtual ICollection<VoucherCode> VoucherCodes { get; set; }
-
-        public Guid OrderId { get; set; }
+        [Key]
+        public string? OrderId { get; set; }
         [ForeignKey(nameof(OrderId))]
         [InverseProperty(nameof(Order.OrderDetails))]
         public virtual Order? Order { get; set; }
 
+        [Key]
         public Guid? ModalId { get; set; }
         [ForeignKey(nameof(ModalId))]
         [InverseProperty(nameof(Modal.OrderDetails))]
         public virtual Modal? Modal { get; set; }
-
-        public Guid? ModalPromotionId { get; set; }
-        [ForeignKey(nameof(ModalPromotionId))]
-        [InverseProperty(nameof(ModalPromotion.ModalPromotionOrderDetails))]
-        public virtual Promotion? ModalPromotion { get; set; }
 
         public Guid? ShopPromotionId { get; set; }
         [ForeignKey(nameof(ShopPromotionId))]
@@ -46,10 +35,9 @@ namespace Vouchee.Data.Models.Entities
 
         public int UnitPrice { get; set; }
         public int ShopDiscountPercent { get; set; } = 0;
-        public int ModalDiscountPercent { get; set; } = 0;
-        public int ModalDiscountMoney { get; set; } = 0;
+        public int ShopDiscountMoney { get; set; } = 0;
         public int TotalPrice => UnitPrice * Quantity;
-        public int DiscountPrice => (TotalPrice * ShopDiscountPercent * 100) + (TotalPrice * ModalDiscountPercent * 100) + ModalDiscountMoney;
+        public int DiscountPrice => (TotalPrice * ShopDiscountPercent * 100) + ShopDiscountMoney;
         public int FinalPrice => TotalPrice - DiscountPrice;
         public int Quantity { get; set; }
 

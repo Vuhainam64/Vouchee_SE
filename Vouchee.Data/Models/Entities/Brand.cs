@@ -19,7 +19,6 @@ namespace Vouchee.Data.Models.Entities
 
         [InverseProperty(nameof(Voucher.Brand))]
         public virtual ICollection<Voucher> Vouchers { get; set; }
-
         [InverseProperty(nameof(Address.Brands))]
         public virtual ICollection<Address> Addresses { get; set; }
 

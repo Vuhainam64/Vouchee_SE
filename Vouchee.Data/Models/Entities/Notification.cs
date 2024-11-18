@@ -12,10 +12,6 @@ namespace Vouchee.Data.Models.Entities
     [Table(nameof(Notification))]
     public class Notification
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [Key]
-        public Guid Id { get; set; }
-
         public Guid? SenderId { get; set; }
         [ForeignKey(nameof(SenderId))]
         [InverseProperty(nameof(User.SenderNotifications))]
@@ -25,6 +21,10 @@ namespace Vouchee.Data.Models.Entities
         [ForeignKey(nameof(ReceiverId))]
         [InverseProperty(nameof(User.ReceiverNotifications))]
         public virtual User? Receiver { get; set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key]
+        public Guid Id { get; set; }
 
         public string? Title { get; set; }
         public string? Description { get; set; }

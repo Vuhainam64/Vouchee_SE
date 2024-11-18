@@ -369,58 +369,57 @@ namespace Vouchee.Business.Services.Impls
                                        .Where(seller => seller.modals.Any())
                                        .ToList();
 
-            foreach (var seller in _cartDTO.sellers)
-            {
-                var activeModalPromotion = await _modalPromotionService.GetModalPromotionBySeller(seller.sellerId.Value);
+            //foreach (var seller in _cartDTO.sellers)
+            //{
+            //    var activeModalPromotion = await _modalPromotionService.GetModalPromotionBySeller(seller.sellerId.Value);
 
-                if (activeModalPromotion != null && activeModalPromotion.Any())
-                {
-                    var applicablePromotions = activeModalPromotion
-                        .Where(promotion => promotion.modals
-                            .Any(promoModal => seller.modals.Any(cartModal => cartModal.id == promoModal.id)))
-                        .ToList();
+            //    if (activeModalPromotion != null && activeModalPromotion.Any())
+            //    {
+            //        var applicablePromotions = activeModalPromotion
+            //            .Where(promotion => promotion.modals
+            //                .Any(promoModal => seller.modals.Any(cartModal => cartModal.id == promoModal.id)))
+            //            .ToList();
 
-                    seller.promotions = _mapper.Map<IList<CartModalPromotionDTO>>(applicablePromotions);
+            //        seller.promotions = _mapper.Map<IList<CartModalPromotionDTO>>(applicablePromotions);
 
-                    foreach (var promotion in seller.promotions)
-                    {
-                        if (promotion.requiredQuantity != null)
-                        {
-                            int totalQuantity = seller.modals.Sum(x => x.quantity);
-                            if (totalQuantity >= promotion.requiredQuantity)
-                            {
-                                promotion.isAppliable = true;
-                            }
-                            else
-                            {
-                                promotion.isAppliable = false;
-                                promotion.note = $"Bạn cần mua {promotion.requiredQuantity} món đồ để áp dụng mã này";
-                            }
-                        }
+            //        foreach (var promotion in seller.promotions)
+            //        {
+            //            if (promotion.requiredQuantity != null)
+            //            {
+            //                int totalQuantity = seller.modals.Sum(x => x.quantity);
+            //                if (totalQuantity >= promotion.requiredQuantity)
+            //                {
+            //                    promotion.isAppliable = true;
+            //                }
+            //                else
+            //                {
+            //                    promotion.isAppliable = false;
+            //                    promotion.note = $"Bạn cần mua {promotion.requiredQuantity} món đồ để áp dụng mã này";
+            //                }
+            //            }
 
-                        if (promotion.minMoneyToAppy != null)
-                        {
-                            int totalUnitPrice = seller.modals.Sum(x => x.totalUnitPrice ?? 0);
-                            if (totalUnitPrice >= promotion.minMoneyToAppy)
-                            {
-                                promotion.isAppliable = true;
-                            }
-                            else
-                            {
-                                promotion.isAppliable = false;
-                                promotion.note = $"Bạn cần chi thêm {promotion.minMoneyToAppy - totalUnitPrice} để áp dụng mã này";
-                            }
-                        }
-                    }
-                }
-            }
+            //            if (promotion.minMoneyToAppy != null)
+            //            {
+            //                int totalUnitPrice = seller.modals.Sum(x => x.totalUnitPrice ?? 0);
+            //                if (totalUnitPrice >= promotion.minMoneyToAppy)
+            //                {
+            //                    promotion.isAppliable = true;
+            //                }
+            //                else
+            //                {
+            //                    promotion.isAppliable = false;
+            //                    promotion.note = $"Bạn cần chi thêm {promotion.minMoneyToAppy - totalUnitPrice} để áp dụng mã này";
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
 
             foreach (var item in checkOutViewModel.item_brief)
             {
                 if (item.promotionId != null)
                 {
-                    var existedPromotion = await _promotionRepository.GetByIdAsync(item.promotionId.Value,
-                                                                                            includeProperties: x => x.Include(x => x.Modals));
+                    var existedPromotion = await _promotionRepository.GetByIdAsync(item.promotionId.Value);
                     if (existedPromotion == null)
                     {
                         throw new NotFoundException($"Không tìm thấy promotion với id {item.promotionId}");
@@ -428,16 +427,7 @@ namespace Vouchee.Business.Services.Impls
 
                     foreach (var seller in _cartDTO.sellers)
                     {
-                        var applicableModals = seller.modals
-                            .Where(modal => existedPromotion.Modals.Any(promoModal => promoModal.VoucherId == modal.voucherId))
-                            .ToList();
 
-                        foreach (var modal in applicableModals)
-                        {
-                            modal.modalPromotionId = existedPromotion.Id;
-                            modal.modalDiscountPercent = existedPromotion.MoneyDiscount;
-                            modal.modalDiscountPercent = existedPromotion.PercentDiscount;
-                        }
                     }
                 }
             }

@@ -109,7 +109,6 @@ namespace Vouchee.Business.Services.Impls
                 {
                     Media media = new()
                     {
-                        Status = ObjectStatusEnum.ACTIVE.ToString(),
                         Url = image,
                         CreateBy = thisUserObj.userId,
                         CreateDate = DateTime.Now,

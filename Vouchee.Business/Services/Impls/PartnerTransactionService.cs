@@ -99,7 +99,6 @@ namespace Vouchee.Business.Services.Impls
                                     CreateDate = DateTime.Now,
                                     Status = WalletTransactionStatusEnum.DONE.ToString(),
                                     Amount = existedOrder.Buyer.BuyerWallet.Balance,
-                                    OrderId = existedOrder.Id
                                 });
                             }
 
@@ -122,7 +121,6 @@ namespace Vouchee.Business.Services.Impls
                                     CreateDate = DateTime.Now,
                                     Status = WalletTransactionStatusEnum.DONE.ToString(),
                                     Amount = amount,
-                                    OrderId = existedOrder.Id,
                                 });
                             }
 

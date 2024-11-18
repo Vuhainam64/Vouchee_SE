@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Vouchee.Data.Helpers;
+using shortid;
+using shortid.Configuration;
 
 namespace Vouchee.Data.Models.Entities
 {
@@ -17,8 +19,12 @@ namespace Vouchee.Data.Models.Entities
         {
             WalletTransactions = [];
             OrderDetails = [];
+            Id = ShortId.Generate(new GenerationOptions(useSpecialCharacters: false));
+            VoucherCodes = [];
         }
 
+        [InverseProperty(nameof(VoucherCode.Order))]
+        public virtual ICollection<VoucherCode> VoucherCodes { get; set; }
         [InverseProperty(nameof(OrderDetail.Order))]
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
         [InverseProperty(nameof(WalletTransaction.Order))]
@@ -34,9 +40,8 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty(nameof(PartnerTransaction.Orders))]
         public virtual PartnerTransaction? PartnerTransaction { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
-        public Guid Id { get; set; }
+        public string Id { get; set; }
 
         public int TotalPrice { get; set; }
         public int DiscountPrice { get; set; }
