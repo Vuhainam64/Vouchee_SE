@@ -39,7 +39,7 @@ namespace Vouchee.Data.Models.DTOs
     {
         public SellerCartDTO()
         {
-            promotions = [];
+            // promotions = [];
             modals = [];
         }
 
@@ -47,7 +47,8 @@ namespace Vouchee.Data.Models.DTOs
         public string? sellerName { get; set; }
         public string? sellerImage { get; set; }
 
-        public virtual ICollection<CartModalPromotionDTO> promotions { get; set; }
+        // public virtual ICollection<CartModalPromotionDTO> promotions { get; set; }
+        public virtual GetShopPromotionDTO? promotion { get; set; }
         public virtual ICollection<CartModalDTO> modals { get; set; }
     }
 }
