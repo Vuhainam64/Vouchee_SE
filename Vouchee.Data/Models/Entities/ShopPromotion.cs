@@ -35,6 +35,7 @@ namespace Vouchee.Data.Models.Entities
         public DateTime? EndDate { get; set; }
         public string? Image { get; set; }
         public int? PercentDiscount { get; set; }
+        public int? Stock { get; set; }
 
         public bool IsActive { get; set; }
         public required string Status { get; set; }

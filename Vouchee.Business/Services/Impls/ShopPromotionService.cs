@@ -55,17 +55,17 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<GetShopPromotionDTO> GetActiveShopPromotion(ThisUserObj thisUserObj)
+        public async Task<IList<GetShopPromotionDTO>> GetActiveShopPromotion(ThisUserObj thisUserObj)
         {
             DateTime currentTime = DateTime.Now;
-            var activePromotion = _shopPromotionRepository.GetTable().FirstOrDefault(x => x.SellerId == thisUserObj.userId
-                                                                        && x.StartDate <= currentTime && currentTime <= x.EndDate);
+            var activePromotion = _shopPromotionRepository.GetTable().Where(x => x.SellerId == thisUserObj.userId
+                                                                                && x.StartDate <= currentTime && currentTime <= x.EndDate);
             if (activePromotion == null)
             {
                 throw new NotFoundException("Hiện tại bạn không có shop promotion này đang hoạt động");
             }
 
-            return _mapper.Map<GetShopPromotionDTO>(activePromotion);
+            return _mapper.Map<IList<GetShopPromotionDTO>>(await activePromotion.ToListAsync());
         }
 
         //public async Task<bool> DeletePromotionAsync(Guid id, ThisUserObj thisUserObj)
