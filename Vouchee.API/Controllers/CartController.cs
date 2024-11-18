@@ -42,7 +42,7 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
 
-            var result = await _cartService.AddItemAsync(modalId, currentUser, quantity);
+            var result = await _cartService.AddItemAsync(modalId, currentUser, quantity = 1);
             return Ok(result);
         }
 
