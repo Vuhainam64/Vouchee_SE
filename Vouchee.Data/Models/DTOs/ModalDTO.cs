@@ -52,10 +52,9 @@ namespace Vouchee.Data.Models.DTOs
         public string? title { get; set; }
         public int? originalPrice { get; set; }
         public int? sellPrice { get; set; }
-        public int? shopDiscount { get; set; } = 0;
-        public int? modalDiscountPercent { get; set; } = 0;
-        public int? modalDiscountMoney { get; set; } = 0;
-        public int? discountPrice => (sellPrice * shopDiscount / 100) + (sellPrice * modalDiscountPercent / 100) + modalDiscountMoney;
+        public int? shopDiscountMoney { get; set; } = 0;
+        public int? shopDiscountPercent { get; set; } = 0;
+        public int? discountPrice => (sellPrice * shopDiscountPercent / 100) + shopDiscountMoney;
         public int? salePrice => sellPrice - discountPrice;
         public string? image { get; set; }
         public int? index { get; set; }

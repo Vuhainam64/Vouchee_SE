@@ -52,8 +52,6 @@ namespace Vouchee.Data.Models.Entities
         public string? HashPassword { get; set; }
         public string? Image { get; set; }
         public string? PhoneNumber { get; set; }
-        public string? BankName { get; set; }
-        public string? BankAccount { get; set; }
         public int ResponsibilityScore { get; set; }
         public int VPoint { get; set; }
         public string? Role { get; set; }

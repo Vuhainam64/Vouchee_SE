@@ -96,7 +96,7 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<ResponseMessage<Guid>> CreateOrderAsync(ThisUserObj thisUserObj, CheckOutViewModel checkOutViewModel)
+        public async Task<ResponseMessage<string>> CreateOrderAsync(ThisUserObj thisUserObj, CheckOutViewModel checkOutViewModel)
         {
             var user = await _userRepository.GetByIdAsync(thisUserObj.userId, includeProperties: x => x.Include(x => x.BuyerWallet), isTracking: true);
 
@@ -161,7 +161,7 @@ namespace Vouchee.Business.Services.Impls
                                 Status = OrderStatusEnum.PENDING.ToString(),
                                 CreateDate = DateTime.Now,
                                 CreateBy = thisUserObj.userId,
-                                ShopDiscountPercent = (int) cartModal.shopDiscount,
+                                ShopDiscountPercent = (int) cartModal.shopDiscountPercent,
                                 ShopPromotionId = cartModal.shopPromotionId,
                             });
                         }
@@ -198,12 +198,7 @@ namespace Vouchee.Business.Services.Impls
             //    user.VPoint += order.FinalPrice / 1000;
             //}
 
-            var orderId = await _orderRepository.AddAsync(order);
-
-            if (orderId == Guid.Empty)
-            {
-                throw new Exception("Failed to create order.");
-            }
+            var orderId = await _orderRepository.AddReturnString(order);
 
             //// Phải chắc chắn order được tạo
             //WalletTransaction transaction = new()
@@ -241,11 +236,11 @@ namespace Vouchee.Business.Services.Impls
 
             //await _userRepository.SaveChanges();
 
-            return new ResponseMessage<Guid>
+            return new ResponseMessage<string>
             {
                 message = "Tạo order thành công",
                 result = true,
-                value = (Guid) orderId
+                value = orderId
             };
         }
 

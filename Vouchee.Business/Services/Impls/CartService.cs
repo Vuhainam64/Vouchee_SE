@@ -54,7 +54,6 @@ namespace Vouchee.Business.Services.Impls
         {
             _user = await _userRepository.GetByIdAsync(thisUserObj.userId,
                                                         includeProperties: query => query
-                                                            .Include(x => x.Role)
                                                             .Include(x => x.Carts)
                                                                 .ThenInclude(cart => cart.Modal)
                                                             .Include(x => x.Carts)
@@ -105,7 +104,7 @@ namespace Vouchee.Business.Services.Impls
             return _cartDTO;
         }
 
-        public async Task<CartDTO> AddItemAsync(Guid modalId, ThisUserObj thisUserObj, int quantity = 1)
+        public async Task<CartDTO> AddItemAsync(Guid modalId, ThisUserObj thisUserObj, int quantity)
         {
             await GetCartsAsync(thisUserObj, true);
 
@@ -165,7 +164,7 @@ namespace Vouchee.Business.Services.Impls
                 {
                     CreateBy = thisUserObj.userId,
                     CreateDate = DateTime.Now,
-                    Quantity = quantity,
+                    Quantity = quantity == 0 ? 1 : quantity,
                     Modal = existedModal,
                 });
 

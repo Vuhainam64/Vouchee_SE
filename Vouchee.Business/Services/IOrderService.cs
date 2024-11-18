@@ -11,7 +11,7 @@ namespace Vouchee.Business.Services
     {
         // CREATE
         // public Task<Guid?> CreateOrderAsync(CreateOrderDTO createOrderDTO, ThisUserObj thisUserObj);
-        public Task<ResponseMessage<Guid>> CreateOrderAsync(ThisUserObj thisUserObj, CheckOutViewModel checkOutViewModel);
+        public Task<ResponseMessage<string>> CreateOrderAsync(ThisUserObj thisUserObj, CheckOutViewModel checkOutViewModel);
 
         // READ
         public Task<GetOrderDTO> GetOrderByIdAsync(Guid id);
