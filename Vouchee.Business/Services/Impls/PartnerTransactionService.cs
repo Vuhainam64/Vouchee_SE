@@ -42,11 +42,11 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<ResponseMessage<Guid>> CreatePartnerTransactionAsync(CreateSePayPartnerInTransactionDTO createPartnerTransaction)
+        public async Task<dynamic> CreatePartnerTransactionAsync(CreateSePayPartnerInTransactionDTO createPartnerTransaction)
         {
             try
             {
-                string input = createPartnerTransaction.content;
+                string input = createPartnerTransaction.code;
 
                 // Unified regex for ORDER and TOPUP
                 Regex regex = new Regex(@"\b(ORDER|TOPUP)([0-9a-fA-F]{8})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{12})\b");
@@ -168,11 +168,12 @@ namespace Vouchee.Business.Services.Impls
 
                             await _topUpRequest.SaveChanges();
 
-                            return new ResponseMessage<Guid>()
+                            return new 
                             {
                                 message = "Tạo transaction thành công",
                                 result = true,
                                 value = (Guid)partnerTransactionId,
+                                success = true
                             };
                         }
                     }

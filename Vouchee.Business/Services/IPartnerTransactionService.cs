@@ -11,6 +11,6 @@ namespace Vouchee.Business.Services
 {
     public interface IPartnerTransactionService
     {
-        public Task<ResponseMessage<Guid>> CreatePartnerTransactionAsync(CreateSePayPartnerInTransactionDTO createWalletTransactionDTO);
+        public Task<dynamic> CreatePartnerTransactionAsync(CreateSePayPartnerInTransactionDTO createWalletTransactionDTO);
     }
 }
