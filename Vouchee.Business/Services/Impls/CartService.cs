@@ -108,7 +108,7 @@ namespace Vouchee.Business.Services.Impls
             return _cartDTO;
         }
 
-        public async Task<CartDTO> AddItemAsync(Guid modalId, ThisUserObj thisUserObj, int quantity = 1)
+        public async Task<CartDTO> AddItemAsync(Guid modalId, ThisUserObj thisUserObj, int quantity)
         {
             await GetCartsAsync(thisUserObj, true);
 
