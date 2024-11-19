@@ -35,7 +35,7 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<ResponseMessage<Guid>> CreateTopUpRequest(CreateTopUpRequestDTO createTopUpRequestDTO, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<string>> CreateTopUpRequest(CreateTopUpRequestDTO createTopUpRequestDTO, ThisUserObj thisUserObj)
         {
             var user = await _userRepository.GetByIdAsync(thisUserObj.userId, includeProperties: x => x.Include(x => x.BuyerWallet), isTracking: true);
 
@@ -56,12 +56,12 @@ namespace Vouchee.Business.Services.Impls
                 BuyerWalletId = user.BuyerWallet.Id,
             };
 
-            var result = await _topUpRequestRepository.AddAsync(topUpRequest);
-            return new ResponseMessage<Guid>()
+            var result = await _topUpRequestRepository.AddReturnString(topUpRequest);
+            return new ResponseMessage<string>()
             {
                 message = "Tạo top up request thành công",
                 result = true,
-                value = (Guid)result
+                value = result
             };
         }
 

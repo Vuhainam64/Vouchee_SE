@@ -1,4 +1,6 @@
-﻿using System;
+﻿using shortid.Configuration;
+using shortid;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -11,6 +13,11 @@ namespace Vouchee.Data.Models.Entities
     [Table(nameof(MoneyRequest))]
     public class MoneyRequest
     {
+        public MoneyRequest()
+        {
+            Id = ShortId.Generate(new GenerationOptions(useSpecialCharacters: false));
+        }
+
         public Guid? UserId { get; set; }
         [ForeignKey(nameof(UserId))]
         [InverseProperty(nameof(User.MoneyRequests))]
@@ -21,9 +28,8 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty(nameof(WalletTransaction.WithDrawRequest))]
         public virtual WalletTransaction? WithdrawWalletTransaction { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
-        public Guid Id { get; set; }
+        public string Id { get; set; }
 
         public int Amount { get; set; }
         public string? Type { get; set; }

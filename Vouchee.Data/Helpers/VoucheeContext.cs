@@ -62,7 +62,6 @@ namespace Vouchee.Data.Helpers
             modelBuilder.Entity<Cart>().HasKey(c => new { c.BuyerId, c.ModalId });
             modelBuilder.Entity<Modal>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Notification>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
-            modelBuilder.Entity<MoneyRequest>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Wallet>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<WalletTransaction>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<PartnerTransaction>().Property(x => x.Id).HasDefaultValueSql("NEWID()");

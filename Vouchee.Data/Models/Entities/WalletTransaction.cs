@@ -31,12 +31,12 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty(nameof(BuyerWallet.BuyerWalletTransactions))]
         public virtual Wallet? BuyerWallet { get; set; }
 
-        public Guid? TopUpRequestId { get; set; }
+        public string? TopUpRequestId { get; set; }
         [ForeignKey(nameof(TopUpRequestId))]
         [InverseProperty(nameof(MoneyRequest.TopUpWalletTransaction))]
         public virtual MoneyRequest? TopUpRequest { get; set; }
 
-        public Guid? WithdrawRequestId { get; set; }
+        public string? WithdrawRequestId { get; set; }
         [ForeignKey(nameof(WithdrawRequestId))]
         [InverseProperty(nameof(MoneyRequest.WithdrawWalletTransaction))]
         public virtual MoneyRequest? WithDrawRequest { get; set; }

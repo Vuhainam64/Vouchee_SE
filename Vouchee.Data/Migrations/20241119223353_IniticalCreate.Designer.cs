@@ -12,8 +12,8 @@ using Vouchee.Data.Helpers;
 namespace Vouchee.Data.Migrations
 {
     [DbContext(typeof(VoucheeContext))]
-    [Migration("20241119214739_RenameTotalQuantity")]
-    partial class RenameTotalQuantity
+    [Migration("20241119223353_IniticalCreate")]
+    partial class IniticalCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -320,10 +320,8 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.MoneyRequest", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWID()");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Amount")
                         .HasColumnType("int");
@@ -658,7 +656,7 @@ namespace Vouchee.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("TotalQuantitySole")
+                    b.Property<int?>("TotalQuantitySold")
                         .HasColumnType("int");
 
                     b.Property<Guid?>("UpdateBy")
@@ -781,7 +779,7 @@ namespace Vouchee.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TotalQuantitySole")
+                    b.Property<int>("TotalQuantitySold")
                         .HasColumnType("int");
 
                     b.Property<Guid?>("UpdateBy")
@@ -977,8 +975,8 @@ namespace Vouchee.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("TopUpRequestId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("TopUpRequestId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -990,8 +988,8 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("WithdrawRequestId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("WithdrawRequestId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 

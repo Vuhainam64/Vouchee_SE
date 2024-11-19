@@ -42,12 +42,14 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<ResponseMessage<Guid>> CreatePartnerTransactionAsync(CreateSePayPartnerInTransactionDTO createPartnerTransaction)
+        public async Task<dynamic> CreatePartnerTransactionAsync(CreateSePayPartnerInTransactionDTO createPartnerTransaction)
         {
             try
             {
-                Regex orderRegex = new Regex(@"\bORDER-([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})\b");
-                Regex topupRegex = new Regex(@"\bTOPUP-([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})\b");
+                string input = createPartnerTransaction.code;
+
+                // Unified regex for ORDER and TOPUP
+                Regex regex = new Regex(@"\b(ORDER|TOPUP)([a-zA-Z0-9]{1,})\b");
 
                 PartnerTransaction partnerTransaction = _mapper.Map<PartnerTransaction>(createPartnerTransaction);
                 partnerTransaction.PartnerTransactionId = createPartnerTransaction.id;
@@ -60,35 +62,39 @@ namespace Vouchee.Business.Services.Impls
 
                 var partnerTransactionId = await _partnerTransactionRepository.AddAsync(partnerTransaction);
 
-                if (partnerTransactionId != Guid.Empty)
+                if (partnerTransactionId != Guid.Empty && !string.IsNullOrEmpty(input))
                 {
-                    if (createPartnerTransaction.content != null)
+                    // Match and replace the content
+                    Match match = regex.Match(input);
+                    if (match.Success)
                     {
-                        // ORDER
-                        Match orderMatch = orderRegex.Match(createPartnerTransaction.content);
-                        if (orderMatch.Success && orderMatch.Groups.Count > 1)
-                        {
-                            string orderId = orderMatch.Groups[1].Value;
-                            if (orderId == null)
-                            {
-                                throw new NotFoundException($"Không tìm thấy mã đơn hàng {orderId} trong content");
-                            }
+                        string transactionType = match.Groups[1].Value; // ORDER or TOPUP
+                        string identifier = match.Groups[2].Value;     // The alphanumeric identifier
 
-                            var existedOrder = await _orderRepository.GetByIdAsync(Guid.Parse(orderId), includeProperties: x => x.Include(x => x.OrderDetails)
-                                                                                                                                        .ThenInclude(x => x.Modal.Voucher.Seller)
-                                                                                                                                    .Include(x => x.Buyer)
-                                                                                                                                        .ThenInclude(x => x.BuyerWallet),
-                                                                                                                                    isTracking: true);
+                        // Replace the content in the input
+                        string convertedContent = $"{transactionType}-{identifier}";
+                        createPartnerTransaction.content = convertedContent;
+
+                        // Proceed based on transaction type
+                        if (transactionType == "ORDER")
+                        {
+                            string orderId = identifier;
+
+                            var existedOrder = await _orderRepository.GetByIdAsync(orderId, includeProperties: x => x.Include(x => x.OrderDetails)
+                                                                                                                                 .ThenInclude(x => x.Modal.Voucher.Seller)
+                                                                                                                             .Include(x => x.Buyer)
+                                                                                                                                 .ThenInclude(x => x.BuyerWallet),
+                                                                                                                             isTracking: true);
 
                             if (existedOrder == null)
                             {
                                 throw new NotFoundException($"Không tìm thấy order {orderId} trong db");
                             }
 
+                            // Update order details
                             existedOrder.PartnerTransactionId = partnerTransactionId;
                             existedOrder.Status = OrderStatusEnum.PAID.ToString();
 
-                            // trừ tiền của người mua 
                             if (existedOrder.UsedBalance > 0)
                             {
                                 existedOrder.Buyer.BuyerWallet.Balance -= existedOrder.UsedBalance;
@@ -98,10 +104,12 @@ namespace Vouchee.Business.Services.Impls
                                     CreateBy = existedOrder.Buyer.Id,
                                     CreateDate = DateTime.Now,
                                     Status = WalletTransactionStatusEnum.DONE.ToString(),
-                                    Amount = existedOrder.Buyer.BuyerWallet.Balance,
+                                    Amount = existedOrder.UsedBalance,
+                                    OrderId = existedOrder.Id
                                 });
                             }
 
+                            // Process seller wallet updates
                             foreach (var seller in existedOrder.OrderDetails.GroupBy(x => x.Modal.Voucher.SellerId))
                             {
                                 var amount = seller.Sum(x => x.FinalPrice);
@@ -121,72 +129,61 @@ namespace Vouchee.Business.Services.Impls
                                     CreateDate = DateTime.Now,
                                     Status = WalletTransactionStatusEnum.DONE.ToString(),
                                     Amount = amount,
+                                    OrderId = existedOrder.Id,
                                 });
                             }
 
                             await _userRepository.SaveChanges();
-
                             await _orderRepository.SaveChanges();
 
-                            return new ResponseMessage<Guid>()
+                            return new
                             {
                                 message = "Tạo transaction thành công",
                                 result = true,
-                                value = (Guid)partnerTransactionId,
+                                value = partnerTransactionId,
+                                success = true
                             };
                         }
-                    }
-
-                    Match topUpMatch = topupRegex.Match(createPartnerTransaction.content);
-
-                    if (topUpMatch.Success && topUpMatch.Groups.Count > 1)
-                    {
-                        string topUpRequestId = topUpMatch.Groups[1].Value;
-
-                        if (topUpRequestId == null)
+                        else if (transactionType == "TOPUP")
                         {
-                            throw new NotFoundException($"Không tìm thấy mã top up {topUpRequestId} trong content");
+                            string topUpRequestId = identifier;
+
+                            var existedTopUpRequest = await _topUpRequestRepository.GetByIdAsync(topUpRequestId, includeProperties: x => x.Include(x => x.TopUpWalletTransaction)
+                                                                                                                                 .ThenInclude(x => x.BuyerWallet),
+                                                                                                                                 isTracking: true);
+
+                            if (existedTopUpRequest == null)
+                            {
+                                throw new NotFoundException($"Không tìm thấy top up request của người này");
+                            }
+
+                            existedTopUpRequest.Status = WalletTransactionStatusEnum.PAID.ToString();
+                            existedTopUpRequest.UpdateDate = DateTime.Now;
+
+                            existedTopUpRequest.TopUpWalletTransaction.PartnerTransactionId = partnerTransactionId;
+                            existedTopUpRequest.TopUpWalletTransaction.UpdateDate = DateTime.Now;
+                            existedTopUpRequest.TopUpWalletTransaction.Status = WalletTransactionStatusEnum.PAID.ToString();
+                            existedTopUpRequest.TopUpWalletTransaction.BuyerWallet.Balance += (int)partnerTransaction.AmountIn;
+                            existedTopUpRequest.TopUpWalletTransaction.BuyerWallet.UpdateDate = DateTime.Now;
+
+                            await _topUpRequestRepository.SaveChanges();
+
+                            return new
+                            {
+                                message = "Tạo transaction thành công",
+                                result = true,
+                                value = partnerTransactionId,
+                                success = true
+                            };
                         }
-
-                        var existedTopUpRequest = await _topUpRequestRepository.GetByIdAsync(Guid.Parse(topUpRequestId), includeProperties: x => x.Include(x => x.TopUpWalletTransaction)
-                                                                                                                                .ThenInclude(x => x.BuyerWallet), 
-                                                                                                                                isTracking: true);
-
-                        if (existedTopUpRequest == null)
-                        {
-                            throw new NotFoundException($"Không tìm thấy top up request của người này");
-                        }
-
-                        if (existedTopUpRequest.TopUpWalletTransaction != null && existedTopUpRequest.TopUpWalletTransaction.BuyerWallet == null)
-                        {
-                            throw new NotFoundException("$Không tìm thấy ví buyer của người này");
-                        }
-
-                        existedTopUpRequest.Status = WalletTransactionStatusEnum.PAID.ToString();
-                        existedTopUpRequest.UpdateDate = DateTime.Now;
-
-                        existedTopUpRequest.TopUpWalletTransaction.PartnerTransactionId = partnerTransactionId;
-                        existedTopUpRequest.TopUpWalletTransaction.UpdateDate = DateTime.Now;
-                        existedTopUpRequest.TopUpWalletTransaction.Status = WalletTransactionStatusEnum.PAID.ToString();
-
-                        existedTopUpRequest.TopUpWalletTransaction.BuyerWallet.Balance += (int) partnerTransaction.AmountIn;
-                        existedTopUpRequest.TopUpWalletTransaction.BuyerWallet.UpdateDate = DateTime.Now;
-
-                        await _topUpRequestRepository.SaveChanges();
-
-                        return new ResponseMessage<Guid>()
-                        {
-                            message = "Tạo transaction thành công",
-                            result = true,
-                            value = (Guid) partnerTransactionId,
-                        };
                     }
                 }
                 return null;
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                // Handle exceptions appropriately
+                throw new Exception("An error occurred during transaction processing.", ex);
             }
         }
     }
