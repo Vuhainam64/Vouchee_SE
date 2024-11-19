@@ -94,6 +94,7 @@ namespace Vouchee.Data.Models.DTOs
         public DateTime? endDate { get; set; }
         public int? stock { get; set; }
         public string? image { get; set; }
+        public string type = "SHOP";
 
         public bool? isActive { get; set; }
         public string? status { get; set; }

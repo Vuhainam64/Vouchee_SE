@@ -26,6 +26,7 @@ namespace Vouchee.Data.Models.DTOs
         public int? maxMoneyToDiscount { get; set; }
         public int? minMoneyToAppy { get; set; }
         public int? requiredQuantity { get; set; }
+        public string type = "MODAL";
 
         public bool? isActive { get; set; }
         public string? status { get; set; }
