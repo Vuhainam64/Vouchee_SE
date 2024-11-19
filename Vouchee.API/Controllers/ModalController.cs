@@ -20,15 +20,12 @@ namespace Vouchee.API.Controllers
     {
         private readonly IModalService _modalService;
         private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
 
         public ModalController(IModalService modalService, 
-                                        IUserService userService, 
-                                        IRoleService roleService)
+                                        IUserService userService)
         {
             _modalService = modalService;
             _userService = userService;
-            _roleService = roleService;
         }
 
         // CREATE
@@ -36,7 +33,7 @@ namespace Vouchee.API.Controllers
         [Authorize]
         public async Task<IActionResult> CreateModal(Guid voucherId, [FromBody] CreateModalDTO createModalDTO)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             //SELLER
             var result = await _modalService.CreateModalAsync(voucherId, createModalDTO, currentUser);
@@ -52,6 +49,7 @@ namespace Vouchee.API.Controllers
             var result = await _modalService.GetModalsAsync(pagingRequest, modalFilter);
             return Ok(result);
         }
+
         // GET BY ID
         [HttpGet("get_modal/{id}")]
         [Authorize]
@@ -73,12 +71,6 @@ namespace Vouchee.API.Controllers
         public async Task<IActionResult> UpdateModalStatus(Guid id, VoucherStatusEnum modalStatus)
         {
             var result = await _modalService.UpdateModalStatusAsync(id, modalStatus);
-            return Ok(result);
-        }
-        [HttpPut("update_many_modals_status")]
-        public async Task<IActionResult> UpdateManyModalStatus([FromBody] List<Guid> Modals)
-        {
-            var result = await _modalService.UpdateManyModalStatusAsync(Modals);
             return Ok(result);
         }
         [HttpPut("update_modal_isActive/{id}")]

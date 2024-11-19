@@ -16,7 +16,7 @@ namespace Vouchee.Data.Models.Entities
         [Key]
         public Guid Id { get; set; }
 
-        public Guid? OrderId { get; set; }
+        public string? OrderId { get; set; }
         [ForeignKey(nameof(OrderId))]
         [InverseProperty(nameof(Order.WalletTransactions))]
         public virtual Order? Order { get; set; }
@@ -33,8 +33,13 @@ namespace Vouchee.Data.Models.Entities
 
         public Guid? TopUpRequestId { get; set; }
         [ForeignKey(nameof(TopUpRequestId))]
-        [InverseProperty(nameof(TopUpRequest.WalletTransaction))]
-        public virtual TopUpRequest? TopUpRequest { get; set; }
+        [InverseProperty(nameof(MoneyRequest.TopUpWalletTransaction))]
+        public virtual MoneyRequest? TopUpRequest { get; set; }
+
+        public Guid? WithdrawRequestId { get; set; }
+        [ForeignKey(nameof(WithdrawRequestId))]
+        [InverseProperty(nameof(MoneyRequest.WithdrawWalletTransaction))]
+        public virtual MoneyRequest? WithDrawRequest { get; set; }
 
         public Guid? PartnerTransactionId { get; set; }
         [ForeignKey(nameof(PartnerTransactionId))]
@@ -47,7 +52,7 @@ namespace Vouchee.Data.Models.Entities
         public int AfterBalance { get; set; }
 
         public required string Status { get; set; }
-        public DateTime? CreateDate { get; set; } = DateTime.Now;
+        public DateTime? CreateDate { get; set; } 
         public Guid? CreateBy { get; set; }
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }

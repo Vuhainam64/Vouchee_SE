@@ -11,15 +11,15 @@ namespace Vouchee.Business.Services
 {
     public interface IModalPromotionService
     {
-        // CREATE
-        public Task<ResponseMessage<Guid>> CreateModalPromotionAsync(CreateModalPromotionDTO createModalPromotionDTO, ThisUserObj thisUserObj);
+        //// CREATE
+        //public Task<ResponseMessage<Guid>> CreateModalPromotionAsync(CreateModalPromotionDTO createModalPromotionDTO, ThisUserObj thisUserObj);
 
-        // READ
-        public Task<GetDetailModalPromotionDTO> GetModalPromotionById(Guid id);
-        public Task<IList<GetDetailModalPromotionDTO>> GetModalPromotionBySeller(Guid sellerId);
+        //// READ
+        //public Task<GetDetailModalPromotionDTO> GetModalPromotionById(Guid id);
+        //public Task<IList<GetDetailModalPromotionDTO>> GetModalPromotionBySeller(Guid sellerId);
 
-        // UPDATE
+        //// UPDATE
         
-        // DELETE
+        //// DELETE
     }
 }

@@ -22,7 +22,6 @@ namespace Vouchee.Business.Services.Impls
     public class AuthService : IAuthService
     {
         private readonly AppSettings _appSettings;
-        private readonly IBaseRepository<Role> _roleRepository;
         private readonly IBaseRepository<User> _userRepository;
         private readonly IBaseRepository<Wallet> _walletRepository;
         private readonly IMapper _mapper;
@@ -30,7 +29,6 @@ namespace Vouchee.Business.Services.Impls
 
         public AuthService(IOptions<AppSettings> appSettings, 
                             IBaseRepository<User> userRepository,
-                            IBaseRepository<Role> roleRepository,
                             IBaseRepository<Wallet> walletRepository,
                             IDistributedCache cache,
                             IMapper mapper)
@@ -40,7 +38,6 @@ namespace Vouchee.Business.Services.Impls
             _appSettings = appSettings.Value;
             _userRepository = userRepository;
             _mapper = mapper;
-            _roleRepository = roleRepository;
         }
 
         public async Task<AuthResponse> GetToken(string firebaseToken)
@@ -56,19 +53,16 @@ namespace Vouchee.Business.Services.Impls
             var phoneNumber = userRecord.PhoneNumber?.ToString() ?? null;
             string lastName = userRecord.DisplayName;
 
-            var user = await _userRepository.GetFirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()), 
-                                                                        includeProperties: x => x.Include(x => x.Role));
-            GetUserDTO useDTO = _mapper.Map<GetUserDTO>(user);
+            var user = await _userRepository.GetFirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()));
+            GetUserDTO userDTO = _mapper.Map<GetUserDTO>(user);
 
-            if (useDTO == null)
+            if (userDTO == null)
             {
-                Guid roleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.USER.ToString()));
-
-                User newBuyer = new()
+                User newUser = new()
                 {
                     Email = email,
                     Image = imageUrl,
-                    RoleId = roleId,
+                    Role = RoleEnum.USER.ToString(),
                     Name = lastName,
                     Status = ObjectStatusEnum.ACTIVE.ToString(),
                     CreateDate = DateTime.Now,
@@ -84,7 +78,7 @@ namespace Vouchee.Business.Services.Impls
                     }
                 };
 
-                Guid? newUserId = await _userRepository.AddAsync(newBuyer);
+                Guid? newUserId = await _userRepository.AddAsync(newUser);
                 if (newUserId == null)
                 {
                     throw new RegisterException("Đăng ký tài khoản mới không thành công");
@@ -97,21 +91,19 @@ namespace Vouchee.Business.Services.Impls
                 response.image = imageUrl;
                 response.phoneNumber = phoneNumber;
                 response.name = userRecord.DisplayName;
-                response.roleId = RoleDictionary.role.GetValueOrDefault(RoleEnum.USER.ToString());
-                response.roleName = RoleEnum.USER.ToString();
+                response.role = newUser.Role;
                 response = await GenerateTokenAsync(response, RoleEnum.USER.ToString());
             }
             else
             {
                 response.email = email;
-                response.id = useDTO.id.ToString();
+                response.id = userDTO.id.ToString();
                 response.uid = uid;
-                response.image = useDTO.image ?? imageUrl;
-                response.roleId = useDTO.roleId.ToString();
-                response.roleName = useDTO.roleName;
-                response.name = useDTO.name;
+                response.image = userDTO.image ?? imageUrl;
+                response.name = userDTO.name;
                 response.phoneNumber = phoneNumber;
-                response = await GenerateTokenAsync(response, useDTO.roleName);
+                response.role = userDTO.role;
+                response = await GenerateTokenAsync(response, userDTO.role);
             }
 
             return response;

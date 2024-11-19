@@ -107,7 +107,6 @@ namespace Vouchee.Business.Services.Impls
             {
                 result = _modalRepository.GetTable()
                             .Include(x => x.VoucherCodes)
-                                .ThenInclude(x => x.OrderDetail)
                             .ProjectTo<GetModalDTO>(_mapper.ConfigurationProvider)
                             .DynamicFilter(_mapper.Map<GetModalDTO>(modalFilter))
                             .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
@@ -175,46 +174,6 @@ namespace Vouchee.Business.Services.Impls
             {
                 throw new NotFoundException("Không tìm thấy modal");
             }
-        }
-
-        public async Task<ResponseMessage<List<GetModalDTO>>> UpdateManyModalStatusAsync(List<Guid> modals)
-        {
-            var result = new List<GetModalDTO>();
-
-            try
-            {
-                foreach (var mod in modals)
-                {
-                    var existedModal = await _modalRepository.GetByIdAsync(mod, isTracking: true);
-                    if (existedModal != null)
-                    {
-                        existedModal.Status = VoucherStatusEnum.PENDING.ToString();
-                        await _modalRepository.UpdateAsync(existedModal);
-                        result.Add(_mapper.Map<GetModalDTO>(existedModal));
-                    }
-                    else
-                    {
-                        throw new NotFoundException("Không tìm thấy modal");
-                    }
-                }
-            }
-            catch (NotFoundException ex)
-            {
-                return new ResponseMessage<List<GetModalDTO>>()
-                {
-                    message = ex.Message,
-                    result = false,
-                    value = null
-                };
-            }
-
-            // Return the response after all modals are processed
-            return new ResponseMessage<List<GetModalDTO>>()
-            {
-                message = "Đổi status thành công",
-                result = true,
-                value = result
-            };
         }
     }
 }

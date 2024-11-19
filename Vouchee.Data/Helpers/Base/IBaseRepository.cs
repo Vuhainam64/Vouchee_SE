@@ -12,6 +12,7 @@ namespace Vouchee.Data.Helpers.Base
 {
     public interface IBaseRepository<TEntity> where TEntity : class
     {
+        Task<string?> AddReturnString(TEntity entity);
         Task<Guid?> AddAsync(TEntity entity);
         Task<TEntity> Add(TEntity entity);
         Task<bool> UpdateAsync(TEntity entity);

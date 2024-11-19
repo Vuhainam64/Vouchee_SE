@@ -25,8 +25,6 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<VoucherCode> VoucherCodes { get; set; }
         [InverseProperty(nameof(OrderDetail.Modal))]
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
-        [InverseProperty(nameof(ModalPromotion.Modals))]
-        public required virtual ICollection<ModalPromotion> ModalPromotions { get; set; }
 
         public Guid VoucherId { get; set; }
         [ForeignKey(nameof(VoucherId))]
@@ -49,7 +47,7 @@ namespace Vouchee.Data.Models.Entities
         public bool IsActive { get; set; }
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; } = DateTime.Now;
+        public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }

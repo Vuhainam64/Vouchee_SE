@@ -14,16 +14,14 @@ namespace Vouchee.Business.Services
     public interface ICategoryService
     {
         // CREATE
-        public Task<Guid?> CreateCategoryAsync(Guid voucherTypeId, CreateCategoryDTO createCategoryDTO, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<Guid>> CreateCategoryAsync(Guid voucherTypeId, CreateCategoryDTO createCategoryDTO, ThisUserObj thisUserObj);
 
         // READ
-        public Task<GetCategoryDTO> GetCategoryByIdAsync(Guid id);
+        public Task<GetDetailCategoryDTO> GetCategoryByIdAsync(Guid id);
         public Task<DynamicResponseModel<GetCategoryDTO>> GetCategoriesAsync(PagingRequest pagingRequest, CategoryFilter categoryFilter);
 
         // UPDATE
-        public Task<bool> UpdateCategoryAsync(Guid id, UpdateCategoryDTO updateCategoryDTO);
-
-        // DELETE
-        public Task<bool> DeleteCategoryAsync(Guid id);
+        public Task<ResponseMessage<bool>> UpdateCategoryAsync(Guid id, UpdateCategoryDTO updateCategoryDTO, ThisUserObj currentUser);
+        public Task<ResponseMessage<bool>> UpdateCategoryStateAsync(Guid id, bool isActive, ThisUserObj currentUser);
     }
 }

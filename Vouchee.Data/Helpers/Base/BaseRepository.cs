@@ -225,5 +225,25 @@ namespace Vouchee.Data.Helpers.Base
         {
             _context.Attach(entity);
         }
+
+        public async Task<string?> AddReturnString(TEntity entity)
+        {
+            try
+            {
+                await _table.AddAsync(entity);
+                var result = await SaveChanges();
+                if (result)
+                {
+                    var idProperty = typeof(TEntity).GetProperty("Id");
+                    return idProperty != null ? (string?)idProperty.GetValue(entity) : null;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.InnerException?.Message);
+                throw new Exception(ex.InnerException?.Message);
+            }
+        }
     }
 }

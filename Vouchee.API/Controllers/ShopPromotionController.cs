@@ -20,15 +20,12 @@ namespace Vouchee.API.Controllers
     {
         private readonly IShopPromotionService _shopPromotionService;
         private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
 
         public ShopPromotionController(IShopPromotionService shopPromotionService,
-                                    IUserService userService,
-                                    IRoleService roleService)
+                                    IUserService userService)
         {
             _shopPromotionService = shopPromotionService;
             _userService = userService;
-            _roleService = roleService;
         }
 
         // CREATE
@@ -36,7 +33,7 @@ namespace Vouchee.API.Controllers
         [Authorize]
         public async Task<IActionResult> CreateShopPromotion([FromBody] CreateShopPromotionDTO createPromotionDTO)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _shopPromotionService.CreateShopPromotionAsync(createPromotionDTO, currentUser);
             return Ok(result);
@@ -58,22 +55,22 @@ namespace Vouchee.API.Controllers
             return Ok(promotion);
         }
 
-        [Authorize]
-        [HttpGet("get_active_shop_promotion")]
-        public async Task<IActionResult> GetActivePromotion()
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
-
-            var promotion = await _shopPromotionService.GetActiveShopPromotion(currentUser);
-            return Ok(promotion);
-        }
-
         [HttpGet("get_promotions_by_shop_id")]
         public async Task<IActionResult> GetShopPromotions(Guid shopId)
         {
             var promotion = await _shopPromotionService.GetShopPromotionByShopId(shopId);
             return Ok(promotion);
         }
+
+        //[Authorize]
+        //[HttpGet("get_active_shop_promotion")]
+        //public async Task<IActionResult> GetActivePromotion()
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+        //    var promotion = await _shopPromotionService.GetActiveShopPromotion(currentUser);
+        //    return Ok(promotion);
+        //}
 
         //[Authorize]
         //[HttpGet("get_shop_promotion")]

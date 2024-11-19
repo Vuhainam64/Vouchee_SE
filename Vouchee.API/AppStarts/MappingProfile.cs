@@ -18,68 +18,79 @@ namespace Vouchee.API.AppStarts
             CreateMap<Voucher, CreateVoucherDTO>().ReverseMap();
             CreateMap<Voucher, UpdateVoucherDTO>().ReverseMap();
 
+            // Mapping for Voucher to GetVoucherDTO
             CreateMap<Voucher, GetVoucherDTO>()
-                .ForMember(dest => dest.totalQuantitySold, opt => opt.MapFrom(src => src.Modals
-                    .SelectMany(m => m.OrderDetails)
-                    .Sum(od => od.Quantity)))
+                .ForMember(dest => dest.shopDiscount, opt => opt.MapFrom(src => src.Seller.ShopPromotions
+                                                                                    .Where(p => p.Stock > 0)
+                                                                                    .OrderByDescending(p => p.PercentDiscount)
+                                                                                    .Select(p => p.PercentDiscount)
+                                                                                    .FirstOrDefault()))
                 .ForMember(dest => dest.image, opt => opt.MapFrom(src => src.Medias.FirstOrDefault(m => m.Index == 0).Url))
                 .ForMember(dest => dest.originalPrice, opt => opt.MapFrom(src => src.Modals.FirstOrDefault(m => m.Index == 0).OriginalPrice))
                 .ForMember(dest => dest.sellPrice, opt => opt.MapFrom(src => src.Modals.FirstOrDefault(m => m.Index == 0).SellPrice))
-                .ForMember(dest => dest.shopDiscount, opt => opt.MapFrom(src => src.Seller.ShopPromotions.FirstOrDefault(p => p.StartDate <= DateTime.Now
-                                                                                        && DateTime.Now <= p.EndDate).PercentDiscount))
-                .ForMember(x => x.brandName, dest => dest.MapFrom(opt => opt.Brand.Name))
-                .ForMember(x => x.brandImage, dest => dest.MapFrom(opt => opt.Brand.Image))
-                .ForMember(x => x.supplierName, dest => dest.MapFrom(opt => opt.Supplier.Name))
-                .ForMember(x => x.supplierImage, dest => dest.MapFrom(opt => opt.Supplier.Image))
-                .ForMember(x => x.sellerName, dest => dest.MapFrom(opt => opt.Seller.Name))
-                .ForMember(x => x.sellerImage, dest => dest.MapFrom(opt => opt.Seller.Image))
+                .ForMember(dest => dest.brandName, opt => opt.MapFrom(src => src.Brand.Name))
+                .ForMember(dest => dest.brandImage, opt => opt.MapFrom(src => src.Brand.Image))
+                .ForMember(dest => dest.supplierName, opt => opt.MapFrom(src => src.Supplier.Name))
+                .ForMember(dest => dest.supplierImage, opt => opt.MapFrom(src => src.Supplier.Image))
+                .ForMember(dest => dest.sellerName, opt => opt.MapFrom(src => src.Seller.Name))
+                .ForMember(dest => dest.sellerImage, opt => opt.MapFrom(src => src.Seller.Image))
                 .ReverseMap();
 
+            // Mapping for Voucher to GetVoucherSellerDTO
             CreateMap<Voucher, GetVoucherSellerDTO>()
-               .ForMember(x => x.supplierName, dest => dest.MapFrom(opt => opt.Supplier.Name))
-               .ForMember(x => x.supplierImage, dest => dest.MapFrom(opt => opt.Supplier.Image))
-               .ForMember(dest => dest.stock, opt => opt.MapFrom(src => src.Modals.Sum(x => x.Stock)))
-               .ForMember(dest => dest.image, opt => opt.MapFrom(src => src.Medias.FirstOrDefault(m => m.Index == 0).Url))
-               .ForMember(dest => dest.originalPrice, opt => opt.MapFrom(src => src.Modals.FirstOrDefault(m => m.Index == 0).OriginalPrice))
-               .ForMember(dest => dest.sellPrice, opt => opt.MapFrom(src => src.Modals.FirstOrDefault(m => m.Index == 0).SellPrice))
-               .ForMember(dest => dest.shopDiscount, opt => opt.MapFrom(src => src.Seller.ShopPromotions.FirstOrDefault(p => p.StartDate <= DateTime.Now
-                                                                                   && DateTime.Now <= p.EndDate).PercentDiscount))
-                .ForMember(x => x.brandName, dest => dest.MapFrom(opt => opt.Brand.Name))
-                .ForMember(x => x.brandImage, dest => dest.MapFrom(opt => opt.Brand.Image))
-                .ForMember(x => x.supplierName, dest => dest.MapFrom(opt => opt.Supplier.Name))
-                .ForMember(x => x.supplierImage, dest => dest.MapFrom(opt => opt.Supplier.Image))
-                .ForMember(x => x.sellerName, dest => dest.MapFrom(opt => opt.Seller.Name))
-                .ForMember(x => x.sellerImage, dest => dest.MapFrom(opt => opt.Seller.Image))
+                .ForMember(dest => dest.shopDiscount, opt => opt.MapFrom(src => src.Seller.ShopPromotions
+                                                                                    .Where(p => p.Stock > 0)
+                                                                                    .OrderByDescending(p => p.PercentDiscount)
+                                                                                    .Select(p => p.PercentDiscount)
+                                                                                    .FirstOrDefault()))
+                .ForMember(dest => dest.supplierName, opt => opt.MapFrom(src => src.Supplier.Name))
+                .ForMember(dest => dest.supplierImage, opt => opt.MapFrom(src => src.Supplier.Image))
+                .ForMember(dest => dest.stock, opt => opt.MapFrom(src => src.Modals.Sum(m => m.Stock)))
+                .ForMember(dest => dest.image, opt => opt.MapFrom(src => src.Medias.FirstOrDefault(m => m.Index == 0).Url))
+                .ForMember(dest => dest.originalPrice, opt => opt.MapFrom(src => src.Modals.FirstOrDefault(m => m.Index == 0).OriginalPrice))
+                .ForMember(dest => dest.sellPrice, opt => opt.MapFrom(src => src.Modals.FirstOrDefault(m => m.Index == 0).SellPrice))
+                .ForMember(dest => dest.brandName, opt => opt.MapFrom(src => src.Brand.Name))
+                .ForMember(dest => dest.brandImage, opt => opt.MapFrom(src => src.Brand.Image))
+                .ForMember(dest => dest.sellerName, opt => opt.MapFrom(src => src.Seller.Name))
+                .ForMember(dest => dest.sellerImage, opt => opt.MapFrom(src => src.Seller.Image))
                 .ReverseMap();
 
+            // Mapping for Voucher to GetDetailVoucherDTO
             CreateMap<Voucher, GetDetailVoucherDTO>()
+                .ForMember(dest => dest.shopDiscount, opt => opt.MapFrom(src => src.Seller.ShopPromotions
+                                                                                    .Where(p => p.Stock > 0)
+                                                                                    .OrderByDescending(p => p.PercentDiscount)
+                                                                                    .Select(p => p.PercentDiscount)
+                                                                                    .FirstOrDefault()))
                 .ForMember(dest => dest.image, opt => opt.MapFrom(src => src.Medias.FirstOrDefault(m => m.Index == 0).Url))
                 .ForMember(dest => dest.originalPrice, opt => opt.MapFrom(src => src.Modals.FirstOrDefault(m => m.Index == 0).OriginalPrice))
                 .ForMember(dest => dest.sellPrice, opt => opt.MapFrom(src => src.Modals.FirstOrDefault(m => m.Index == 0).SellPrice))
-                .ForMember(dest => dest.shopDiscount, opt => opt.MapFrom(src => src.Seller.ShopPromotions.FirstOrDefault(p => p.StartDate <= DateTime.Now
-                                                                                    && DateTime.Now <= p.EndDate).PercentDiscount))
-                .ForMember(x => x.brandName, dest => dest.MapFrom(opt => opt.Brand.Name))
-                .ForMember(x => x.brandImage, dest => dest.MapFrom(opt => opt.Brand.Image))
-                .ForMember(x => x.supplierName, dest => dest.MapFrom(opt => opt.Supplier.Name))
-                .ForMember(x => x.supplierImage, dest => dest.MapFrom(opt => opt.Supplier.Image))
-                .ForMember(x => x.sellerName, dest => dest.MapFrom(opt => opt.Seller.Name))
-                .ForMember(x => x.sellerImage, dest => dest.MapFrom(opt => opt.Seller.Image))
-                .ForMember(x => x.addresses, dest => dest.MapFrom(opt => opt.Brand.Addresses))
+                .ForMember(dest => dest.brandName, opt => opt.MapFrom(src => src.Brand.Name))
+                .ForMember(dest => dest.brandImage, opt => opt.MapFrom(src => src.Brand.Image))
+                .ForMember(dest => dest.supplierName, opt => opt.MapFrom(src => src.Supplier.Name))
+                .ForMember(dest => dest.supplierImage, opt => opt.MapFrom(src => src.Supplier.Image))
+                .ForMember(dest => dest.sellerName, opt => opt.MapFrom(src => src.Seller.Name))
+                .ForMember(dest => dest.sellerImage, opt => opt.MapFrom(src => src.Seller.Image))
+                .ForMember(dest => dest.addresses, opt => opt.MapFrom(src => src.Brand.Addresses))
                 .ReverseMap();
 
+            // Mapping for Voucher to GetNearestVoucherDTO
             CreateMap<Voucher, GetNearestVoucherDTO>()
+                .ForMember(dest => dest.shopDiscount, opt => opt.MapFrom(src => src.Seller.ShopPromotions
+                                                                                    .Where(p => p.Stock > 0)
+                                                                                    .OrderByDescending(p => p.PercentDiscount)
+                                                                                    .Select(p => p.PercentDiscount) 
+                                                                                    .FirstOrDefault())) 
                 .ForMember(dest => dest.image, opt => opt.MapFrom(src => src.Medias.FirstOrDefault(m => m.Index == 0).Url))
                 .ForMember(dest => dest.originalPrice, opt => opt.MapFrom(src => src.Modals.FirstOrDefault(m => m.Index == 0).OriginalPrice))
                 .ForMember(dest => dest.sellPrice, opt => opt.MapFrom(src => src.Modals.FirstOrDefault(m => m.Index == 0).SellPrice))
-                .ForMember(dest => dest.shopDiscount, opt => opt.MapFrom(src => src.Seller.ShopPromotions.FirstOrDefault(p => p.StartDate <= DateTime.Now
-                                                                                    && DateTime.Now <= p.EndDate).PercentDiscount))
-                .ForMember(x => x.brandName, dest => dest.MapFrom(opt => opt.Brand.Name))
-                .ForMember(x => x.brandImage, dest => dest.MapFrom(opt => opt.Brand.Image))
-                .ForMember(x => x.supplierName, dest => dest.MapFrom(opt => opt.Supplier.Name))
-                .ForMember(x => x.supplierImage, dest => dest.MapFrom(opt => opt.Supplier.Image))
-                .ForMember(x => x.sellerName, dest => dest.MapFrom(opt => opt.Seller.Name))
-                .ForMember(x => x.sellerImage, dest => dest.MapFrom(opt => opt.Seller.Image))
-                .ForMember(x => x.addresses, dest => dest.MapFrom(opt => opt.Brand.Addresses))
+                .ForMember(dest => dest.brandName, opt => opt.MapFrom(src => src.Brand.Name))
+                .ForMember(dest => dest.brandImage, opt => opt.MapFrom(src => src.Brand.Image))
+                .ForMember(dest => dest.supplierName, opt => opt.MapFrom(src => src.Supplier.Name))
+                .ForMember(dest => dest.supplierImage, opt => opt.MapFrom(src => src.Supplier.Image))
+                .ForMember(dest => dest.sellerName, opt => opt.MapFrom(src => src.Seller.Name))
+                .ForMember(dest => dest.sellerImage, opt => opt.MapFrom(src => src.Seller.Image))
+                .ForMember(dest => dest.addresses, opt => opt.MapFrom(src => src.Brand.Addresses))
                 .ReverseMap();
 
             CreateMap<GetVoucherDTO, VoucherFilter>().ReverseMap();
@@ -99,26 +110,17 @@ namespace Vouchee.API.AppStarts
             CreateMap<Order, GetOrderDTO>().ReverseMap();
             CreateMap<GetOrderDTO, OrderFilter>().ReverseMap();
 
-            // ROLE
-            CreateMap<Role, RoleDTO>().ReverseMap();
-            CreateMap<Role, CreateRoleDTO>().ReverseMap();
-            CreateMap<Role, UpdateRoleDTO>().ReverseMap();
-            CreateMap<Role, GetRoleDTO>().ReverseMap();
-            CreateMap<GetRoleDTO, RoleFilter>().ReverseMap();
-
             // ADDRESS
             CreateMap<Address, CreateAddressDTO>().ReverseMap();
             CreateMap<Address, UpdateAddressDTO>().ReverseMap();
             CreateMap<Address, GetDistanceAddressDTO>().ReverseMap();
             CreateMap<Address, GetAddressDTO>().ReverseMap();
             CreateMap<Address, GetDetailAddressDTO>().ReverseMap();
-            CreateMap<GetDetailAddressDTO, AddressFilter>().ReverseMap();
+            CreateMap<GetAddressDTO, AddressFilter>().ReverseMap();
 
             // SUPPLIER
             CreateMap<Supplier, CreateSupplierDTO>().ReverseMap();
-            CreateMap<Supplier, UpdateSupplierDTO>()
-                
-                .ReverseMap();
+            CreateMap<Supplier, UpdateSupplierDTO>().ReverseMap();
             CreateMap<Supplier, GetSupplierDTO>().ReverseMap();
             CreateMap<GetSupplierDTO, SupplierFilter>().ReverseMap();
             CreateMap<Supplier, BestSuppleriDTO>().ReverseMap();
@@ -127,9 +129,7 @@ namespace Vouchee.API.AppStarts
             CreateMap<User, UserDTO>().ReverseMap();
             CreateMap<User, CreateUserDTO>().ReverseMap();
             CreateMap<User, UpdateUserDTO>().ReverseMap();
-            CreateMap<User, GetUserDTO>()
-                .ForMember(x => x.roleName, dest => dest.MapFrom(opt => opt.Role.Name))
-                .ReverseMap();
+            CreateMap<User, GetUserDTO>().ReverseMap();
             CreateMap<GetUserDTO, UserFilter>().ReverseMap();
             CreateMap<User, RegisterDTO>().ReverseMap();
 
@@ -149,18 +149,23 @@ namespace Vouchee.API.AppStarts
             // CATEGORY
             CreateMap<Category, CreateCategoryDTO>().ReverseMap();
             CreateMap<Category, UpdateCategoryDTO>().ReverseMap();
-            CreateMap<Category, GetCategoryDTO>()
+            CreateMap<Category, CategoryDTO>()
                 .ForMember(x => x.voucherTypeTitle, dest => dest.MapFrom(opt => opt.VoucherType.Title))
                 .ReverseMap();
+            CreateMap<Category, GetCategoryDTO>().ReverseMap();
+            CreateMap<Category, GetDetailCategoryDTO>().ReverseMap();
             CreateMap<GetCategoryDTO, CategoryFilter>().ReverseMap();
 
             // BRAND
-            CreateMap<Brand, CreateBrandDTO>().ReverseMap();
+            CreateMap<Brand, CreateBrandDTO>()
+                .ForMember(dest => dest.addresses, opt => opt.Ignore())
+                .ReverseMap()
+                .ForMember(dest => dest.Addresses, opt => opt.Ignore());
             CreateMap<Brand, UpdateBrandDTO>().ReverseMap();
             CreateMap<Brand, GetDetalBrandDTO>().ReverseMap();
             CreateMap<Brand, GetBrandDTO>().ReverseMap();
-            CreateMap<GetDetalBrandDTO, BrandFilter>().ReverseMap();
-            CreateMap<GetDetalBrandDTO, GetBrandDTO>().ReverseMap();
+            CreateMap<Brand, GetDetalBrandDTO>().ReverseMap();
+            CreateMap<GetBrandDTO, BrandFilter>().ReverseMap();
 
             // IMAGE
             CreateMap<Media, CreateMediaDTO>().ReverseMap();
@@ -177,10 +182,6 @@ namespace Vouchee.API.AppStarts
             CreateMap<Modal, CreateModalDTO>().ReverseMap();
             CreateMap<Modal, UpdateModalDTO>().ReverseMap();
             CreateMap<Modal, GetModalDTO>()
-                .ForMember(dest => dest.shopDiscount, opt => opt.MapFrom(src => src.Voucher.Seller.ShopPromotions.FirstOrDefault(p => p.StartDate <= DateTime.Now
-                                                                                                                    && DateTime.Now <= p.EndDate).PercentDiscount))
-                .ForMember(dest => dest.shopPromotionId, opt => opt.MapFrom(src => src.Voucher.Seller.ShopPromotions.FirstOrDefault(p => p.StartDate <= DateTime.Now
-                                                                && DateTime.Now <= p.EndDate).Id))
                 .ForMember(dest => dest.brandId, opt => opt.MapFrom(src => src.Voucher.Brand.Id))
                 .ForMember(dest => dest.brandName, opt => opt.MapFrom(src => src.Voucher.Brand.Name))
                 .ForMember(dest => dest.brandImage, opt => opt.MapFrom(src => src.Voucher.Brand.Image))
@@ -206,11 +207,6 @@ namespace Vouchee.API.AppStarts
             CreateMap<Wallet, GetBuyerWallet>().ReverseMap();
             CreateMap<Wallet, GetSellerWallet>().ReverseMap();
 
-            // TOP UP REQUEST
-            CreateMap<TopUpRequest, TopUpRequestDTO>().ReverseMap();
-            CreateMap<TopUpRequest, CreateTopUpRequestDTO>().ReverseMap();
-            CreateMap<TopUpRequest, GetTopUpRequestDTO>().ReverseMap();
-
             // WALLET TRANSACTION
             CreateMap<WalletTransaction, WalletTransactionDTO>().ReverseMap();
             CreateMap<WalletTransaction, GetSellerWalletTransaction>().ReverseMap();
@@ -218,10 +214,9 @@ namespace Vouchee.API.AppStarts
             CreateMap<GetSellerWalletTransaction, WalletTransactionFilter>().ReverseMap();
             CreateMap<GetBuyerWalletTransactionDTO, WalletTransactionFilter>().ReverseMap();
 
-            // TOP UP REQUEST
-            CreateMap<TopUpRequest, TopUpRequestDTO>().ReverseMap();
-            CreateMap<TopUpRequest, GetTopUpRequestDTO>().ReverseMap();
-            CreateMap<GetTopUpRequestDTO, TopUpRequestFilter>().ReverseMap();
+            // MONEY REQUEST
+            CreateMap<MoneyRequest, CreateTopUpRequestDTO>().ReverseMap();
+            CreateMap<MoneyRequest, GetTopUpRequestDTO>().ReverseMap();
 
             // PARTNER TRANSACTION
             CreateMap<PartnerTransaction, SePayTransactionDTO>().ReverseMap();
@@ -230,16 +225,12 @@ namespace Vouchee.API.AppStarts
                 .ReverseMap()
                 .ForMember(src => src.Id, opt => opt.Ignore());
 
-            // SHOP PROMOTION
-            CreateMap<ShopPromotion, CreateShopPromotionDTO>().ReverseMap();
-            CreateMap<ShopPromotion, GetShopPromotionDTO>().ReverseMap();
+            // PROMOTION
+            CreateMap<Promotion, CreateShopPromotionDTO>().ReverseMap();
+            CreateMap<Promotion, CreateModalPromotionDTO>().ReverseMap();
+            CreateMap<Promotion, GetShopPromotionDTO>().ReverseMap();
+            CreateMap<Promotion, GetModalPromotionDTO>().ReverseMap();
             CreateMap<GetShopPromotionDTO, ShopPromotionFilter>().ReverseMap();
-
-            // MODAL PROMOTION
-            CreateMap<ModalPromotion, CreateModalPromotionDTO>().ReverseMap();
-            CreateMap<ModalPromotion, GetModalPromotionDTO>().ReverseMap();
-            CreateMap<ModalPromotion, GetDetailModalPromotionDTO>().ReverseMap();
-            CreateMap<GetDetailModalPromotionDTO, CartModalPromotionDTO>().ReverseMap();
         }
     }
 }

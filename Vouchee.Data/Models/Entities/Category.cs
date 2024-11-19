@@ -32,9 +32,9 @@ namespace Vouchee.Data.Models.Entities
         public required string Title { get; set; }
         public string? Image { get; set; }
 
-        public required string Status { get; set; }
+        public bool IsActive { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; } = DateTime.Now;
+        public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }

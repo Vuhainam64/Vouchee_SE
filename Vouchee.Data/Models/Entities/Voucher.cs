@@ -52,11 +52,12 @@ namespace Vouchee.Data.Models.Entities
         public decimal Rating { get; set; }
         public string? Video { get; set; }
         public int Stock { get; set; }
+        public int QuantitySold { get; set; }
 
         public bool IsActive { get; set; }
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; } = DateTime.Now;
+        public DateTime? CreateDate { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }

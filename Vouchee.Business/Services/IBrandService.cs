@@ -8,23 +8,23 @@ using Vouchee.Business.Models;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Filters;
 using Vouchee.Data.Models.DTOs;
+using Vouchee.Data.Models.Constants.Enum.Status;
 
 namespace Vouchee.Business.Services
 {
     public interface IBrandService
     {
         // CREATE
-        public Task<Guid?> CreateBrandAsync(CreateBrandDTO createBrandDTO, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<Guid>> CreateBrandAsync(CreateBrandDTO createBrandDTO, ThisUserObj thisUserObj);
 
         // READ
         public Task<GetDetalBrandDTO> GetBrandByIdAsync(Guid id);
-        public Task<DynamicResponseModel<GetDetalBrandDTO>> GetBrandsAsync(PagingRequest pagingRequest, BrandFilter brandFilter);
-        public Task<IList<GetBrandDTO>> GetBrandsbynameAsync(string name);
+        public Task<DynamicResponseModel<GetBrandDTO>> GetBrandsAsync(PagingRequest pagingRequest, BrandFilter brandFilter);
 
         // UPDATE
-        public Task<bool> UpdateBrandAsync(Guid id, UpdateBrandDTO updateBrandDTO);
-
-        // DELETE
-        public Task<bool> DeleteBrandAsync(Guid id);
+        public Task<ResponseMessage<bool>> UpdateBrandAsync(Guid id, UpdateBrandDTO updateBrandDTO, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<bool>> UpdateBrandStatusAsync(Guid id, ObjectStatusEnum status, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<bool>> UpdateBrandStateAsync(Guid id, bool isActive, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<bool>> VerifyBrand(Guid id, ThisUserObj thisUserObj);
     }
 }

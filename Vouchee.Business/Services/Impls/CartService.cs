@@ -24,10 +24,7 @@ namespace Vouchee.Business.Services.Impls
 {
     public class CartService : ICartService
     {
-        private readonly IModalPromotionService _modalPromotionService;
-
-        private readonly IBaseRepository<ShopPromotion> _shopPromotionRepository;
-        private readonly IBaseRepository<ModalPromotion> _modalPromotoinRepository;
+        private readonly IBaseRepository<Promotion> _shopPromotionRepository;
         private readonly IBaseRepository<Modal> _modalRepository;
         private readonly IBaseRepository<Voucher> _voucherRepository;
         private readonly IBaseRepository<User> _userRepository;
@@ -36,17 +33,13 @@ namespace Vouchee.Business.Services.Impls
         private User? _user;
         private CartDTO? _cartDTO;
 
-        public CartService(IBaseRepository<ShopPromotion> shopPromotionRepository,
-                           IModalPromotionService modalPromotionService,
-                           IBaseRepository<ModalPromotion> modalPromotoinRepository,
+        public CartService(IBaseRepository<Promotion> shopPromotionRepository,
                            IBaseRepository<Modal> modalRepository,
                            IBaseRepository<Voucher> voucherRepository,
                            IBaseRepository<User> userRepository,
                            IMapper mapper)
         {
             _shopPromotionRepository = shopPromotionRepository;
-            _modalPromotionService = modalPromotionService;
-            _modalPromotoinRepository = modalPromotoinRepository;
             _modalRepository = modalRepository;
             _voucherRepository = voucherRepository;
             _userRepository = userRepository;
@@ -57,7 +50,6 @@ namespace Vouchee.Business.Services.Impls
         {
             _user = await _userRepository.GetByIdAsync(thisUserObj.userId,
                                                         includeProperties: query => query
-                                                            .Include(x => x.Role)
                                                             .Include(x => x.Carts)
                                                                 .ThenInclude(cart => cart.Modal)
                                                             .Include(x => x.Carts)
@@ -78,12 +70,6 @@ namespace Vouchee.Business.Services.Impls
             CartDTO cartDTO = new();
 
             cartDTO.vPoint = _user.VPoint;
-
-            if (_user.BuyerWallet == null)
-            {
-                throw new ConflictException("Người này chưa có ví");
-            }
-
             cartDTO.balance = _user.BuyerWallet.Balance;
 
             cartDTO.buyerId = _user.Id;
@@ -104,7 +90,6 @@ namespace Vouchee.Business.Services.Impls
                         sellerCartDTO.modals.FirstOrDefault(x => x.id == cart.ModalId).quantity = cart.Quantity;
 
                         var existedPromotions = await _shopPromotionRepository.GetWhereAsync(x => x.SellerId == sellerCartDTO.sellerId);
-
                         sellerCartDTO.promotions = _mapper.Map<IList<GetShopPromotionDTO>>(existedPromotions);
                     }
 
@@ -113,32 +98,6 @@ namespace Vouchee.Business.Services.Impls
                     cartDTO.totalQuantity = cartDTO.sellers.Sum(x => x.modals.Sum(x => x.quantity));
                 }
             }
-
-            //    var existedShopPromotion = await _shopPromotionRepository.GetByIdAsync(item.promotionId.Value);
-
-            //    if (existedShopPromotion == null)
-            //    {
-            //        throw new NotFoundException($"Không tìm thấy promotion với id {item.promotionId}");
-            //    }
-
-            //    foreach (var seller in _cartDTO.sellers)
-            //    {
-            //        foreach (var modal in seller.modals)
-            //        {
-            //            modal.shopDiscount = existedShopPromotion.PercentDiscount;
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    foreach (var seller in _cartDTO.sellers)
-            //    {
-            //        foreach (var modal in seller.modals)
-            //        {
-            //            modal.shopDiscount = 0;
-            //        }
-            //    }
-            //}
 
             _cartDTO = cartDTO;
             return _cartDTO;
@@ -165,7 +124,7 @@ namespace Vouchee.Business.Services.Impls
                 }
                 else
                 {
-                    cartModal.Quantity += quantity;
+                    cartModal.Quantity += quantity == 0 ? 1 : quantity;
                     cartModal.UpdateBy = thisUserObj.userId;
                     cartModal.UpdateDate = DateTime.Now;
 
@@ -195,35 +154,27 @@ namespace Vouchee.Business.Services.Impls
                 }
 
                 // tam thoi comment lai
-                //if (existedModal.Stock == 0)
-                //{
-                //    throw new NotFoundException("Modal này không có code nào để sử dụng");
-                //}
+                if (existedModal.Stock == 0)
+                {
+                    throw new NotFoundException("Modal này không có code nào để sử dụng");
+                }
 
                 _user.Carts.Add(new()
                 {
                     CreateBy = thisUserObj.userId,
                     CreateDate = DateTime.Now,
-                    Quantity = quantity,
+                    Quantity = quantity == 0 ? 1 : quantity,
                     Modal = existedModal,
                 });
 
-                try
+                var result = await _userRepository.SaveChanges();
+                if (result)
                 {
-                    var result = await _userRepository.SaveChanges();
-                    if (result)
-                    {
-                        await GetCartsAsync(thisUserObj, false);
-                        return _cartDTO;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception(ex.Message);
+                    await GetCartsAsync(thisUserObj, false);
+                    return _cartDTO;
                 }
             }
-
-            throw new Exception("Lỗi không xác định");
+            return null;
         }
 
         public async Task<CartDTO> DecreaseQuantityAsync(Guid modalId, ThisUserObj thisUserObj)
@@ -421,17 +372,25 @@ namespace Vouchee.Business.Services.Impls
                     var appliedPromotion = await _shopPromotionRepository.GetByIdAsync(item.promotionId,
                                                                                 includeProperties: x => x.Include(x => x.Seller));
 
-                    _cartDTO.sellers.FirstOrDefault(x => x.sellerId == appliedPromotion.SellerId).appliedPromotion = _mapper.Map<GetShopPromotionDTO>(appliedPromotion);
-
-                    foreach (var seller in _cartDTO.sellers.Where(x => x.sellerId == appliedPromotion.SellerId))
+                    var currentSeller = _cartDTO.sellers.FirstOrDefault(x => x.sellerId == appliedPromotion.SellerId);
+                    currentSeller.appliedPromotion = _mapper.Map<GetShopPromotionDTO>(appliedPromotion);
+                    foreach (var modal in currentSeller.modals)
                     {
-                        foreach (var modal in seller.modals)
+                        modal.shopPromotionId = appliedPromotion.Id;
+                        if (currentSeller.appliedPromotion.moneyDiscount != 0
+                                && currentSeller.appliedPromotion.moneyDiscount != null)
                         {
-                            modal.shopDiscount = appliedPromotion.PercentDiscount;
+                            modal.shopDiscountMoney = appliedPromotion.MoneyDiscount;
+                        }
+                        else if (currentSeller.appliedPromotion.percentDiscount != 0
+                                && currentSeller.appliedPromotion.percentDiscount != null)
+                        {
+                            modal.shopDiscountPercent = appliedPromotion.PercentDiscount;
                         }
                     }
                 }
             }
+
 
             DetailCartDTO detailCartDTO = new()
             {

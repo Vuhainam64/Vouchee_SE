@@ -73,8 +73,7 @@ namespace Vouchee.Business.Services.Impls
             {
                 var user = await _userRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Carts)
                                                                                                 .Include(x => x.BuyerWallet)
-                                                                                                .Include(x => x.SellerWallet)
-                                                                                                .Include(x => x.Role));
+                                                                                                .Include(x => x.SellerWallet));
                 if (user != null)
                 {
                     GetUserDTO userDTO = _mapper.Map<GetUserDTO>(user);

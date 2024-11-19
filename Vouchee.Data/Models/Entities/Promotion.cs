@@ -8,39 +8,41 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Entities
 {
-    [Table(nameof(ShopPromotion))]
-    public class ShopPromotion
+    [Table(nameof(Promotion))]
+    public class Promotion
     {
-        public ShopPromotion()
+        public Promotion()
         {
-            OrderDetails = [];
+            ShopPromotionOrderDetails = [];
         }
 
         [InverseProperty(nameof(OrderDetail.ShopPromotion))]
-        public virtual ICollection<OrderDetail> OrderDetails { get; set; }
+        public virtual ICollection<OrderDetail> ShopPromotionOrderDetails { get; set; }
 
         public Guid? SellerId { get; set; }
         [ForeignKey(nameof(SellerId))]
-        [InverseProperty(nameof(Seller.ShopPromotions))]
         public required virtual User? Seller { get; set; }
 
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
 
         public required string Name { get; set; }
         public string? Description { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime? StartDate { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime? EndDate { get; set; }
-        public string? Image { get; set; }
         public int? PercentDiscount { get; set; }
+        public int? MoneyDiscount { get; set; }
+        public int? RequiredQuantity { get; set; }
+        public int? MaxMoneyToDiscount { get; set; }
+        public int? MinMoneyToApply { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
         public int? Stock { get; set; }
+        public string? Image { get; set; }
 
         public bool IsActive { get; set; }
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; } = DateTime.Now;
+        public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }

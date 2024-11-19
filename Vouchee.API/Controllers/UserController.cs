@@ -16,13 +16,10 @@ namespace Vouchee.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
 
-        public UserController(IUserService userService,
-                                IRoleService roleService)
+        public UserController(IUserService userService)
         {
             _userService = userService;
-            _roleService = roleService;
         }
 
         [HttpGet("get_all_user")]
@@ -43,7 +40,7 @@ namespace Vouchee.API.Controllers
         [HttpGet("get_user")]
         public async Task<IActionResult> GetUser()
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var user = await _userService.GetUserByIdAsync(currentUser.userId);
             return Ok(user);
@@ -53,7 +50,7 @@ namespace Vouchee.API.Controllers
         [HttpPut("update_user/{id}")]
         public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUserDTO updateUserDTO)
         {
-            ThisUserObj thisUserObj = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService); // Ensure current user is fetched here
+            ThisUserObj thisUserObj = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService); // Ensure current user is fetched here
             var result = await _userService.UpdateUserAsync(id, updateUserDTO, thisUserObj);
             return Ok(result);
         }

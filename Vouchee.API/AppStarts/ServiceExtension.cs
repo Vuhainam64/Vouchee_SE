@@ -25,7 +25,6 @@ namespace Vouchee.API.AppStarts
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IVoucherService, VoucherService>();
             services.AddScoped<IOrderService, OrderService>();
-            services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IAddressService, AddressService>();
             services.AddScoped<ISupplierService, SupplierService>();
             services.AddScoped<IUserService, UserService>();

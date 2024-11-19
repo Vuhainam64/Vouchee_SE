@@ -19,14 +19,15 @@ namespace Vouchee.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Lon = table.Column<decimal>(type: "decimal(38,20)", nullable: true),
                     Lat = table.Column<decimal>(type: "decimal(38,20)", nullable: true),
-                    IsVerfied = table.Column<bool>(type: "bit", nullable: false),
+                    IsVerified = table.Column<bool>(type: "bit", nullable: false),
+                    VerifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    VerifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    VerifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    VerifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -40,7 +41,8 @@ namespace Vouchee.Data.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsVerfied = table.Column<bool>(type: "bit", nullable: false),
+                    IsVerified = table.Column<bool>(type: "bit", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -52,33 +54,6 @@ namespace Vouchee.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Brand", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ModalPromotion",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    StartDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    EndDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    Stock = table.Column<int>(type: "int", nullable: true),
-                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PercentDiscount = table.Column<int>(type: "int", nullable: true),
-                    MoneyDiscount = table.Column<int>(type: "int", nullable: true),
-                    MaxMoneyToDiscount = table.Column<int>(type: "int", nullable: true),
-                    MinMoneyToAppy = table.Column<int>(type: "int", nullable: true),
-                    RequiredQuantity = table.Column<int>(type: "int", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ModalPromotion", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -107,29 +82,21 @@ namespace Vouchee.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Role",
+                name: "User",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Role", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TopUpRequest",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    Amount = table.Column<int>(type: "int", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    HashPassword = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BankName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BankAccount = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ResponsibilityScore = table.Column<int>(type: "int", nullable: false),
+                    VPoint = table.Column<int>(type: "int", nullable: false),
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -138,7 +105,7 @@ namespace Vouchee.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TopUpRequest", x => x.Id);
+                    table.PrimaryKey("PK_User", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -148,6 +115,7 @@ namespace Vouchee.Data.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -184,20 +152,13 @@ namespace Vouchee.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "User",
+                name: "MoneyRequest",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    HashPassword = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BankName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BankAccount = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ResponsibilityScore = table.Column<int>(type: "int", nullable: false),
-                    VPoint = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Amount = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -206,37 +167,12 @@ namespace Vouchee.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_User", x => x.Id);
+                    table.PrimaryKey("PK_MoneyRequest", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_User_Role_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "Role",
+                        name: "FK_MoneyRequest_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
                         principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Category",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    VoucherTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Category", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Category_VoucherType_VoucherTypeId",
-                        column: x => x.VoucherTypeId,
-                        principalTable: "VoucherType",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -274,12 +210,11 @@ namespace Vouchee.Data.Migrations
                 name: "Order",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PartnerTransactionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    PaymentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DiscountValue = table.Column<int>(type: "int", nullable: false),
                     TotalPrice = table.Column<int>(type: "int", nullable: false),
+                    DiscountPrice = table.Column<int>(type: "int", nullable: false),
                     UsedVPoint = table.Column<int>(type: "int", nullable: false),
                     UsedBalance = table.Column<int>(type: "int", nullable: false),
                     GiftEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -305,17 +240,23 @@ namespace Vouchee.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ShopPromotion",
+                name: "Promotion",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
                     SellerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    StartDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    EndDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PercentDiscount = table.Column<int>(type: "int", nullable: true),
+                    MoneyDiscount = table.Column<int>(type: "int", nullable: true),
+                    RequiredQuantity = table.Column<int>(type: "int", nullable: true),
+                    MaxMoneyToDiscount = table.Column<int>(type: "int", nullable: true),
+                    MinMoneyToApply = table.Column<int>(type: "int", nullable: true),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Stock = table.Column<int>(type: "int", nullable: true),
+                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -324,9 +265,9 @@ namespace Vouchee.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ShopPromotion", x => x.Id);
+                    table.PrimaryKey("PK_Promotion", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ShopPromotion_User_SellerId",
+                        name: "FK_Promotion_User_SellerId",
                         column: x => x.SellerId,
                         principalTable: "User",
                         principalColumn: "Id");
@@ -390,26 +331,29 @@ namespace Vouchee.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "WithdrawRequest",
+                name: "Category",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Amount = table.Column<int>(type: "int", nullable: false),
+                    VoucherTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WithdrawRequest", x => x.Id);
+                    table.PrimaryKey("PK_Category", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_WithdrawRequest_User_UserId",
-                        column: x => x.UserId,
-                        principalTable: "User",
-                        principalColumn: "Id");
+                        name: "FK_Category_VoucherType_VoucherTypeId",
+                        column: x => x.VoucherTypeId,
+                        principalTable: "VoucherType",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -459,10 +403,11 @@ namespace Vouchee.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    OrderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     SellerWalletId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     BuyerWalletId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     TopUpRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    WithdrawRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     PartnerTransactionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BeforeBalance = table.Column<int>(type: "int", nullable: false),
@@ -478,6 +423,16 @@ namespace Vouchee.Data.Migrations
                 {
                     table.PrimaryKey("PK_WalletTransaction", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_WalletTransaction_MoneyRequest_TopUpRequestId",
+                        column: x => x.TopUpRequestId,
+                        principalTable: "MoneyRequest",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_WalletTransaction_MoneyRequest_WithdrawRequestId",
+                        column: x => x.WithdrawRequestId,
+                        principalTable: "MoneyRequest",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_WalletTransaction_Order_OrderId",
                         column: x => x.OrderId,
                         principalTable: "Order",
@@ -486,11 +441,6 @@ namespace Vouchee.Data.Migrations
                         name: "FK_WalletTransaction_PartnerTransaction_PartnerTransactionId",
                         column: x => x.PartnerTransactionId,
                         principalTable: "PartnerTransaction",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_WalletTransaction_TopUpRequest_TopUpRequestId",
-                        column: x => x.TopUpRequestId,
-                        principalTable: "TopUpRequest",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_WalletTransaction_Wallet_BuyerWalletId",
@@ -536,6 +486,7 @@ namespace Vouchee.Data.Migrations
                     VoucherId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Index = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -557,7 +508,6 @@ namespace Vouchee.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    ModalPromotionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     VoucherId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     OriginalPrice = table.Column<int>(type: "int", nullable: false),
@@ -577,11 +527,6 @@ namespace Vouchee.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Modal", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Modal_ModalPromotion_ModalPromotionId",
-                        column: x => x.ModalPromotionId,
-                        principalTable: "ModalPromotion",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Modal_Voucher_VoucherId",
                         column: x => x.VoucherId,
@@ -623,15 +568,13 @@ namespace Vouchee.Data.Migrations
                 name: "OrderDetail",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModalId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ModalPromotionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    OrderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ModalId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ShopPromotionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
                     UnitPrice = table.Column<int>(type: "int", nullable: false),
                     ShopDiscountPercent = table.Column<int>(type: "int", nullable: false),
-                    ModalDiscountPercent = table.Column<int>(type: "int", nullable: false),
-                    ModalDiscountMoney = table.Column<int>(type: "int", nullable: false),
+                    ShopDiscountMoney = table.Column<int>(type: "int", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
@@ -641,27 +584,23 @@ namespace Vouchee.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderDetail", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_OrderDetail_ModalPromotion_ModalPromotionId",
-                        column: x => x.ModalPromotionId,
-                        principalTable: "ModalPromotion",
-                        principalColumn: "Id");
+                    table.PrimaryKey("PK_OrderDetail", x => new { x.OrderId, x.ModalId });
                     table.ForeignKey(
                         name: "FK_OrderDetail_Modal_ModalId",
                         column: x => x.ModalId,
                         principalTable: "Modal",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_OrderDetail_Order_OrderId",
                         column: x => x.OrderId,
                         principalTable: "Order",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
-                        name: "FK_OrderDetail_ShopPromotion_ShopPromotionId",
+                        name: "FK_OrderDetail_Promotion_ShopPromotionId",
                         column: x => x.ShopPromotionId,
-                        principalTable: "ShopPromotion",
+                        principalTable: "Promotion",
                         principalColumn: "Id");
                 });
 
@@ -670,15 +609,19 @@ namespace Vouchee.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    ModalId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    OrderDetailId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    OrderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ModalId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsVerified = table.Column<bool>(type: "bit", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    VerifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    VerifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -687,12 +630,11 @@ namespace Vouchee.Data.Migrations
                         name: "FK_VoucherCode_Modal_ModalId",
                         column: x => x.ModalId,
                         principalTable: "Modal",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_VoucherCode_OrderDetail_OrderDetailId",
-                        column: x => x.OrderDetailId,
-                        principalTable: "OrderDetail",
+                        name: "FK_VoucherCode_Order_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Order",
                         principalColumn: "Id");
                 });
 
@@ -722,14 +664,14 @@ namespace Vouchee.Data.Migrations
                 column: "VoucherId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Modal_ModalPromotionId",
-                table: "Modal",
-                column: "ModalPromotionId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Modal_VoucherId",
                 table: "Modal",
                 column: "VoucherId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MoneyRequest_UserId",
+                table: "MoneyRequest",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Notification_ReceiverId",
@@ -757,23 +699,13 @@ namespace Vouchee.Data.Migrations
                 column: "ModalId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderDetail_ModalPromotionId",
-                table: "OrderDetail",
-                column: "ModalPromotionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OrderDetail_OrderId",
-                table: "OrderDetail",
-                column: "OrderId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_OrderDetail_ShopPromotionId",
                 table: "OrderDetail",
                 column: "ShopPromotionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ShopPromotion_SellerId",
-                table: "ShopPromotion",
+                name: "IX_Promotion_SellerId",
+                table: "Promotion",
                 column: "SellerId");
 
             migrationBuilder.CreateIndex(
@@ -782,11 +714,6 @@ namespace Vouchee.Data.Migrations
                 column: "UserId",
                 unique: true,
                 filter: "[UserId] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_User_RoleId",
-                table: "User",
-                column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Voucher_BrandId",
@@ -809,9 +736,9 @@ namespace Vouchee.Data.Migrations
                 column: "ModalId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_VoucherCode_OrderDetailId",
+                name: "IX_VoucherCode_OrderId",
                 table: "VoucherCode",
-                column: "OrderDetailId");
+                column: "OrderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Wallet_BuyerId",
@@ -855,9 +782,11 @@ namespace Vouchee.Data.Migrations
                 filter: "[TopUpRequestId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WithdrawRequest_UserId",
-                table: "WithdrawRequest",
-                column: "UserId");
+                name: "IX_WalletTransaction_WithdrawRequestId",
+                table: "WalletTransaction",
+                column: "WithdrawRequestId",
+                unique: true,
+                filter: "[WithdrawRequestId] IS NOT NULL");
         }
 
         /// <inheritdoc />
@@ -879,13 +808,13 @@ namespace Vouchee.Data.Migrations
                 name: "Notification");
 
             migrationBuilder.DropTable(
+                name: "OrderDetail");
+
+            migrationBuilder.DropTable(
                 name: "VoucherCode");
 
             migrationBuilder.DropTable(
                 name: "WalletTransaction");
-
-            migrationBuilder.DropTable(
-                name: "WithdrawRequest");
 
             migrationBuilder.DropTable(
                 name: "Address");
@@ -894,28 +823,22 @@ namespace Vouchee.Data.Migrations
                 name: "Category");
 
             migrationBuilder.DropTable(
-                name: "OrderDetail");
+                name: "Promotion");
 
             migrationBuilder.DropTable(
-                name: "TopUpRequest");
+                name: "Modal");
+
+            migrationBuilder.DropTable(
+                name: "MoneyRequest");
+
+            migrationBuilder.DropTable(
+                name: "Order");
 
             migrationBuilder.DropTable(
                 name: "Wallet");
 
             migrationBuilder.DropTable(
                 name: "VoucherType");
-
-            migrationBuilder.DropTable(
-                name: "Modal");
-
-            migrationBuilder.DropTable(
-                name: "Order");
-
-            migrationBuilder.DropTable(
-                name: "ShopPromotion");
-
-            migrationBuilder.DropTable(
-                name: "ModalPromotion");
 
             migrationBuilder.DropTable(
                 name: "Voucher");
@@ -931,9 +854,6 @@ namespace Vouchee.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "User");
-
-            migrationBuilder.DropTable(
-                name: "Role");
         }
     }
 }

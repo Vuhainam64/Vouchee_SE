@@ -67,14 +67,5 @@ namespace Vouchee.API.Controllers
             var result = await _supplierService.DeleteSupplierAsync(id);
             return Ok(result);
         }
-
-        [HttpGet("download-voucher-template")]
-        public async Task<IActionResult> DownloadVoucherTemplate()
-        {
-            var fileContent = await _supplierService.GenerateVoucherTemplateAsync();
-            var fileName = "VoucherTemplate.xlsx";
-            return File(fileContent, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
-        }
-
     }
 }

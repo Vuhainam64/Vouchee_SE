@@ -14,15 +14,12 @@ namespace Vouchee.API.Controllers
     public class WalletController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
         private readonly IWalletService _walletService;
 
         public WalletController(IUserService userService,
-                                IRoleService roleService,
                                 IWalletService walletService)
         {
             _userService = userService;
-            _roleService = roleService;
             _walletService = walletService;
         }
 
@@ -30,7 +27,7 @@ namespace Vouchee.API.Controllers
         [HttpPost("create_wallet")]
         public async Task<IActionResult> CreateWallet()
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _walletService.CreateWalletAsync(currentUser);
             return Ok(result);
@@ -40,7 +37,7 @@ namespace Vouchee.API.Controllers
         [HttpGet("get_seller_wallet")]
         public async Task<IActionResult> GetSellerWallet()
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _walletService.GetSellerWalletAsync(currentUser);
             return Ok(result);
@@ -50,7 +47,7 @@ namespace Vouchee.API.Controllers
         [HttpGet("get_buyer_wallet")]
         public async Task<IActionResult> GetBuyerWallet()
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _walletService.GetBuyerWalletAsync(currentUser);
             return Ok(result);

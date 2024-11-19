@@ -90,10 +90,11 @@ namespace Vouchee.Business.Models.DTOs
         public int stock { get; set; }
         public DateTime? createDate { get; set; }
 
-        public int? shopDiscount = 0;
+        public int? shopDiscount { get; set; }
         public int? originalPrice { get; set; }
         public int? sellPrice { get; set; }
         public int? salePrice => sellPrice - ((sellPrice * shopDiscount) / 100);
+        public int? quantitySold { get; set; }
 
         public string? image { get; set; }
 
@@ -116,7 +117,7 @@ namespace Vouchee.Business.Models.DTOs
 
     public class GetVoucherDTO : VoucherDTO
     {
-        public int? totalQuantitySold { get; set; }
+        
     }
 
     public class GetVoucherSellerDTO : VoucherDTO

@@ -5,32 +5,33 @@
 namespace Vouchee.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class RemoveSmOrderProperty : Migration
+    public partial class PropMeida : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "PaymentType",
-                table: "Order");
+                name: "IsActive",
+                table: "Media");
 
-            migrationBuilder.RenameColumn(
-                name: "DiscountValue",
-                table: "Order",
-                newName: "DiscountPrice");
+            migrationBuilder.DropColumn(
+                name: "Status",
+                table: "Media");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "DiscountPrice",
-                table: "Order",
-                newName: "DiscountValue");
+            migrationBuilder.AddColumn<bool>(
+                name: "IsActive",
+                table: "Media",
+                type: "bit",
+                nullable: false,
+                defaultValue: false);
 
             migrationBuilder.AddColumn<string>(
-                name: "PaymentType",
-                table: "Order",
+                name: "Status",
+                table: "Media",
                 type: "nvarchar(max)",
                 nullable: false,
                 defaultValue: "");

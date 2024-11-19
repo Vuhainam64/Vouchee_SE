@@ -18,22 +18,19 @@ namespace Vouchee.API.Controllers
     {
         private readonly INotificationService _notificationService;
         private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
 
         public NotificationController(INotificationService notificationService, 
-                                        IUserService userService, 
-                                        IRoleService roleService)
+                                        IUserService userService)
         {
             _notificationService = notificationService;
             _userService = userService;
-            _roleService = roleService;
         }
 
         [Authorize]
         [HttpPost("create_notification/{receiverId}")]
         public async Task<IActionResult> CreateNotification(Guid receiverId, [FromBody] CreateNotificationDTO createNotificationDTO)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _notificationService.CreateNotificationAsync(receiverId, createNotificationDTO, currentUser);
             return Ok(result);
@@ -44,7 +41,7 @@ namespace Vouchee.API.Controllers
         public async Task<IActionResult> GetReceiverNotifications([FromQuery] PagingRequest pagingRequest,
                                                                         [FromQuery] NotifcationFilter notifcationFilter)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _notificationService.GetNotificationsByToUserIdAsync(pagingRequest, notifcationFilter, currentUser.userId);
             return Ok(result);
@@ -54,7 +51,7 @@ namespace Vouchee.API.Controllers
         [HttpPut("mark_seen_notification/{notificationId}")]
         public async Task<IActionResult> MarkSeenNotification(Guid notificationId)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _notificationService.MarkSeenAsync(notificationId, currentUser);
             return Ok(result);

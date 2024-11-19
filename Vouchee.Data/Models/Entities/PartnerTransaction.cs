@@ -39,6 +39,6 @@ namespace Vouchee.Data.Models.Entities
         public string? Description { get; set; }
         public string? PartnerName { get; set; }
         public int? PartnerTransactionId { get; set; }
-        public DateTime? CreateDate { get; set; } = DateTime.Now;
+        public DateTime? CreateDate { get; set; }
     }
 }

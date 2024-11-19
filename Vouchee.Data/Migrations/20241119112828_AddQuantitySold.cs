@@ -5,14 +5,21 @@
 namespace Vouchee.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class AddShopPromotionStock : Migration
+    public partial class AddQuantitySold : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<int>(
-                name: "Stock",
-                table: "ShopPromotion",
+                name: "QuantitySold",
+                table: "Voucher",
+                type: "int",
+                nullable: false,
+                defaultValue: 0);
+
+            migrationBuilder.AddColumn<int>(
+                name: "QuantitySold",
+                table: "Supplier",
                 type: "int",
                 nullable: true);
         }
@@ -21,8 +28,12 @@ namespace Vouchee.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Stock",
-                table: "ShopPromotion");
+                name: "QuantitySold",
+                table: "Voucher");
+
+            migrationBuilder.DropColumn(
+                name: "QuantitySold",
+                table: "Supplier");
         }
     }
 }

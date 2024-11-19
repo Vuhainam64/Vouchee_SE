@@ -9,6 +9,5 @@ namespace Vouchee.Data.Models.Filters
     public class ModalFilter
     {
         public string? title { get; set; }
-        public string? status { get; set; }
     }
 }

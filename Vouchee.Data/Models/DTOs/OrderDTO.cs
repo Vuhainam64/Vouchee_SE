@@ -39,7 +39,7 @@ namespace Vouchee.Business.Models.DTOs
             orderDetails = new HashSet<GetOrderDetailDTO>();
         }
 
-        public Guid? id { get; set; }
+        public string? id { get; set; }
         public Guid? promotionId { get; set; }
 
         public string? paymentType { get; set; }

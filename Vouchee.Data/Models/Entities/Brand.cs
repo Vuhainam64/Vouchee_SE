@@ -19,7 +19,6 @@ namespace Vouchee.Data.Models.Entities
 
         [InverseProperty(nameof(Voucher.Brand))]
         public virtual ICollection<Voucher> Vouchers { get; set; }
-
         [InverseProperty(nameof(Address.Brands))]
         public virtual ICollection<Address> Addresses { get; set; }
 
@@ -29,11 +28,12 @@ namespace Vouchee.Data.Models.Entities
 
         public required string Name { get; set; }
         public string? Image { get; set; }
-        public bool IsVerfied { get; set; }
+        public bool IsVerified { get; set; }
 
+        public bool IsActive { get; set; }
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; } = DateTime.Now;
+        public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }

@@ -52,21 +52,6 @@ namespace Vouchee.Data.Migrations
                     b.ToTable("CategoryVoucher");
                 });
 
-            modelBuilder.Entity("ModalModalPromotion", b =>
-                {
-                    b.Property<Guid>("ModalPromotionsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ModalsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ModalPromotionsId", "ModalsId");
-
-                    b.HasIndex("ModalsId");
-
-                    b.ToTable("ModalModalPromotion");
-                });
-
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Address", b =>
                 {
                     b.Property<Guid>("Id")
@@ -80,7 +65,10 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<bool>("IsVerfied")
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsVerified")
                         .HasColumnType("bit");
 
                     b.Property<decimal?>("Lat")
@@ -130,7 +118,10 @@ namespace Vouchee.Data.Migrations
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsVerfied")
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsVerified")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
@@ -204,9 +195,8 @@ namespace Vouchee.Data.Migrations
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -243,10 +233,6 @@ namespace Vouchee.Data.Migrations
 
                     b.Property<int>("Index")
                         .HasColumnType("int");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
@@ -329,69 +315,43 @@ namespace Vouchee.Data.Migrations
                     b.ToTable("Modal");
                 });
 
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.ModalPromotion", b =>
+            modelBuilder.Entity("Vouchee.Data.Models.Entities.MoneyRequest", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("NEWID()");
 
-                    b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
 
                     b.Property<Guid?>("CreateBy")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("MaxMoneyToDiscount")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("MinMoneyToAppy")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("MoneyDiscount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("PercentDiscount")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("RequiredQuantity")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("Stock")
-                        .HasColumnType("int");
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.ToTable("ModalPromotion");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("MoneyRequest");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Notification", b =>
@@ -443,10 +403,8 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Order", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWID()");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<Guid>("CreateBy")
                         .HasColumnType("uniqueidentifier");
@@ -493,10 +451,11 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.OrderDetail", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWID()");
+                    b.Property<string>("OrderId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid?>("ModalId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("CreateBy")
                         .HasColumnType("uniqueidentifier");
@@ -504,22 +463,10 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<int>("ModalDiscountMoney")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ModalDiscountPercent")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("ModalId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("ModalPromotionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ShopDiscountMoney")
                         .HasColumnType("int");
 
                     b.Property<int>("ShopDiscountPercent")
@@ -541,13 +488,9 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime");
 
-                    b.HasKey("Id");
+                    b.HasKey("OrderId", "ModalId");
 
                     b.HasIndex("ModalId");
-
-                    b.HasIndex("ModalPromotionId");
-
-                    b.HasIndex("OrderId");
 
                     b.HasIndex("ShopPromotionId");
 
@@ -609,42 +552,7 @@ namespace Vouchee.Data.Migrations
                     b.ToTable("PartnerTransaction");
                 });
 
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.Role", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWID()");
-
-                    b.Property<Guid?>("CreateBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("UpdateBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Role");
-                });
-
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.ShopPromotion", b =>
+            modelBuilder.Entity("Vouchee.Data.Models.Entities.Promotion", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -661,13 +569,22 @@ namespace Vouchee.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
+
+                    b.Property<int?>("MaxMoneyToDiscount")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MinMoneyToApply")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MoneyDiscount")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -676,11 +593,14 @@ namespace Vouchee.Data.Migrations
                     b.Property<int?>("PercentDiscount")
                         .HasColumnType("int");
 
+                    b.Property<int?>("RequiredQuantity")
+                        .HasColumnType("int");
+
                     b.Property<Guid?>("SellerId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -699,7 +619,7 @@ namespace Vouchee.Data.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.ToTable("ShopPromotion");
+                    b.ToTable("Promotion");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Supplier", b =>
@@ -727,6 +647,9 @@ namespace Vouchee.Data.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("QuantitySold")
+                        .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -756,49 +679,12 @@ namespace Vouchee.Data.Migrations
                     b.ToTable("Supplier");
                 });
 
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.TopUpRequest", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWID()");
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("CreateBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("UpdateBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TopUpRequest");
-                });
-
             modelBuilder.Entity("Vouchee.Data.Models.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("NEWID()");
-
-                    b.Property<string>("BankAccount")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BankName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("CreateBy")
                         .HasColumnType("uniqueidentifier");
@@ -816,6 +702,9 @@ namespace Vouchee.Data.Migrations
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -826,8 +715,8 @@ namespace Vouchee.Data.Migrations
                     b.Property<int>("ResponsibilityScore")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("RoleId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Role")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -843,8 +732,6 @@ namespace Vouchee.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
 
                     b.ToTable("User");
                 });
@@ -867,6 +754,9 @@ namespace Vouchee.Data.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
+
+                    b.Property<int>("QuantitySold")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("Rating")
                         .HasColumnType("decimal(10,5)");
@@ -927,11 +817,17 @@ namespace Vouchee.Data.Migrations
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("ModalId")
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ModalId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("OrderDetailId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("OrderId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -943,11 +839,17 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime");
 
+                    b.Property<Guid?>("VerifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("VerifiedDate")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ModalId");
 
-                    b.HasIndex("OrderDetailId");
+                    b.HasIndex("OrderId");
 
                     b.ToTable("VoucherCode");
                 });
@@ -968,9 +870,8 @@ namespace Vouchee.Data.Migrations
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -1057,8 +958,8 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("OrderId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("OrderId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<Guid?>("PartnerTransactionId")
                         .HasColumnType("uniqueidentifier");
@@ -1083,6 +984,9 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid?>("WithdrawRequestId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BuyerWalletId");
@@ -1097,43 +1001,11 @@ namespace Vouchee.Data.Migrations
                         .IsUnique()
                         .HasFilter("[TopUpRequestId] IS NOT NULL");
 
+                    b.HasIndex("WithdrawRequestId")
+                        .IsUnique()
+                        .HasFilter("[WithdrawRequestId] IS NOT NULL");
+
                     b.ToTable("WalletTransaction");
-                });
-
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.WithdrawRequest", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWID()");
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("CreateBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("UpdateBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("WithdrawRequest");
                 });
 
             modelBuilder.Entity("AddressBrand", b =>
@@ -1162,21 +1034,6 @@ namespace Vouchee.Data.Migrations
                     b.HasOne("Vouchee.Data.Models.Entities.Voucher", null)
                         .WithMany()
                         .HasForeignKey("VouchersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ModalModalPromotion", b =>
-                {
-                    b.HasOne("Vouchee.Data.Models.Entities.ModalPromotion", null)
-                        .WithMany()
-                        .HasForeignKey("ModalPromotionsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Vouchee.Data.Models.Entities.Modal", null)
-                        .WithMany()
-                        .HasForeignKey("ModalsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -1231,6 +1088,15 @@ namespace Vouchee.Data.Migrations
                     b.Navigation("Voucher");
                 });
 
+            modelBuilder.Entity("Vouchee.Data.Models.Entities.MoneyRequest", b =>
+                {
+                    b.HasOne("Vouchee.Data.Models.Entities.User", "User")
+                        .WithMany("MoneyRequests")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Notification", b =>
                 {
                     b.HasOne("Vouchee.Data.Models.Entities.User", "Receiver")
@@ -1267,11 +1133,9 @@ namespace Vouchee.Data.Migrations
                 {
                     b.HasOne("Vouchee.Data.Models.Entities.Modal", "Modal")
                         .WithMany("OrderDetails")
-                        .HasForeignKey("ModalId");
-
-                    b.HasOne("Vouchee.Data.Models.Entities.ModalPromotion", "ModalPromotion")
-                        .WithMany("OrderDetails")
-                        .HasForeignKey("ModalPromotionId");
+                        .HasForeignKey("ModalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Vouchee.Data.Models.Entities.Order", "Order")
                         .WithMany("OrderDetails")
@@ -1279,20 +1143,18 @@ namespace Vouchee.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Vouchee.Data.Models.Entities.ShopPromotion", "ShopPromotion")
-                        .WithMany("OrderDetails")
+                    b.HasOne("Vouchee.Data.Models.Entities.Promotion", "ShopPromotion")
+                        .WithMany("ShopPromotionOrderDetails")
                         .HasForeignKey("ShopPromotionId");
 
                     b.Navigation("Modal");
-
-                    b.Navigation("ModalPromotion");
 
                     b.Navigation("Order");
 
                     b.Navigation("ShopPromotion");
                 });
 
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.ShopPromotion", b =>
+            modelBuilder.Entity("Vouchee.Data.Models.Entities.Promotion", b =>
                 {
                     b.HasOne("Vouchee.Data.Models.Entities.User", "Seller")
                         .WithMany("ShopPromotions")
@@ -1308,15 +1170,6 @@ namespace Vouchee.Data.Migrations
                         .HasForeignKey("Vouchee.Data.Models.Entities.Supplier", "UserId");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.User", b =>
-                {
-                    b.HasOne("Vouchee.Data.Models.Entities.Role", "Role")
-                        .WithMany("Users")
-                        .HasForeignKey("RoleId");
-
-                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Voucher", b =>
@@ -1350,17 +1203,15 @@ namespace Vouchee.Data.Migrations
                 {
                     b.HasOne("Vouchee.Data.Models.Entities.Modal", "Modal")
                         .WithMany("VoucherCodes")
-                        .HasForeignKey("ModalId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ModalId");
 
-                    b.HasOne("Vouchee.Data.Models.Entities.OrderDetail", "OrderDetail")
+                    b.HasOne("Vouchee.Data.Models.Entities.Order", "Order")
                         .WithMany("VoucherCodes")
-                        .HasForeignKey("OrderDetailId");
+                        .HasForeignKey("OrderId");
 
                     b.Navigation("Modal");
 
-                    b.Navigation("OrderDetail");
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Wallet", b =>
@@ -1396,9 +1247,13 @@ namespace Vouchee.Data.Migrations
                         .WithMany("SellerWalletTransactions")
                         .HasForeignKey("SellerWalletId");
 
-                    b.HasOne("Vouchee.Data.Models.Entities.TopUpRequest", "TopUpRequest")
-                        .WithOne("WalletTransaction")
+                    b.HasOne("Vouchee.Data.Models.Entities.MoneyRequest", "TopUpRequest")
+                        .WithOne("TopUpWalletTransaction")
                         .HasForeignKey("Vouchee.Data.Models.Entities.WalletTransaction", "TopUpRequestId");
+
+                    b.HasOne("Vouchee.Data.Models.Entities.MoneyRequest", "WithDrawRequest")
+                        .WithOne("WithdrawWalletTransaction")
+                        .HasForeignKey("Vouchee.Data.Models.Entities.WalletTransaction", "WithdrawRequestId");
 
                     b.Navigation("BuyerWallet");
 
@@ -1409,15 +1264,8 @@ namespace Vouchee.Data.Migrations
                     b.Navigation("SellerWallet");
 
                     b.Navigation("TopUpRequest");
-                });
 
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.WithdrawRequest", b =>
-                {
-                    b.HasOne("Vouchee.Data.Models.Entities.User", "User")
-                        .WithMany("WithdrawRequests")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
+                    b.Navigation("WithDrawRequest");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Brand", b =>
@@ -1434,21 +1282,20 @@ namespace Vouchee.Data.Migrations
                     b.Navigation("VoucherCodes");
                 });
 
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.ModalPromotion", b =>
+            modelBuilder.Entity("Vouchee.Data.Models.Entities.MoneyRequest", b =>
                 {
-                    b.Navigation("OrderDetails");
+                    b.Navigation("TopUpWalletTransaction");
+
+                    b.Navigation("WithdrawWalletTransaction");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Order", b =>
                 {
                     b.Navigation("OrderDetails");
 
-                    b.Navigation("WalletTransactions");
-                });
-
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.OrderDetail", b =>
-                {
                     b.Navigation("VoucherCodes");
+
+                    b.Navigation("WalletTransactions");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.PartnerTransaction", b =>
@@ -1458,14 +1305,9 @@ namespace Vouchee.Data.Migrations
                     b.Navigation("WalletTransactions");
                 });
 
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.Role", b =>
+            modelBuilder.Entity("Vouchee.Data.Models.Entities.Promotion", b =>
                 {
-                    b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.ShopPromotion", b =>
-                {
-                    b.Navigation("OrderDetails");
+                    b.Navigation("ShopPromotionOrderDetails");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Supplier", b =>
@@ -1473,16 +1315,13 @@ namespace Vouchee.Data.Migrations
                     b.Navigation("Vouchers");
                 });
 
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.TopUpRequest", b =>
-                {
-                    b.Navigation("WalletTransaction");
-                });
-
             modelBuilder.Entity("Vouchee.Data.Models.Entities.User", b =>
                 {
                     b.Navigation("BuyerWallet");
 
                     b.Navigation("Carts");
+
+                    b.Navigation("MoneyRequests");
 
                     b.Navigation("Orders");
 
@@ -1497,8 +1336,6 @@ namespace Vouchee.Data.Migrations
                     b.Navigation("Supplier");
 
                     b.Navigation("Vouchers");
-
-                    b.Navigation("WithdrawRequests");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Voucher", b =>

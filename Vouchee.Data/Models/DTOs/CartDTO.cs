@@ -46,9 +46,9 @@ namespace Vouchee.Data.Models.DTOs
         public Guid? sellerId { get; set; }
         public string? sellerName { get; set; }
         public string? sellerImage { get; set; }
+        public GetShopPromotionDTO? appliedPromotion { get; set; }
 
         public virtual ICollection<GetShopPromotionDTO> promotions { get; set; }
-        public virtual GetShopPromotionDTO? appliedPromotion { get; set; }
         public virtual ICollection<CartModalDTO> modals { get; set; }
     }
 }

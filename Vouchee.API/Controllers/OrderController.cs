@@ -20,17 +20,14 @@ namespace Vouchee.API.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
         private readonly IVoucherCodeService _voucherCodeSerivce;
 
         public OrderController(IOrderService orderService,
                                 IUserService userService,
-                                IRoleService roleService,
                                 IVoucherCodeService voucherCodeSerivce)
         {
             _orderService = orderService;
             _userService = userService;
-            _roleService = roleService;
             _voucherCodeSerivce = voucherCodeSerivce;
         }
 
@@ -39,7 +36,7 @@ namespace Vouchee.API.Controllers
         [Authorize]
         public async Task<IActionResult> CreateOrder([FromBody] CheckOutViewModel checkOutViewModel)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _orderService.CreateOrderAsync(currentUser, checkOutViewModel);
             return Ok(result);
@@ -57,7 +54,7 @@ namespace Vouchee.API.Controllers
         [HttpGet("get_buyer_order")]
         public async Task<IActionResult> GetBuyerOrders([FromQuery] PagingRequest pagingRequest, [FromQuery] OrderFilter orderFilter)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _orderService.GetOrdersAsync(pagingRequest, orderFilter, currentUser);
             return Ok(result);
@@ -65,7 +62,7 @@ namespace Vouchee.API.Controllers
 
         [HttpGet("get_order/{id}")]
         [Authorize]
-        public async Task<IActionResult> GetOrderById(Guid id)
+        public async Task<IActionResult> GetOrderById(string id)
         {
             var order = await _orderService.GetOrderByIdAsync(id);
             return Ok(order);
@@ -74,9 +71,9 @@ namespace Vouchee.API.Controllers
         // UPDATE
         [HttpPut("update_order/{id}")]
         [Authorize]
-        public async Task<IActionResult> UpdateOrder(Guid id, [FromBody] UpdateOrderDTO updateOrderDTO)
+        public async Task<IActionResult> UpdateOrder(string id, [FromBody] UpdateOrderDTO updateOrderDTO)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _orderService.UpdateOrderAsync(id, updateOrderDTO, currentUser);
             return Ok(result);
@@ -84,9 +81,9 @@ namespace Vouchee.API.Controllers
 
         [Authorize]
         [HttpPut("update_order_transaction/{id}")]
-        public async Task<IActionResult> UpdateOrderTransaction(Guid id, Guid partnerTransactionId)
+        public async Task<IActionResult> UpdateOrderTransaction(string id, Guid partnerTransactionId)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _orderService.UpdateOrderTransactionAsync(id, partnerTransactionId, currentUser);
             return Ok(result);
@@ -97,7 +94,7 @@ namespace Vouchee.API.Controllers
         [Authorize]
         public async Task<IActionResult> AssignCode(Guid orderDetailId, [FromBody] VoucherCodeList voucherCodeList)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _orderService.AssignCodeToOrderAsync(orderDetailId, voucherCodeList);
             return Ok(result);
@@ -106,7 +103,7 @@ namespace Vouchee.API.Controllers
         // DELETE
         [HttpDelete("delete_order/{id}")]
         [Authorize]
-        public async Task<IActionResult> DeleteOrder(Guid id)
+        public async Task<IActionResult> DeleteOrder(string id)
         {
             var result = await _orderService.DeleteOrderAsync(id);
             return Ok(result);

@@ -7,6 +7,7 @@ using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Services;
 using Vouchee.Business.Services.Impls;
+using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Filters;
 
@@ -19,25 +20,22 @@ namespace Vouchee.API.Controllers
     {
         private readonly IVoucherTypeService _voucherTypeService;
         private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
 
         public VoucherTypeController(IVoucherTypeService voucherTypeService, 
-                                        IUserService userService, 
-                                        IRoleService roleService)
+                                        IUserService userService)
         {
             _voucherTypeService = voucherTypeService;
             _userService = userService;
-            _roleService = roleService;
         }
 
         // CREATE
-        [Authorize("create_voucher_type")]
-        [HttpPost]
+        [Authorize]
+        [HttpPost("create_voucher_type")]
         public async Task<IActionResult> CreateVoucherType([FromForm] CreateVoucherTypeDTO createVoucherTypeDTO)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            if (currentUser.roleId.Equals(currentUser.adminRoleId))
+            if (currentUser.role.Equals(RoleEnum.ADMIN.ToString()))
             {
                 var result = await _voucherTypeService.CreateVoucherTypeAsync(createVoucherTypeDTO, currentUser);
                 return Ok(result);

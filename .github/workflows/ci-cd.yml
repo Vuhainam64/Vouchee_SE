@@ -37,7 +37,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build  # Ensure this job runs after the build job 
+    needs: build  # Ensure this job runs after the build job
     steps:
       - name: Add SSH key
         run: |

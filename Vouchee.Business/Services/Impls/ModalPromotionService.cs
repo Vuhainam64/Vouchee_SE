@@ -21,84 +21,84 @@ namespace Vouchee.Business.Services.Impls
 {
     public class ModalPromotionService : IModalPromotionService
     {
-        private readonly IBaseRepository<Modal> _modalRepository;
-        private readonly IBaseRepository<ModalPromotion> _modalPromotionRepository;
-        private readonly IMapper _mapper;
+        //private readonly IBaseRepository<Modal> _modalRepository;
+        //private readonly IBaseRepository<Promotion> _promotionRepository;
+        //private readonly IMapper _mapper;
 
-        public ModalPromotionService(IBaseRepository<Modal> modalRepository,
-                                        IBaseRepository<ModalPromotion> modalPromotionRepository, 
-                                        IMapper mapper)
-        {
-            _modalRepository = modalRepository;
-            _modalPromotionRepository = modalPromotionRepository;
-            _mapper = mapper;
-        }
+        //public ModalPromotionService(IBaseRepository<Modal> modalRepository,
+        //                                IBaseRepository<Promotion> promotionRepository, 
+        //                                IMapper mapper)
+        //{
+        //    _modalRepository = modalRepository;
+        //    _promotionRepository = promotionRepository;
+        //    _mapper = mapper;
+        //}
 
-        public async Task<ResponseMessage<Guid>> CreateModalPromotionAsync(CreateModalPromotionDTO createModalPromotionDTO, ThisUserObj thisUserObj)
-        {
-            try
-            {
-                ModalPromotion modalPromotion = _mapper.Map<ModalPromotion>(createModalPromotionDTO);
+        //public async Task<ResponseMessage<Guid>> CreateModalPromotionAsync(CreateModalPromotionDTO createModalPromotionDTO, ThisUserObj thisUserObj)
+        //{
+        //    try
+        //    {
+        //        Promotion modalPromotion = _mapper.Map<Promotion>(createModalPromotionDTO);
 
-                foreach (var modalId in createModalPromotionDTO.modal_id)
-                {
-                    var existedModal = await _modalRepository.GetByIdAsync(modalId, includeProperties: x => x.Include(x => x.Voucher), isTracking: true);
-                    if (existedModal == null)
-                    {
-                        throw new NotFoundException($"Không tìm thấy modal {modalId}");
-                    }
-                    if (thisUserObj.userId != existedModal.Voucher.SellerId)
-                    {
-                        throw new ConflictException($"Modal {existedModal.Id} không phải của bạn");
-                    }
+        //        foreach (var modalId in createModalPromotionDTO.modal_id)
+        //        {
+        //            var existedModal = await _modalRepository.GetByIdAsync(modalId, includeProperties: x => x.Include(x => x.Voucher), isTracking: true);
+        //            if (existedModal == null)
+        //            {
+        //                throw new NotFoundException($"Không tìm thấy modal {modalId}");
+        //            }
+        //            if (thisUserObj.userId != existedModal.Voucher.SellerId)
+        //            {
+        //                throw new ConflictException($"Modal {existedModal.Id} không phải của bạn");
+        //            }
 
-                    modalPromotion.Modals.Add(existedModal);
-                }
+        //            modalPromotion.Modals.Add(existedModal);
+        //        }
 
-                var modalPromotionId = await _modalPromotionRepository.AddAsync(modalPromotion);
+        //        var modalPromotionId = await _promotionRepository.AddAsync(modalPromotion);
 
-                return new ResponseMessage<Guid>()
-                {
-                    message = "Tạo modal promotion thành công",
-                    result = true,
-                    value = modalPromotionId.Value
-                };
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
+        //        return new ResponseMessage<Guid>()
+        //        {
+        //            message = "Tạo modal promotion thành công",
+        //            result = true,
+        //            value = modalPromotionId.Value
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception(ex.Message);
+        //    }
+        //}
 
-        public async Task<GetDetailModalPromotionDTO> GetModalPromotionById(Guid id)
-        {
-            var existedModal = await _modalPromotionRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Modals));
+        //public async Task<GetDetailModalPromotionDTO> GetModalPromotionById(Guid id)
+        //{
+        //    var existedModal = await _promotionRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Modals));
 
-            if (existedModal == null)
-            {
-                throw new NotFoundException("Không tìm thấy modal này");
-            }
+        //    if (existedModal == null)
+        //    {
+        //        throw new NotFoundException("Không tìm thấy modal này");
+        //    }
 
-            return _mapper.Map<GetDetailModalPromotionDTO>(existedModal);
-        }
+        //    return _mapper.Map<GetDetailModalPromotionDTO>(existedModal);
+        //}
 
-        public async Task<IList<GetDetailModalPromotionDTO>> GetModalPromotionBySeller(Guid sellerId)
-        {
-            IQueryable<GetDetailModalPromotionDTO> result;
-            try
-            {
-                DateTime currentDate = DateTime.Now;
+        //public async Task<IList<GetDetailModalPromotionDTO>> GetModalPromotionBySeller(Guid sellerId)
+        //{
+        //    IQueryable<GetDetailModalPromotionDTO> result;
+        //    try
+        //    {
+        //        DateTime currentDate = DateTime.Now;
 
-                result = _modalPromotionRepository.GetTable()
-                                                  .Where(mp => mp.Modals.Any(modal => modal.Voucher.SellerId == sellerId))
-                                                  .Where(x => x.StartDate <= currentDate && currentDate <= x.EndDate)
-                                                  .ProjectTo<GetDetailModalPromotionDTO>(_mapper.ConfigurationProvider);
-            }
-            catch (Exception ex)
-            {
-                throw new LoadException(ex.Message);
-            }
-            return await result.ToListAsync();
-        }
+        //        result = _promotionRepository.GetTable()
+        //                                          .Where(mp => mp.Modals.Any(modal => modal.Voucher.SellerId == sellerId))
+        //                                          .Where(x => x.StartDate <= currentDate && currentDate <= x.EndDate)
+        //                                          .ProjectTo<GetDetailModalPromotionDTO>(_mapper.ConfigurationProvider);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new LoadException(ex.Message);
+        //    }
+        //    return await result.ToListAsync();
+        //}
     }
 }

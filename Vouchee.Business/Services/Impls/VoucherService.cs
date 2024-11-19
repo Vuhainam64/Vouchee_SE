@@ -30,7 +30,7 @@ namespace Vouchee.Business.Services.Impls
         private readonly IBaseRepository<Media> _mediaRepository;
         private readonly IBaseRepository<Supplier> _supplierRepository;
         private readonly IBaseRepository<Brand> _brandReposiroty;
-        private readonly IBaseRepository<ModalPromotion> _promotionRepository;
+        private readonly IBaseRepository<Promotion> _promotionRepository;
         private readonly IBaseRepository<Category> _categoryRepository;
         private readonly IFileUploadService _fileUploadService;
         private readonly IBaseRepository<Voucher> _voucherRepository;
@@ -41,7 +41,7 @@ namespace Vouchee.Business.Services.Impls
                                 IBaseRepository<Media> mediaRepository,
                                 IBaseRepository<Supplier> supplierRepository,
                                 IBaseRepository<Brand> brandReposiroty,
-                                IBaseRepository<ModalPromotion> promotionRepository,
+                                IBaseRepository<Promotion> promotionRepository,
                                 IBaseRepository<Category> categoryRepository,
                                 IFileUploadService fileUploadService,
                                 IBaseRepository<Voucher> voucherRepository,
@@ -109,7 +109,6 @@ namespace Vouchee.Business.Services.Impls
                 {
                     Media media = new()
                     {
-                        Status = ObjectStatusEnum.ACTIVE.ToString(),
                         Url = image,
                         CreateBy = thisUserObj.userId,
                         CreateDate = DateTime.Now,
@@ -164,7 +163,7 @@ namespace Vouchee.Business.Services.Impls
                                                     .ThenInclude(x => x.OrderDetails)
                         .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
                         .Where(x => x.stock > 0 && x.status == VoucherStatusEnum.NONE.ToString() && x.isActive == true)
-                        .OrderByDescending(x => x.totalQuantitySold)
+                        .OrderByDescending(x => x.quantitySold)
                         .Take(numberOfVoucher != 0 ? numberOfVoucher : 10);
 
             return await result.ToListAsync();
@@ -294,7 +293,7 @@ namespace Vouchee.Business.Services.Impls
             query = sortVoucherEnum switch
             {
                 SortVoucherEnum.NEWEST => query.OrderByDescending(x => x.createDate),
-                SortVoucherEnum.SELLEST => query.OrderByDescending(x => x.totalQuantitySold),
+                SortVoucherEnum.SELLEST => query.OrderByDescending(x => x.quantitySold),
                 SortVoucherEnum.PRICE_ASCENDING => query.OrderBy(x => x.sellPrice),
                 SortVoucherEnum.PRICE_DESCENDING => query.OrderByDescending(x => x.sellPrice),
                 _ => query

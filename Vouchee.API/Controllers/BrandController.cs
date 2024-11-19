@@ -7,7 +7,9 @@ using Vouchee.API.Helpers;
 using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Services;
+using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
+using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Filters;
 
@@ -20,36 +22,24 @@ namespace Vouchee.API.Controllers
     {
         private readonly IBrandService _brandService;
         private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
 
         public BrandController(IBrandService brandService,
-                               IUserService userService,
-                               IRoleService roleService)
+                               IUserService userService)
         {
             _brandService = brandService;
             _userService = userService;
-            _roleService = roleService;
         }
 
         // CREATE
-        //[HttpPost("create_new_brand")]
-        //[Authorize]
-        //public async Task<IActionResult> CreateBrand([FromForm] CreateBrandDTO createBrandDTO)
-        //{
-        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+        [HttpPost("create_brand")]
+        [Authorize]
+        public async Task<IActionResult> CreateBrand([FromBody] CreateBrandDTO createBrandDTO)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-        //    if (currentUser.roleId.Equals(currentUser.adminRoleId))
-        //    {
-        //        var result = await _brandService.CreateBrandAsync(createBrandDTO, currentUser);
-        //        return Ok(result);
-        //    }
-
-        //    return StatusCode((int)HttpStatusCode.Forbidden, new
-        //    {
-        //        code = HttpStatusCode.Forbidden,
-        //        message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
-        //    });
-        //}
+            var result = await _brandService.CreateBrandAsync(createBrandDTO, currentUser);
+            return Ok(result);
+        }
 
         // READ
         [HttpGet("get_all_brand")]
@@ -65,60 +55,58 @@ namespace Vouchee.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetBrandById(Guid id)
         {
-            var brand = await _brandService.GetBrandByIdAsync(id);
-            if (brand == null)
-            {
-                return NotFound(new { message = "Brand not found." });
-            }
-            return Ok(brand);
+            var result = await _brandService.GetBrandByIdAsync(id);
+            return Ok(result);
         }
 
-        //[HttpGet("get_brand_by_name")]
-        //[AllowAnonymous]
-        //public async Task<IActionResult> GetBrandsbyname(string name)
-        //{
-        //    var result = await _brandService.GetBrandsbynameAsync(name);
-        //    return Ok(result);
-        //}
+        // UPDATE
+        [HttpPut("update_brand/{id}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateBrand(Guid id, [FromBody] UpdateBrandDTO updateBrandDTO)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-        //// UPDATE
-        //[HttpPut("update_brand/{id}")]
-        //[Authorize]
-        //public async Task<IActionResult> UpdateBrand(Guid id, [FromBody] UpdateBrandDTO updateBrandDTO)
-        //{
-        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            var result = await _brandService.UpdateBrandAsync(id, updateBrandDTO, currentUser);
+            return Ok(result);
+        }
 
-        //    if (currentUser.roleId.Equals(currentUser.adminRoleId))
-        //    {
-        //        var result = await _brandService.UpdateBrandAsync(id, updateBrandDTO);
-        //        return Ok(result);
-        //    }
+        [HttpPut("update_brand_state/{id}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateBrandState(Guid id, [FromQuery] bool isActive)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-        //    return StatusCode((int)HttpStatusCode.Forbidden, new
-        //    {
-        //        code = HttpStatusCode.Forbidden,
-        //        message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
-        //    });
-        //}
+            var result = await _brandService.UpdateBrandStateAsync(id, isActive, currentUser);
+            return Ok(result);
+        }
 
-        // DELETE
-        //[HttpDelete("delete_brand/{id}")]
-        //[Authorize]
-        //public async Task<IActionResult> DeleteBrand(Guid id)
-        //{
-        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+        [HttpPut("update_brand_status/{id}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateBrandStatus(Guid id, [FromQuery] ObjectStatusEnum status)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-        //    if (currentUser.roleId.Equals(currentUser.adminRoleId))
-        //    {
-        //        var result = await _brandService.DeleteBrandAsync(id);
-        //        return Ok(result);
-        //    }
+            var result = await _brandService.UpdateBrandStatusAsync(id, status, currentUser);
+            return Ok(result);
+        }
 
-        //    return StatusCode((int)HttpStatusCode.Forbidden, new
-        //    {
-        //        code = HttpStatusCode.Forbidden,
-        //        message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
-        //    });
-        //}
+        [HttpPut("verify_brand/{id}")]
+        [Authorize]
+        public async Task<IActionResult> VerifyBrand(Guid id)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            if (currentUser.role.Equals(RoleEnum.ADMIN.ToString()))
+            {
+                var result = await _brandService.VerifyBrand(id, currentUser);
+                return Ok(result);
+            }
+
+            return StatusCode((int)HttpStatusCode.Forbidden, new
+            {
+                code = HttpStatusCode.Forbidden,
+                message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
+            });
+        }
     }
 }

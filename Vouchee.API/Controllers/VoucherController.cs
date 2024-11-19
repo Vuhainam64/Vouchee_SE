@@ -22,14 +22,11 @@ namespace Vouchee.API.Controllers
     {
         private readonly IVoucherService _voucherService;
         private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
 
         public VoucherController(IVoucherService voucherService,
-                                    IUserService userService,
-                                    IRoleService roleService)
+                                    IUserService userService)
         {
             _voucherService = voucherService;
-            _roleService = roleService;
             _userService = userService;
         }
 
@@ -38,7 +35,7 @@ namespace Vouchee.API.Controllers
         [Authorize]
         public async Task<dynamic> CreateVoucher([FromBody] CreateVoucherDTO voucherDTO)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _voucherService.CreateVoucherAsync(voucherDTO, currentUser);
             return result;
@@ -99,7 +96,7 @@ namespace Vouchee.API.Controllers
                                                             [FromQuery] VoucherFilter voucherFilter,
                                                             [FromQuery] IList<Guid>? categoryIds)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var voucher = await _voucherService.GetVoucherBySellerId(currentUser.userId, pagingRequest, voucherFilter, categoryIds);
             return Ok(voucher);

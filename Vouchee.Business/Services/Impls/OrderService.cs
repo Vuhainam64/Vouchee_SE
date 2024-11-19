@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Linq;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
@@ -79,8 +80,6 @@ namespace Vouchee.Business.Services.Impls
                         throw new ConflictException("Voucher code này không thuộc voucher đang đặt");
                     }
 
-                    existedOrderDetail.VoucherCodes.Add(existedVoucherCode);
-
                     existedVoucherCode.Status = "ASSIGNED";
                     await _voucherCodeRepository.UpdateAsync(existedVoucherCode);
                 }
@@ -98,7 +97,7 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<ResponseMessage<Guid>> CreateOrderAsync(ThisUserObj thisUserObj, CheckOutViewModel checkOutViewModel)
+        public async Task<ResponseMessage<string>> CreateOrderAsync(ThisUserObj thisUserObj, CheckOutViewModel checkOutViewModel)
         {
             var user = await _userRepository.GetByIdAsync(thisUserObj.userId, includeProperties: x => x.Include(x => x.BuyerWallet), isTracking: true);
 
@@ -119,7 +118,8 @@ namespace Vouchee.Business.Services.Impls
                 Status = OrderStatusEnum.PENDING.ToString(),
                 CreateBy = thisUserObj.userId,
                 CreateDate = DateTime.Now,
-                OrderDetails = new List<OrderDetail>()
+                OrderDetails = new List<OrderDetail>(),
+                
             };
 
             // duyet tung seller
@@ -145,10 +145,10 @@ namespace Vouchee.Business.Services.Impls
                             var existedModal = existedVoucher.Modals.FirstOrDefault(x => x.Id == cartModal.id);
 
                             // kiem tra ton kho cua modal
-                            //if (cartModal.quantity > existedModal?.Stock)
-                            //{
-                            //    throw new ConflictException($"Bạn đặt {cartModal.quantity} {cartModal.title} nhưng trong khi chỉ còn {existedModal.Stock}");
-                            //}
+                            if (cartModal.quantity > existedModal?.Stock)
+                            {
+                                throw new ConflictException($"Bạn đặt {cartModal.quantity} {cartModal.title} nhưng trong khi chỉ còn {existedModal.Stock}");
+                            }
 
                             existedModal.Stock -= cartModal.quantity;
                             existedVoucher.Stock -= cartModal.quantity;
@@ -163,10 +163,8 @@ namespace Vouchee.Business.Services.Impls
                                 Status = OrderStatusEnum.PENDING.ToString(),
                                 CreateDate = DateTime.Now,
                                 CreateBy = thisUserObj.userId,
-                                ModalDiscountMoney = (int) cartModal.modalDiscountMoney,
-                                ModalDiscountPercent = (int) cartModal.modalDiscountPercent,
-                                ModalPromotionId = cartModal.modalPromotionId,
-                                ShopDiscountPercent = (int) cartModal.shopDiscount,
+                                ShopDiscountPercent = (int) cartModal.shopDiscountPercent,
+                                ShopDiscountMoney = (int) cartModal.shopDiscountMoney,
                                 ShopPromotionId = cartModal.shopPromotionId,
                             });
                         }
@@ -203,12 +201,7 @@ namespace Vouchee.Business.Services.Impls
             //    user.VPoint += order.FinalPrice / 1000;
             //}
 
-            var orderId = await _orderRepository.AddAsync(order);
-
-            if (orderId == Guid.Empty)
-            {
-                throw new Exception("Failed to create order.");
-            }
+            var orderId = await _orderRepository.AddReturnString(order);
 
             //// Phải chắc chắn order được tạo
             //WalletTransaction transaction = new()
@@ -246,15 +239,15 @@ namespace Vouchee.Business.Services.Impls
 
             //await _userRepository.SaveChanges();
 
-            return new ResponseMessage<Guid>
+            return new ResponseMessage<string>
             {
                 message = "Tạo order thành công",
                 result = true,
-                value = (Guid) orderId
+                value = orderId
             };
         }
 
-        public async Task<bool> DeleteOrderAsync(Guid id)
+        public async Task<bool> DeleteOrderAsync(string id)
         {
             try
             {
@@ -277,9 +270,9 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<GetOrderDTO> GetOrderByIdAsync(Guid id)
+        public async Task<GetOrderDTO> GetOrderByIdAsync(string id)
         {
-            var order = await _orderRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.OrderDetails).ThenInclude(x => x.VoucherCodes));
+            var order = await _orderRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.OrderDetails));
             if (order != null)
             {
                 var orderDTO = _mapper.Map<GetOrderDTO>(order);
@@ -294,11 +287,21 @@ namespace Vouchee.Business.Services.Impls
         public async Task<DynamicResponseModel<GetOrderDTO>> GetOrdersAsync(PagingRequest pagingRequest, OrderFilter orderFilter, ThisUserObj? thisUserObj)
         {
             (int, IQueryable<GetOrderDTO>) result;
-
-            result = _orderRepository.GetTable().Where(x => x.CreateBy.Equals(thisUserObj.userId))
+            if (thisUserObj == null)
+            {
+                result = _orderRepository.GetTable()
                         .ProjectTo<GetOrderDTO>(_mapper.ConfigurationProvider)
                         .DynamicFilter(_mapper.Map<GetOrderDTO>(orderFilter))
                         .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+            }
+            else
+            {
+                result = _orderRepository.GetTable().Where(x => x.CreateBy.Equals(thisUserObj.userId))
+                        .ProjectTo<GetOrderDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetOrderDTO>(orderFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+            }
+            
 
             return new DynamicResponseModel<GetOrderDTO>()
             {
@@ -312,7 +315,7 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<bool> UpdateOrderAsync(Guid id, UpdateOrderDTO updateOrderDTO, ThisUserObj thisUserObj)
+        public async Task<bool> UpdateOrderAsync(string id, UpdateOrderDTO updateOrderDTO, ThisUserObj thisUserObj)
         {
             try
             {
@@ -334,7 +337,7 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<ResponseMessage<bool>> UpdateOrderTransactionAsync(Guid id, Guid partnerTransactionId, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<bool>> UpdateOrderTransactionAsync(string id, Guid partnerTransactionId, ThisUserObj thisUserObj)
         {
             try
             {
@@ -374,7 +377,6 @@ namespace Vouchee.Business.Services.Impls
                         CreateDate = DateTime.Now,
                         Status = WalletTransactionStatusEnum.DONE.ToString(),
                         Amount = groupedModal.Sum(x => x.FinalPrice),
-                        OrderId = existedOrder.Id,
                         PartnerTransactionId = partnerTransactionId,
                         SellerWalletId = existedSeller.Id,
                     };

@@ -18,15 +18,12 @@ namespace Vouchee.API.Controllers
     {
         private readonly IWalletTransactionService _walletTransactionService;
         private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
 
         public WalletTransactionController(IWalletTransactionService walletTransactionService,  
-                                            IUserService userService, 
-                                            IRoleService roleService)
+                                            IUserService userService)
         {
             _walletTransactionService = walletTransactionService;
             _userService = userService;
-            _roleService = roleService;
         }
 
         [Authorize]
@@ -34,7 +31,7 @@ namespace Vouchee.API.Controllers
         public async Task<IActionResult> GetWalletById([FromQuery] PagingRequest pagingRequest,
                                                         [FromQuery] WalletTransactionFilter walletTransactionFilter)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _walletTransactionService.GetWalletTransactionsAsync(pagingRequest, walletTransactionFilter, currentUser);
             return Ok(result);

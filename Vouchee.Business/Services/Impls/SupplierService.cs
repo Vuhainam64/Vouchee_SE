@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
-using OfficeOpenXml;
 using System.Collections.Generic;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
@@ -13,7 +12,6 @@ using Vouchee.Data.Models.Constants.Enum;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Constants.Number;
-using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.DTOs.Dashboard;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
@@ -24,14 +22,12 @@ namespace Vouchee.Business.Services.Impls
     {
         private readonly IBaseRepository<Supplier> _supplierRepository;
         private readonly IMapper _mapper;
-        private readonly IBaseRepository<Category> _categoryRepository;
+
         public SupplierService(IBaseRepository<Supplier> supplierRepository,
-                                    IMapper mapper,
-                                    IBaseRepository<Category> categoryRepository)
+                                    IMapper mapper)
         {
             _supplierRepository = supplierRepository;
             _mapper = mapper;
-            _categoryRepository = categoryRepository;
         }
 
         public async Task<Guid?> CreateSupplierAsync(CreateSupplierDTO createSupplierDTO)
@@ -142,46 +138,6 @@ namespace Vouchee.Business.Services.Impls
             else
             {
                 throw new NotFoundException("Không tìm thấy supplier");
-            }
-        }
-
-        public async Task<byte[]> GenerateVoucherTemplateAsync()
-        {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // Set the license context for EPPlus
-            var categories = _categoryRepository.GetTable().ToList(); // Assuming a method to retrieve all categories
-
-            using (var package = new ExcelPackage())
-            {
-                var worksheet = package.Workbook.Worksheets.Add("VoucherTemplate");
-
-                // Headers
-                worksheet.Cells[1, 1].Value = "BrandId";
-                worksheet.Cells[1, 2].Value = "SupplierId";
-                worksheet.Cells[1, 3].Value = "CategoryId";
-                worksheet.Cells[1, 4].Value = "Title";
-                worksheet.Cells[1, 5].Value = "Description";
-                worksheet.Cells[1, 6].Value = "Images (comma-separated)";
-                worksheet.Cells[1, 7].Value = "Video URL";
-                worksheet.Cells[1, 8].Value = "Stock";
-                worksheet.Cells[1, 9].Value = "IsActive";
-                worksheet.Cells[1, 10].Value = "Modals (title,originalPrice,sellPrice;...)";
-
-                // Load categories in a hidden sheet for dropdown data
-                var categorySheet = package.Workbook.Worksheets.Add("Categories");
-                categorySheet.Hidden = eWorkSheetHidden.Hidden;
-
-                for (int i = 0; i < categories.Count; i++)
-                {
-                    categorySheet.Cells[i + 1, 2].Value = categories[i].Id.ToString();
-                    categorySheet.Cells[i + 1, 1].Value = categories[i].Title;
-                }
-
-                // Add dropdown for CategoryId in VoucherTemplate sheet
-                var categoryRange = categorySheet.Cells[1, 1, categories.Count, 1].Address; // e.g., A1:A10
-                var validation = worksheet.DataValidations.AddListValidation("C2:C100"); // Restrict up to 100 entries
-                validation.Formula.ExcelFormula = $"Categories!{categoryRange}";
-
-                return package.GetAsByteArray();
             }
         }
     }
