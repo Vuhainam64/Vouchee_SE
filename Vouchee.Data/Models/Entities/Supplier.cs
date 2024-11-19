@@ -33,7 +33,7 @@ namespace Vouchee.Data.Models.Entities
         public string? Contact { get; set; }
         public bool IsVerfied { get; set; }
         public string? Image { get; set; }
-        public int? QuantitySold { get; set; }
+        public int? TotalQuantitySold { get; set; }
 
         public bool IsActive = true;
         public required string Status { get; set; }

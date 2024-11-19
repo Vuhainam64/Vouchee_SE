@@ -52,7 +52,7 @@ namespace Vouchee.Data.Models.Entities
         public decimal Rating { get; set; }
         public string? Video { get; set; }
         public int Stock { get; set; }
-        public int QuantitySold { get; set; }
+        public int TotalQuantitySold { get; set; }
 
         public bool IsActive { get; set; }
         public required string Status { get; set; }

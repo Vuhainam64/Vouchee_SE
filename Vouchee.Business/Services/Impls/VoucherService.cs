@@ -163,7 +163,7 @@ namespace Vouchee.Business.Services.Impls
                                                     .ThenInclude(x => x.OrderDetails)
                         .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
                         .Where(x => x.stock > 0 && x.status == VoucherStatusEnum.NONE.ToString() && x.isActive == true)
-                        .OrderByDescending(x => x.quantitySold)
+                        .OrderByDescending(x => x.totalQuantitySold)
                         .Take(numberOfVoucher != 0 ? numberOfVoucher : 10);
 
             return await result.ToListAsync();
@@ -293,7 +293,7 @@ namespace Vouchee.Business.Services.Impls
             query = sortVoucherEnum switch
             {
                 SortVoucherEnum.NEWEST => query.OrderByDescending(x => x.createDate),
-                SortVoucherEnum.SELLEST => query.OrderByDescending(x => x.quantitySold),
+                SortVoucherEnum.SELLEST => query.OrderByDescending(x => x.totalQuantitySold),
                 SortVoucherEnum.PRICE_ASCENDING => query.OrderBy(x => x.sellPrice),
                 SortVoucherEnum.PRICE_DESCENDING => query.OrderByDescending(x => x.sellPrice),
                 _ => query
