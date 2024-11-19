@@ -45,7 +45,6 @@ namespace Vouchee.Data.Models.DTOs
         public Guid? id { get; set; }
         public Guid? voucherId { get; set; }
         public Guid? shopPromotionId { get; set; }
-        public Guid? modalPromotionId { get; set; }
         public Guid? brandId { get; set; }
         public string? brandName { get; set; }
         public string? brandImage { get; set; }

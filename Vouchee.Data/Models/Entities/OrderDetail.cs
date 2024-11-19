@@ -29,15 +29,11 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty(nameof(ShopPromotion.ShopPromotionOrderDetails))]
         public virtual Promotion? ShopPromotion { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [Key]
-        public Guid Id { get; set; }
-
         public int UnitPrice { get; set; }
         public int ShopDiscountPercent { get; set; } = 0;
         public int ShopDiscountMoney { get; set; } = 0;
         public int TotalPrice => UnitPrice * Quantity;
-        public int DiscountPrice => (TotalPrice * ShopDiscountPercent * 100) + ShopDiscountMoney;
+        public int DiscountPrice => (TotalPrice * ShopDiscountPercent / 100) + ShopDiscountMoney;
         public int FinalPrice => TotalPrice - DiscountPrice;
         public int Quantity { get; set; }
 

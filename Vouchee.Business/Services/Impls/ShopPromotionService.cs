@@ -39,8 +39,8 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<ResponseMessage<Guid>> CreateShopPromotionAsync(CreateShopPromotionDTO createShopPromotionDTO, ThisUserObj thisUserObj)
         {
-            var currentTime = DateTime.Now;
             var promotion = _mapper.Map<Promotion>(createShopPromotionDTO);
+
             promotion.CreateBy = thisUserObj.userId;
             promotion.SellerId = thisUserObj.userId;
 
@@ -162,19 +162,12 @@ namespace Vouchee.Business.Services.Impls
         public async Task<DynamicResponseModel<GetShopPromotionDTO>> GetPromotionsAsync(PagingRequest pagingRequest, ShopPromotionFilter promotionFilter)
         {
             (int, IQueryable<GetShopPromotionDTO>) result;
-            try
-            {
-                DateTime dateTime = DateTime.Now;
-                result = _shopPromotionRepository.GetTable()
-                            .ProjectTo<GetShopPromotionDTO>(_mapper.ConfigurationProvider)
-                            .DynamicFilter(_mapper.Map<GetShopPromotionDTO>(promotionFilter))
-                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAGE);
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new LoadException(ex.Message);
-            }
+
+            result = _shopPromotionRepository.GetTable()
+                        .ProjectTo<GetShopPromotionDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetShopPromotionDTO>(promotionFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAGE);
+
             return new DynamicResponseModel<GetShopPromotionDTO>()
             {
                 metaData = new MetaData()
@@ -183,8 +176,14 @@ namespace Vouchee.Business.Services.Impls
                     size = pagingRequest.pageSize,
                     total = result.Item1 // Total vouchers count for metadata
                 },
-                results = result.Item2.ToList() // Return the paged voucher list with nearest address and distance
+                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
             };
+        }
+
+        public async Task<IList<GetShopPromotionDTO>> GetShopPromotionByShopId(Guid shopId)
+        {
+            var promotions = await _shopPromotionRepository.GetWhereAsync(x => x.SellerId == shopId);
+            return _mapper.Map<IList<GetShopPromotionDTO>>(promotions);
         }
 
         //public async Task<bool> UpdatePromotionAsync(Guid id, UpdateShopPromotionDTO updatePromotionDTO, ThisUserObj thisUserObj)

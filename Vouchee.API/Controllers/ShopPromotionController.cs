@@ -55,15 +55,22 @@ namespace Vouchee.API.Controllers
             return Ok(promotion);
         }
 
-        [Authorize]
-        [HttpGet("get_active_shop_promotion")]
-        public async Task<IActionResult> GetActivePromotion()
+        [HttpGet("get_promotions_by_shop_id")]
+        public async Task<IActionResult> GetShopPromotions(Guid shopId)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
-
-            var promotion = await _shopPromotionService.GetActiveShopPromotion(currentUser);
+            var promotion = await _shopPromotionService.GetShopPromotionByShopId(shopId);
             return Ok(promotion);
         }
+
+        //[Authorize]
+        //[HttpGet("get_active_shop_promotion")]
+        //public async Task<IActionResult> GetActivePromotion()
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+        //    var promotion = await _shopPromotionService.GetActiveShopPromotion(currentUser);
+        //    return Ok(promotion);
+        //}
 
         //[Authorize]
         //[HttpGet("get_shop_promotion")]

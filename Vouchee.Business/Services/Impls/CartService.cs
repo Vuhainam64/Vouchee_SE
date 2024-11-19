@@ -24,9 +24,7 @@ namespace Vouchee.Business.Services.Impls
 {
     public class CartService : ICartService
     {
-        private readonly IModalPromotionService _modalPromotionService;
-
-        private readonly IBaseRepository<Promotion> _promotionRepository;
+        private readonly IBaseRepository<Promotion> _shopPromotionRepository;
         private readonly IBaseRepository<Modal> _modalRepository;
         private readonly IBaseRepository<Voucher> _voucherRepository;
         private readonly IBaseRepository<User> _userRepository;
@@ -35,15 +33,13 @@ namespace Vouchee.Business.Services.Impls
         private User? _user;
         private CartDTO? _cartDTO;
 
-        public CartService(IModalPromotionService modalPromotionService,
-                           IBaseRepository<Promotion> promotionRepository,
+        public CartService(IBaseRepository<Promotion> shopPromotionRepository,
                            IBaseRepository<Modal> modalRepository,
                            IBaseRepository<Voucher> voucherRepository,
                            IBaseRepository<User> userRepository,
                            IMapper mapper)
         {
-            _modalPromotionService = modalPromotionService;
-            _promotionRepository = promotionRepository;
+            _shopPromotionRepository = shopPromotionRepository;
             _modalRepository = modalRepository;
             _voucherRepository = voucherRepository;
             _userRepository = userRepository;
@@ -92,6 +88,9 @@ namespace Vouchee.Business.Services.Impls
                     {
                         sellerCartDTO.modals.Add(_mapper.Map<CartModalDTO>(cart.Modal));
                         sellerCartDTO.modals.FirstOrDefault(x => x.id == cart.ModalId).quantity = cart.Quantity;
+
+                        var existedPromotions = await _shopPromotionRepository.GetWhereAsync(x => x.SellerId == sellerCartDTO.sellerId);
+                        sellerCartDTO.promotions = _mapper.Map<IList<GetShopPromotionDTO>>(existedPromotions);
                     }
 
                     cartDTO.sellers.Add(sellerCartDTO);
@@ -125,7 +124,7 @@ namespace Vouchee.Business.Services.Impls
                 }
                 else
                 {
-                    cartModal.Quantity += quantity;
+                    cartModal.Quantity += quantity == 0 ? 1 : quantity;
                     cartModal.UpdateBy = thisUserObj.userId;
                     cartModal.UpdateDate = DateTime.Now;
 
@@ -168,11 +167,9 @@ namespace Vouchee.Business.Services.Impls
                     Modal = existedModal,
                 });
 
-                _userRepository.SetEntityState(_user, EntityState.Modified);
                 var result = await _userRepository.SaveChanges();
                 if (result)
                 {
-                    _userRepository.Attach(_user);
                     await GetCartsAsync(thisUserObj, false);
                     return _cartDTO;
                 }
@@ -368,65 +365,28 @@ namespace Vouchee.Business.Services.Impls
                                        .Where(seller => seller.modals.Any())
                                        .ToList();
 
-            //foreach (var seller in _cartDTO.sellers)
-            //{
-            //    var activeModalPromotion = await _modalPromotionService.GetModalPromotionBySeller(seller.sellerId.Value);
-
-            //    if (activeModalPromotion != null && activeModalPromotion.Any())
-            //    {
-            //        var applicablePromotions = activeModalPromotion
-            //            .Where(promotion => promotion.modals
-            //                .Any(promoModal => seller.modals.Any(cartModal => cartModal.id == promoModal.id)))
-            //            .ToList();
-
-            //        seller.promotions = _mapper.Map<IList<CartModalPromotionDTO>>(applicablePromotions);
-
-            //        foreach (var promotion in seller.promotions)
-            //        {
-            //            if (promotion.requiredQuantity != null)
-            //            {
-            //                int totalQuantity = seller.modals.Sum(x => x.quantity);
-            //                if (totalQuantity >= promotion.requiredQuantity)
-            //                {
-            //                    promotion.isAppliable = true;
-            //                }
-            //                else
-            //                {
-            //                    promotion.isAppliable = false;
-            //                    promotion.note = $"Bạn cần mua {promotion.requiredQuantity} món đồ để áp dụng mã này";
-            //                }
-            //            }
-
-            //            if (promotion.minMoneyToAppy != null)
-            //            {
-            //                int totalUnitPrice = seller.modals.Sum(x => x.totalUnitPrice ?? 0);
-            //                if (totalUnitPrice >= promotion.minMoneyToAppy)
-            //                {
-            //                    promotion.isAppliable = true;
-            //                }
-            //                else
-            //                {
-            //                    promotion.isAppliable = false;
-            //                    promotion.note = $"Bạn cần chi thêm {promotion.minMoneyToAppy - totalUnitPrice} để áp dụng mã này";
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
-
             foreach (var item in checkOutViewModel.item_brief)
             {
                 if (item.promotionId != null)
                 {
-                    var existedPromotion = await _promotionRepository.GetByIdAsync(item.promotionId.Value);
-                    if (existedPromotion == null)
-                    {
-                        throw new NotFoundException($"Không tìm thấy promotion với id {item.promotionId}");
-                    }
+                    var appliedPromotion = await _shopPromotionRepository.GetByIdAsync(item.promotionId,
+                                                                                includeProperties: x => x.Include(x => x.Seller));
 
-                    foreach (var seller in _cartDTO.sellers)
+                    var currentSeller = _cartDTO.sellers.FirstOrDefault(x => x.sellerId == appliedPromotion.SellerId);
+                    currentSeller.appliedPromotion = _mapper.Map<GetShopPromotionDTO>(appliedPromotion);
+                    foreach (var modal in currentSeller.modals)
                     {
-
+                        modal.shopPromotionId = appliedPromotion.Id;
+                        if (currentSeller.appliedPromotion.moneyDiscount != 0
+                                && currentSeller.appliedPromotion.moneyDiscount != null)
+                        {
+                            modal.shopDiscountMoney = appliedPromotion.MoneyDiscount;
+                        }
+                        else if (currentSeller.appliedPromotion.percentDiscount != 0
+                                && currentSeller.appliedPromotion.percentDiscount != null)
+                        {
+                            modal.shopDiscountPercent = appliedPromotion.PercentDiscount;
+                        }
                     }
                 }
             }

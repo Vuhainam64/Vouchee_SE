@@ -118,7 +118,8 @@ namespace Vouchee.Business.Services.Impls
                 Status = OrderStatusEnum.PENDING.ToString(),
                 CreateBy = thisUserObj.userId,
                 CreateDate = DateTime.Now,
-                OrderDetails = new List<OrderDetail>()
+                OrderDetails = new List<OrderDetail>(),
+                
             };
 
             // duyet tung seller
@@ -144,10 +145,10 @@ namespace Vouchee.Business.Services.Impls
                             var existedModal = existedVoucher.Modals.FirstOrDefault(x => x.Id == cartModal.id);
 
                             // kiem tra ton kho cua modal
-                            //if (cartModal.quantity > existedModal?.Stock)
-                            //{
-                            //    throw new ConflictException($"Bạn đặt {cartModal.quantity} {cartModal.title} nhưng trong khi chỉ còn {existedModal.Stock}");
-                            //}
+                            if (cartModal.quantity > existedModal?.Stock)
+                            {
+                                throw new ConflictException($"Bạn đặt {cartModal.quantity} {cartModal.title} nhưng trong khi chỉ còn {existedModal.Stock}");
+                            }
 
                             existedModal.Stock -= cartModal.quantity;
                             existedVoucher.Stock -= cartModal.quantity;
@@ -163,6 +164,7 @@ namespace Vouchee.Business.Services.Impls
                                 CreateDate = DateTime.Now,
                                 CreateBy = thisUserObj.userId,
                                 ShopDiscountPercent = (int) cartModal.shopDiscountPercent,
+                                ShopDiscountMoney = (int) cartModal.shopDiscountMoney,
                                 ShopPromotionId = cartModal.shopPromotionId,
                             });
                         }

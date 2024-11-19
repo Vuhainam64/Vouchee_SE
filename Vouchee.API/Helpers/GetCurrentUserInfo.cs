@@ -31,8 +31,6 @@ namespace Vouchee.API.Helpers
                 currentUser.fullName = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Actor).Value;
             }
 
-            GetUserDTO? user = await _userService.GetUserByEmailAsync(currentUser.email);
-
             return currentUser;
         }
     }

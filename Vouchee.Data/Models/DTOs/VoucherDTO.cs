@@ -117,7 +117,7 @@ namespace Vouchee.Business.Models.DTOs
 
     public class GetVoucherDTO : VoucherDTO
     {
-        public int? totalQuantitySold { get; set; }
+        
     }
 
     public class GetVoucherSellerDTO : VoucherDTO
