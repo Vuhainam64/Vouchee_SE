@@ -94,7 +94,7 @@ namespace Vouchee.Business.Models.DTOs
         public int? originalPrice { get; set; }
         public int? sellPrice { get; set; }
         public int? salePrice => sellPrice - ((sellPrice * shopDiscount) / 100);
-        public int? quantitySold { get; set; }
+        public int? totalQuantitySold { get; set; }
 
         public string? image { get; set; }
 
