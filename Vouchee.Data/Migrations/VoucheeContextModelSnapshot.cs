@@ -317,10 +317,8 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.MoneyRequest", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWID()");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Amount")
                         .HasColumnType("int");
@@ -974,8 +972,8 @@ namespace Vouchee.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("TopUpRequestId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("TopUpRequestId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -987,8 +985,8 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("WithdrawRequestId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("WithdrawRequestId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 

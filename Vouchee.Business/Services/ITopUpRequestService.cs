@@ -13,7 +13,7 @@ namespace Vouchee.Business.Services
     public interface ITopUpRequestService
     {
         // CREATE
-        public Task<ResponseMessage<Guid>> CreateTopUpRequest(CreateTopUpRequestDTO createTopUpRequestDTO, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<string>> CreateTopUpRequest(CreateTopUpRequestDTO createTopUpRequestDTO, ThisUserObj thisUserObj);
 
         // READ
         public Task<GetTopUpRequestDTO> GetTopUpRequestById(Guid id);
