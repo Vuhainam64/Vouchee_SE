@@ -49,7 +49,6 @@ namespace Vouchee.Data.Helpers
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<OrderDetail>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Address>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Supplier>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<User>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
