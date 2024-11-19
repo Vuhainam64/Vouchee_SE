@@ -49,7 +49,7 @@ namespace Vouchee.Business.Services.Impls
                 string input = createPartnerTransaction.code;
 
                 // Unified regex for ORDER and TOPUP
-                Regex regex = new Regex(@"\b(ORDER|TOPUP)([a-zA-Z0-9]{1,})\b");
+                Regex regex = new Regex(@"\b(ORD|TOP)([a-zA-Z0-9]{1,})\b");
 
                 PartnerTransaction partnerTransaction = _mapper.Map<PartnerTransaction>(createPartnerTransaction);
                 partnerTransaction.PartnerTransactionId = createPartnerTransaction.id;
@@ -76,7 +76,7 @@ namespace Vouchee.Business.Services.Impls
                         createPartnerTransaction.content = convertedContent;
 
                         // Proceed based on transaction type
-                        if (transactionType == "ORDER")
+                        if (transactionType == "ORD")
                         {
                             string orderId = identifier;
 
@@ -144,7 +144,7 @@ namespace Vouchee.Business.Services.Impls
                                 success = true
                             };
                         }
-                        else if (transactionType == "TOPUP")
+                        else if (transactionType == "TOP")
                         {
                             string topUpRequestId = identifier;
 
