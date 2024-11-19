@@ -36,7 +36,7 @@ namespace Vouchee.Business.Models.DTOs
         }
 
         public Guid? id { get; set; }
-        public Guid? orderId { get; set; }
+        public string? orderId { get; set; }
         public Guid? modalId { get; set; }
 
         public int? unitPrice { get; set; }
