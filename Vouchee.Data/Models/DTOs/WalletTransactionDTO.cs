@@ -32,7 +32,7 @@ namespace Vouchee.Data.Models.DTOs
         public Guid? id { get; set; }
 
         public Guid? partnerTransactionId { get; set; }
-        public Guid? orderId { get; set; }
+        public string? orderId { get; set; }
         public Guid? sellerWalletId { get; set; }
         public Guid? buyerWalletId { get; set; }
 

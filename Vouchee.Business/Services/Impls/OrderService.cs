@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Linq;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
@@ -244,7 +245,7 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<bool> DeleteOrderAsync(Guid id)
+        public async Task<bool> DeleteOrderAsync(string id)
         {
             try
             {
@@ -284,11 +285,21 @@ namespace Vouchee.Business.Services.Impls
         public async Task<DynamicResponseModel<GetOrderDTO>> GetOrdersAsync(PagingRequest pagingRequest, OrderFilter orderFilter, ThisUserObj? thisUserObj)
         {
             (int, IQueryable<GetOrderDTO>) result;
-
-            result = _orderRepository.GetTable().Where(x => x.CreateBy.Equals(thisUserObj.userId))
+            if (thisUserObj == null)
+            {
+                result = _orderRepository.GetTable()
                         .ProjectTo<GetOrderDTO>(_mapper.ConfigurationProvider)
                         .DynamicFilter(_mapper.Map<GetOrderDTO>(orderFilter))
                         .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+            }
+            else
+            {
+                result = _orderRepository.GetTable().Where(x => x.CreateBy.Equals(thisUserObj.userId))
+                        .ProjectTo<GetOrderDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetOrderDTO>(orderFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+            }
+            
 
             return new DynamicResponseModel<GetOrderDTO>()
             {
@@ -302,7 +313,7 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<bool> UpdateOrderAsync(Guid id, UpdateOrderDTO updateOrderDTO, ThisUserObj thisUserObj)
+        public async Task<bool> UpdateOrderAsync(string id, UpdateOrderDTO updateOrderDTO, ThisUserObj thisUserObj)
         {
             try
             {
@@ -324,7 +335,7 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<ResponseMessage<bool>> UpdateOrderTransactionAsync(Guid id, Guid partnerTransactionId, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<bool>> UpdateOrderTransactionAsync(string id, Guid partnerTransactionId, ThisUserObj thisUserObj)
         {
             try
             {

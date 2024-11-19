@@ -29,13 +29,13 @@ namespace Vouchee.API.Controllers
         }
 
         // CREATE
-        [Authorize("create_voucher_type")]
-        [HttpPost]
+        [Authorize]
+        [HttpPost("create_voucher_type")]
         public async Task<IActionResult> CreateVoucherType([FromForm] CreateVoucherTypeDTO createVoucherTypeDTO)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            if (currentUser.role.Equals(RoleEnum.ADMIN))
+            if (currentUser.role.Equals(RoleEnum.ADMIN.ToString()))
             {
                 var result = await _voucherTypeService.CreateVoucherTypeAsync(createVoucherTypeDTO, currentUser);
                 return Ok(result);

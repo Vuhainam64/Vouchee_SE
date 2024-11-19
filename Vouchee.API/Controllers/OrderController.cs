@@ -71,7 +71,7 @@ namespace Vouchee.API.Controllers
         // UPDATE
         [HttpPut("update_order/{id}")]
         [Authorize]
-        public async Task<IActionResult> UpdateOrder(Guid id, [FromBody] UpdateOrderDTO updateOrderDTO)
+        public async Task<IActionResult> UpdateOrder(string id, [FromBody] UpdateOrderDTO updateOrderDTO)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
@@ -81,7 +81,7 @@ namespace Vouchee.API.Controllers
 
         [Authorize]
         [HttpPut("update_order_transaction/{id}")]
-        public async Task<IActionResult> UpdateOrderTransaction(Guid id, Guid partnerTransactionId)
+        public async Task<IActionResult> UpdateOrderTransaction(string id, Guid partnerTransactionId)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
@@ -103,7 +103,7 @@ namespace Vouchee.API.Controllers
         // DELETE
         [HttpDelete("delete_order/{id}")]
         [Authorize]
-        public async Task<IActionResult> DeleteOrder(Guid id)
+        public async Task<IActionResult> DeleteOrder(string id)
         {
             var result = await _orderService.DeleteOrderAsync(id);
             return Ok(result);

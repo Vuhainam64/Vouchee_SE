@@ -18,12 +18,12 @@ namespace Vouchee.Business.Services
         public Task<DynamicResponseModel<GetOrderDTO>> GetOrdersAsync(PagingRequest pagingRequest, OrderFilter orderFilter, ThisUserObj? thisUserObj);
 
         // UPDATE
-        public Task<bool> UpdateOrderAsync(Guid id, UpdateOrderDTO updateOrderDTO, ThisUserObj thisUserObj);
-        public Task<ResponseMessage<bool>> UpdateOrderTransactionAsync(Guid id, Guid orderTransactionId, ThisUserObj thisUserObj);
+        public Task<bool> UpdateOrderAsync(string id, UpdateOrderDTO updateOrderDTO, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<bool>> UpdateOrderTransactionAsync(string id, Guid orderTransactionId, ThisUserObj thisUserObj);
         public Task<bool> AssignCodeToOrderAsync(Guid orderDetailId, VoucherCodeList voucherCodeId);
         public Task<bool> UpdateUserPointAsync(Guid orderId);
 
         // DELETE
-        public Task<bool> DeleteOrderAsync(Guid id);
+        public Task<bool> DeleteOrderAsync(string id);
     }
 }
