@@ -267,7 +267,7 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<GetOrderDTO> GetOrderByIdAsync(Guid id)
+        public async Task<GetOrderDTO> GetOrderByIdAsync(string id)
         {
             var order = await _orderRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.OrderDetails));
             if (order != null)

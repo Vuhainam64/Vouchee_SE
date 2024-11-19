@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Vouchee.Business.Models.DTOs;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Entities;
 
@@ -15,20 +16,20 @@ namespace Vouchee.Data.Models.DTOs
     {
         [Required(ErrorMessage = "Cần title")]
         public string? title { get; set; }
-
-        [Range(0, 100, ErrorMessage = "PersentShow cần từ 0 tới 100")]
-        public decimal? percentShow { get; set; }
-        public IFormFile? image { get; set; }
         public DateTime createDate = DateTime.Now;
-        public string status = ObjectStatusEnum.ACTIVE.ToString();
+        [Required(ErrorMessage = "Cần hình ảnh")]
+        public string? image { get; set; }
     }
 
     public class UpdateCategoryDTO 
     {
-
+        [Required(ErrorMessage = "Cần title")]
+        public string? title { get; set; }
+        public string? image { get; set; }
+        public DateTime updateDate = DateTime.Now;
     }
 
-    public class GetCategoryDTO
+    public class CategoryDTO
     {
         public Guid? id { get; set; }
 
@@ -36,13 +37,21 @@ namespace Vouchee.Data.Models.DTOs
         public string? voucherTypeTitle { get; set; }
 
         public string? title { get; set; }
-        //public decimal? percentShow { get; set; }
         public string? image { get; set; }
+    }
 
-        //public string? status { get; set; }
-        //public DateTime? createDate { get; set; }
-        //public Guid? createBy { get; set; }
-        //public DateTime? updateDate { get; set; }
-        //public Guid? updateBy { get; set; }
+    public class GetCategoryDTO : CategoryDTO
+    {
+
+    }
+
+    public class GetDetailCategoryDTO : CategoryDTO
+    {
+        public GetDetailCategoryDTO()
+        {
+            vouchers = [];
+        }
+
+        public virtual ICollection<GetVoucherDTO> vouchers { get; set; }
     }
 }

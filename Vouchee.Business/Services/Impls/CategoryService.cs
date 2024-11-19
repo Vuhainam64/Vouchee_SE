@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,81 +39,40 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<Guid?> CreateCategoryAsync(Guid voucherTypeId, 
-                                                CreateCategoryDTO createCategoryDTO, 
-                                                ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<Guid>> CreateCategoryAsync(Guid voucherTypeId, 
+                                                        CreateCategoryDTO createCategoryDTO, 
+                                                        ThisUserObj thisUserObj)
         {
-            try
+            var existedVoucherType = await _voucherTypeRepository.FindAsync(voucherTypeId, isTracking: true);
+
+            if (existedVoucherType == null)
             {
-                var existedVoucherType = await _voucherTypeRepository.FindAsync(voucherTypeId, false);
+                throw new NotFoundException("Không tìm thấy voucher type này");
+            }    
 
-                if (existedVoucherType == null)
-                {
-                    throw new NotFoundException("Không tìm thấy voucher type");
-                }    
+            Category category = _mapper.Map<Category>(createCategoryDTO);
+            category.CreateBy = thisUserObj.userId;
+            category.VoucherTypeId = voucherTypeId;
 
-                Category category = _mapper.Map<Category>(createCategoryDTO);
-                category.CreateBy = thisUserObj.userId;
-                category.VoucherTypeId = voucherTypeId;
+            var categoryId = await _categoryRepository.AddAsync(category);
 
-                var categoryId = await _categoryRepository.AddAsync(category);
-
-                if (categoryId != null && createCategoryDTO.image != null)
-                {
-                    category.Image = await _fileUploadService.UploadImageToFirebase(createCategoryDTO.image, thisUserObj.userId.ToString(), StoragePathEnum.CATEGORY);
-
-                    if (!await _categoryRepository.UpdateAsync(category)) 
-                    {
-                        throw new UpdateObjectException("Không thể update category");
-                    }
-                }
-
-                return categoryId;
-            }
-            catch (Exception ex)
+            return new ResponseMessage<Guid>()
             {
-                LoggerService.Logger(ex.Message);
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public async Task<bool> DeleteCategoryAsync(Guid id)
-        {
-            try
-            {
-                var existedCategory = await _categoryRepository.FindAsync(id, false);
-
-                if (existedCategory == null)
-                {
-                    throw new NotFoundException($"Không tìm thấy category với id {id}");
-                }
-
-                var result = await _categoryRepository.DeleteAsync(existedCategory);
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new Exception(ex.Message);
-            }
+                message = "Tạo danh mục thành công",
+                result = true,
+                value = (Guid) categoryId
+            };
         }
 
         public async Task<DynamicResponseModel<GetCategoryDTO>> GetCategoriesAsync(PagingRequest pagingRequest, CategoryFilter categoryFilter)
         {
             (int, IQueryable<GetCategoryDTO>) result;
-            try
-            {
-                result = _categoryRepository.GetTable()
-                            .ProjectTo<GetCategoryDTO>(_mapper.ConfigurationProvider)
-                            .DynamicFilter(_mapper.Map<GetCategoryDTO>(categoryFilter))
-                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new LoadException(ex.Message);
-            }
+
+            result = _categoryRepository.GetTable()
+                        .ProjectTo<GetCategoryDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetCategoryDTO>(categoryFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
             return new DynamicResponseModel<GetCategoryDTO>()
             {
                 metaData = new MetaData()
@@ -121,18 +81,68 @@ namespace Vouchee.Business.Services.Impls
                     size = pagingRequest.pageSize,
                     total = result.Item1 // Total vouchers count for metadata
                 },
-                results = result.Item2.ToList() // Return the paged voucher list with nearest address and distance
+                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
             };
         }
 
-        public Task<GetCategoryDTO> GetCategoryByIdAsync(Guid id)
+        public async Task<GetDetailCategoryDTO> GetCategoryByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var existedCategory = await _categoryRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Vouchers)
+                                                                                                            .ThenInclude(x => x.Medias)
+                                                                                                        .Include(x => x.Vouchers)
+                                                                                                            .ThenInclude(x => x.Modals));
+            
+            if (existedCategory == null)
+            {
+                throw new NotFoundException("Không tìm thấy category");
+            }
+
+            return _mapper.Map<GetDetailCategoryDTO>(existedCategory);
         }
 
-        public Task<bool> UpdateCategoryAsync(Guid id, UpdateCategoryDTO updateCategoryDTO)
+        public async Task<ResponseMessage<bool>> UpdateCategoryAsync(Guid id, UpdateCategoryDTO updateCategoryDTO, ThisUserObj currentUser)
         {
-            throw new NotImplementedException();
+            var existedCategory = await _categoryRepository.GetByIdAsync(id, isTracking: true);
+
+            if (existedCategory == null)
+            {
+                throw new NotFoundException("Không tìm thấy category");
+            }
+
+            existedCategory = _mapper.Map(updateCategoryDTO, existedCategory);
+            existedCategory.UpdateBy = currentUser.userId;
+
+            await _categoryRepository.UpdateAsync(existedCategory);
+
+            return new ResponseMessage<bool>
+            {
+                message = "Cập nhật thông tin thành công",
+                result = true,
+                value = true
+            };
+        }
+
+        public async Task<ResponseMessage<bool>> UpdateCategoryStateAsync(Guid id, bool isActive, ThisUserObj currentUser)
+        {
+            var existedCategory = await _categoryRepository.GetByIdAsync(id, isTracking: true);
+
+            if (existedCategory == null)
+            {
+                throw new NotFoundException("Không tìm thấy category");
+            }
+
+            existedCategory.IsActive = isActive;
+            existedCategory.UpdateDate = DateTime.Now;
+            existedCategory.UpdateBy = currentUser.userId;
+
+            await _categoryRepository.UpdateAsync(existedCategory);
+
+            return new ResponseMessage<bool>
+            {
+                message = "Cập nhật thông tin thành công",
+                result = true,
+                value = true
+            };
         }
     }
 }

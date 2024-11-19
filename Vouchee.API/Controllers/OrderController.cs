@@ -62,7 +62,7 @@ namespace Vouchee.API.Controllers
 
         [HttpGet("get_order/{id}")]
         [Authorize]
-        public async Task<IActionResult> GetOrderById(Guid id)
+        public async Task<IActionResult> GetOrderById(string id)
         {
             var order = await _orderService.GetOrderByIdAsync(id);
             return Ok(order);

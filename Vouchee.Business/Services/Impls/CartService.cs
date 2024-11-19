@@ -155,10 +155,10 @@ namespace Vouchee.Business.Services.Impls
                 }
 
                 // tam thoi comment lai
-                //if (existedModal.Stock == 0)
-                //{
-                //    throw new NotFoundException("Modal này không có code nào để sử dụng");
-                //}
+                if (existedModal.Stock == 0)
+                {
+                    throw new NotFoundException("Modal này không có code nào để sử dụng");
+                }
 
                 _user.Carts.Add(new()
                 {

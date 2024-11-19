@@ -19,18 +19,26 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? updateBy { get; set; }
     }
 
-    public class GetSupplierDTO
+    public class SupplierDTO
     {
-        //public GetSupplierDTO()
-        //{
-        //    vouchers = new HashSet<GetAllVoucherDTO>();
-        //}
-
         public Guid? id { get; set; }
 
         public string? name { get; set; }
         public string? image { get; set; }
+    }
 
-        // public virtual ICollection<GetAllVoucherDTO>? vouchers { get; set; }
+    public class GetSupplierDTO
+    {
+
+    }
+
+    public class GetDetailSupplierDTO : SupplierDTO
+    {
+        public GetDetailSupplierDTO()
+        {
+            vouchers = [];
+        }
+
+        public virtual ICollection<GetVoucherDTO>? vouchers { get; set; }
     }
 }
