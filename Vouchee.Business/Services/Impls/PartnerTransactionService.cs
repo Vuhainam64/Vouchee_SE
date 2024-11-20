@@ -95,6 +95,13 @@ namespace Vouchee.Business.Services.Impls
                             existedOrder.PartnerTransactionId = partnerTransactionId;
                             existedOrder.Status = OrderStatusEnum.PAID.ToString();
 
+                            if (existedOrder.UsedVPoint > 0)
+                            {
+                                existedOrder.Buyer.VPoint -= existedOrder.UsedVPoint;
+                            }
+
+                            existedOrder.Buyer.VPoint += existedOrder.FinalPrice;
+
                             if (existedOrder.UsedBalance > 0)
                             {
                                 existedOrder.Buyer.BuyerWallet.Balance -= existedOrder.UsedBalance;
@@ -134,6 +141,7 @@ namespace Vouchee.Business.Services.Impls
                             }
 
                             await _userRepository.SaveChanges();
+
                             await _orderRepository.SaveChanges();
 
                             return new

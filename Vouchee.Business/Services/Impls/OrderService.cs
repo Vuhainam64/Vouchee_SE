@@ -52,15 +52,11 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<bool> AssignCodeToOrderAsync(Guid orderDetailId, VoucherCodeList voucherCodeList)
+        public async Task<bool> AssignCodeToOrderAsync(string orderId, Guid modalId, VoucherCodeList voucherCodeList)
         {
             try
             {
-                var existedOrderDetail = await _orderDetailRepository.FindAsync(orderDetailId, false);
-                if (existedOrderDetail == null)
-                {
-                    throw new NotFoundException("Không tìm thấy order detail");
-                }
+                var existedOrderDetail = await _orderDetailRepository.GetFirstOrDefaultAsync(x => x.OrderId == orderId && x.ModalId == modalId, isTracking: true);
 
                 if (voucherCodeList.voucherCodeIds.Count() != existedOrderDetail.Quantity)
                 {
@@ -69,7 +65,7 @@ namespace Vouchee.Business.Services.Impls
 
                 foreach (var voucherCodeId in voucherCodeList.voucherCodeIds)
                 {
-                    var existedVoucherCode = await _voucherCodeRepository.FindAsync(voucherCodeId, false);
+                    var existedVoucherCode = await _voucherCodeRepository.FindAsync(voucherCodeId, isTracking: true);
                     if (existedVoucherCode == null)
                     {
                         throw new NotFoundException($"Không tìm thấy voucher code với id {voucherCodeId}");
@@ -80,13 +76,14 @@ namespace Vouchee.Business.Services.Impls
                         throw new ConflictException("Voucher code này không thuộc voucher đang đặt");
                     }
 
-                    existedVoucherCode.Status = "ASSIGNED";
-                    await _voucherCodeRepository.UpdateAsync(existedVoucherCode);
+                    existedVoucherCode.Status = VoucherCodeStatusEnum.SOLD.ToString();
+                    existedVoucherCode.OrderId = orderId;
                 }
 
-                existedOrderDetail.Status = "DONE";
-                await _orderDetailRepository.UpdateAsync(existedOrderDetail);
+                await _voucherCodeRepository.SaveChanges();
 
+                existedOrderDetail.Status = OrderStatusEnum.DONE.ToString();
+                await _orderDetailRepository.SaveChanges();
 
                 return true;
             }
@@ -172,10 +169,6 @@ namespace Vouchee.Business.Services.Impls
 
                     result = await _voucherRepository.UpdateAsync(existedVoucher);
                 }
-
-                //// chuyen tiền từ ví người mua sang ví nhà bán hàng;
-                //var amount = seller.modals.Sum(x => x.finalPrice);
-                //amountSellers[seller.sellerId.Value] = amount.Value;
             }
 
             order.DiscountPrice = order.OrderDetails.Sum(x => x.DiscountPrice);
@@ -184,60 +177,7 @@ namespace Vouchee.Business.Services.Impls
             order.UsedVPoint = checkOutViewModel.use_VPoint;
             order.GiftEmail = checkOutViewModel.gift_email;
 
-            //if (checkOutViewModel.use_VPoint != 0)
-            //{
-            //    if (user.VPoint != 0)
-            //    {
-            //        order.PointDown = user.VPoint;
-            //        user.VPoint = order.PointUp;
-            //    }
-            //    else
-            //    {
-            //        user.VPoint += order.FinalPrice / 1000;
-            //    }
-            //}
-            //else
-            //{
-            //    user.VPoint += order.FinalPrice / 1000;
-            //}
-
             var orderId = await _orderRepository.AddReturnString(order);
-
-            //// Phải chắc chắn order được tạo
-            //WalletTransaction transaction = new()
-            //{
-            //    CreateBy = user.Id,
-            //    CreateDate = DateTime.Now,
-            //    Status = WalletTransactionStatusEnum.DONE.ToString(),
-            //};
-
-            //foreach (var seller in amountSellers)
-            //{
-            //    var existedSeller = await _userRepository.GetByIdAsync(seller.Key, includeProperties: x => x.Include(x => x.SellerWallet), isTracking: true);
-
-            //    if (existedSeller == null)
-            //    {
-            //        throw new NotFoundException($"Không tìm thấy seller {seller.Key}");
-            //    }
-
-            //    if (existedSeller.SellerWallet == null)
-            //    {
-            //        throw new NotFoundException($"Không tìm thấy wallet của seller {seller.Key}");
-            //    }
-
-            //    transaction.Amount = seller.Value;
-            //    transaction.SellerWalletId = existedSeller.Id;
-            //    transaction.OrderId = orderId;
-
-            //    existedSeller.SellerWallet.SellerWalletTransactions.Add(transaction);
-            //    existedSeller.SellerWallet.Balance += seller.Value;
-
-            //    transaction.BuyerWalletId = user.BuyerWallet.Id;
-            //    user.BuyerWallet.BuyerWalletTransactions.Add(transaction);
-            //    user.BuyerWallet.Balance -= seller.Value;
-            //}
-
-            //await _userRepository.SaveChanges();
 
             return new ResponseMessage<string>
             {
@@ -272,7 +212,8 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<GetOrderDTO> GetOrderByIdAsync(string id)
         {
-            var order = await _orderRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.OrderDetails));
+            var order = await _orderRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.OrderDetails)
+                                                                                            .Include(x => x.VoucherCodes));
             if (order != null)
             {
                 var orderDTO = _mapper.Map<GetOrderDTO>(order);

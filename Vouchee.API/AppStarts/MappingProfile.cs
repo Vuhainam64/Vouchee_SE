@@ -101,7 +101,10 @@ namespace Vouchee.API.AppStarts
             CreateMap<OrderDetail, OrderDetailDTO>().ReverseMap();
             CreateMap<OrderDetail, CreateOrderDetailDTO>().ReverseMap();
             CreateMap<OrderDetail, UpdateOrderDetailDTO>().ReverseMap();
-            CreateMap<OrderDetail, GetOrderDetailDTO>().ReverseMap();
+            CreateMap<OrderDetail, GetOrderDetailDTO>()
+                .ForMember(dto => dto.voucherCodes, opt => opt.MapFrom(od => od.Order.VoucherCodes))
+                .ReverseMap()
+                .ForPath(od => od.Order.VoucherCodes, opt => opt.Ignore());
 
             // ORDER
             CreateMap<Order, OrderDTO>().ReverseMap();
