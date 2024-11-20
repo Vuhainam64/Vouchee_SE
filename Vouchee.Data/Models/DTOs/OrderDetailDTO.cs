@@ -39,10 +39,11 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? modalId { get; set; }
 
         public int? unitPrice { get; set; }
-        public int? discountValue { get; set; }
-        public int? totalPrice { get; set; }
-        public int? discountPrice { get; set; }
-        public int? finalPrice { get; set; }
+        public int? shopDiscountPercent { get; set; }
+        public int? shopDiscountMoney { get; set; }
+        public int? totalPrice => unitPrice * quantity;
+        public int? discountPrice => (totalPrice * shopDiscountPercent / 100) + shopDiscountMoney;
+        public int? finalPrice => totalPrice - discountPrice;
 
         public string? status { get; set; }
 

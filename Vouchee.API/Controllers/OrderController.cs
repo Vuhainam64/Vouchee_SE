@@ -90,13 +90,13 @@ namespace Vouchee.API.Controllers
         }
 
         // Assign Voucher Code
-        [HttpPut("voucher/assign_voucher_code_to_order")]
+        [HttpPut("assign_voucher_code_to_order")]
         [Authorize]
-        public async Task<IActionResult> AssignCode(Guid orderDetailId, [FromBody] VoucherCodeList voucherCodeList)
+        public async Task<IActionResult> AssignCode(string orderId, Guid modalId, [FromBody] VoucherCodeList voucherCodeList)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _orderService.AssignCodeToOrderAsync(orderDetailId, voucherCodeList);
+            var result = await _orderService.AssignCodeToOrderAsync(orderId, modalId, voucherCodeList);
             return Ok(result);
         }
 

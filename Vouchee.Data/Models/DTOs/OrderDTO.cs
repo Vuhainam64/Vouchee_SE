@@ -40,15 +40,13 @@ namespace Vouchee.Business.Models.DTOs
         }
 
         public string? id { get; set; }
-        public Guid? promotionId { get; set; }
 
-        public string? paymentType { get; set; }
-        public int? discountValue { get; set; }
         public int? totalPrice { get; set; }
         public int? discountPrice { get; set; }
-        public int? pointDown { get; set; }
+        public int? usedVPoint { get; set; }
+        public int? usedBalance { get; set; }
         public int? finalPrice { get; set; }
-        public int? pointUp { get; set; }
+        public int? VPointUp { get; set; }
 
 
         public string? status { get; set; }
