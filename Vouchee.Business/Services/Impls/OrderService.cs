@@ -177,6 +177,8 @@ namespace Vouchee.Business.Services.Impls
             order.UsedVPoint = checkOutViewModel.use_VPoint;
             order.GiftEmail = checkOutViewModel.gift_email;
 
+            // gửi thông báo ở đây
+
             var orderId = await _orderRepository.AddReturnString(order);
 
             return new ResponseMessage<string>

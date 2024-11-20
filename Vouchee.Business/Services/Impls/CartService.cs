@@ -89,8 +89,8 @@ namespace Vouchee.Business.Services.Impls
                         sellerCartDTO.modals.Add(_mapper.Map<CartModalDTO>(cart.Modal));
                         sellerCartDTO.modals.FirstOrDefault(x => x.id == cart.ModalId).quantity = cart.Quantity;
 
-                        var existedPromotions = await _shopPromotionRepository.GetWhereAsync(x => x.SellerId == sellerCartDTO.sellerId);
-                        sellerCartDTO.promotions = _mapper.Map<IList<GetShopPromotionDTO>>(existedPromotions);
+                        //var existedPromotions = await _shopPromotionRepository.GetWhereAsync(x => x.SellerId == sellerCartDTO.sellerId);
+                        //sellerCartDTO.promotions = _mapper.Map<IList<GetShopPromotionDTO>>(existedPromotions);
                     }
 
                     cartDTO.sellers.Add(sellerCartDTO);
@@ -377,20 +377,20 @@ namespace Vouchee.Business.Services.Impls
                     foreach (var modal in currentSeller.modals)
                     {
                         modal.shopPromotionId = appliedPromotion.Id;
-                        if (currentSeller.appliedPromotion.moneyDiscount != 0
-                                && currentSeller.appliedPromotion.moneyDiscount != null)
+
+                        if (appliedPromotion.MoneyDiscount != 0
+                                && appliedPromotion.MoneyDiscount != null)
                         {
                             modal.shopDiscountMoney = appliedPromotion.MoneyDiscount;
                         }
-                        else if (currentSeller.appliedPromotion.percentDiscount != 0
-                                && currentSeller.appliedPromotion.percentDiscount != null)
+                        else if (appliedPromotion.PercentDiscount != 0
+                                    && appliedPromotion.PercentDiscount != null)
                         {
                             modal.shopDiscountPercent = appliedPromotion.PercentDiscount;
                         }
                     }
                 }
             }
-
 
             DetailCartDTO detailCartDTO = new()
             {
