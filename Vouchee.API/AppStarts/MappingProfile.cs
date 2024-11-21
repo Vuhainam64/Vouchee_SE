@@ -238,9 +238,10 @@ namespace Vouchee.API.AppStarts
             // RATING
             CreateMap<Rating, CreateRatingDTO>().ReverseMap();
             CreateMap<Rating, UpdateRatingDTO>().ReverseMap();
-            CreateMap<Rating, RatingDTO>().ReverseMap();
-            CreateMap<Rating, GetRatingDTO>().ReverseMap();
-            CreateMap<GetRatingDTO, RatingFilter>().ReverseMap();
+            CreateMap<Rating, GetRatingDTO>()
+                .ForMember(dest => dest.rep, opt => opt.MapFrom(src => src.Reply))
+                .ReverseMap();
+            CreateMap<RatingFilter, GetRatingDTO>().ReverseMap();
         }
     }
 }
