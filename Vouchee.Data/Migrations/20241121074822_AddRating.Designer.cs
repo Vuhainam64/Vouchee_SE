@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vouchee.Data.Helpers;
 
@@ -11,9 +12,11 @@ using Vouchee.Data.Helpers;
 namespace Vouchee.Data.Migrations
 {
     [DbContext(typeof(VoucheeContext))]
-    partial class VoucheeContextModelSnapshot : ModelSnapshot
+    [Migration("20241121074822_AddRating")]
+    partial class AddRating
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -234,9 +237,6 @@ namespace Vouchee.Data.Migrations
                     b.Property<int>("Index")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("RatingId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -251,8 +251,6 @@ namespace Vouchee.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("RatingId");
 
                     b.HasIndex("VoucherId");
 
@@ -630,10 +628,11 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Rating", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWID()");
+                    b.Property<string>("OrderId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid?>("ModalId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
@@ -643,12 +642,6 @@ namespace Vouchee.Data.Migrations
 
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("ModalId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("OrderId")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Reply")
                         .HasColumnType("nvarchar(max)");
@@ -668,13 +661,12 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("Id");
+                    b.HasKey("OrderId", "ModalId");
 
                     b.HasIndex("ModalId");
 
                     b.HasIndex("OrderId")
-                        .IsUnique()
-                        .HasFilter("[OrderId] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Rating");
                 });
@@ -1127,15 +1119,9 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Media", b =>
                 {
-                    b.HasOne("Vouchee.Data.Models.Entities.Rating", "Rating")
-                        .WithMany("Medias")
-                        .HasForeignKey("RatingId");
-
                     b.HasOne("Vouchee.Data.Models.Entities.Voucher", "Voucher")
                         .WithMany("Medias")
                         .HasForeignKey("VoucherId");
-
-                    b.Navigation("Rating");
 
                     b.Navigation("Voucher");
                 });
@@ -1230,11 +1216,15 @@ namespace Vouchee.Data.Migrations
                 {
                     b.HasOne("Vouchee.Data.Models.Entities.Modal", "Modal")
                         .WithMany("Ratings")
-                        .HasForeignKey("ModalId");
+                        .HasForeignKey("ModalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Vouchee.Data.Models.Entities.Order", "Order")
                         .WithOne("Rating")
-                        .HasForeignKey("Vouchee.Data.Models.Entities.Rating", "OrderId");
+                        .HasForeignKey("Vouchee.Data.Models.Entities.Rating", "OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Modal");
 
@@ -1390,11 +1380,6 @@ namespace Vouchee.Data.Migrations
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Promotion", b =>
                 {
                     b.Navigation("ShopPromotionOrderDetails");
-                });
-
-            modelBuilder.Entity("Vouchee.Data.Models.Entities.Rating", b =>
-                {
-                    b.Navigation("Medias");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Supplier", b =>

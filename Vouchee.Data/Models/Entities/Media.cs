@@ -17,6 +17,11 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty(nameof(Voucher.Medias))]
         public virtual Voucher? Voucher { get; set; }
 
+        public Guid? RatingId { get; set; }
+        [ForeignKey(nameof(RatingId))]
+        [InverseProperty(nameof(Rating.Medias))]
+        public virtual Rating? Rating { get; set; }
+
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }

@@ -100,7 +100,7 @@ namespace Vouchee.Business.Services.Impls
                                 existedOrder.Buyer.VPoint -= existedOrder.UsedVPoint;
                             }
 
-                            existedOrder.Buyer.VPoint += (int)Math.Ceiling((decimal)(existedOrder.TotalPrice + existedOrder.DiscountPrice + existedOrder.UsedVPoint) / 1000);
+                            existedOrder.Buyer.VPoint += existedOrder.VPointUp;
 
                             if (existedOrder.UsedBalance > 0)
                             {

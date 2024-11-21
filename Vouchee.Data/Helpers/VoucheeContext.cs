@@ -65,6 +65,7 @@ namespace Vouchee.Data.Helpers
             modelBuilder.Entity<Wallet>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<WalletTransaction>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<PartnerTransaction>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            modelBuilder.Entity<Rating>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
 
             // modelBuilder.Seed();
             modelBuilder.Entity<User>()
