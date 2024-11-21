@@ -16,13 +16,15 @@ namespace Vouchee.Data.Models.Entities
             Medias = [];
         }
 
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
+        public Guid Id { get; set; }
+
         public string? OrderId { get; set; }
         [ForeignKey(nameof(OrderId))]
         [InverseProperty(nameof(Order.Rating))]
         public required virtual Order? Order { get; set; }
 
-        [Key]
         public Guid? ModalId { get; set; }
         [ForeignKey(nameof(ModalId))]
         [InverseProperty(nameof(Modal.Ratings))]

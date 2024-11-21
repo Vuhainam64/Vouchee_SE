@@ -43,7 +43,7 @@ namespace Vouchee.Data.Helpers
                                     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
                 IConfigurationRoot configuration = builder.Build();
                 optionsBuilder.EnableSensitiveDataLogging();
-                optionsBuilder.UseSqlServer(configuration.GetConnectionString("DEV"));
+                optionsBuilder.UseSqlServer(configuration.GetConnectionString("PROD"));
             }
         }
 
@@ -65,6 +65,7 @@ namespace Vouchee.Data.Helpers
             modelBuilder.Entity<Wallet>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<WalletTransaction>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<PartnerTransaction>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            modelBuilder.Entity<Rating>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
 
             // modelBuilder.Seed();
             modelBuilder.Entity<User>()
@@ -73,10 +74,6 @@ namespace Vouchee.Data.Helpers
                             .HasForeignKey<Supplier>(s => s.UserId);
 
             modelBuilder.Entity<OrderDetail>()
-                            .HasKey(od => new { od.OrderId, od.ModalId });
-
-
-            modelBuilder.Entity<Rating>()
                             .HasKey(od => new { od.OrderId, od.ModalId });
 
             base.OnModelCreating(modelBuilder);
