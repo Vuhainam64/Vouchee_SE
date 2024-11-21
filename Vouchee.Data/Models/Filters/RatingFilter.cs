@@ -8,6 +8,6 @@ namespace Vouchee.Data.Models.Filters
 {
     public class RatingFilter
     {
-
+        public int? star { get; set; }
     }
 }

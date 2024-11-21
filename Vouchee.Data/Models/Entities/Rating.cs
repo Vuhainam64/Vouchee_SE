@@ -23,12 +23,12 @@ namespace Vouchee.Data.Models.Entities
         public string? OrderId { get; set; }
         [ForeignKey(nameof(OrderId))]
         [InverseProperty(nameof(Order.Rating))]
-        public required virtual Order? Order { get; set; }
+        public virtual Order? Order { get; set; }
 
         public Guid? ModalId { get; set; }
         [ForeignKey(nameof(ModalId))]
         [InverseProperty(nameof(Modal.Ratings))]
-        public required virtual Modal? Modal { get; set; }
+        public virtual Modal? Modal { get; set; }
 
         [InverseProperty(nameof(Media.Rating))]
         public virtual ICollection<Media> Medias { get; set; }
@@ -41,7 +41,7 @@ namespace Vouchee.Data.Models.Entities
         public Guid? CreateBy { get; set; }
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
-        public DateTime ReplyDate { get; set; }
+        public DateTime? ReplyDate { get; set; }
         public Guid? ReplyBy { get; set; }
     }
 }
