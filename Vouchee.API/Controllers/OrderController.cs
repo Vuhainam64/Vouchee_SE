@@ -101,12 +101,12 @@ namespace Vouchee.API.Controllers
         }
 
         // DELETE
-        [HttpDelete("delete_order/{id}")]
-        [Authorize]
-        public async Task<IActionResult> DeleteOrder(string id)
-        {
-            var result = await _orderService.DeleteOrderAsync(id);
-            return Ok(result);
-        }
+        //[HttpDelete("delete_order/{id}")]
+        //[Authorize]
+        //public async Task<IActionResult> DeleteOrder(string id)
+        //{
+        //    var result = await _orderService.DeleteOrderAsync(id);
+        //    return Ok(result);
+        //}
     }
 }

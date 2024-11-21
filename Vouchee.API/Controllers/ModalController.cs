@@ -80,11 +80,11 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
         // DELETE
-        [HttpDelete("delete_modal/{id}")]
-        public async Task<IActionResult> DeleteVoucherCode(Guid id)
-        {
-            var result = await _modalService.DeleteModalAsync(id);
-            return Ok(result);
-        }
+        //[HttpDelete("delete_modal/{id}")]
+        //public async Task<IActionResult> DeleteVoucherCode(Guid id)
+        //{
+        //    var result = await _modalService.DeleteModalAsync(id);
+        //    return Ok(result);
+        //}
     }
 }

@@ -123,11 +123,11 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
         // DELETE
-        [HttpDelete("delete_voucher/{id}")]
-        public async Task<IActionResult> DeleteVoucher(Guid id)
-        {
-            var result = await _voucherService.DeleteVoucherAsync(id);
-            return Ok(result);
-        }
+        //[HttpDelete("delete_voucher/{id}")]
+        //public async Task<IActionResult> DeleteVoucher(Guid id)
+        //{
+        //    var result = await _voucherService.DeleteVoucherAsync(id);
+        //    return Ok(result);
+        //}
     }
 }

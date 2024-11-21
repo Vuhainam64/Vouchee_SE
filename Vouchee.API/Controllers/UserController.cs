@@ -55,11 +55,11 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("delete_user/{id}")]
-        public async Task<IActionResult> DeleteUser(Guid id)
-        {
-            var result = await _userService.DeleteUserAsync(id);
-            return Ok(result);
-        }
+        //[HttpDelete("delete_user/{id}")]
+        //public async Task<IActionResult> DeleteUser(Guid id)
+        //{
+        //    var result = await _userService.DeleteUserAsync(id);
+        //    return Ok(result);
+        //}
     }
 }
