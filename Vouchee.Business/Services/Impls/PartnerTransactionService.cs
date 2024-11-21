@@ -14,12 +14,12 @@ using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
-using static Google.Cloud.Firestore.V1.StructuredAggregationQuery.Types.Aggregation.Types;
 
 namespace Vouchee.Business.Services.Impls
 {
     public class PartnerTransactionService : IPartnerTransactionService
     {
+        private readonly IBaseRepository<Voucher> _voucherRepository;
         private readonly IBaseRepository<MoneyRequest> _topUpRequestRepository;
         private readonly IBaseRepository<Wallet> _wallerRepository;
         private readonly IBaseRepository<User> _userRepository;
@@ -27,13 +27,15 @@ namespace Vouchee.Business.Services.Impls
         private readonly IBaseRepository<PartnerTransaction> _partnerTransactionRepository;
         private readonly IMapper _mapper;
 
-        public PartnerTransactionService(IBaseRepository<MoneyRequest> topUpRequestRepository,
+        public PartnerTransactionService(IBaseRepository<Voucher> voucherRepository,
+                                         IBaseRepository<MoneyRequest> topUpRequestRepository,
                                          IBaseRepository<Wallet> wallerRepository,
                                          IBaseRepository<User> userRepository,
                                          IBaseRepository<Order> orderRepository,
                                          IBaseRepository<PartnerTransaction> partnerTransactionRepository,
                                          IMapper mapper)
         {
+            _voucherRepository = voucherRepository;
             _topUpRequestRepository = topUpRequestRepository;
             _wallerRepository = wallerRepository;
             _userRepository = userRepository;
@@ -81,14 +83,52 @@ namespace Vouchee.Business.Services.Impls
                             string orderId = identifier;
 
                             var existedOrder = await _orderRepository.GetByIdAsync(orderId, includeProperties: x => x.Include(x => x.OrderDetails)
-                                                                                                                                 .ThenInclude(x => x.Modal.Voucher.Seller)
+                                                                                                                                .ThenInclude(x => x.Modal.Voucher.Seller)
                                                                                                                              .Include(x => x.Buyer)
-                                                                                                                                 .ThenInclude(x => x.BuyerWallet),
+                                                                                                                                .ThenInclude(x => x.BuyerWallet)
+                                                                                                                             .Include(x => x.OrderDetails)
+                                                                                                                                .ThenInclude(x => x.Modal)
+                                                                                                                                    .ThenInclude(x => x.Voucher),
                                                                                                                              isTracking: true);
 
                             if (existedOrder == null)
                             {
                                 throw new NotFoundException($"Không tìm thấy order {orderId} trong db");
+                            }
+
+                            if (DateTime.Now > existedOrder.CreateDate.Value.AddMinutes(2))
+                            {
+                                throw new ConflictException($"Order này đã hết hạn lúc {existedOrder.CreateDate.Value.AddMinutes(2)}");
+                            }
+
+                            foreach (var orderDetail in existedOrder.OrderDetails.GroupBy(x => x.Modal.VoucherId))
+                            {
+                                var result = false;
+
+                                // gop tung modal co cung voucher id
+                                var existedVoucher = await _voucherRepository.GetByIdAsync(orderDetail.Key,
+                                                                                                    isTracking: true,
+                                                                                                    includeProperties: x => x.Include(x => x.Modals)
+                                                                                                                                .ThenInclude(x => x.Carts));
+
+                                // duyet tung modal 
+                                foreach (var cartModal in orderDetail)
+                                {
+                                    var existedModal = existedVoucher.Modals.FirstOrDefault(x => x.Id == cartModal.ModalId);
+
+                                    // kiem tra ton kho cua modal
+                                    if (cartModal.Quantity > existedModal?.Stock)
+                                    {
+                                        throw new ConflictException($"Bạn đặt {cartModal.Quantity} {cartModal.Modal.Title} nhưng trong khi chỉ còn {existedModal.Stock}");
+                                    }
+
+                                    existedModal.Stock -= cartModal.Quantity;
+                                    existedVoucher.Stock -= cartModal.Quantity;
+
+                                    existedModal.Carts.Remove(existedModal.Carts.FirstOrDefault(c => c.ModalId == cartModal.ModalId));
+                                }
+
+                                await _voucherRepository.UpdateAsync(existedVoucher);
                             }
 
                             // Update order details
