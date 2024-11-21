@@ -61,11 +61,11 @@ namespace Vouchee.API.Controllers
         }
 
         // DELETE
-        [HttpDelete("delete_supplier/{id}")]
-        public async Task<IActionResult> DeleteSupplier(Guid id)
-        {
-            var result = await _supplierService.DeleteSupplierAsync(id);
-            return Ok(result);
-        }
+        //[HttpDelete("delete_supplier/{id}")]
+        //public async Task<IActionResult> DeleteSupplier(Guid id)
+        //{
+        //    var result = await _supplierService.DeleteSupplierAsync(id);
+        //    return Ok(result);
+        //}
     }
 }

@@ -75,13 +75,13 @@ namespace Vouchee.API.Controllers
         }
 
         // DELETE
-        [Authorize]
-        [HttpDelete("delete_voucher_type/{id}")]
-        public async Task<IActionResult> DeleteVoucherType(Guid id)
-        {
-            var result = await _voucherTypeService.DeleteVoucherTypeAsync(id);
-            return Ok(result);
-        }
+        //[Authorize]
+        //[HttpDelete("delete_voucher_type/{id}")]
+        //public async Task<IActionResult> DeleteVoucherType(Guid id)
+        //{
+        //    var result = await _voucherTypeService.DeleteVoucherTypeAsync(id);
+        //    return Ok(result);
+        //}
     }
 }
 
