@@ -116,11 +116,9 @@ namespace Vouchee.Business.Services.Impls
                 CreateBy = thisUserObj.userId,
                 CreateDate = DateTime.Now,
                 OrderDetails = new List<OrderDetail>(),
-                
             };
 
             // duyet tung seller
-            var amountSellers = new Dictionary<Guid, int>();
             foreach (var seller in cartDTO.sellers)
             {
                 var result = false;
@@ -147,9 +145,6 @@ namespace Vouchee.Business.Services.Impls
                                 throw new ConflictException($"Bạn đặt {cartModal.quantity} {cartModal.title} nhưng trong khi chỉ còn {existedModal.Stock}");
                             }
 
-                            existedModal.Stock -= cartModal.quantity;
-                            existedVoucher.Stock -= cartModal.quantity;
-
                             existedModal.Carts.Remove(existedModal.Carts.FirstOrDefault(c => c.ModalId == cartModal.id));
 
                             order.OrderDetails.Add(new OrderDetail
@@ -160,8 +155,8 @@ namespace Vouchee.Business.Services.Impls
                                 Status = OrderStatusEnum.PENDING.ToString(),
                                 CreateDate = DateTime.Now,
                                 CreateBy = thisUserObj.userId,
-                                ShopDiscountPercent = (int) cartModal.shopDiscountPercent,
-                                ShopDiscountMoney = (int) cartModal.shopDiscountMoney,
+                                ShopDiscountPercent = (int)cartModal.shopDiscountPercent,
+                                ShopDiscountMoney = (int)cartModal.shopDiscountMoney,
                                 ShopPromotionId = cartModal.shopPromotionId,
                             });
                         }
