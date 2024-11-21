@@ -19,7 +19,7 @@ namespace Vouchee.Business.Services
         public Task<GetRatingDTO> GetRatingByIdAsync(Guid id);
 
         // UPDATE
-        public Task<ResponseMessage<bool>> UpdateRatingAsync(UpdateRatingDTO updateRatingDTO, ThisUserObj thisUserObj);
-        public Task<ResponseMessage<bool>> ReplyRatingAsync(string reply, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<bool>> UpdateRatingAsync(Guid id, UpdateRatingDTO updateRatingDTO, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<bool>> ReplyRatingAsync(Guid id, string reply, ThisUserObj thisUserObj);
     }
 }

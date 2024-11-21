@@ -47,9 +47,30 @@ namespace Vouchee.API.Controllers
         }
 
         [HttpGet("get_rating_by_id/{id}")]
-        public async Task<IActionResult> GetAllRating(Guid id)
+        public async Task<IActionResult> GetRatingById(Guid id)
         {
             var result = await _ratingService.GetRatingByIdAsync(id);
+            return Ok(result);
+        }
+
+        // UPDATE
+        [Authorize]
+        [HttpPut("update_rating/{id}")]
+        public async Task<IActionResult> UpdateRating(Guid id, [FromBody] UpdateRatingDTO updateRatingDTO)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _ratingService.UpdateRatingAsync(id, updateRatingDTO, currentUser);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpPut("reply_rating/{id}")]
+        public async Task<IActionResult> ReplyRating(Guid id, string rep)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _ratingService.ReplyRatingAsync(id, rep, currentUser);
             return Ok(result);
         }
     }

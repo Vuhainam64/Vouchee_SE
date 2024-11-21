@@ -35,7 +35,13 @@ namespace Vouchee.Data.Models.DTOs
 
     public class UpdateRatingDTO
     {
+        [Range(1, 5, ErrorMessage = "Số sao phải nằm trong khoảng từ 1 đến 5.")]
+        public int star { get; set; }
 
+        [StringLength(500, ErrorMessage = "Bình luận không được vượt quá 500 ký tự.")]
+        public string? comment { get; set; }
+
+        public DateTime? updateDate = DateTime.Now;
     }
 
     public class GetRatingDTO

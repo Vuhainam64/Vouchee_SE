@@ -103,19 +103,66 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public Task<GetRatingDTO> GetRatingByIdAsync(Guid id)
+        public async Task<GetRatingDTO> GetRatingByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var existedRating = await _ratingRepository.FindAsync(id);
+            if (existedRating == null)
+            {
+                throw new NotFoundException("Không tìm thấy rating này");
+            }
+
+            return _mapper.Map<GetRatingDTO>(existedRating);
         }
 
-        public Task<ResponseMessage<bool>> ReplyRatingAsync(string reply, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<bool>> ReplyRatingAsync(Guid id, string reply, ThisUserObj thisUserObj)
         {
-            throw new NotImplementedException();
+            var existedRating = await _ratingRepository.GetByIdAsync(id, isTracking: true);
+            if (existedRating == null)
+            {
+                throw new NotFoundException("Không tìm thấy rating này");
+            }
+
+            existedRating.Reply = reply;
+            existedRating.ReplyDate = DateTime.Now;
+            existedRating.ReplyBy = thisUserObj.userId;
+
+            await _ratingRepository.UpdateAsync(existedRating);
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Cập nhật thành công",
+                result = true,
+                value = true
+            };
         }
 
-        public Task<ResponseMessage<bool>> UpdateRatingAsync(UpdateRatingDTO updateRatingDTO, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<bool>> UpdateRatingAsync(Guid id, UpdateRatingDTO updateRatingDTO, ThisUserObj thisUserObj)
         {
-            throw new NotImplementedException();
+            var existedRating = await _ratingRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Modal)
+                                                                                                    .ThenInclude(x => x.Voucher)
+                                                                            , isTracking: true);
+            if (existedRating == null)
+            {
+                throw new NotFoundException("Không tìm thấy rating này");
+            }
+
+            existedRating = _mapper.Map(updateRatingDTO, existedRating);
+            existedRating.UpdateBy = thisUserObj.userId;
+
+            await _ratingRepository.SaveChanges();
+
+            var existedRatings = await _ratingRepository.GetWhereAsync(x => x.ModalId == existedRating.ModalId);
+
+            existedRating.Modal.Voucher.Rating = (decimal) existedRatings.Average(x => x.Star);
+
+            await _ratingRepository.SaveChanges();
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Cập nhật thành công",
+                result = true,
+                value = true
+            };
         }
     }
 }
