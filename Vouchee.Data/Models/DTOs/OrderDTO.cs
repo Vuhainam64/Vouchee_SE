@@ -47,7 +47,8 @@ namespace Vouchee.Business.Models.DTOs
         public int? usedBalance { get; set; }
         public int? finalPrice { get; set; }
         public int? VPointUp { get; set; }
-
+        public DateTime? createDate { get; set; }
+        public DateTime? exprireTime => createDate.Value.AddMinutes(2); // Calculate expire time
 
         public string? status { get; set; }
 
