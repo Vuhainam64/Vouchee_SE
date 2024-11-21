@@ -234,6 +234,13 @@ namespace Vouchee.API.AppStarts
             CreateMap<Promotion, GetShopPromotionDTO>().ReverseMap();
             CreateMap<Promotion, GetModalPromotionDTO>().ReverseMap();
             CreateMap<GetShopPromotionDTO, ShopPromotionFilter>().ReverseMap();
+
+            // RATING
+            CreateMap<Rating, CreateRatingDTO>().ReverseMap();
+            CreateMap<Rating, UpdateRatingDTO>().ReverseMap();
+            CreateMap<Rating, RatingDTO>().ReverseMap();
+            CreateMap<Rating, GetRatingDTO>().ReverseMap();
+            CreateMap<GetRatingDTO, RatingFilter>().ReverseMap();
         }
     }
 }

@@ -23,6 +23,9 @@ namespace Vouchee.Data.Models.Entities
             VoucherCodes = [];
         }
 
+        [InverseProperty(nameof(Rating.Order))]
+        public virtual Rating? Rating { get; set; }
+
         [InverseProperty(nameof(VoucherCode.Order))]
         public virtual ICollection<VoucherCode> VoucherCodes { get; set; }
         [InverseProperty(nameof(OrderDetail.Order))]

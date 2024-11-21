@@ -43,7 +43,7 @@ namespace Vouchee.Data.Helpers
                                     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
                 IConfigurationRoot configuration = builder.Build();
                 optionsBuilder.EnableSensitiveDataLogging();
-                optionsBuilder.UseSqlServer(configuration.GetConnectionString("PROD"));
+                optionsBuilder.UseSqlServer(configuration.GetConnectionString("DEV"));
             }
         }
 
@@ -73,6 +73,10 @@ namespace Vouchee.Data.Helpers
                             .HasForeignKey<Supplier>(s => s.UserId);
 
             modelBuilder.Entity<OrderDetail>()
+                            .HasKey(od => new { od.OrderId, od.ModalId });
+
+
+            modelBuilder.Entity<Rating>()
                             .HasKey(od => new { od.OrderId, od.ModalId });
 
             base.OnModelCreating(modelBuilder);
