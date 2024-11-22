@@ -216,13 +216,25 @@ namespace Vouchee.Business.Services.Impls
         {
             (int, IQueryable<GetVoucherCodeDTO>) result;
 
-            result = _voucherCodeRepository.GetTable()
-                                            .Include(x => x.Modal)
-                                            .Include(x => x.Order)
-                                            .Where(x => x.ModalId == modalId && x.Order.CreateBy == thisUserObj.userId)
-                                            .ProjectTo<GetVoucherCodeDTO>(_mapper.ConfigurationProvider)
-                                            .DynamicFilter(_mapper.Map<GetVoucherCodeDTO>(voucherCodeFilter))
-                                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+            if (modalId == Guid.Empty)
+            {
+                result = _voucherCodeRepository.GetTable()
+                                                 .Include(x => x.Order)
+                                                 .Where(x => x.Order.CreateBy == thisUserObj.userId)
+                                                 .ProjectTo<GetVoucherCodeDTO>(_mapper.ConfigurationProvider)
+                                                 .DynamicFilter(_mapper.Map<GetVoucherCodeDTO>(voucherCodeFilter))
+                                                 .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+            }
+            else
+            {
+                result = _voucherCodeRepository.GetTable()
+                                 .Include(x => x.Modal)
+                                 .Include(x => x.Order)
+                                 .Where(x => x.ModalId == modalId && x.Order.CreateBy == thisUserObj.userId)
+                                 .ProjectTo<GetVoucherCodeDTO>(_mapper.ConfigurationProvider)
+                                 .DynamicFilter(_mapper.Map<GetVoucherCodeDTO>(voucherCodeFilter))
+                                 .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+            }
 
             return new DynamicResponseModel<GetVoucherCodeDTO>()
             {
