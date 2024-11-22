@@ -19,6 +19,7 @@ namespace Vouchee.Business.Services.Impls
 {
     public class PartnerTransactionService : IPartnerTransactionService
     {
+        private readonly IBaseRepository<Notification> _notificationRepository;
         private readonly IBaseRepository<Voucher> _voucherRepository;
         private readonly IBaseRepository<MoneyRequest> _topUpRequestRepository;
         private readonly IBaseRepository<Wallet> _wallerRepository;
@@ -27,7 +28,8 @@ namespace Vouchee.Business.Services.Impls
         private readonly IBaseRepository<PartnerTransaction> _partnerTransactionRepository;
         private readonly IMapper _mapper;
 
-        public PartnerTransactionService(IBaseRepository<Voucher> voucherRepository,
+        public PartnerTransactionService(IBaseRepository<Notification> notificationRepository,
+                                         IBaseRepository<Voucher> voucherRepository,
                                          IBaseRepository<MoneyRequest> topUpRequestRepository,
                                          IBaseRepository<Wallet> wallerRepository,
                                          IBaseRepository<User> userRepository,
@@ -35,6 +37,7 @@ namespace Vouchee.Business.Services.Impls
                                          IBaseRepository<PartnerTransaction> partnerTransactionRepository,
                                          IMapper mapper)
         {
+            _notificationRepository = notificationRepository;
             _voucherRepository = voucherRepository;
             _topUpRequestRepository = topUpRequestRepository;
             _wallerRepository = wallerRepository;
@@ -101,6 +104,16 @@ namespace Vouchee.Business.Services.Impls
                                 throw new ConflictException($"Order này đã hết hạn lúc {existedOrder.CreateDate.Value.AddMinutes(2)}");
                             }
 
+                            await _notificationRepository.Add(new()
+                            {
+                                CreateBy = existedOrder.CreateBy,
+                                CreateDate = DateTime.Now,
+                                Title = "THÔNG BÁO TRẠNG THÁI ĐƠN HÀNG",
+                                Description = $"Đơn hàng {orderId} của bạn đã thanh toán",
+                                ReceiverId = existedOrder.CreateBy,
+                                Seen = false,
+                            });
+
                             foreach (var orderDetail in existedOrder.OrderDetails.GroupBy(x => x.Modal.VoucherId))
                             {
                                 var result = false;
@@ -144,7 +157,6 @@ namespace Vouchee.Business.Services.Impls
 
                             if (existedOrder.UsedBalance > 0)
                             {
-                                existedOrder.Buyer.BuyerWallet.Balance -= existedOrder.UsedBalance;
                                 existedOrder.Buyer.BuyerWallet.BuyerWalletTransactions.Add(new()
                                 {
                                     Type = "AMOUNT_OUT",
@@ -152,8 +164,11 @@ namespace Vouchee.Business.Services.Impls
                                     CreateDate = DateTime.Now,
                                     Status = WalletTransactionStatusEnum.DONE.ToString(),
                                     Amount = existedOrder.UsedBalance,
-                                    OrderId = existedOrder.Id
+                                    OrderId = existedOrder.Id,
+                                    BeforeBalance = existedOrder.Buyer.BuyerWallet.Balance,
+                                    AfterBalance = existedOrder.Buyer.BuyerWallet.Balance - existedOrder.UsedBalance,
                                 });
+                                existedOrder.Buyer.BuyerWallet.Balance -= existedOrder.UsedBalance;
                             }
 
                             // Process seller wallet updates
@@ -178,6 +193,25 @@ namespace Vouchee.Business.Services.Impls
                                     Amount = amount,
                                     OrderId = existedOrder.Id,
                                 });
+
+                                string description = $"Đơn hàng số {existedOrder.Id}\n";
+
+                                foreach (var modal in seller)
+                                {
+                                    description += $"Modal: {modal.ModalId} - {modal.Quantity}\n";
+                                }
+
+                                Notification sellerNotification = new()
+                                {
+                                    ReceiverId = existedSeller.Id,
+                                    CreateBy = existedOrder.CreateBy,
+                                    CreateDate = DateTime.Now,
+                                    Title = "THÔNG BÁO CÓ ĐƠN HÀNG MỚI",
+                                    Description = description,
+                                    Seen = false,
+                                };
+
+                                await _notificationRepository.AddAsync(sellerNotification);
                             }
 
                             await _userRepository.SaveChanges();
