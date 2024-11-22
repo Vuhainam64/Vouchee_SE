@@ -22,6 +22,7 @@ namespace Vouchee.Business.Services
         // READ
         public Task<GetVoucherCodeDTO> GetVoucherCodeByIdAsync(Guid id);
         public Task<IList<GetVoucherCodeDTO>> GetVoucherCodesAsync();
+        public Task<DynamicResponseModel<GetVoucherCodeDTO>> GetOrderedVoucherCode(Guid modalId, ThisUserObj thisUserObj, PagingRequest pagingRequest, VoucherCodeFilter voucherCodeFilter);
 
         // UPDATE
         public Task<bool> UpdateVoucherCodeAsync(Guid id, UpdateVoucherCodeDTO updateVoucherCodeDTO);

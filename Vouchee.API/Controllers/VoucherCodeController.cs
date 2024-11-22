@@ -51,6 +51,15 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("get_ordered_voucher_codes")]
+        public async Task<IActionResult> GetOrderedVoucherCodes(Guid modalId, [FromQuery] PagingRequest pagingRequest, [FromQuery] VoucherCodeFilter voucherCodeFilter)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _voucherCodeService.GetOrderedVoucherCode(modalId, currentUser, pagingRequest, voucherCodeFilter);
+            return Ok(result);
+        }
+
         // GET BY ID
         [HttpGet("get_voucher_code/{id}")]
         public async Task<IActionResult> GetVoucherCodeById(Guid id)
