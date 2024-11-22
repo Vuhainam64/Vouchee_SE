@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Firebase.Auth;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -29,6 +30,7 @@ namespace Vouchee.Business.Services.Impls
         private readonly IFileUploadService _fileUploadService;
         private readonly IBaseRepository<Modal> _modalRepository;
         private readonly IMapper _mapper;
+
         public ModalService(IBaseRepository<Voucher> voucherRepository,
                                     IFileUploadService fileUploadService,
                                     IBaseRepository<Modal> modalRepository,
@@ -127,6 +129,33 @@ namespace Vouchee.Business.Services.Impls
                     total = result.Item1 // Total vouchers count for metadata
                 },
                 results = list// Return the paged voucher list with nearest address and distance
+            };
+        }
+
+        public async Task<DynamicResponseModel<GetDetailModalDTO>> GetOrderedModals(Guid buyerId, PagingRequest pagingRequest, ModalFilter modalFilter)
+        {
+            (int, IQueryable<GetDetailModalDTO>) result;
+
+            result = _modalRepository.GetTable()
+                                                   .Include(x => x.VoucherCodes)
+                                                       .ThenInclude(x => x.Order)
+                                                   .Include(x => x.OrderDetails)
+                                                       .ThenInclude(od => od.Order)
+                                                   .Where(x => x.OrderDetails.Any(od => od.Order.CreateBy == buyerId))
+                                                   .Where(x => x.VoucherCodes.Any(vc => vc.Order.CreateBy == buyerId))
+                                                   .ProjectTo<GetDetailModalDTO>(_mapper.ConfigurationProvider)
+                                                   .DynamicFilter(_mapper.Map<GetDetailModalDTO>(modalFilter))
+                                                   .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            return new DynamicResponseModel<GetDetailModalDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1
+                },
+                results = await result.Item2.ToListAsync()
             };
         }
 

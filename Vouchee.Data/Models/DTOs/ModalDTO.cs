@@ -69,7 +69,7 @@ namespace Vouchee.Data.Models.DTOs
         
     }
 
-    public class GetDetailModalDTO : GetModalDTO
+    public class GetDetailModalDTO : ModalDTO
     {
         public GetDetailModalDTO()
         {
