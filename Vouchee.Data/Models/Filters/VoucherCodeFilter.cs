@@ -8,5 +8,6 @@ namespace Vouchee.Data.Models.Filters
 {
     public class VoucherCodeFilter
     {
+        public string? status { get; set; }
     }
 }

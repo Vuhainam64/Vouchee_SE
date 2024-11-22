@@ -132,22 +132,19 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<DynamicResponseModel<GetDetailModalDTO>> GetOrderedModals(Guid buyerId, PagingRequest pagingRequest, ModalFilter modalFilter)
+        public async Task<DynamicResponseModel<GetModalDTO>> GetOrderedModals(Guid buyerId, PagingRequest pagingRequest, ModalFilter modalFilter)
         {
-            (int, IQueryable<GetDetailModalDTO>) result;
+            (int, IQueryable<GetModalDTO>) result;
 
             result = _modalRepository.GetTable()
-                                                   .Include(x => x.VoucherCodes)
-                                                       .ThenInclude(x => x.Order)
-                                                   .Include(x => x.OrderDetails)
-                                                       .ThenInclude(od => od.Order)
-                                                   .Where(x => x.OrderDetails.Any(od => od.Order.CreateBy == buyerId))
-                                                   .Where(x => x.VoucherCodes.Any(vc => vc.Order.CreateBy == buyerId))
-                                                   .ProjectTo<GetDetailModalDTO>(_mapper.ConfigurationProvider)
-                                                   .DynamicFilter(_mapper.Map<GetDetailModalDTO>(modalFilter))
-                                                   .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+                                        .Include(x => x.OrderDetails)
+                                            .ThenInclude(od => od.Order)
+                                        .Where(x => x.OrderDetails.Any(od => od.Order.CreateBy == buyerId))
+                                        .ProjectTo<GetModalDTO>(_mapper.ConfigurationProvider)
+                                        .DynamicFilter(_mapper.Map<GetModalDTO>(modalFilter))
+                                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
-            return new DynamicResponseModel<GetDetailModalDTO>()
+            return new DynamicResponseModel<GetModalDTO>()
             {
                 metaData = new MetaData()
                 {
