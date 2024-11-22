@@ -286,6 +286,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<CartDTO> UpdateQuantityAsync(Guid modalId, int quantity, ThisUserObj thisUserObj)
         {
+            await GetCartsAsync(thisUserObj, true);
             if (quantity < 1)
             {
                 //throw new ConflictException("Số lượng không hợp lệ");
@@ -310,7 +311,7 @@ namespace Vouchee.Business.Services.Impls
                 throw new ConflictException("Bạn chỉ có thể mua tối đa 20 code mỗi loại voucher");
             }
 
-            await GetCartsAsync(thisUserObj, true);
+            /*await GetCartsAsync(thisUserObj, true);*/
 
             if (_user.Carts != null && _user.Carts.Count != 0)
             {
