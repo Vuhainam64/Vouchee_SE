@@ -25,9 +25,11 @@ namespace Vouchee.Business.Models.DTOs
 
         public string? name { get; set; }
         public string? image { get; set; }
+
+        public bool? isVerified { get; set; }
     }
 
-    public class GetSupplierDTO
+    public class GetSupplierDTO : SupplierDTO
     {
 
     }

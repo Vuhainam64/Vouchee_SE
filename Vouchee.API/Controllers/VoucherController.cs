@@ -116,6 +116,7 @@ namespace Vouchee.API.Controllers
             var result = await _voucherService.UpdateVoucherStatusAsync(id, voucherStatus);
             return Ok(result);
         }
+
         [HttpPut("update_voucher_isActive/{id}")]
         public async Task<IActionResult> UpdateVoucherisActive(Guid id, bool isActive)
         {

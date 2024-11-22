@@ -140,7 +140,9 @@ namespace Vouchee.API.AppStarts
             CreateMap<VoucherCode, VoucherCodeDTO>().ReverseMap();
             CreateMap<VoucherCode, CreateVoucherCodeDTO>().ReverseMap();
             CreateMap<VoucherCode, UpdateVoucherCodeDTO>().ReverseMap();
-            CreateMap<VoucherCode, GetVoucherCodeDTO>().ReverseMap();
+            CreateMap<VoucherCode, GetVoucherCodeDTO>()
+                .ForMember(dest => dest.buyerId, opt => opt.MapFrom(src => src.Order.CreateBy))
+                .ReverseMap();
             CreateMap<GetVoucherCodeDTO, VoucherCodeFilter>().ReverseMap();
 
             // VOUCHER TYPE
@@ -189,8 +191,13 @@ namespace Vouchee.API.AppStarts
                 .ForMember(dest => dest.brandName, opt => opt.MapFrom(src => src.Voucher.Brand.Name))
                 .ForMember(dest => dest.brandImage, opt => opt.MapFrom(src => src.Voucher.Brand.Image))
                 .ReverseMap();
-            CreateMap<Modal, GetDetailModalDTO>().ReverseMap();
+            CreateMap<Modal, GetDetailModalDTO>()
+                .ForMember(dest => dest.brandId, opt => opt.MapFrom(src => src.Voucher.Brand.Id))
+                .ForMember(dest => dest.brandName, opt => opt.MapFrom(src => src.Voucher.Brand.Name))
+                .ForMember(dest => dest.brandImage, opt => opt.MapFrom(src => src.Voucher.Brand.Image))
+                .ReverseMap();
             CreateMap<GetModalDTO, ModalFilter>().ReverseMap();
+            CreateMap<GetDetailModalDTO, ModalFilter>().ReverseMap();
             CreateMap<Modal, CartModalDTO>()
                 .ForMember(dest => dest.brandId, opt => opt.MapFrom(src => src.Voucher.Brand.Id))
                 .ForMember(dest => dest.brandName, opt => opt.MapFrom(src => src.Voucher.Brand.Name))

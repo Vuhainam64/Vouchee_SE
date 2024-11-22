@@ -26,6 +26,7 @@ namespace Vouchee.Business.Services.Impls
 {
     public class VoucherService : IVoucherService
     {
+        private readonly IBaseRepository<Order> _orderRepository;
         private readonly IBaseRepository<User> _userRepository;
         private readonly IBaseRepository<Media> _mediaRepository;
         private readonly IBaseRepository<Supplier> _supplierRepository;
@@ -37,17 +38,19 @@ namespace Vouchee.Business.Services.Impls
         private readonly IBaseRepository<OrderDetail> _orderDetailRepository;
         private readonly IMapper _mapper;
 
-        public VoucherService(IBaseRepository<User> userRepository,
-                                IBaseRepository<Media> mediaRepository,
-                                IBaseRepository<Supplier> supplierRepository,
-                                IBaseRepository<Brand> brandReposiroty,
-                                IBaseRepository<Promotion> promotionRepository,
-                                IBaseRepository<Category> categoryRepository,
-                                IFileUploadService fileUploadService,
-                                IBaseRepository<Voucher> voucherRepository,
-                                IBaseRepository<OrderDetail> orderDetailRepository,
-                                IMapper mapper)
+        public VoucherService(IBaseRepository<Order> orderRepository,
+                              IBaseRepository<User> userRepository,
+                              IBaseRepository<Media> mediaRepository,
+                              IBaseRepository<Supplier> supplierRepository,
+                              IBaseRepository<Brand> brandReposiroty,
+                              IBaseRepository<Promotion> promotionRepository,
+                              IBaseRepository<Category> categoryRepository,
+                              IFileUploadService fileUploadService,
+                              IBaseRepository<Voucher> voucherRepository,
+                              IBaseRepository<OrderDetail> orderDetailRepository,
+                              IMapper mapper)
         {
+            _orderRepository = orderRepository;
             _userRepository = userRepository;
             _mediaRepository = mediaRepository;
             _supplierRepository = supplierRepository;

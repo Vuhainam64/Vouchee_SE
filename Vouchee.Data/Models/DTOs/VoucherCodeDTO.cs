@@ -29,7 +29,8 @@ namespace Vouchee.Business.Models.DTOs
         public Guid id { get; set; }
 
         public Guid? modalId { get; set; }
-        public Guid? orderDetailId { get; set; }
+        public string? orderId { get; set; }
+        public Guid? buyerId { get; set; }
 
         public string? status { get; set; }
     }

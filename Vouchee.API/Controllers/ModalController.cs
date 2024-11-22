@@ -50,6 +50,17 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("get_ordered_modals")]
+        [Authorize]
+        public async Task<IActionResult> GetOrderedModals([FromQuery] PagingRequest pagingRequest,
+                                                            [FromQuery] ModalFilter modalFilter)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _modalService.GetOrderedModals(currentUser.userId, pagingRequest, modalFilter);
+            return Ok(result);
+        }
+
         // GET BY ID
         [HttpGet("get_modal/{id}")]
         [Authorize]
@@ -73,6 +84,7 @@ namespace Vouchee.API.Controllers
             var result = await _modalService.UpdateModalStatusAsync(id, modalStatus);
             return Ok(result);
         }
+
         [HttpPut("update_modal_isActive/{id}")]
         public async Task<IActionResult> UpdateModalisActive(Guid id, bool isActive)
         {

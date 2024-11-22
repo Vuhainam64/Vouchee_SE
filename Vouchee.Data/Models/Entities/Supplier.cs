@@ -31,7 +31,7 @@ namespace Vouchee.Data.Models.Entities
 
         public required string Name { get; set; }
         public string? Contact { get; set; }
-        public bool IsVerfied { get; set; }
+        public bool IsVerified { get; set; }
         public string? Image { get; set; }
         public int? TotalQuantitySold { get; set; }
 
