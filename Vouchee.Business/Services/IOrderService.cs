@@ -3,6 +3,7 @@ using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Models.ViewModels;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
+using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Filters;
 
 namespace Vouchee.Business.Services

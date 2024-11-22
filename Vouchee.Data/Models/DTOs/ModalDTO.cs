@@ -69,6 +69,16 @@ namespace Vouchee.Data.Models.DTOs
         
     }
 
+    public class GetPendingModalDTO : ModalDTO
+    {
+        public GetPendingModalDTO()
+        {
+            orderDetails = [];
+        }
+
+        public virtual ICollection<GetOrderDetailDTO> orderDetails { get; set; }
+    }
+
     public class GetDetailModalDTO : ModalDTO
     {
         public GetDetailModalDTO()

@@ -156,6 +156,36 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
+        public async Task<DynamicResponseModel<GetPendingModalDTO>> GetPendingModals(Guid sellerId, PagingRequest pagingRequest, ModalFilter modalFilter)
+        {
+            (int, IQueryable<GetPendingModalDTO>) result;
+
+            result = _modalRepository.GetTable()
+                .Include(x => x.OrderDetails)
+                .ThenInclude(od => od.Modal)
+                    .ThenInclude(m => m.Voucher)
+                .Where(x => x.Voucher.SellerId == sellerId)
+                .Where(x => x.OrderDetails.Count != 0 && x.OrderDetails.All(x => x.Status == "PENDING"))
+                .ProjectTo<GetPendingModalDTO>(_mapper.ConfigurationProvider)
+                .DynamicFilter(_mapper.Map<GetPendingModalDTO>(modalFilter))
+                .PagingIQueryable(pagingRequest.page,
+                                  pagingRequest.pageSize,
+                                  PageConstant.LIMIT_PAGING,
+                                  PageConstant.DEFAULT_PAPING);
+
+
+            return new DynamicResponseModel<GetPendingModalDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1
+                },
+                results = await result.Item2.ToListAsync()
+            };
+        }
+
         public Task<bool> UpdateModalAsync(Guid id, UpdateModalDTO updateModalDTO)
         {
             throw new NotImplementedException();
