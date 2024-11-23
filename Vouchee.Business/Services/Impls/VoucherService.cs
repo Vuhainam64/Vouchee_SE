@@ -131,19 +131,56 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<bool> DeleteVoucherAsync(Guid id)
+        public async Task<ResponseMessage<bool>> DeleteVoucherAsync(Guid id)
         {
-            bool result = false;
-            var voucher = await _voucherRepository.GetByIdAsync(id);
-            if (voucher != null)
-            {
-                result = await _voucherRepository.DeleteAsync(voucher);
-            }
-            else
+            var exkstedVoucher = await _voucherRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Modals)
+                                                                                                        .ThenInclude(x => x.OrderDetails)
+                                                                                                     .Include(x => x.Modals)
+                                                                                                        .ThenInclude(x => x.VoucherCodes)
+                                                                                                    .Include(x => x.Modals)
+                                                                                                        .ThenInclude(x => x.Ratings)
+                                                                                                    .Include(x => x.Modals)
+                                                                                                        .ThenInclude(x => x.Carts)
+                                                                                                    .Include(x => x.Medias), isTracking: true);
+
+            if (exkstedVoucher == null)
             {
                 throw new NotFoundException($"Không tìm thấy voucher với id {id}");
             }
-            return result;
+
+            foreach (var modal in exkstedVoucher.Modals.ToList()) 
+            {
+                if (modal.OrderDetails.Any())
+                {
+                    throw new ConflictException("Không thể xóa voucher này vì đã được order");
+                }
+
+                foreach (var voucherCode in modal.VoucherCodes.ToList()) 
+                {
+                    modal.VoucherCodes.Remove(voucherCode);
+                }
+
+                foreach (var cart in modal.Carts.ToList()) 
+                {
+                    modal.Carts.Remove(cart);
+                }
+
+                exkstedVoucher.Modals.Remove(modal);
+            }
+
+            foreach (var media in exkstedVoucher.Medias.ToList()) 
+            {
+                exkstedVoucher.Medias.Remove(media);
+            }
+
+            await _voucherRepository.DeleteAsync(exkstedVoucher);
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Xóa voucher thành công",
+                result = true,
+                value = true
+            };
         }
 
         public async Task<IList<GetVoucherDTO>> GetNewestVouchers(int numberOfVoucher)
@@ -407,6 +444,42 @@ namespace Vouchee.Business.Services.Impls
             };
 
             return response;
+        }
+
+        public async Task<ResponseMessage<bool>> RemoveCategoryFromVoucherAsync(Guid categoryId, Guid voucherId, ThisUserObj thisUserObj)
+        {
+            var existedVoucher = await _voucherRepository.GetByIdAsync(voucherId, includeProperties: x => x.Include(x => x.Categories), isTracking: true);
+
+            if (existedVoucher == null)
+            {
+                throw new NotFoundException("Không tìm thấy voucher này");
+            }
+
+            var existedCategory = existedVoucher.Categories.FirstOrDefault(x => x.Id == categoryId);
+
+            if (existedCategory != null)
+            {
+                throw new ConflictException("Danh mục này đã tồn tại trong voucher");
+            }
+
+            existedCategory = await _categoryRepository.GetByIdAsync(categoryId, includeProperties: x => x.Include(x => x.Vouchers), isTracking: true);
+            if (existedCategory == null)
+            {
+                throw new NotFoundException("Không tìm thấy category này");
+            }
+
+            existedVoucher.Categories.Add(existedCategory);
+            existedVoucher.UpdateDate = DateTime.Now;
+            existedVoucher.UpdateBy = thisUserObj.userId;
+
+            await _voucherRepository.SaveChanges();
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Cập nhật thành công",
+                result = true,
+                value = true
+            };
         }
     }
 }

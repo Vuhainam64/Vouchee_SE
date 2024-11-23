@@ -56,7 +56,6 @@ namespace Vouchee.Business.Services.Impls
                 newAddress.CreateBy = thisUserObj.userId;
                 newAddress.IsVerified = false;
                 newAddress.Brands.Add(existedBrand);
-                addressId = await _addressRepository.AddAsync(newAddress);
             }
 
             return new ResponseMessage<Guid>()
@@ -69,7 +68,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<ResponseMessage<bool>> DeleteAddressAsync(Guid id)
         {
-            var existedAddress = await _addressRepository.GetByIdAsync(id, isTracking: true);
+            var existedAddress = await _addressRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Brands), isTracking: true);
 
             if (existedAddress == null)
             {

@@ -26,5 +26,9 @@ namespace Vouchee.Business.Services
         public Task<ResponseMessage<bool>> UpdateBrandStatusAsync(Guid id, ObjectStatusEnum status, ThisUserObj thisUserObj);
         public Task<ResponseMessage<bool>> UpdateBrandStateAsync(Guid id, bool isActive, ThisUserObj thisUserObj);
         public Task<ResponseMessage<bool>> VerifyBrand(Guid id, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<bool>> RemoveAddressFromBrandAsync(Guid addressId, Guid brandId);
+
+        // DELETE
+        public Task<ResponseMessage<bool>> DeleteBrandAsync(Guid id);
     }
 }

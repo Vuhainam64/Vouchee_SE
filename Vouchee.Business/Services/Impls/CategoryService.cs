@@ -23,16 +23,19 @@ namespace Vouchee.Business.Services.Impls
 {
     public class CategoryService : ICategoryService
     {
+        private readonly IBaseRepository<Voucher> _voucherRepository;
         private readonly IBaseRepository<VoucherType> _voucherTypeRepository;
         private readonly IFileUploadService _fileUploadService;
         private readonly IBaseRepository<Category> _categoryRepository;
         private readonly IMapper _mapper;
 
-        public CategoryService(IBaseRepository<VoucherType> voucherTypeRepository,
-                                IFileUploadService fileUploadService,
-                                IBaseRepository<Category> categoryRepository, 
-                                IMapper mapper)
+        public CategoryService(IBaseRepository<Voucher> voucherRepository,
+                               IBaseRepository<VoucherType> voucherTypeRepository,
+                               IFileUploadService fileUploadService,
+                               IBaseRepository<Category> categoryRepository,
+                               IMapper mapper)
         {
+            _voucherRepository = voucherRepository;
             _voucherTypeRepository = voucherTypeRepository;
             _fileUploadService = fileUploadService;
             _categoryRepository = categoryRepository;
@@ -64,6 +67,25 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
+        public async Task<ResponseMessage<bool>> DeleteCategoryAsync(Guid id)
+        {
+            var existedCategory = await _categoryRepository.GetByIdAsync(id, isTracking: true);
+
+            if (existedCategory == null)
+            {
+                throw new NotFoundException("Không thấy category này");
+            }
+
+            await _categoryRepository.DeleteAsync(existedCategory);
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Xóa category thành công",
+                result = true,
+                value = true
+            };
+        }
+
         public async Task<DynamicResponseModel<GetCategoryDTO>> GetCategoriesAsync(PagingRequest pagingRequest, CategoryFilter categoryFilter)
         {
             (int, IQueryable<GetCategoryDTO>) result;
@@ -90,7 +112,8 @@ namespace Vouchee.Business.Services.Impls
             var existedCategory = await _categoryRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Vouchers)
                                                                                                             .ThenInclude(x => x.Medias)
                                                                                                         .Include(x => x.Vouchers)
-                                                                                                            .ThenInclude(x => x.Modals));
+                                                                                                            .ThenInclude(x => x.Modals)
+                                                                                                        .Include(x => x.VoucherType));
             
             if (existedCategory == null)
             {
@@ -98,6 +121,34 @@ namespace Vouchee.Business.Services.Impls
             }
 
             return _mapper.Map<GetDetailCategoryDTO>(existedCategory);
+        }
+
+        public async Task<ResponseMessage<bool>> RemoveCategoryFromVoucherAsync(Guid categoryId, Guid voucherId)
+        {
+            var existedVoucher = await _voucherRepository.GetByIdAsync(voucherId, includeProperties: x => x.Include(x => x.Categories), isTracking: true);
+
+            if (existedVoucher == null)
+            {
+                throw new NotFoundException("Không tìm thấy voucher này");
+            }
+
+            var existedCategory = existedVoucher.Categories.FirstOrDefault(x => x.Id == categoryId);
+
+            if (existedCategory == null)
+            {
+                throw new NotFoundException("Không tìm thấy category trong voucher này");
+            }
+
+            existedVoucher.Categories.Remove(existedCategory);
+
+            await _categoryRepository.SaveChanges();
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Xóa category ra khỏi voucher thành công",
+                result = true,
+                value = true
+            };
         }
 
         public async Task<ResponseMessage<bool>> UpdateCategoryAsync(Guid id, UpdateCategoryDTO updateCategoryDTO, ThisUserObj currentUser)
