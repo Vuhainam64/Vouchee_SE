@@ -16,7 +16,7 @@ namespace Vouchee.Data.Models.DTOs
         public Guid? receiverId { get; set; }
 
         public string? title { get; set; }
-        public string? description { get; set; }
+        public string? body { get; set; }
     }
 
     public class CreateNotificationDTO
