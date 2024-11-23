@@ -1,46 +1,80 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Vouchee.Business.Exceptions;
+using Vouchee.Business.Helpers;
+using Vouchee.Business.Models;
 using Vouchee.Data.Helpers.Base;
+using Vouchee.Data.Models.Constants.Enum.Status;
+using Vouchee.Data.Models.Constants.Number;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
+using Vouchee.Data.Models.Filters;
 
 namespace Vouchee.Business.Services.Impls
 {
     public class DeviceTokenService : IDeviceTokenService
     {
+        private readonly IBaseRepository<User> _userRepository;
         private readonly IBaseRepository<DeviceToken> _devicetokenRepository;
         private readonly IMapper _mapper;
 
-        public async Task<IActionResult> RegisterDevice([FromBody] CreateDeviceTokenDTO dto)
+        public DeviceTokenService(IBaseRepository<User> userRepository, 
+                                    IBaseRepository<DeviceToken> devicetokenRepository, 
+                                    IMapper mapper)
         {
-            if (dto.Token == null || dto.UserId == Guid.Empty)
-            {
-                throw new Exception ("Token and UserId are required.");
-            }
-
-            /*var existingToken = await _devicetokenRepository.GetTable()
-                .Where(d => d.Token == dto.Token);*/
-            var existingToken = await _devicetokenRepository.GetTable().ToListAsync() ;
-            if (existingToken == null)
-            {
-                var newToken = new DeviceToken
-                {
-                    UserId = dto.UserId,
-                    Token = dto.Token,
-                    Platform = dto.Platform.ToString(),
-                    CreateDate = DateTime.UtcNow
-                };
-
-                _devicetokenRepository.AddAsync(newToken);
-                await _devicetokenRepository.SaveChanges();
-            }
-
-            return Ok(new { Message = "Device registered successfully." });
+            _userRepository = userRepository;
+            _devicetokenRepository = devicetokenRepository;
+            _mapper = mapper;
         }
+
+        public async Task<ResponseMessage<Guid>> CreateDeviceToken(Guid userId, CreateDeviceTokenDTO createDeviceTokenDTO, DevicePlatformEnum devicePlatformEnum)
+        {
+            var existedUser = await _userRepository.GetByIdAsync(userId, includeProperties: x => x.Include(x => x.DeviceTokens));
+
+            if (existedUser == null)
+            {
+                throw new NotFoundException("Không tìm thấy user");
+            }
+
+            if (existedUser.DeviceTokens.FirstOrDefault(x => x.Token == createDeviceTokenDTO.token) != null)
+            {
+                throw new ConflictException("Người dùng này đã đăng ký token này");
+            }
+
+            var deviceToken = _mapper.Map<DeviceToken>(createDeviceTokenDTO);
+            deviceToken.Platform = devicePlatformEnum.ToString();
+            deviceToken.UserId = userId;
+
+            var id = await _devicetokenRepository.AddAsync(deviceToken);
+
+            return new ResponseMessage<Guid>
+            {
+                message = "Tạo device token thành công",
+                result = true,
+                value = (Guid)id
+            };
+        }
+
+        public async Task<DynamicResponseModel<GetDeviceTokenDTO>> GetDeviceTokenAsync(PagingRequest pagingRequest, DeviceTokenFilter deviceTokenFilter, Guid userId)
+        {
+            (int, IQueryable<GetDeviceTokenDTO>) result;
+
+            result = _devicetokenRepository.GetTable().Where(x => x.UserId == userId)
+                        .ProjectTo<GetDeviceTokenDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetDeviceTokenDTO>(deviceTokenFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            return new DynamicResponseModel<GetDeviceTokenDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+            };
+        }
+    }
 }

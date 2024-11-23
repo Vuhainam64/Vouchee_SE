@@ -261,7 +261,8 @@ namespace Vouchee.API.AppStarts
 
             //DEVICE TOKEN
             CreateMap<DeviceToken, CreateDeviceTokenDTO>().ReverseMap();
-            CreateMap<DeviceToken,NotificationDeviceTokenDTO>().ReverseMap();
+            CreateMap<DeviceToken, GetDeviceTokenDTO>().ReverseMap();
+            CreateMap<GetDeviceTokenDTO, DeviceTokenFilter>().ReverseMap();
         }
     }
 }

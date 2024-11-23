@@ -1,22 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Vouchee.Data.Models.Constants.Enum.Status;
+using Vouchee.Data.Models.Entities;
 
 namespace Vouchee.Data.Models.DTOs
 {
     public class CreateDeviceTokenDTO
     {
-        public Guid UserId { get; set; }
-        public string? Token { get; set; }
-        public DevicePlatformEnum? Platform { get; set; }
+        public string? token { get; set; }
+
+        public DateTime createDate = DateTime.Now;
     }
-    public class NotificationDeviceTokenDTO
+
+    public class GetDeviceTokenDTO
     {
-        public Guid UserId { get; set; }
-        public string Title { get; set; }
-        public string Body { get; set; }
+        public Guid id { get; set; }
+        public Guid userId { get; set; }
+
+        public string? token { get; set; }
+        public string? platform { get; set; }
+
+        public DateTime? createDate { get; set; }
     }
 }

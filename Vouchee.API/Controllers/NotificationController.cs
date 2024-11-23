@@ -27,12 +27,12 @@ namespace Vouchee.API.Controllers
         }
 
         [Authorize]
-        [HttpPost("create_notification/{receiverId}")]
-        public async Task<IActionResult> CreateNotification(Guid receiverId, [FromBody] CreateNotificationDTO createNotificationDTO)
+        [HttpPost("create_notification")]
+        public async Task<IActionResult> CreateNotification([FromBody] CreateNotificationDTO createNotificationDTO)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _notificationService.CreateNotificationAsync(receiverId, createNotificationDTO, currentUser);
+            var result = await _notificationService.CreateNotificationAsync(createNotificationDTO);
             return Ok(result);
         }
 

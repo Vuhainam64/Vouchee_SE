@@ -13,7 +13,7 @@ namespace Vouchee.Business.Services
     public interface INotificationService
     {
         // CREATE
-        public Task<ResponseMessage<Guid>> CreateNotificationAsync(Guid receiverId, CreateNotificationDTO createNotificationDTO, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<Guid>> CreateNotificationAsync(CreateNotificationDTO createNotificationDTO);
 
         // READ
         public Task<DynamicResponseModel<GetNotificationDTO>> GetNotificationsAsync(PagingRequest pagingRequest,

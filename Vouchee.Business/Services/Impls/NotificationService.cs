@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using FirebaseAdmin.Messaging;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core.Tokenizer;
 using System.Text;
 using System.Threading.Tasks;
 using Vouchee.Business.Exceptions;
@@ -21,47 +23,46 @@ namespace Vouchee.Business.Services.Impls
 {
     public class NotificationService : INotificationService
     {
-        private readonly IBaseRepository<Notification> _notificationRepository;
+        private readonly IBaseRepository<Data.Models.Entities.Notification> _notificationRepository;
         private readonly IMapper _mapper;
 
-        public NotificationService(IBaseRepository<Notification> notificationRepository,
+        public NotificationService(IBaseRepository<Data.Models.Entities.Notification> notificationRepository,
                                     IMapper mapper)
         {
             _notificationRepository = notificationRepository;
             _mapper = mapper;
         }
 
-        public async Task<ResponseMessage<Guid>> CreateNotificationAsync(Guid receiverId, CreateNotificationDTO createNotificationDTO, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<Guid>> CreateNotificationAsync(CreateNotificationDTO createNotificationDTO)
         {
-            try
+            Data.Models.Entities.Notification notification = _mapper.Map<Data.Models.Entities.Notification>(createNotificationDTO);
+            notification.SenderId = createNotificationDTO.senderId;
+            notification.CreateBy = createNotificationDTO.senderId;
+            notification.ReceiverId = createNotificationDTO.receiverId;
+
+            foreach (var token in createNotificationDTO.deviceTokens)
             {
-                if (receiverId == thisUserObj.userId)
+                var message = new Message
                 {
-                    throw new ConflictException("Không gửi thông báo cho chính mình được đâu má");
-                }
-
-                Notification notification = _mapper.Map<Notification>(createNotificationDTO);
-                notification.SenderId = thisUserObj.userId;
-                notification.CreateBy = thisUserObj.userId;
-                notification.ReceiverId = receiverId;
-
-                var id = await _notificationRepository.AddAsync(notification);
-                if (id != Guid.Empty)
-                {
-                    return new ResponseMessage<Guid>()
+                    Token = token,
+                    Notification = new FirebaseAdmin.Messaging.Notification
                     {
-                        message = "Tạo thành công",
-                        result = true,
-                        value = (Guid)id
-                    };
-                }
+                        Title = createNotificationDTO.title,
+                        Body = createNotificationDTO.body,
+                    }
+                };
+
+                await FirebaseMessaging.DefaultInstance.SendAsync(message);
             }
-            catch (Exception ex)
+
+            var id = await _notificationRepository.AddAsync(notification);
+
+            return new ResponseMessage<Guid>()
             {
-                LoggerService.Logger(ex.Message);
-                throw new Exception(ex.Message);
-            }
-            return null;
+                message = "Tạo noti thành công",
+                result = true,
+                value = (Guid)id
+            };
         }
 
         public Task<bool> DeleteNotificationAsync(Guid id, ThisUserObj thisUserObj)
@@ -73,7 +74,7 @@ namespace Vouchee.Business.Services.Impls
         {
             try
             {
-                Notification? existedNotification = await _notificationRepository.GetByIdAsync(id);
+                Data.Models.Entities.Notification? existedNotification = await _notificationRepository.GetByIdAsync(id);
                 if (existedNotification != null)
                 {
                     throw new NotFoundException("Không tìm thấy notification này");
