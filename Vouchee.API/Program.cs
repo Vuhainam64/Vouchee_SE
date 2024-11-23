@@ -32,7 +32,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: "MyAllowSpecificOrigins",
                       policy =>
                       {
-                          policy.WithOrigins("https://phatnq-test.web.app/", "https://www.vouchee.shop", "https://vouchee.shop", "http://localhost:3000")
+                          policy.WithOrigins("https://phatnq-test.web.app", "https://www.vouchee.shop", "https://vouchee.shop", "http://localhost:3000")
                                 .AllowAnyMethod()
                                 .AllowAnyHeader()
                                 .AllowCredentials(); // If you need to allow cookies or credentials
