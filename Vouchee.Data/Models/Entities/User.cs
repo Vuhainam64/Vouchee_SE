@@ -17,6 +17,7 @@ namespace Vouchee.Data.Models.Entities
             SenderNotifications = [];
             MoneyRequests = [];
             ShopPromotions = [];
+            DeviceTokens = [];
         }
 
         [InverseProperty(nameof(Wallet.Buyer))]
@@ -40,7 +41,7 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<MoneyRequest> MoneyRequests { get; set; }
         [InverseProperty(nameof(Promotion.Seller))]
         public virtual ICollection<Promotion> ShopPromotions { get; set; }
-        [InverseProperty(nameof(DeviceToken.User))]
+        [InverseProperty(nameof(DeviceToken.Users))]
         public virtual ICollection<DeviceToken> DeviceTokens { get; set; }
 
         [Key]

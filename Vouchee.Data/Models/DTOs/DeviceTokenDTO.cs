@@ -20,7 +20,6 @@ namespace Vouchee.Data.Models.DTOs
     public class GetDeviceTokenDTO
     {
         public Guid id { get; set; }
-        public Guid userId { get; set; }
 
         public string? token { get; set; }
         public string? platform { get; set; }

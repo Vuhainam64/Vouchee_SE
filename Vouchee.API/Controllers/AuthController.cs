@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Models.ViewModels;
 using Vouchee.Business.Services;
+using Vouchee.Data.Models.Constants.Enum.Status;
 
 namespace Vouchee.API.Controllers
 {
@@ -21,9 +23,16 @@ namespace Vouchee.API.Controllers
 
         [HttpPost("login_with_google_token")]
         [AllowAnonymous]
-        public async Task<IActionResult> LoginWithGoogle([FromQuery] string token)
+        public async Task<IActionResult> LoginWithGoogle([FromQuery] string token,
+                                                            [FromQuery] DevicePlatformEnum? platform,
+                                                            [FromQuery] string? deviceToken)
         {
-            var result = await _authService.GetToken(token);
+            if ((platform == null && deviceToken != null) || (platform != null && deviceToken == null))
+            {
+                return Conflict("Cần phải chọn cả platform và device token");
+            }
+
+            var result = await _authService.GetToken(token, platform, deviceToken);
             return Ok(result);
         }
     }
