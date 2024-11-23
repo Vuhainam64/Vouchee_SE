@@ -35,9 +35,23 @@ namespace Vouchee.Data.Models.DTOs
         public DateTime createDate = DateTime.Now;
     }
 
-    public class UpdateModalDTO : CreateModalDTO
+    public class UpdateModalDTO
     {
+        [Required(ErrorMessage = "Title is required")]
+        [StringLength(100, ErrorMessage = "Title cannot exceed 100 characters")]
+        public string? title { get; set; }
 
+        [Required(ErrorMessage = "Original price is required")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Original price must be greater than zero")]
+        public decimal originalPrice { get; set; }
+
+        [Required(ErrorMessage = "Sell price is required")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Sell price must be greater than zero")]
+        public decimal sellPrice { get; set; }
+
+        public string? image { get; set; }
+
+        public DateTime updateDate = DateTime.Now;
     }
 
     public class ModalDTO 
@@ -67,6 +81,11 @@ namespace Vouchee.Data.Models.DTOs
     public class GetModalDTO : ModalDTO
     {
         
+    }
+
+    public class GetOrderedModalDTO : ModalDTO
+    {
+        public int? voucherCodeCount { get; set; } = 0;
     }
 
     public class GetPendingModalDTO : ModalDTO

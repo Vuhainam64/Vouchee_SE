@@ -59,14 +59,16 @@ namespace Vouchee.Business.Services.Impls
             return await _modalRepository.AddAsync(modal);
         }
 
-        public async Task<bool> DeleteModalAsync(Guid id)
+        public async Task<ResponseMessage<bool>> DeleteModalAsync(Guid id)
         {
-            Modal modal = await _modalRepository.FindAsync(id, false);
-            if (modal != null)
-            {
-                return await _modalRepository.DeleteAsync(modal);
-            }
-            return false;
+            //Modal modal = await _modalRepository.FindAsync(id, false);
+            //if (modal != null)
+            //{
+            //    return await _modalRepository.DeleteAsync(modal);
+            //}
+            //return false;
+
+            throw new NotImplementedException();
         }
 
         public async Task<dynamic> GetModalByIdAsync(Guid id, PagingRequest pagingRequest)
@@ -132,19 +134,24 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<DynamicResponseModel<GetModalDTO>> GetOrderedModals(Guid buyerId, PagingRequest pagingRequest, ModalFilter modalFilter)
+        public async Task<DynamicResponseModel<GetOrderedModalDTO>> GetOrderedModals(Guid buyerId, PagingRequest pagingRequest, ModalFilter modalFilter)
         {
-            (int, IQueryable<GetModalDTO>) result;
+            (int, IQueryable<GetOrderedModalDTO>) result;
 
             result = _modalRepository.GetTable()
-                                        .Include(x => x.OrderDetails)
-                                            .ThenInclude(od => od.Order)
-                                        .Where(x => x.OrderDetails.Any(od => od.Order.CreateBy == buyerId))
-                                        .ProjectTo<GetModalDTO>(_mapper.ConfigurationProvider)
-                                        .DynamicFilter(_mapper.Map<GetModalDTO>(modalFilter))
-                                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+                                      .Include(x => x.OrderDetails)
+                                          .ThenInclude(od => od.Order)
+                                      .Where(x => x.OrderDetails.Any(od => od.Order.CreateBy == buyerId))
+                                      .Where(x =>
+                                          (modalFilter.startDate == null || x.StartDate >= modalFilter.startDate.Value) &&
+                                          (modalFilter.endDate == null || x.EndDate <= modalFilter.endDate.Value))
+                                      .ProjectTo<GetOrderedModalDTO>(_mapper.ConfigurationProvider)
+                                      .DynamicFilter(_mapper.Map<GetOrderedModalDTO>(modalFilter))
+                                      .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
-            return new DynamicResponseModel<GetModalDTO>()
+
+            // Prepare response
+            return new DynamicResponseModel<GetOrderedModalDTO>()
             {
                 metaData = new MetaData()
                 {

@@ -38,6 +38,8 @@ namespace Vouchee.Data.Models.DTOs
 
         public string? title { get; set; }
         public string? image { get; set; }
+
+        public bool? isActive { get; set; }
     }
 
     public class GetCategoryDTO : CategoryDTO

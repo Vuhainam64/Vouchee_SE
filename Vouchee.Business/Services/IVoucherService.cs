@@ -35,8 +35,9 @@ namespace Vouchee.Business.Services
         public Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO);
         public Task<ResponseMessage<GetVoucherDTO>> UpdateVoucherStatusAsync(Guid id, VoucherStatusEnum voucherStatus);
         public Task<ResponseMessage<GetVoucherDTO>> UpdateVoucherisActiveAsync(Guid id, bool isActive);
+        public Task<ResponseMessage<bool>> RemoveCategoryFromVoucherAsync(Guid categoryId, Guid voucherId, ThisUserObj thisUserObj);
 
         // DELETE
-        public Task<bool> DeleteVoucherAsync(Guid id);
+        public Task<ResponseMessage<bool>> DeleteVoucherAsync(Guid id);
     }
 }

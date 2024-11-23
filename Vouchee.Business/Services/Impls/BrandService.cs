@@ -118,13 +118,28 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<IList<GetBrandDTO>> GetBrandsbynameAsync(string name)
+        public async Task<ResponseMessage<bool>> DeleteBrandAsync(Guid id)
         {
-            IQueryable<GetBrandDTO> result;
-            result = _brandRepository.GetTable()
-                        .Where(b => b.Name.ToLower().Contains(name.ToLower()))
-                        .ProjectTo<GetBrandDTO>(_mapper.ConfigurationProvider);
-            return await result.ToListAsync();
+            var existedBrand = await _brandRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Vouchers), isTracking: true);
+
+            if (existedBrand == null)
+            {
+                throw new NotFoundException("Không tìm thấy brand này");
+            }
+
+            if (existedBrand.Vouchers.Count != 0)
+            {
+                throw new ConflictException("Có các voucher phụ thuộc vào brand này");
+            }
+
+            await _brandRepository.DeleteAsync(existedBrand);
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Xóa thành công",
+                result = true,
+                value = true
+            };
         }
 
         public async Task<ResponseMessage<bool>> UpdateBrandAsync(Guid id, UpdateBrandDTO updateBrandDTO, ThisUserObj thisUserObj)
@@ -213,6 +228,40 @@ namespace Vouchee.Business.Services.Impls
             return new ResponseMessage<bool>()
             {
                 message = "Cập nhật thương hiệu thành công",
+                result = true,
+                value = true
+            };
+        }
+
+        public async Task<ResponseMessage<bool>> RemoveAddressFromBrandAsync(Guid addressId, Guid brandId)
+        {
+            var existedBrand = await _brandRepository.GetByIdAsync(brandId, includeProperties: x => x.Include(x => x.Addresses), isTracking: true);
+
+            if (existedBrand == null)
+            {
+                throw new NotFoundException("Không tìm thấy brand này");
+            }
+
+            var existedAddress = existedBrand.Addresses.FirstOrDefault(x => x.Id == addressId);
+            if (existedAddress != null)
+            {
+                throw new ConflictException("Thương hiệu này đã chứa địa chỉ này");
+            }
+
+            existedAddress = await _addressRepository.GetByIdAsync(addressId, includeProperties: x => x.Include(x => x.Brands), isTracking: true);
+
+            if (existedAddress == null)
+            {
+                throw new NotFoundException("Không tìm thấy địa chỉ này");
+            }
+
+            existedBrand.Addresses.Add(existedAddress);
+
+            await _brandRepository.SaveChanges();
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Cập nhật thường hiệu thành công",
                 result = true,
                 value = true
             };

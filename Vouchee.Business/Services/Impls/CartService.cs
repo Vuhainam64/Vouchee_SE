@@ -286,16 +286,32 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<CartDTO> UpdateQuantityAsync(Guid modalId, int quantity, ThisUserObj thisUserObj)
         {
+            await GetCartsAsync(thisUserObj, true);
             if (quantity < 1)
             {
-                throw new ConflictException("Số lượng không hợp lệ");
+                //throw new ConflictException("Số lượng không hợp lệ");
+                var cartVoucher = _user.Carts.FirstOrDefault(x => x.ModalId == modalId);
+                if (cartVoucher == null)
+                {
+                    throw new NotFoundException($"Không thấy modal {modalId} trong cart");
+                }
+
+                _user.Carts.Remove(cartVoucher);
+
+                var state = _userRepository.GetEntityState(_user);
+                var result = await _userRepository.SaveChanges();
+                if (result)
+                {
+                    await GetCartsAsync(thisUserObj, false);
+                    return _cartDTO;
+                }
             }
             if (quantity > 20)
             {
                 throw new ConflictException("Bạn chỉ có thể mua tối đa 20 code mỗi loại voucher");
             }
 
-            await GetCartsAsync(thisUserObj, true);
+            /*await GetCartsAsync(thisUserObj, true);*/
 
             if (_user.Carts != null && _user.Carts.Count != 0)
             {

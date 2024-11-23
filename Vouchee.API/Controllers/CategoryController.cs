@@ -88,13 +88,33 @@ namespace Vouchee.API.Controllers
 
         [HttpPut("update_category_state/{id}")]
         [Authorize]
-        public async Task<IActionResult> UpdateCategoryState(Guid id, [FromBody] UpdateCategoryDTO updateCategoryDTO)
+        public async Task<IActionResult> UpdateCategoryState(Guid id, bool isActive)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             if (currentUser.role.Equals(RoleEnum.ADMIN.ToString()))
             {
-                var result = await _categoryService.UpdateCategoryAsync(id, updateCategoryDTO, currentUser);
+                var result = await _categoryService.UpdateCategoryStateAsync(id, isActive, currentUser);
+                return Ok(result);
+            }
+
+            return StatusCode((int)HttpStatusCode.Forbidden, new
+            {
+                code = HttpStatusCode.Forbidden,
+                message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
+            });
+        }
+
+        // REMOVE
+        [HttpDelete("delete_category/{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteCategory(Guid id)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            if (currentUser.role.Equals(RoleEnum.ADMIN.ToString()))
+            {
+                var result = await _categoryService.DeleteCategoryAsync(id);
                 return Ok(result);
             }
 
