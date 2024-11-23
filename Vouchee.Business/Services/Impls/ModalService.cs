@@ -26,16 +26,22 @@ namespace Vouchee.Business.Services.Impls
 {
     public class ModalService : IModalService
     {
+        private readonly IBaseRepository<VoucherCode> _voucherCodeRepository;
+        private readonly IBaseRepository<Order> _orderRepository;
         private readonly IBaseRepository<Voucher> _voucherRepository;
         private readonly IFileUploadService _fileUploadService;
         private readonly IBaseRepository<Modal> _modalRepository;
         private readonly IMapper _mapper;
 
-        public ModalService(IBaseRepository<Voucher> voucherRepository,
-                                    IFileUploadService fileUploadService,
-                                    IBaseRepository<Modal> modalRepository,
-                                    IMapper mapper)
+        public ModalService(IBaseRepository<VoucherCode> voucherCodeRepository,
+                            IBaseRepository<Order> orderRepository,
+                            IBaseRepository<Voucher> voucherRepository,
+                            IFileUploadService fileUploadService,
+                            IBaseRepository<Modal> modalRepository,
+                            IMapper mapper)
         {
+            _voucherCodeRepository = voucherCodeRepository;
+            _orderRepository = orderRepository;
             _voucherRepository = voucherRepository;
             _fileUploadService = fileUploadService;
             _modalRepository = modalRepository;
@@ -136,30 +142,56 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<DynamicResponseModel<GetOrderedModalDTO>> GetOrderedModals(Guid buyerId, PagingRequest pagingRequest, ModalFilter modalFilter)
         {
-            (int, IQueryable<GetOrderedModalDTO>) result;
+            var query = _voucherCodeRepository.GetTable()
+                .Include(vc => vc.Order) // Include related Order for filtering
+                .Include(vc => vc.Modal) // Include related Modal for projection
+                    .ThenInclude(x => x.Voucher)
+                        .ThenInclude(x => x.Brand)
+                .Where(vc => vc.Order.CreateBy == buyerId); // Filter by buyerId
 
-            result = _modalRepository.GetTable()
-                                      .Include(x => x.OrderDetails)
-                                          .ThenInclude(od => od.Order)
-                                      .Where(x => x.OrderDetails.Any(od => od.Order.CreateBy == buyerId))
-                                      .Where(x =>
-                                          (modalFilter.startDate == null || x.StartDate >= modalFilter.startDate.Value) &&
-                                          (modalFilter.endDate == null || x.EndDate <= modalFilter.endDate.Value))
-                                      .ProjectTo<GetOrderedModalDTO>(_mapper.ConfigurationProvider)
-                                      .DynamicFilter(_mapper.Map<GetOrderedModalDTO>(modalFilter))
-                                      .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
-
-
-            // Prepare response
-            return new DynamicResponseModel<GetOrderedModalDTO>()
+            // Apply the startDate filter if provided
+            if (modalFilter.startDate.HasValue)
             {
-                metaData = new MetaData()
+                query = query.Where(vc => vc.Modal.StartDate >= modalFilter.startDate.Value);
+            }
+
+            // Apply the endDate filter if provided
+            if (modalFilter.endDate.HasValue)
+            {
+                query = query.Where(vc => vc.Modal.EndDate <= modalFilter.endDate.Value);
+            }
+
+            var groupedData = await query
+                .GroupBy(vc => vc.Modal) // Group by Modal entity
+                .Select(group => new
+                {
+                    Modal = group.Key, // The Modal entity
+                    VoucherCodeCount = group.Count() // Count of VoucherCodes for each Modal
+                })
+                .ToListAsync();
+
+            // Project grouped data directly to GetOrderedModalDTO using AutoMapper
+            var list = groupedData.Select(data =>
+            {
+                var dto = _mapper.Map<GetOrderedModalDTO>(data.Modal);
+                dto.voucherCodeCount = data.VoucherCodeCount;
+                return dto;
+            }).ToList();
+
+            // Apply paging after the mapping
+            var pagedList = list.Skip((pagingRequest.page - 1) * pagingRequest.pageSize)
+                                .Take(pagingRequest.pageSize)
+                                .ToList();
+
+            return new DynamicResponseModel<GetOrderedModalDTO>
+            {
+                metaData = new MetaData
                 {
                     page = pagingRequest.page,
                     size = pagingRequest.pageSize,
-                    total = result.Item1
+                    total = list.Count // Total number of records before paging
                 },
-                results = await result.Item2.ToListAsync()
+                results = pagedList // Paged result
             };
         }
 
