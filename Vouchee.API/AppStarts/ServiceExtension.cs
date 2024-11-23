@@ -43,6 +43,7 @@ namespace Vouchee.API.AppStarts
             services.AddScoped<IPartnerTransactionService, PartnerTransactionService>();
             services.AddScoped<IModalPromotionService, ModalPromotionService>();
             services.AddScoped<IRatingService, RatingService>();
+            services.AddScoped<IDeviceTokenService, DeviceTokenService>();
         }
 
         public static void AddSwaggerServices(this IServiceCollection services, IConfiguration configuration)

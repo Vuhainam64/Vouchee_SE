@@ -255,6 +255,10 @@ namespace Vouchee.API.AppStarts
                 .ForMember(dest => dest.rep, opt => opt.MapFrom(src => src.Reply))
                 .ReverseMap();
             CreateMap<RatingFilter, GetRatingDTO>().ReverseMap();
+
+            //DEVICE TOKEN
+            CreateMap<DeviceToken, CreateDeviceTokenDTO>().ReverseMap();
+            CreateMap<DeviceToken,NotificationDeviceTokenDTO>().ReverseMap();
         }
     }
 }
