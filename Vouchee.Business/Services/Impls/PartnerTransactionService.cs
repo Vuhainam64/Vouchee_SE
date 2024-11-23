@@ -109,7 +109,7 @@ namespace Vouchee.Business.Services.Impls
                                 CreateBy = existedOrder.CreateBy,
                                 CreateDate = DateTime.Now,
                                 Title = "THÔNG BÁO TRẠNG THÁI ĐƠN HÀNG",
-                                Description = $"Đơn hàng {orderId} của bạn đã thanh toán",
+                                Body = $"Đơn hàng {orderId} của bạn đã thanh toán",
                                 ReceiverId = existedOrder.CreateBy,
                                 Seen = false,
                             });
@@ -207,7 +207,7 @@ namespace Vouchee.Business.Services.Impls
                                     CreateBy = existedOrder.CreateBy,
                                     CreateDate = DateTime.Now,
                                     Title = "THÔNG BÁO CÓ ĐƠN HÀNG MỚI",
-                                    Description = description,
+                                    Body = description,
                                     Seen = false,
                                 };
 

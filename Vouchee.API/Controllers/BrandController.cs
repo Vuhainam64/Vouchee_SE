@@ -108,5 +108,35 @@ namespace Vouchee.API.Controllers
                 message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
             });
         }
+
+        [HttpPut("remove_address_from_brand")]
+        [Authorize]
+        public async Task<IActionResult> RemoveAddressFromBrand(Guid addressId, Guid brandId)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _brandService.RemoveAddressFromBrandAsync(addressId, brandId);
+            return Ok(result);
+        }
+
+        // DELETE
+        [HttpDelete("delete_brand/{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteBrand(Guid id)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            if (currentUser.role.Equals(RoleEnum.ADMIN.ToString()))
+            {
+                var result = await _brandService.DeleteBrandAsync(id);
+                return Ok(result);
+            }
+
+            return StatusCode((int)HttpStatusCode.Forbidden, new
+            {
+                code = HttpStatusCode.Forbidden,
+                message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
+            });
+        }
     }
 }

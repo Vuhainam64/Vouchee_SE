@@ -123,12 +123,23 @@ namespace Vouchee.API.Controllers
             var result = await _voucherService.UpdateVoucherisActiveAsync(id, isActive);
             return Ok(result);
         }
+
+        [HttpPut("remove_category_from_voucher")]
+        public async Task<IActionResult> RemoveCategoryFromVoucher(Guid categoryId, Guid voucherId)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _voucherService.RemoveCategoryFromVoucherAsync(categoryId, voucherId, currentUser);
+            return Ok(result);
+        }
+
         // DELETE
-        //[HttpDelete("delete_voucher/{id}")]
-        //public async Task<IActionResult> DeleteVoucher(Guid id)
-        //{
-        //    var result = await _voucherService.DeleteVoucherAsync(id);
-        //    return Ok(result);
-        //}
+        [Authorize]
+        [HttpDelete("delete_voucher/{id}")]
+        public async Task<IActionResult> DeleteVoucher(Guid id)
+        {
+            var result = await _voucherService.DeleteVoucherAsync(id);
+            return Ok(result);
+        }
     }
 }

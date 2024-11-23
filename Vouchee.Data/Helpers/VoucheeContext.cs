@@ -33,6 +33,8 @@ namespace Vouchee.Data.Helpers
         public virtual DbSet<PartnerTransaction> PartnerTransactions { get; set; }
         public virtual DbSet<Media> Medias { get; set; }
         public virtual DbSet<Promotion> Promotions { get; set; }
+        public virtual DbSet<DeviceToken> DeviceTokens { get; set; }
+        public virtual DbSet<Rating> Ratings { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -66,6 +68,7 @@ namespace Vouchee.Data.Helpers
             modelBuilder.Entity<WalletTransaction>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<PartnerTransaction>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<Rating>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            modelBuilder.Entity<DeviceToken>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
 
             // modelBuilder.Seed();
             modelBuilder.Entity<User>()

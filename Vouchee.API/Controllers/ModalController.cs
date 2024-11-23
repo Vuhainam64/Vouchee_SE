@@ -50,17 +50,6 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("get_ordered_modals")]
-        [Authorize]
-        public async Task<IActionResult> GetOrderedModals([FromQuery] PagingRequest pagingRequest,
-                                                            [FromQuery] ModalFilter modalFilter)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
-
-            var result = await _modalService.GetOrderedModals(currentUser.userId, pagingRequest, modalFilter);
-            return Ok(result);
-        }
-
         [HttpGet("get_pending_modals")]
         [Authorize]
         public async Task<IActionResult> GetPendingModals([FromQuery] PagingRequest pagingRequest,
@@ -102,12 +91,14 @@ namespace Vouchee.API.Controllers
             var result = await _modalService.UpdateModalisActiveAsync(id, isActive);
             return Ok(result);
         }
+
         // DELETE
-        //[HttpDelete("delete_modal/{id}")]
-        //public async Task<IActionResult> DeleteVoucherCode(Guid id)
-        //{
-        //    var result = await _modalService.DeleteModalAsync(id);
-        //    return Ok(result);
-        //}
+        [Authorize]
+        [HttpDelete("delete_modal/{id}")]
+        public async Task<IActionResult> DeleteModal(Guid id)
+        {
+            var result = await _modalService.DeleteModalAsync(id);
+            return Ok(result);
+        }
     }
 }

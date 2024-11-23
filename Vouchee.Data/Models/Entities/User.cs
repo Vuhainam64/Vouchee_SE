@@ -40,6 +40,8 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<MoneyRequest> MoneyRequests { get; set; }
         [InverseProperty(nameof(Promotion.Seller))]
         public virtual ICollection<Promotion> ShopPromotions { get; set; }
+        [InverseProperty(nameof(DeviceToken.User))]
+        public virtual ICollection<DeviceToken> DeviceTokens { get; set; }
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -53,6 +55,8 @@ namespace Vouchee.Data.Models.Entities
         public int ResponsibilityScore { get; set; }
         public int VPoint { get; set; }
         public string? Role { get; set; }
+        public string? BankName { get; set; }
+        public string? BankNumber { get; set; }
 
         public bool IsActive { get; set; }
         public required string Status { get; set; }

@@ -122,16 +122,6 @@ namespace Vouchee.API.Controllers
             var result = await _addresService.DeleteAddressAsync(id);
             return Ok(result);
         }
-
-        [Authorize]
-        [HttpDelete("remove_address_from_brand")]
-        public async Task<IActionResult> RemoveAddressFromBrand(Guid addressId, Guid brandId)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
-
-            var result = await _addresService.RemoveAddressFromBrandAsync(addressId, brandId, currentUser);
-            return Ok(result);
-        }
     }
 }
 

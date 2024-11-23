@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Vouchee.Business.Models
+namespace Vouchee.Data.Models.Constants.Enum.Status
 {
-    public class DeviceToken
+    public enum DevicePlatformEnum
     {
-        public List<string> Tokens { get; set; }
+        WEB, 
+        APP
     }
 }
