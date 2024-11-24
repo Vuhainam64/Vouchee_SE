@@ -44,15 +44,16 @@ namespace Vouchee.Business.Services.Impls
 
             var deviceToken = _mapper.Map<DeviceToken>(createDeviceTokenDTO);
             deviceToken.Platform = devicePlatformEnum.ToString();
-            deviceToken.UserId = userId;
 
-            var id = await _devicetokenRepository.AddAsync(deviceToken);
+            existedUser.DeviceTokens.Add(deviceToken);
+
+            await _userRepository.SaveChanges();
 
             return new ResponseMessage<Guid>
             {
                 message = "Tạo device token thành công",
                 result = true,
-                value = (Guid)id
+                value = (Guid) deviceToken.Id
             };
         }
 
@@ -60,7 +61,9 @@ namespace Vouchee.Business.Services.Impls
         {
             (int, IQueryable<GetDeviceTokenDTO>) result;
 
-            result = _devicetokenRepository.GetTable().Where(x => x.UserId == userId)
+            result = _userRepository.GetTable()
+                                        .Include(x => x.DeviceTokens)
+                                        .Where(x => x.Id == userId)
                         .ProjectTo<GetDeviceTokenDTO>(_mapper.ConfigurationProvider)
                         .DynamicFilter(_mapper.Map<GetDeviceTokenDTO>(deviceTokenFilter))
                         .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);

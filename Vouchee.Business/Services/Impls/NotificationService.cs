@@ -23,28 +23,38 @@ namespace Vouchee.Business.Services.Impls
 {
     public class NotificationService : INotificationService
     {
+        private readonly IBaseRepository<User> _userRepository;
         private readonly IBaseRepository<Data.Models.Entities.Notification> _notificationRepository;
         private readonly IMapper _mapper;
 
-        public NotificationService(IBaseRepository<Data.Models.Entities.Notification> notificationRepository,
-                                    IMapper mapper)
+        public NotificationService(IBaseRepository<User> userRepository,
+                                   IBaseRepository<Data.Models.Entities.Notification> notificationRepository,
+                                   IMapper mapper)
         {
+            _userRepository = userRepository;
             _notificationRepository = notificationRepository;
             _mapper = mapper;
         }
 
-        public async Task<ResponseMessage<Guid>> CreateNotificationAsync(CreateNotificationDTO createNotificationDTO)
+        public async Task<ResponseMessage<Guid>> CreateNotificationAsync(Guid senderId, CreateNotificationDTO createNotificationDTO)
         {
             Data.Models.Entities.Notification notification = _mapper.Map<Data.Models.Entities.Notification>(createNotificationDTO);
-            notification.SenderId = createNotificationDTO.senderId;
-            notification.CreateBy = createNotificationDTO.senderId;
             notification.ReceiverId = createNotificationDTO.receiverId;
+            notification.SenderId = senderId;
+            notification.CreateBy = senderId;
 
-            foreach (var token in createNotificationDTO.deviceTokens)
+            var existedUser = await _userRepository.GetByIdAsync(notification.ReceiverId, includeProperties: x => x.Include(x => x.DeviceTokens));
+
+            if (existedUser == null)
+            {
+                throw new NotFoundException("Không tìm thấy người nhận");
+            }
+
+            foreach (var deviceToken in existedUser.DeviceTokens)
             {
                 var message = new Message
                 {
-                    Token = token,
+                    Token = deviceToken.Token,
                     Notification = new FirebaseAdmin.Messaging.Notification
                     {
                         Title = createNotificationDTO.title,

@@ -16,24 +16,16 @@ namespace Vouchee.Data.Models.DTOs
         public Guid? receiverId { get; set; }
 
         public string? title { get; set; }
-        public string? description { get; set; }
+        public string? body { get; set; }
     }
 
     public class CreateNotificationDTO
     {
-        public CreateNotificationDTO() 
-        {
-            deviceTokens = [];
-        }
-
-        public Guid senderId { get; set; }
         public Guid receiverId { get; set; }
 
         public string? title { get; set; }
         public string? body { get; set; }
         public bool seen = false;
-
-        public IList<string> deviceTokens { get; set; }
 
         public DateTime CreateDate = DateTime.Now;
     }

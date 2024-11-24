@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -83,8 +84,16 @@ namespace Vouchee.Data.Models.DTOs
         
     }
 
-    public class GetOrderedModalDTO : ModalDTO
+    public class GetOrderedModalDTO
     {
+        public Guid? id { get; set; }
+
+        public string? title { get; set; }
+        public string? image { get; set; }
+
+        public DateOnly? startDate { get; set; }
+        public DateOnly? endDate { get; set; }
+
         public int? voucherCodeCount { get; set; } = 0;
     }
 

@@ -11,10 +11,13 @@ namespace Vouchee.Data.Models.Entities
     [Table(nameof(DeviceToken))]
     public class DeviceToken
     {
-        public Guid UserId { get; set; }
-        [ForeignKey(nameof(UserId))]
+        public DeviceToken()
+        {
+            Users = [];
+        }
+
         [InverseProperty(nameof(User.DeviceTokens))]
-        public virtual User? User { get; set; }
+        public virtual ICollection<User> Users { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
