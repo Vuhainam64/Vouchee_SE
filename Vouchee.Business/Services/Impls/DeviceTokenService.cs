@@ -79,5 +79,33 @@ namespace Vouchee.Business.Services.Impls
                 results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
             };
         }
+
+        public async Task<ResponseMessage<bool>> RemoveDeviceTokenAsync(Guid userId, string deviceToken, DevicePlatformEnum devicePlatformEnum)
+        {
+            var existedUser = await _userRepository.GetByIdAsync(userId, includeProperties: x => x.Include(x => x.DeviceTokens), isTracking: true);
+
+            if (existedUser == null)
+            {
+                throw new NotFoundException("Không tìm thấy user này");
+            }
+
+            var existedToken = existedUser.DeviceTokens.FirstOrDefault(x => x.Token.Equals(deviceToken));
+
+            if (existedToken == null)
+            {
+                throw new NotFoundException("User này chưa có token này");
+            }
+
+            existedUser.DeviceTokens.Remove(existedToken);
+
+            await _userRepository.SaveChanges();
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Xóa token thành công",
+                result = true,
+                value = true
+            };
+        }
     }
 }
