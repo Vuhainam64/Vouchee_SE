@@ -82,6 +82,13 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("get_mini_vouchers")]
+        public async Task<IActionResult> GetMiniVouchers(string title)
+        {
+            var result = await _voucherService.GetMiniVoucherAsync(title);
+            return Ok(result);
+        }
+
         // GET BY ID
         [HttpGet("get_voucher/{id}")]
         public async Task<IActionResult> GetVoucherById(Guid id, [FromQuery] PagingRequest pagingRequest)
