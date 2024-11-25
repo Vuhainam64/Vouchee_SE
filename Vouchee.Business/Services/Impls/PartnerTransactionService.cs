@@ -140,6 +140,19 @@ namespace Vouchee.Business.Services.Impls
 
                                     existedModal.Stock -= cartModal.Quantity;
 
+                                    var voucherCodes = _voucherCodeRepository.GetTable()
+                                                                                .Where(x => x.OrderId == null && x.ModalId == existedModal.Id)
+                                                                                .OrderBy(x => x.EndDate)
+                                                                                .Take(cartModal.Quantity)
+                                                                                .AsTracking();
+
+                                    foreach (var voucherCode in voucherCodes)
+                                    {
+                                        voucherCode.OrderId = orderId; // Replace `orderId` with the actual OrderId value
+                                    }
+
+                                    await _voucherCodeRepository.SaveChanges();
+
                                     existedVoucher.Stock -= cartModal.Quantity;
 
                                     existedModal.Carts.Remove(existedModal.Carts.FirstOrDefault(c => c.ModalId == cartModal.ModalId));
