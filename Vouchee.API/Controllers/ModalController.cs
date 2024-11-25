@@ -50,16 +50,16 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("get_pending_modals")]
-        [Authorize]
-        public async Task<IActionResult> GetPendingModals([FromQuery] PagingRequest pagingRequest,
-                                                            [FromQuery] ModalFilter modalFilter)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+        //[HttpGet("get_pending_modals")]
+        //[Authorize]
+        //public async Task<IActionResult> GetPendingModals([FromQuery] PagingRequest pagingRequest,
+        //                                                    [FromQuery] ModalFilter modalFilter)
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _modalService.GetPendingModals(currentUser.userId, pagingRequest, modalFilter);
-            return Ok(result);
-        }
+        //    var result = await _modalService.GetPendingModals(currentUser.userId, pagingRequest, modalFilter);
+        //    return Ok(result);
+        //}
 
         // GET BY ID
         [HttpGet("get_modal/{id}")]

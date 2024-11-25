@@ -91,21 +91,18 @@ namespace Vouchee.Data.Models.DTOs
         public string? title { get; set; }
         public string? image { get; set; }
 
-        public DateOnly? startDate { get; set; }
-        public DateOnly? endDate { get; set; }
-
         public int? voucherCodeCount { get; set; } = 0;
     }
 
-    public class GetPendingModalDTO : ModalDTO
-    {
-        public GetPendingModalDTO()
-        {
-            orderDetails = [];
-        }
+    //public class GetPendingModalDTO : ModalDTO
+    //{
+    //    public GetPendingModalDTO()
+    //    {
+    //        orderDetails = [];
+    //    }
 
-        public virtual ICollection<GetOrderDetailDTO> orderDetails { get; set; }
-    }
+    //    public virtual ICollection<GetOrderDetailDTO> orderDetails { get; set; }
+    //}
 
     public class GetDetailModalDTO : ModalDTO
     {

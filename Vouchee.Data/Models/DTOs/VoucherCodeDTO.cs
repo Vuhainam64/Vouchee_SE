@@ -10,6 +10,9 @@ namespace Vouchee.Business.Models.DTOs
     {
         public string? code { get; set; } = null;
         public string? image { get; set; } = null;
+
+        public DateOnly? startDate { get; set; }
+        public DateOnly? endDate { get; set; }
     }
 
     public class CreateVoucherCodeDTO : VoucherCodeDTO

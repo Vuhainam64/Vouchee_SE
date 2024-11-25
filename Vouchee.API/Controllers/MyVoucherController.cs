@@ -23,15 +23,15 @@ namespace Vouchee.API.Controllers
             _userService = userService;
         }
 
-        [HttpGet("get_my_vouchers")]
-        [Authorize]
-        public async Task<IActionResult> GetOrderedModals([FromQuery] PagingRequest pagingRequest,
-                                                    [FromQuery] ModalFilter modalFilter)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+        //[HttpGet("get_my_vouchers")]
+        //[Authorize]
+        //public async Task<IActionResult> GetOrderedModals([FromQuery] PagingRequest pagingRequest,
+        //                                            [FromQuery] ModalFilter modalFilter)
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _modalService.GetOrderedModals(currentUser.userId, pagingRequest, modalFilter);
-            return Ok(result);
-        }
+        //    var result = await _modalService.GetOrderedModals(currentUser.userId, pagingRequest, modalFilter);
+        //    return Ok(result);
+        //}
     }
 }

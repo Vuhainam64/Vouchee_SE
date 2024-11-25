@@ -116,13 +116,13 @@ namespace Vouchee.Business.Services.Impls
 
                             foreach (var orderDetail in existedOrder.OrderDetails.GroupBy(x => x.Modal.VoucherId))
                             {
-                                var result = false;
-
                                 // gop tung modal co cung voucher id
                                 var existedVoucher = await _voucherRepository.GetByIdAsync(orderDetail.Key,
                                                                                                     isTracking: true,
                                                                                                     includeProperties: x => x.Include(x => x.Modals)
-                                                                                                                                .ThenInclude(x => x.Carts));
+                                                                                                                                .ThenInclude(x => x.Carts)
+                                                                                                                              .Include(x => x.Modals)
+                                                                                                                                .ThenInclude(x => x.VoucherCodes));
 
                                 // duyet tung modal 
                                 foreach (var cartModal in orderDetail)

@@ -149,18 +149,6 @@ namespace Vouchee.Business.Services.Impls
                         .ThenInclude(x => x.Brand)
                 .Where(vc => vc.Order.CreateBy == buyerId); // Filter by buyerId
 
-            // Apply the startDate filter if provided
-            if (modalFilter.startDate.HasValue)
-            {
-                query = query.Where(vc => vc.Modal.StartDate >= modalFilter.startDate.Value);
-            }
-
-            // Apply the endDate filter if provided
-            if (modalFilter.endDate.HasValue)
-            {
-                query = query.Where(vc => vc.Modal.EndDate <= modalFilter.endDate.Value);
-            }
-
             var groupedData = await query
                 .GroupBy(vc => vc.Modal) // Group by Modal entity
                 .Select(group => new
@@ -195,35 +183,35 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<DynamicResponseModel<GetPendingModalDTO>> GetPendingModals(Guid sellerId, PagingRequest pagingRequest, ModalFilter modalFilter)
-        {
-            (int, IQueryable<GetPendingModalDTO>) result;
+        //public async Task<DynamicResponseModel<GetPendingModalDTO>> GetPendingModals(Guid sellerId, PagingRequest pagingRequest, ModalFilter modalFilter)
+        //{
+        //    (int, IQueryable<GetPendingModalDTO>) result;
 
-            result = _modalRepository.GetTable()
-                .Include(x => x.OrderDetails)
-                .ThenInclude(od => od.Modal)
-                    .ThenInclude(m => m.Voucher)
-                .Where(x => x.Voucher.SellerId == sellerId)
-                .Where(x => x.OrderDetails.Count != 0 && x.OrderDetails.All(x => x.Status == "PENDING"))
-                .ProjectTo<GetPendingModalDTO>(_mapper.ConfigurationProvider)
-                .DynamicFilter(_mapper.Map<GetPendingModalDTO>(modalFilter))
-                .PagingIQueryable(pagingRequest.page,
-                                  pagingRequest.pageSize,
-                                  PageConstant.LIMIT_PAGING,
-                                  PageConstant.DEFAULT_PAPING);
+        //    result = _modalRepository.GetTable()
+        //        .Include(x => x.OrderDetails)
+        //        .ThenInclude(od => od.Modal)
+        //            .ThenInclude(m => m.Voucher)
+        //        .Where(x => x.Voucher.SellerId == sellerId)
+        //        .Where(x => x.OrderDetails.Count != 0 && x.OrderDetails.All(x => x.Status == "PENDING"))
+        //        .ProjectTo<GetPendingModalDTO>(_mapper.ConfigurationProvider)
+        //        .DynamicFilter(_mapper.Map<GetPendingModalDTO>(modalFilter))
+        //        .PagingIQueryable(pagingRequest.page,
+        //                          pagingRequest.pageSize,
+        //                          PageConstant.LIMIT_PAGING,
+        //                          PageConstant.DEFAULT_PAPING);
 
 
-            return new DynamicResponseModel<GetPendingModalDTO>()
-            {
-                metaData = new MetaData()
-                {
-                    page = pagingRequest.page,
-                    size = pagingRequest.pageSize,
-                    total = result.Item1
-                },
-                results = await result.Item2.ToListAsync()
-            };
-        }
+        //    return new DynamicResponseModel<GetPendingModalDTO>()
+        //    {
+        //        metaData = new MetaData()
+        //        {
+        //            page = pagingRequest.page,
+        //            size = pagingRequest.pageSize,
+        //            total = result.Item1
+        //        },
+        //        results = await result.Item2.ToListAsync()
+        //    };
+        //}
 
         public Task<bool> UpdateModalAsync(Guid id, UpdateModalDTO updateModalDTO)
         {

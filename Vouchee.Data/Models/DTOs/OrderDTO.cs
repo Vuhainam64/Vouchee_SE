@@ -12,33 +12,19 @@ namespace Vouchee.Business.Models.DTOs
 
     public class CreateOrderDTO : OrderDTO
     {
-        //public CreateOrderDTO()
-        //{
-        //    orderDetails = new HashSet<CreateOrderDetailDTO>();
-        //}
+
 
         [JsonIgnore] public string status = ObjectStatusEnum.ACTIVE.ToString();
         public DateTime? createDate = DateTime.Now;
-        //public Guid promotionId { get; set; }
-        //public PaymentTypeEnum paymentType { get; set; }
-        //public virtual ICollection<CreateOrderDetailDTO> orderDetails { get; set; }
     }
 
     public class UpdateOrderDTO : OrderDTO
     {
-        //public OrderStatusEnum? status { get; set; }
-        //public DateTime? updateDate = DateTime.Now;
-        //public Guid? updateBy { get; set; }
         public List<string>? voucherCodes { get; set; }
     }
 
     public class GetOrderDTO : OrderDTO
     {
-        public GetOrderDTO()
-        {
-            orderDetails = new HashSet<GetOrderDetailDTO>();
-        }
-
         public string? id { get; set; }
 
         public int? totalPrice { get; set; }
@@ -48,10 +34,17 @@ namespace Vouchee.Business.Models.DTOs
         public int? finalPrice { get; set; }
         public int? VPointUp { get; set; }
         public DateTime? createDate { get; set; }
-        public DateTime? exprireTime => createDate.Value.AddMinutes(2); 
-        public string? image { get; set; }
+        public DateTime? exprireTime => createDate != null ? createDate.Value.AddMinutes(2) : null;
 
         public string? status { get; set; }
+    }
+
+    public class GetDetailOrderDTO : GetOrderDTO
+    {
+        public GetDetailOrderDTO()
+        {
+            orderDetails = new HashSet<GetOrderDetailDTO>();
+        }
 
         public virtual ICollection<GetOrderDetailDTO>? orderDetails { get; set; }
     }

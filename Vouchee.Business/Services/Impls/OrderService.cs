@@ -184,36 +184,16 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<bool> DeleteOrderAsync(string id)
-        {
-            try
-            {
-                var result = false;
-                var order = await _orderRepository.GetByIdAsync(id);
-                if (order != null)
-                {
-                    result = await _orderRepository.DeleteAsync(order);
-                }
-                else
-                {
-                    throw new NotFoundException($"Không tìm thấy order với id {id}");
-                }
-                return result;
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new DeleteObjectException(ex.Message);
-            }
-        }
-
-        public async Task<GetOrderDTO> GetOrderByIdAsync(string id)
+        public async Task<GetDetailOrderDTO> GetOrderByIdAsync(string id)
         {
             var order = await _orderRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.OrderDetails)
+                                                                                                .ThenInclude(x => x.Modal)
+                                                                                                    .ThenInclude(x => x.Voucher)
+                                                                                                        .ThenInclude(x => x.Brand)
                                                                                             .Include(x => x.VoucherCodes));
             if (order != null)
             {
-                var orderDTO = _mapper.Map<GetOrderDTO>(order);
+                var orderDTO = _mapper.Map<GetDetailOrderDTO>(order);
                 return orderDTO;
             }
             else
@@ -253,100 +233,100 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<bool> UpdateOrderAsync(string id, UpdateOrderDTO updateOrderDTO, ThisUserObj thisUserObj)
-        {
-            try
-            {
-                var existedOrder = await _orderRepository.GetByIdAsync(id);
-                if (existedOrder != null)
-                {
-                    var entity = _mapper.Map<Order>(updateOrderDTO);
-                    return await _orderRepository.UpdateAsync(entity);
-                }
-                else
-                {
-                    throw new NotFoundException("Không tìm thấy order");
-                }
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new UpdateObjectException(ex.Message);
-            }
-        }
+        //public async Task<bool> UpdateOrderAsync(string id, UpdateOrderDTO updateOrderDTO, ThisUserObj thisUserObj)
+        //{
+        //    try
+        //    {
+        //        var existedOrder = await _orderRepository.GetByIdAsync(id);
+        //        if (existedOrder != null)
+        //        {
+        //            var entity = _mapper.Map<Order>(updateOrderDTO);
+        //            return await _orderRepository.UpdateAsync(entity);
+        //        }
+        //        else
+        //        {
+        //            throw new NotFoundException("Không tìm thấy order");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        LoggerService.Logger(ex.Message);
+        //        throw new UpdateObjectException(ex.Message);
+        //    }
+        //}
 
-        public async Task<ResponseMessage<bool>> UpdateOrderTransactionAsync(string id, Guid partnerTransactionId, ThisUserObj thisUserObj)
-        {
-            try
-            {
-                var existedOrder = await _orderRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.OrderDetails)
-                                                                                                        .ThenInclude(x => x.Modal)
-                                                                                                            .ThenInclude(x => x.Voucher)
-                                                                                                                .ThenInclude(x => x.Seller)
-                                                                                                                    .ThenInclude(x => x.SellerWallet)
-                                                                        , isTracking: true);
+        //public async Task<ResponseMessage<bool>> UpdateOrderTransactionAsync(string id, Guid partnerTransactionId, ThisUserObj thisUserObj)
+        //{
+        //    try
+        //    {
+        //        var existedOrder = await _orderRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.OrderDetails)
+        //                                                                                                .ThenInclude(x => x.Modal)
+        //                                                                                                    .ThenInclude(x => x.Voucher)
+        //                                                                                                        .ThenInclude(x => x.Seller)
+        //                                                                                                            .ThenInclude(x => x.SellerWallet)
+        //                                                                , isTracking: true);
 
-                if (existedOrder == null)
-                {
-                    throw new NotFoundException("Không tìm thấy order này");
-                }
+        //        if (existedOrder == null)
+        //        {
+        //            throw new NotFoundException("Không tìm thấy order này");
+        //        }
 
-                var groupedModals = existedOrder.OrderDetails.GroupBy(x => x.Modal.Voucher.SellerId);
-                foreach (var groupedModal in groupedModals)
-                {
-                    var existedSeller = await _userRepository.GetByIdAsync(groupedModal.Key, includeProperties: x => x.Include(x => x.SellerWallet)
-                                                                                                                        .ThenInclude(x => x.SellerWalletTransactions)                                    
-                                                                            , isTracking: true);
+        //        var groupedModals = existedOrder.OrderDetails.GroupBy(x => x.Modal.Voucher.SellerId);
+        //        foreach (var groupedModal in groupedModals)
+        //        {
+        //            var existedSeller = await _userRepository.GetByIdAsync(groupedModal.Key, includeProperties: x => x.Include(x => x.SellerWallet)
+        //                                                                                                                .ThenInclude(x => x.SellerWalletTransactions)                                    
+        //                                                                    , isTracking: true);
 
-                    if (existedSeller == null)
-                    {
-                        throw new NotFoundException($"Không tìm thấy seller {groupedModal.Key}");
-                    }
+        //            if (existedSeller == null)
+        //            {
+        //                throw new NotFoundException($"Không tìm thấy seller {groupedModal.Key}");
+        //            }
 
-                    if (existedSeller.SellerWallet == null)
-                    {
-                        throw new NotFiniteNumberException($"Không tìm thấy ví seller {groupedModal.Key}");
-                    }
+        //            if (existedSeller.SellerWallet == null)
+        //            {
+        //                throw new NotFiniteNumberException($"Không tìm thấy ví seller {groupedModal.Key}");
+        //            }
 
-                    WalletTransaction walletTransaction = new()
-                    {
-                        Type = "AMOUNT_OUT",
-                        CreateBy = thisUserObj.userId,
-                        CreateDate = DateTime.Now,
-                        Status = WalletTransactionStatusEnum.DONE.ToString(),
-                        Amount = groupedModal.Sum(x => x.FinalPrice),
-                        PartnerTransactionId = partnerTransactionId,
-                        SellerWalletId = existedSeller.Id,
-                    };
+        //            WalletTransaction walletTransaction = new()
+        //            {
+        //                Type = "AMOUNT_OUT",
+        //                CreateBy = thisUserObj.userId,
+        //                CreateDate = DateTime.Now,
+        //                Status = WalletTransactionStatusEnum.DONE.ToString(),
+        //                Amount = groupedModal.Sum(x => x.FinalPrice),
+        //                PartnerTransactionId = partnerTransactionId,
+        //                SellerWalletId = existedSeller.Id,
+        //            };
 
-                    existedSeller.SellerWallet.SellerWalletTransactions.Add(walletTransaction);
-                    existedSeller.SellerWallet.Balance += groupedModal.Sum(x => x.FinalPrice);
-                }
+        //            existedSeller.SellerWallet.SellerWalletTransactions.Add(walletTransaction);
+        //            existedSeller.SellerWallet.Balance += groupedModal.Sum(x => x.FinalPrice);
+        //        }
 
-                await _userRepository.SaveChanges();
+        //        await _userRepository.SaveChanges();
 
-                existedOrder.Status = partnerTransactionId == Guid.Empty ? OrderStatusEnum.ERROR_AT_TRANSACTION.ToString() : OrderStatusEnum.FINISH_TRANSACTION.ToString();
+        //        existedOrder.Status = partnerTransactionId == Guid.Empty ? OrderStatusEnum.ERROR_AT_TRANSACTION.ToString() : OrderStatusEnum.FINISH_TRANSACTION.ToString();
 
-                var result = await _orderRepository.UpdateAsync(existedOrder);
+        //        var result = await _orderRepository.UpdateAsync(existedOrder);
 
-                return new ResponseMessage<bool>()
-                {
-                    message = "Cập nhật trạng thái thành công",
-                    result = result,
-                    value = result
-                };
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new UpdateObjectException(ex.Message);
-            }
-        }
+        //        return new ResponseMessage<bool>()
+        //        {
+        //            message = "Cập nhật trạng thái thành công",
+        //            result = result,
+        //            value = result
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        LoggerService.Logger(ex.Message);
+        //        throw new UpdateObjectException(ex.Message);
+        //    }
+        //}
 
-        public Task<bool> UpdateUserPointAsync(Guid orderId)
-        {
-            throw new NotImplementedException();
-        }
+        //public Task<bool> UpdateUserPointAsync(Guid orderId)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }
 
