@@ -19,6 +19,8 @@ namespace Vouchee.Business.Services.Impls
 {
     public class PartnerTransactionService : IPartnerTransactionService
     {
+        private readonly INotificationService _notificationService;
+
         private readonly IBaseRepository<VoucherCode> _voucherCodeRepository;
         private readonly IBaseRepository<Notification> _notificationRepository;
         private readonly IBaseRepository<Voucher> _voucherRepository;
@@ -29,7 +31,8 @@ namespace Vouchee.Business.Services.Impls
         private readonly IBaseRepository<PartnerTransaction> _partnerTransactionRepository;
         private readonly IMapper _mapper;
 
-        public PartnerTransactionService(IBaseRepository<VoucherCode> voucherCodeRepository,
+        public PartnerTransactionService(INotificationService notificationService,
+                                         IBaseRepository<VoucherCode> voucherCodeRepository,
                                          IBaseRepository<Notification> notificationRepository,
                                          IBaseRepository<Voucher> voucherRepository,
                                          IBaseRepository<MoneyRequest> topUpRequestRepository,
@@ -39,6 +42,7 @@ namespace Vouchee.Business.Services.Impls
                                          IBaseRepository<PartnerTransaction> partnerTransactionRepository,
                                          IMapper mapper)
         {
+            _notificationService = notificationService;
             _voucherCodeRepository = voucherCodeRepository;
             _notificationRepository = notificationRepository;
             _voucherRepository = voucherRepository;
@@ -106,18 +110,26 @@ namespace Vouchee.Business.Services.Impls
 
                             if (DateTime.Now > existedOrder.CreateDate.Value.AddMinutes(2))
                             {
+                                CreateNotificationDTO createNotificationDTO = new()
+                                {
+                                    title = "Thanh toán đơn hàng lỗi",
+                                    body = $"Đơn hàng {orderId} đã hết hạn lúc {existedOrder.CreateDate.Value.AddMinutes(2)}",
+                                    receiverId = existedOrder.Buyer.Id
+                                };
+
+                                await _notificationService.CreateNotificationAsync(Guid.Parse("DEEE9638-DA34-4230-BE77-34137AA5FCFF"), createNotificationDTO);
+
                                 throw new ConflictException($"Order này đã hết hạn lúc {existedOrder.CreateDate.Value.AddMinutes(2)}");
                             }
 
-                            await _notificationRepository.Add(new()
+                            CreateNotificationDTO createNotificationDTO = new()
                             {
-                                CreateBy = existedOrder.CreateBy,
-                                CreateDate = DateTime.Now,
-                                Title = "THÔNG BÁO TRẠNG THÁI ĐƠN HÀNG",
-                                Body = $"Đơn hàng {orderId} của bạn đã thanh toán",
-                                ReceiverId = existedOrder.CreateBy,
-                                Seen = false,
-                            });
+                                title = "Thanh toán đơn hàng thành công",
+                                body = $"Đơn hàng {orderId}, chi tiết đơn hàng là ",
+                                receiverId = existedOrder.Buyer.Id
+                            };
+
+                            await _notificationService.CreateNotificationAsync(Guid.Parse("DEEE9638-DA34-4230-BE77-34137AA5FCFF"), createNotificationDTO);
 
                             foreach (var orderDetail in existedOrder.OrderDetails.GroupBy(x => x.Modal.VoucherId))
                             {
