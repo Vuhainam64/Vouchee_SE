@@ -86,12 +86,19 @@ namespace Vouchee.Data.Models.DTOs
 
     public class GetOrderedModalDTO
     {
+        public GetOrderedModalDTO()
+        {
+            voucherCodes = [];
+        }
+
         public Guid? id { get; set; }
 
         public string? title { get; set; }
         public string? image { get; set; }
 
         public int? voucherCodeCount { get; set; } = 0;
+
+        public virtual ICollection<GetVoucherCodeDTO> voucherCodes { get; set; }
     }
 
     //public class GetPendingModalDTO : ModalDTO

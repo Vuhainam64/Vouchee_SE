@@ -19,7 +19,7 @@ namespace Vouchee.Business.Services
         // READ
         public Task<dynamic> GetModalByIdAsync(Guid id, PagingRequest pagingRequest);
         public Task<DynamicResponseModel<GetModalDTO>> GetModalsAsync(PagingRequest pagingRequest, ModalFilter modalFilter);
-        //public Task<DynamicResponseModel<GetOrderedModalDTO>> GetOrderedModals(Guid buyerId, PagingRequest pagingRequest, ModalFilter modalFilter);
+        public Task<DynamicResponseModel<GetOrderedModalDTO>> GetOrderedModals(Guid buyerId, PagingRequest pagingRequest, VoucherCodeFilter voucherCodeFilter);
         //public Task<DynamicResponseModel<GetPendingModalDTO>> GetPendingModals(Guid sellerId, PagingRequest pagingRequest, ModalFilter modalFilter);
 
         // UPDATE
