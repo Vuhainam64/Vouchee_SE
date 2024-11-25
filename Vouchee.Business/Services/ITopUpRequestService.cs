@@ -16,7 +16,7 @@ namespace Vouchee.Business.Services
         public Task<ResponseMessage<string>> CreateTopUpRequest(CreateTopUpRequestDTO createTopUpRequestDTO, ThisUserObj thisUserObj);
 
         // READ
-        public Task<GetTopUpRequestDTO> GetTopUpRequestById(Guid id);
+        public Task<GetTopUpRequestDTO> GetTopUpRequestById(string id);
         public Task<DynamicResponseModel<GetTopUpRequestDTO>> GetTopUpRequestsAsync(PagingRequest pagingRequest, TopUpRequestFilter topUpRequestFilter);
 
         // UPDATE

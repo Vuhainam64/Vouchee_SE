@@ -36,7 +36,7 @@ namespace Vouchee.API.Controllers
 
         [Authorize]
         [HttpGet("get_top_up_request_by_id/{id}")]
-        public async Task<IActionResult> GetTopUpRequestById(Guid id)
+        public async Task<IActionResult> GetTopUpRequestById(string id)
         {
             var result = await _topUpRequestService.GetTopUpRequestById(id);
             return Ok(result);
