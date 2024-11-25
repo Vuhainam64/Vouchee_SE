@@ -51,6 +51,7 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpGet("get_buyer_order")]
         public async Task<IActionResult> GetBuyerOrders([FromQuery] PagingRequest pagingRequest, [FromQuery] OrderFilter orderFilter)
         {
@@ -69,36 +70,36 @@ namespace Vouchee.API.Controllers
         }
 
         // UPDATE
-        [HttpPut("update_order/{id}")]
-        [Authorize]
-        public async Task<IActionResult> UpdateOrder(string id, [FromBody] UpdateOrderDTO updateOrderDTO)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+        //[HttpPut("update_order/{id}")]
+        //[Authorize]
+        //public async Task<IActionResult> UpdateOrder(string id, [FromBody] UpdateOrderDTO updateOrderDTO)
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _orderService.UpdateOrderAsync(id, updateOrderDTO, currentUser);
-            return Ok(result);
-        }
+        //    var result = await _orderService.UpdateOrderAsync(id, updateOrderDTO, currentUser);
+        //    return Ok(result);
+        //}
 
-        [Authorize]
-        [HttpPut("update_order_transaction/{id}")]
-        public async Task<IActionResult> UpdateOrderTransaction(string id, Guid partnerTransactionId)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+        //[Authorize]
+        //[HttpPut("update_order_transaction/{id}")]
+        //public async Task<IActionResult> UpdateOrderTransaction(string id, Guid partnerTransactionId)
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _orderService.UpdateOrderTransactionAsync(id, partnerTransactionId, currentUser);
-            return Ok(result);
-        }
+        //    var result = await _orderService.UpdateOrderTransactionAsync(id, partnerTransactionId, currentUser);
+        //    return Ok(result);
+        //}
 
         // Assign Voucher Code
-        [HttpPut("assign_voucher_code_to_order")]
-        [Authorize]
-        public async Task<IActionResult> AssignCode(string orderId, Guid modalId, [FromBody] VoucherCodeList voucherCodeList)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+        //[HttpPut("assign_voucher_code_to_order")]
+        //[Authorize]
+        //public async Task<IActionResult> AssignCode(string orderId, Guid modalId, [FromBody] VoucherCodeList voucherCodeList)
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _orderService.AssignCodeToOrderAsync(orderId, modalId, voucherCodeList);
-            return Ok(result);
-        }
+        //    var result = await _orderService.AssignCodeToOrderAsync(orderId, modalId, voucherCodeList);
+        //    return Ok(result);
+        //}
 
         // DELETE
         //[HttpDelete("delete_order/{id}")]

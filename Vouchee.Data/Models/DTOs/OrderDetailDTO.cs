@@ -37,6 +37,10 @@ namespace Vouchee.Business.Models.DTOs
 
         public string? orderId { get; set; }
         public Guid? modalId { get; set; }
+        public string? image { get; set; }
+        public string? brandId { get; set; }
+        public string? brandName { get; set; }
+        public string? brandImage { get; set; }
 
         public int? unitPrice { get; set; }
         public int? shopDiscountPercent { get; set; }

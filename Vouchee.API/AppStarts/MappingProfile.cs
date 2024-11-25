@@ -99,6 +99,10 @@ namespace Vouchee.API.AppStarts
             CreateMap<OrderDetail, CreateOrderDetailDTO>().ReverseMap();
             CreateMap<OrderDetail, UpdateOrderDetailDTO>().ReverseMap();
             CreateMap<OrderDetail, GetOrderDetailDTO>()
+                .ForMember(dest => dest.brandId, opt => opt.MapFrom(src => src.Modal.Voucher.Brand.Id))
+                .ForMember(dest => dest.brandName, opt => opt.MapFrom(src => src.Modal.Voucher.Brand.Name))
+                .ForMember(dest => dest.brandImage, opt => opt.MapFrom(src => src.Modal.Voucher.Brand.Image))
+                .ForMember(dest => dest.image, opt => opt.MapFrom(src => src.Modal.Image))
                 .ForMember(dto => dto.voucherCodes, opt => opt.MapFrom(od => od.Order.VoucherCodes))
                 .ReverseMap()
                 .ForPath(od => od.Order.VoucherCodes, opt => opt.Ignore());
@@ -108,6 +112,7 @@ namespace Vouchee.API.AppStarts
             CreateMap<Order, CreateOrderDTO>().ReverseMap();
             CreateMap<Order, UpdateOrderDTO>().ReverseMap();
             CreateMap<Order, GetOrderDTO>().ReverseMap();
+            CreateMap<Order, GetDetailOrderDTO>().ReverseMap();
             CreateMap<GetOrderDTO, OrderFilter>().ReverseMap();
 
             // ADDRESS
@@ -187,21 +192,25 @@ namespace Vouchee.API.AppStarts
                 .ForMember(dest => dest.brandId, opt => opt.MapFrom(src => src.Voucher.Brand.Id))
                 .ForMember(dest => dest.brandName, opt => opt.MapFrom(src => src.Voucher.Brand.Name))
                 .ForMember(dest => dest.brandImage, opt => opt.MapFrom(src => src.Voucher.Brand.Image))
+                .ForMember(dest => dest.startDate, opt => opt.MapFrom(src => src.VoucherCodes.Where(x => x.OrderId == null).OrderBy(x => x.StartDate).FirstOrDefault().StartDate))
+                .ForMember(dest => dest.endDate, opt => opt.MapFrom(src => src.VoucherCodes.Where(x => x.OrderId == null).OrderBy(x => x.EndDate).FirstOrDefault().EndDate))
                 .ReverseMap();
             CreateMap<Modal, GetDetailModalDTO>()
                 .ForMember(dest => dest.brandId, opt => opt.MapFrom(src => src.Voucher.Brand.Id))
                 .ForMember(dest => dest.brandName, opt => opt.MapFrom(src => src.Voucher.Brand.Name))
                 .ForMember(dest => dest.brandImage, opt => opt.MapFrom(src => src.Voucher.Brand.Image))
+                .ForMember(dest => dest.startDate, opt => opt.MapFrom(src => src.VoucherCodes.Where(x => x.OrderId == null).OrderBy(x => x.StartDate).FirstOrDefault().StartDate))
+                .ForMember(dest => dest.endDate, opt => opt.MapFrom(src => src.VoucherCodes.Where(x => x.OrderId == null).OrderBy(x => x.EndDate).FirstOrDefault().EndDate))
                 .ReverseMap();
-            CreateMap<Modal, GetPendingModalDTO>()
-                .ForMember(dest => dest.brandId, opt => opt.MapFrom(src => src.Voucher.Brand.Id))
-                .ForMember(dest => dest.brandName, opt => opt.MapFrom(src => src.Voucher.Brand.Name))
-                .ForMember(dest => dest.brandImage, opt => opt.MapFrom(src => src.Voucher.Brand.Image))
-                .ReverseMap();
+            //CreateMap<Modal, GetPendingModalDTO>()
+            //    .ForMember(dest => dest.brandId, opt => opt.MapFrom(src => src.Voucher.Brand.Id))
+            //    .ForMember(dest => dest.brandName, opt => opt.MapFrom(src => src.Voucher.Brand.Name))
+            //    .ForMember(dest => dest.brandImage, opt => opt.MapFrom(src => src.Voucher.Brand.Image))
+            //    .ReverseMap();
             CreateMap<Modal, GetOrderedModalDTO>().ReverseMap();
             CreateMap<GetModalDTO, ModalFilter>().ReverseMap();
             CreateMap<GetDetailModalDTO, ModalFilter>().ReverseMap();
-            CreateMap<GetPendingModalDTO, ModalFilter>().ReverseMap();
+            //CreateMap<GetPendingModalDTO, ModalFilter>().ReverseMap();
             CreateMap<GetOrderedModalDTO, ModalFilter>().ReverseMap();
             CreateMap<Modal, CartModalDTO>()
                 .ForMember(dest => dest.brandId, opt => opt.MapFrom(src => src.Voucher.Brand.Id))

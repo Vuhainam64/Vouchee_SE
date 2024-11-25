@@ -43,8 +43,6 @@ namespace Vouchee.Data.Models.Entities
         public int SellPrice { get; set; }
         public int Index { get; set; }
         public string? Image { get; set; }
-        public DateOnly? StartDate { get; set; }
-        public DateOnly? EndDate { get; set; }
         public int Stock { get; set; }
 
         public bool IsActive { get; set; }

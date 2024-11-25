@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Vouchee.Data.Models.Constants.Enum.Status;
 
 namespace Vouchee.Data.Models.Filters
 {
     public class OrderFilter
     {
-        public decimal? totalPrice { get; set; }
-        public decimal? discountPrice { get; set; }
-        public decimal? finalPrice { get; set; }
+        public OrderStatusEnum? status { get; set; }
     }
 }
