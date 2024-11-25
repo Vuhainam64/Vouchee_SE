@@ -200,7 +200,6 @@ namespace Vouchee.Business.Services.Impls
                                     throw new NotFoundException($"{existedSeller.Id} chưa có ví seller");
                                 }
 
-                                existedSeller.SellerWallet.Balance += amount;
                                 existedSeller.SellerWallet.SellerWalletTransactions.Add(new()
                                 {
                                     Type = "AMOUNT_IN",
@@ -209,7 +208,11 @@ namespace Vouchee.Business.Services.Impls
                                     Status = WalletTransactionStatusEnum.DONE.ToString(),
                                     Amount = amount,
                                     OrderId = existedOrder.Id,
+                                    BeforeBalance = existedSeller.SellerWallet.Balance,
+                                    AfterBalance = existedSeller.SellerWallet.Balance + amount
                                 });
+
+                                existedSeller.SellerWallet.Balance += amount;
 
                                 string description = $"Đơn hàng số {existedOrder.Id}\n";
 
