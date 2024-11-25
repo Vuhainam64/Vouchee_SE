@@ -84,7 +84,7 @@ namespace Vouchee.Business.Services.Impls
                     {
                         CreateDate = DateTime.Now,
                         Platform = devicePlatformEnum.ToString(),
-                        Token = deviceToken,
+                        Token = deviceToken.Trim(),
                     });
                 }
 
