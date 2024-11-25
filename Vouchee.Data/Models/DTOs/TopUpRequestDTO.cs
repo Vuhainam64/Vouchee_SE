@@ -30,7 +30,7 @@ namespace Vouchee.Data.Models.DTOs
     {
         public string? id { get; set; }
 
-        public virtual GetSellerWalletTransaction? walletTransaction { get; set; }
+        public virtual GetBuyerWalletTransactionDTO? walletTransaction { get; set; }
 
         public string? status { get; set; }
         public DateTime? createDate { get; set; }

@@ -30,19 +30,19 @@ namespace Vouchee.Data.Models.DTOs
     {
         public GetSellerWallet()
         {
-            sellerWalletTransactions = [];
+            walletTransactions = [];
         }
 
-        public virtual ICollection<GetSellerWalletTransaction> sellerWalletTransactions { get; set; }
+        public virtual ICollection<GetSellerWalletTransaction> walletTransactions { get; set; }
     }
 
     public class GetBuyerWallet : WalletDTO
     {
         public GetBuyerWallet()
         {
-            buyerWalletTransactions = [];
+            walletTransactions = [];
         }
 
-        public virtual ICollection<GetBuyerWalletTransactionDTO> buyerWalletTransactions { get; set; }
+        public virtual ICollection<GetBuyerWalletTransactionDTO> walletTransactions { get; set; }
     }
 }
