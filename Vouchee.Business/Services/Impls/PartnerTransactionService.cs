@@ -54,6 +54,8 @@ namespace Vouchee.Business.Services.Impls
         {
             try
             {
+                var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
                 string input = createPartnerTransaction.code;
 
                 // Unified regex for ORDER and TOPUP
@@ -141,7 +143,7 @@ namespace Vouchee.Business.Services.Impls
                                     existedModal.Stock -= cartModal.Quantity;
 
                                     var voucherCodes = _voucherCodeRepository.GetTable()
-                                                                                .Where(x => x.OrderId == null && x.ModalId == existedModal.Id)
+                                                                                .Where(x => x.OrderId == null && x.ModalId == existedModal.Id && x.EndDate >= today)
                                                                                 .OrderBy(x => x.EndDate)
                                                                                 .Take(cartModal.Quantity)
                                                                                 .AsTracking();
