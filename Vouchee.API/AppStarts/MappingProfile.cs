@@ -207,10 +207,11 @@ namespace Vouchee.API.AppStarts
             //    .ForMember(dest => dest.brandName, opt => opt.MapFrom(src => src.Voucher.Brand.Name))
             //    .ForMember(dest => dest.brandImage, opt => opt.MapFrom(src => src.Voucher.Brand.Image))
             //    .ReverseMap();
-            CreateMap<Modal, GetOrderedModalDTO>().ReverseMap();
+            CreateMap<Modal, GetOrderedModalDTO>()
+                .ForMember(dest => dest.voucherCodes, opt => opt.MapFrom(src => src.VoucherCodes))
+                .ReverseMap();
             CreateMap<GetModalDTO, ModalFilter>().ReverseMap();
             CreateMap<GetDetailModalDTO, ModalFilter>().ReverseMap();
-            //CreateMap<GetPendingModalDTO, ModalFilter>().ReverseMap();
             CreateMap<GetOrderedModalDTO, ModalFilter>().ReverseMap();
             CreateMap<Modal, CartModalDTO>()
                 .ForMember(dest => dest.brandId, opt => opt.MapFrom(src => src.Voucher.Brand.Id))

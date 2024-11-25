@@ -140,7 +140,7 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<DynamicResponseModel<GetOrderedModalDTO>> GetOrderedModals(Guid buyerId, PagingRequest pagingRequest, ModalFilter modalFilter)
+        public async Task<DynamicResponseModel<GetOrderedModalDTO>> GetOrderedModals(Guid buyerId, PagingRequest pagingRequest, VoucherCodeFilter voucherCodeFilter)
         {
             var query = _voucherCodeRepository.GetTable()
                 .Include(vc => vc.Order) // Include related Order for filtering
@@ -149,12 +149,19 @@ namespace Vouchee.Business.Services.Impls
                         .ThenInclude(x => x.Brand)
                 .Where(vc => vc.Order.CreateBy == buyerId); // Filter by buyerId
 
+            if (voucherCodeFilter.startDate.HasValue)
+                query = query.Where(vc => vc.StartDate >= voucherCodeFilter.startDate.Value);
+
+            if (voucherCodeFilter.endDate.HasValue)
+                query = query.Where(vc => vc.EndDate <= voucherCodeFilter.endDate.Value);
+
             var groupedData = await query
                 .GroupBy(vc => vc.Modal) // Group by Modal entity
                 .Select(group => new
                 {
                     Modal = group.Key, // The Modal entity
-                    VoucherCodeCount = group.Count() // Count of VoucherCodes for each Modal
+                    VoucherCodeCount = group.Count(), // Count of VoucherCodes for each Modal
+                    VoucherCodes = group.Select(vc => vc).ToList()
                 })
                 .ToListAsync();
 
@@ -163,6 +170,9 @@ namespace Vouchee.Business.Services.Impls
             {
                 var dto = _mapper.Map<GetOrderedModalDTO>(data.Modal);
                 dto.voucherCodeCount = data.VoucherCodeCount;
+                dto.voucherCodes = data.VoucherCodes
+                                        .Select(vc => _mapper.Map<GetVoucherCodeDTO>(vc))
+                                        .ToList();
                 return dto;
             }).ToList();
 
