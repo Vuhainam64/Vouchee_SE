@@ -65,7 +65,7 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<GetTopUpRequestDTO> GetTopUpRequestById(Guid id)
+        public async Task<GetTopUpRequestDTO> GetTopUpRequestById(string id)
         {
             var existedTopUpRequest = await _topUpRequestRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.TopUpWalletTransaction)
                                                                                                                                 .ThenInclude(x => x.BuyerWallet));

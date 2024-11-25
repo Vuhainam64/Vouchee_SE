@@ -50,29 +50,35 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Không tìm thấy người nhận");
             }
 
-            foreach (var deviceToken in existedUser.DeviceTokens)
-            {
-                var message = new Message
-                {
-                    Token = deviceToken.Token,
-                    Notification = new FirebaseAdmin.Messaging.Notification
-                    {
-                        Title = createNotificationDTO.title,
-                        Body = createNotificationDTO.body,
-                    }
-                };
 
-                await FirebaseMessaging.DefaultInstance.SendAsync(message);
+            if (existedUser.DeviceTokens.Count != 0)
+            {
+                foreach (var deviceToken in existedUser.DeviceTokens)
+                {
+                    var message = new Message
+                    {
+                        Token = deviceToken.Token,
+                        Notification = new FirebaseAdmin.Messaging.Notification
+                        {
+                            Title = createNotificationDTO.title,
+                            Body = createNotificationDTO.body,
+                        }
+                    };
+
+                    await FirebaseMessaging.DefaultInstance.SendAsync(message);
+                }
+
+                var id = await _notificationRepository.AddAsync(notification);
+
+                return new ResponseMessage<Guid>()
+                {
+                    message = "Tạo noti thành công",
+                    result = true,
+                    value = (Guid)id
+                };
             }
 
-            var id = await _notificationRepository.AddAsync(notification);
-
-            return new ResponseMessage<Guid>()
-            {
-                message = "Tạo noti thành công",
-                result = true,
-                value = (Guid)id
-            };
+            return null;
         }
 
         public Task<bool> DeleteNotificationAsync(Guid id, ThisUserObj thisUserObj)
