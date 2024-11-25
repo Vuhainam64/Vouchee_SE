@@ -110,26 +110,26 @@ namespace Vouchee.Business.Services.Impls
 
                             if (DateTime.Now > existedOrder.CreateDate.Value.AddMinutes(2))
                             {
-                                CreateNotificationDTO createNotificationDTO = new()
+                                CreateNotificationDTO errorNoti = new()
                                 {
                                     title = "Thanh toán đơn hàng lỗi",
                                     body = $"Đơn hàng {orderId} đã hết hạn lúc {existedOrder.CreateDate.Value.AddMinutes(2)}",
                                     receiverId = existedOrder.Buyer.Id
                                 };
 
-                                await _notificationService.CreateNotificationAsync(Guid.Parse("DEEE9638-DA34-4230-BE77-34137AA5FCFF"), createNotificationDTO);
+                                await _notificationService.CreateNotificationAsync(Guid.Parse("DEEE9638-DA34-4230-BE77-34137AA5FCFF"), errorNoti);
 
                                 throw new ConflictException($"Order này đã hết hạn lúc {existedOrder.CreateDate.Value.AddMinutes(2)}");
                             }
 
-                            CreateNotificationDTO createNotificationDTO = new()
+                            CreateNotificationDTO successNoti = new()
                             {
                                 title = "Thanh toán đơn hàng thành công",
                                 body = $"Đơn hàng {orderId}, chi tiết đơn hàng là ",
                                 receiverId = existedOrder.Buyer.Id
                             };
 
-                            await _notificationService.CreateNotificationAsync(Guid.Parse("DEEE9638-DA34-4230-BE77-34137AA5FCFF"), createNotificationDTO);
+                            await _notificationService.CreateNotificationAsync(Guid.Parse("DEEE9638-DA34-4230-BE77-34137AA5FCFF"), successNoti);
 
                             foreach (var orderDetail in existedOrder.OrderDetails.GroupBy(x => x.Modal.VoucherId))
                             {
