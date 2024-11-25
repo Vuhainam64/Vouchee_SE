@@ -481,5 +481,16 @@ namespace Vouchee.Business.Services.Impls
                 value = true
             };
         }
+
+        public async Task<IList<MiniVoucher>> GetMiniVoucherAsync(string title)
+        {
+            var result = _voucherRepository.GetTable()
+                                            .Include(x => x.Medias)
+                                            .Where(x => x.Title.ToLower().Contains(title.ToLower()))
+                                            .Take(10)
+                                            .ProjectTo<MiniVoucher>(_mapper.ConfigurationProvider);
+
+            return await result.ToListAsync();
+        }
     }
 }

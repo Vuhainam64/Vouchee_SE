@@ -31,6 +31,8 @@ namespace Vouchee.Business.Services
                                                                                         VoucherFilter voucherFilter,
                                                                                         IList<Guid>? categoryIds);
 
+        public Task<IList<MiniVoucher>> GetMiniVoucherAsync(string title);
+
         // UPDATE
         public Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO);
         public Task<ResponseMessage<GetVoucherDTO>> UpdateVoucherStatusAsync(Guid id, VoucherStatusEnum voucherStatus);

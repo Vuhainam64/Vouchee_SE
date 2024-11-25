@@ -90,6 +90,9 @@ namespace Vouchee.API.AppStarts
                 .ForMember(dest => dest.addresses, opt => opt.MapFrom(src => src.Brand.Addresses))
                 .ReverseMap();
 
+            CreateMap<Voucher, MiniVoucher>()
+                .ForMember(dest => dest.image, opt => opt.MapFrom(src => src.Medias.FirstOrDefault(m => m.Index == 0).Url));
+
             CreateMap<GetVoucherDTO, VoucherFilter>().ReverseMap();
             CreateMap<GetVoucherSellerDTO, VoucherFilter>().ReverseMap();
             CreateMap<GetNearestVoucherDTO, VoucherFilter>().ReverseMap();

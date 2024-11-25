@@ -15,6 +15,14 @@ using Vouchee.Data.Models.DTOs;
 
 namespace Vouchee.Business.Models.DTOs
 {
+    public class MiniVoucher
+    {
+        public Guid? id { get; set; }
+        public string? title { get; set; }
+
+        public string? image { get; set; }
+    }
+
     public class CreateVoucherDTO
     {
         public CreateVoucherDTO()
