@@ -23,6 +23,7 @@ namespace Vouchee.Business.Services.Impls
 {
     public class OrderService : IOrderService
     {
+        private readonly INotificationService _notificationService;
         private readonly ICartService _cartService;
 
         private readonly IBaseRepository<Modal> _modalRepository;
@@ -33,18 +34,20 @@ namespace Vouchee.Business.Services.Impls
         private readonly IBaseRepository<Order> _orderRepository;
         private readonly IMapper _mapper;
 
-        public OrderService(IBaseRepository<Modal> modalRepository,
-                                IBaseRepository<User> userRepository,
-                                ICartService cartService,
-                                IBaseRepository<Voucher> voucherRepository,
-                                IBaseRepository<Order> orderRepository,
-                                IBaseRepository<OrderDetail> orderDetailRepository,
-                                IBaseRepository<VoucherCode> voucherCodeRepository,
-                                IMapper mapper)
+        public OrderService(INotificationService notificationService,
+                            ICartService cartService,
+                            IBaseRepository<Modal> modalRepository,
+                            IBaseRepository<User> userRepository,
+                            IBaseRepository<VoucherCode> voucherCodeRepository,
+                            IBaseRepository<OrderDetail> orderDetailRepository,
+                            IBaseRepository<Voucher> voucherRepository,
+                            IBaseRepository<Order> orderRepository,
+                            IMapper mapper)
         {
+            _notificationService = notificationService;
+            _cartService = cartService;
             _modalRepository = modalRepository;
             _userRepository = userRepository;
-            _cartService = cartService;
             _voucherCodeRepository = voucherCodeRepository;
             _orderDetailRepository = orderDetailRepository;
             _voucherRepository = voucherRepository;
@@ -175,6 +178,16 @@ namespace Vouchee.Business.Services.Impls
             // gửi thông báo ở đây
 
             var orderId = await _orderRepository.AddReturnString(order);
+
+            CreateNotificationDTO createNotificationDTO = new()
+            {
+                body = "Cảm ơn bạn đã dặt hơn hàng\n" +
+                        $"ID tham khảo: {orderId}",
+                title = "Đơn hàng mới",
+                receiverId = thisUserObj.userId,
+            };
+
+            await _notificationService.CreateNotificationAsync(Guid.Parse("DEEE9638-DA34-4230-BE77-34137AA5FCFF"), createNotificationDTO);
 
             return new ResponseMessage<string>
             {
