@@ -19,6 +19,7 @@ namespace Vouchee.Business.Services.Impls
 {
     public class PartnerTransactionService : IPartnerTransactionService
     {
+        private readonly IBaseRepository<VoucherCode> _voucherCodeRepository;
         private readonly IBaseRepository<Notification> _notificationRepository;
         private readonly IBaseRepository<Voucher> _voucherRepository;
         private readonly IBaseRepository<MoneyRequest> _topUpRequestRepository;
@@ -28,7 +29,8 @@ namespace Vouchee.Business.Services.Impls
         private readonly IBaseRepository<PartnerTransaction> _partnerTransactionRepository;
         private readonly IMapper _mapper;
 
-        public PartnerTransactionService(IBaseRepository<Notification> notificationRepository,
+        public PartnerTransactionService(IBaseRepository<VoucherCode> voucherCodeRepository,
+                                         IBaseRepository<Notification> notificationRepository,
                                          IBaseRepository<Voucher> voucherRepository,
                                          IBaseRepository<MoneyRequest> topUpRequestRepository,
                                          IBaseRepository<Wallet> wallerRepository,
@@ -37,6 +39,7 @@ namespace Vouchee.Business.Services.Impls
                                          IBaseRepository<PartnerTransaction> partnerTransactionRepository,
                                          IMapper mapper)
         {
+            _voucherCodeRepository = voucherCodeRepository;
             _notificationRepository = notificationRepository;
             _voucherRepository = voucherRepository;
             _topUpRequestRepository = topUpRequestRepository;
@@ -136,6 +139,7 @@ namespace Vouchee.Business.Services.Impls
                                     }
 
                                     existedModal.Stock -= cartModal.Quantity;
+
                                     existedVoucher.Stock -= cartModal.Quantity;
 
                                     existedModal.Carts.Remove(existedModal.Carts.FirstOrDefault(c => c.ModalId == cartModal.ModalId));
