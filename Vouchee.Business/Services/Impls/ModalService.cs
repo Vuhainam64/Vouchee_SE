@@ -149,11 +149,21 @@ namespace Vouchee.Business.Services.Impls
                         .ThenInclude(x => x.Brand)
                 .Where(vc => vc.Order.CreateBy == buyerId); // Filter by buyerId
 
-            if (voucherCodeFilter.startDate.HasValue)
-                query = query.Where(vc => vc.StartDate >= voucherCodeFilter.startDate.Value);
+            if (voucherCodeFilter.status.HasValue)
+            {
+                query = query.Where(vc => vc.Status.Equals(voucherCodeFilter.status.Value.ToString()));
 
-            if (voucherCodeFilter.endDate.HasValue)
-                query = query.Where(vc => vc.EndDate <= voucherCodeFilter.endDate.Value);
+                DateOnly currentDate = DateOnly.FromDateTime(DateTime.Now);
+
+                if (voucherCodeFilter.status.HasValue.ToString().Equals(VoucherCodeStatusEnum.UNUSED.ToString()))
+                {
+                    query = query.Where(vc => vc.StartDate >= voucherCodeFilter.startDate.Value && vc.EndDate <= voucherCodeFilter.endDate.Value);
+                }
+                else if (voucherCodeFilter.status.Value.ToString().Equals(VoucherCodeStatusEnum.EXPIRED.ToString()))
+                {
+                    query = query.Where(vc => vc.EndDate < voucherCodeFilter.endDate.Value);
+                }
+            }
 
             var groupedData = await query
                 .GroupBy(vc => vc.Modal) // Group by Modal entity

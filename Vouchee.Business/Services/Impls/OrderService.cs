@@ -55,47 +55,47 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<bool> AssignCodeToOrderAsync(string orderId, Guid modalId, VoucherCodeList voucherCodeList)
-        {
-            try
-            {
-                var existedOrderDetail = await _orderDetailRepository.GetFirstOrDefaultAsync(x => x.OrderId == orderId && x.ModalId == modalId, isTracking: true);
+        //public async Task<bool> AssignCodeToOrderAsync(string orderId, Guid modalId, VoucherCodeList voucherCodeList)
+        //{
+        //    try
+        //    {
+        //        var existedOrderDetail = await _orderDetailRepository.GetFirstOrDefaultAsync(x => x.OrderId == orderId && x.ModalId == modalId, isTracking: true);
 
-                if (voucherCodeList.voucherCodeIds.Count() != existedOrderDetail.Quantity)
-                {
-                    throw new ConflictException($"Khách hàng đã đặt {existedOrderDetail.Quantity} voucher, bạn sẽ bị trừ điểm uy tín nếu không cung cấp đủ voucher");
-                }
+        //        if (voucherCodeList.voucherCodeIds.Count() != existedOrderDetail.Quantity)
+        //        {
+        //            throw new ConflictException($"Khách hàng đã đặt {existedOrderDetail.Quantity} voucher, bạn sẽ bị trừ điểm uy tín nếu không cung cấp đủ voucher");
+        //        }
 
-                foreach (var voucherCodeId in voucherCodeList.voucherCodeIds)
-                {
-                    var existedVoucherCode = await _voucherCodeRepository.FindAsync(voucherCodeId, isTracking: true);
-                    if (existedVoucherCode == null)
-                    {
-                        throw new NotFoundException($"Không tìm thấy voucher code với id {voucherCodeId}");
-                    }
-                    // check code này có phải là voucher đang đặt không
-                    if (existedOrderDetail.ModalId != existedVoucherCode.ModalId)
-                    {
-                        throw new ConflictException("Voucher code này không thuộc voucher đang đặt");
-                    }
+        //        foreach (var voucherCodeId in voucherCodeList.voucherCodeIds)
+        //        {
+        //            var existedVoucherCode = await _voucherCodeRepository.FindAsync(voucherCodeId, isTracking: true);
+        //            if (existedVoucherCode == null)
+        //            {
+        //                throw new NotFoundException($"Không tìm thấy voucher code với id {voucherCodeId}");
+        //            }
+        //            // check code này có phải là voucher đang đặt không
+        //            if (existedOrderDetail.ModalId != existedVoucherCode.ModalId)
+        //            {
+        //                throw new ConflictException("Voucher code này không thuộc voucher đang đặt");
+        //            }
 
-                    existedVoucherCode.Status = VoucherCodeStatusEnum.SOLD.ToString();
-                    existedVoucherCode.OrderId = orderId;
-                }
+        //            existedVoucherCode.Status = VoucherCodeStatusEnum.SOLD.ToString();
+        //            existedVoucherCode.OrderId = orderId;
+        //        }
 
-                await _voucherCodeRepository.SaveChanges();
+        //        await _voucherCodeRepository.SaveChanges();
 
-                existedOrderDetail.Status = OrderStatusEnum.DONE.ToString();
-                await _orderDetailRepository.SaveChanges();
+        //        existedOrderDetail.Status = OrderStatusEnum.DONE.ToString();
+        //        await _orderDetailRepository.SaveChanges();
 
-                return true;
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new Exception(ex.Message);
-            }
-        }
+        //        return true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        LoggerService.Logger(ex.Message);
+        //        throw new Exception(ex.Message);
+        //    }
+        //}
 
         public async Task<ResponseMessage<string>> CreateOrderAsync(ThisUserObj thisUserObj, CheckOutViewModel checkOutViewModel)
         {

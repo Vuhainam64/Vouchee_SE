@@ -8,9 +8,10 @@ namespace Vouchee.Data.Models.Constants.Enum.Status
 {
     public enum VoucherCodeStatusEnum
     {
-        ACTIVE,
-        INACTIVE,
-        SOLD,
-        USED
+        UNUSED,
+        USED,
+        EXPIRED,
+        VIOLENT,
+        NONE
     }
 }

@@ -72,7 +72,7 @@ namespace Vouchee.Business.Services.Impls
                 {
                     var voucherCode = _mapper.Map<VoucherCode>(createVoucherCode);
                     voucherCode.ModalId = exisedModal.Id;
-                    voucherCode.Status = VoucherCodeStatusEnum.ACTIVE.ToString();
+                    voucherCode.Status = VoucherCodeStatusEnum.NONE.ToString();
                     voucherCode.CreateBy = thisUserObj.userId;
 
                     exisedModal.VoucherCodes.Add(voucherCode);

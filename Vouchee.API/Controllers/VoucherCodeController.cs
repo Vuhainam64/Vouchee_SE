@@ -68,9 +68,9 @@ namespace Vouchee.API.Controllers
         }
         [HttpPut("update_status_voucher_code/{id}")]
         [Authorize]
-        public async Task<IActionResult> UpdateStatusVoucherCode(Guid id, VoucherCodeStatusEnum voucherCodeStatus)
+        public async Task<IActionResult> UpdateStatusVoucherCode(Guid id, VoucherCodeStatusEnum status)
         {
-            var result = await _voucherCodeService.UpdateStatusVoucherCodeAsync(id, voucherCodeStatus);
+            var result = await _voucherCodeService.UpdateStatusVoucherCodeAsync(id, status);
             return Ok(result);
         }
 
