@@ -160,7 +160,8 @@ namespace Vouchee.Business.Services.Impls
 
                                 foreach (var voucherCode in voucherCodes)
                                 {
-                                    voucherCode.OrderId = orderId; // Replace `orderId` with the actual OrderId value
+                                    voucherCode.OrderId = orderId;
+                                    voucherCode.Status = VoucherCodeStatusEnum.UNUSED.ToString();
                                 }
 
                                 await _voucherCodeRepository.SaveChanges();

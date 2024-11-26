@@ -149,11 +149,62 @@ namespace Vouchee.Business.Services.Impls
                         .ThenInclude(x => x.Brand)
                 .Where(vc => vc.Order.CreateBy == buyerId); // Filter by buyerId
 
-            if (voucherCodeFilter.startDate.HasValue)
-                query = query.Where(vc => vc.StartDate >= voucherCodeFilter.startDate.Value);
+            if (voucherCodeFilter != null)
+            {
+                DateOnly currentDate = DateOnly.FromDateTime(DateTime.Now);
 
-            if (voucherCodeFilter.endDate.HasValue)
-                query = query.Where(vc => vc.EndDate <= voucherCodeFilter.endDate.Value);
+                if (voucherCodeFilter.status.HasValue)
+                {
+                    switch (voucherCodeFilter.status.Value)
+                    {
+                        case VoucherCodeStatusEnum.UNUSED:
+                            // Filter for UNUSED vouchers within the specified date range
+                            if (voucherCodeFilter.startDate.HasValue && voucherCodeFilter.endDate.HasValue)
+                            {
+                                query = query.Where(vc =>
+                                    vc.StartDate <= voucherCodeFilter.startDate.Value &&
+                                    voucherCodeFilter.endDate.Value >= vc.EndDate);
+                            }
+                            else if (voucherCodeFilter.startDate.HasValue)
+                            {
+                                query = query.Where(vc => vc.StartDate <= voucherCodeFilter.startDate.Value);
+                            }
+                            else if (voucherCodeFilter.endDate.HasValue)
+                            {
+                                query = query.Where(vc => voucherCodeFilter.endDate.Value >= vc.EndDate);
+                            }
+                            break;
+
+                        case VoucherCodeStatusEnum.EXPIRED:
+                            // Filter for EXPIRED vouchers
+                            query = query.Where(vc => vc.EndDate < currentDate);
+                            break;
+
+                        default:
+                            // Filter by exact status
+                            query = query.Where(vc => vc.Status == voucherCodeFilter.status.Value.ToString());
+                            break;
+                    }
+                }
+                else
+                {
+                    // Handle cases where only dates are provided
+                    if (voucherCodeFilter.startDate.HasValue && voucherCodeFilter.endDate.HasValue)
+                    {
+                        query = query.Where(vc =>
+                            vc.StartDate >= voucherCodeFilter.startDate.Value &&
+                            voucherCodeFilter.endDate.Value >= vc.EndDate);
+                    }
+                    else if (voucherCodeFilter.startDate.HasValue)
+                    {
+                        query = query.Where(vc => vc.StartDate <= voucherCodeFilter.startDate.Value);
+                    }
+                    else if (voucherCodeFilter.endDate.HasValue)
+                    {
+                        query = query.Where(vc => voucherCodeFilter.endDate.Value <= vc.EndDate);
+                    }
+                }
+            }
 
             var groupedData = await query
                 .GroupBy(vc => vc.Modal) // Group by Modal entity
@@ -192,6 +243,7 @@ namespace Vouchee.Business.Services.Impls
                 results = pagedList // Paged result
             };
         }
+
 
         //public async Task<DynamicResponseModel<GetPendingModalDTO>> GetPendingModals(Guid sellerId, PagingRequest pagingRequest, ModalFilter modalFilter)
         //{
