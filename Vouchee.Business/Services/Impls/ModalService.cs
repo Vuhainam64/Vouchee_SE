@@ -147,6 +147,9 @@ namespace Vouchee.Business.Services.Impls
                 .Include(vc => vc.Modal) // Include related Modal for projection
                     .ThenInclude(x => x.Voucher)
                         .ThenInclude(x => x.Brand)
+                .Include(vc => vc.Modal) // Include related Modal for projection
+                    .ThenInclude(x => x.Voucher)
+                        .ThenInclude(x => x.Seller)
                 .Where(vc => vc.Order.CreateBy == buyerId); // Filter by buyerId
 
             if (voucherCodeFilter != null)
