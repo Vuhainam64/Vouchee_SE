@@ -266,5 +266,12 @@ namespace Vouchee.Business.Services.Impls
                 value = true
             };
         }
+
+        public async Task<List<GetBrandDTO>> GetBrandsByName(string name)
+        {
+            var existedBrand = await _brandRepository.GetWhereAsync(x => x.Name.ToLower().Contains(name.ToLower()));
+
+            return _mapper.Map<List<GetBrandDTO>>(existedBrand);
+        }
     }
 }

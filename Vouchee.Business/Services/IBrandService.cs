@@ -20,6 +20,7 @@ namespace Vouchee.Business.Services
         // READ
         public Task<GetDetalBrandDTO> GetBrandByIdAsync(Guid id);
         public Task<DynamicResponseModel<GetBrandDTO>> GetBrandsAsync(PagingRequest pagingRequest, BrandFilter brandFilter);
+        public Task<List<GetBrandDTO>> GetBrandsByName(string name);
 
         // UPDATE
         public Task<ResponseMessage<bool>> UpdateBrandAsync(Guid id, UpdateBrandDTO updateBrandDTO, ThisUserObj thisUserObj);
