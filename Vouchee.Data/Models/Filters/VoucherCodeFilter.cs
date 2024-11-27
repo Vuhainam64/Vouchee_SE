@@ -13,5 +13,7 @@ namespace Vouchee.Data.Models.Filters
 
         public DateOnly? startDate { get; set; }
         public DateOnly? endDate { get; set; }
+
+        public string? Title { get; set; }
     }
 }

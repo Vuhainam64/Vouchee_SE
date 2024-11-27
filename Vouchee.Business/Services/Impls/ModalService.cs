@@ -206,6 +206,10 @@ namespace Vouchee.Business.Services.Impls
                     {
                         query = query.Where(vc => voucherCodeFilter.endDate.Value <= vc.EndDate);
                     }
+                    else if (voucherCodeFilter.Title != null)
+                    {
+                        query = query.Where(vc => vc.Modal.Title.Equals(voucherCodeFilter.Title.ToString()));
+                    }
                 }
             }
 
