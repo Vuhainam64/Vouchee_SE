@@ -98,6 +98,9 @@ namespace Vouchee.Data.Models.DTOs
 
         public int? voucherCodeCount { get; set; } = 0;
 
+        public Guid? SellerId { get; set; }
+        public string? SellerImage { get; set; }
+
         public virtual ICollection<GetVoucherCodeDTO> voucherCodes { get; set; }
     }
 
