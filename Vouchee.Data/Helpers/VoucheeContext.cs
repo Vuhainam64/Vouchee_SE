@@ -46,7 +46,7 @@ namespace Vouchee.Data.Helpers
                 IConfigurationRoot configuration = builder.Build();
                 optionsBuilder.EnableSensitiveDataLogging();
                 optionsBuilder.UseLazyLoadingProxies();
-                optionsBuilder.UseSqlServer(configuration.GetConnectionString("DEV"));
+                optionsBuilder.UseSqlServer(configuration.GetConnectionString("PROD"));
             }
         }
 
