@@ -88,6 +88,7 @@ namespace Vouchee.Business.Models.DTOs
         public VoucherDTO()
         {
             categories = [];
+            modals = [];
         }
 
         public Guid? id { get; set; }
@@ -95,7 +96,7 @@ namespace Vouchee.Business.Models.DTOs
         public string? description { get; set; }
         public decimal? rating { get; set; }
         public string? video { get; set; }
-        public int stock { get; set; }
+        public int stock => modals.Sum(x => x.stock);
         public DateTime? createDate { get; set; }
 
         public int? shopDiscount { get; set; }
@@ -120,7 +121,9 @@ namespace Vouchee.Business.Models.DTOs
 
         public string? status { get; set; }
         public bool? isActive { get; set; }
+
         public virtual ICollection<GetCategoryDTO> categories { get; set; }
+        public virtual ICollection<GetModalDTO> modals { get; set; }
     }
 
     public class GetVoucherDTO : VoucherDTO
@@ -130,12 +133,7 @@ namespace Vouchee.Business.Models.DTOs
 
     public class GetVoucherSellerDTO : VoucherDTO
     {
-        public GetVoucherSellerDTO() 
-        {
-            modals = [];
-        }
 
-        public virtual IEnumerable<GetModalDTO> modals { get; set; }
     }
 
     public class GetNearestVoucherDTO : VoucherDTO
@@ -153,11 +151,9 @@ namespace Vouchee.Business.Models.DTOs
         public GetDetailVoucherDTO()
         {
             addresses = [];
-            modals = [];
             medias = [];
         }
 
-        public virtual ICollection<GetModalDTO> modals { get; set; }
         public virtual IEnumerable<GetAddressDTO> addresses { get; set; }
         public virtual ICollection<GetMediaDTO> medias { get; set; }
     }

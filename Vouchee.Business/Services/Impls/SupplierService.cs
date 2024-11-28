@@ -62,7 +62,6 @@ namespace Vouchee.Business.Services.Impls
             {
                 // Fetch suppliers and include their vouchers and order details
                 suppliers = _supplierRepository.GetTable()
-                    .Include(s => s.Vouchers)
                     //.ThenInclude(v => v.OrderDetails) // Include order details to calculate sold quantities
                     .ToList();
 

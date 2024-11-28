@@ -204,11 +204,6 @@ namespace Vouchee.API.AppStarts
                 .ForMember(dest => dest.startDate, opt => opt.MapFrom(src => src.VoucherCodes.Where(x => x.OrderId == null).OrderBy(x => x.StartDate).FirstOrDefault().StartDate))
                 .ForMember(dest => dest.endDate, opt => opt.MapFrom(src => src.VoucherCodes.Where(x => x.OrderId == null).OrderBy(x => x.EndDate).FirstOrDefault().EndDate))
                 .ReverseMap();
-            //CreateMap<Modal, GetPendingModalDTO>()
-            //    .ForMember(dest => dest.brandId, opt => opt.MapFrom(src => src.Voucher.Brand.Id))
-            //    .ForMember(dest => dest.brandName, opt => opt.MapFrom(src => src.Voucher.Brand.Name))
-            //    .ForMember(dest => dest.brandImage, opt => opt.MapFrom(src => src.Voucher.Brand.Image))
-            //    .ReverseMap();
             CreateMap<Modal, GetOrderedModalDTO>()
                 .ForMember(dest => dest.voucherCodes, opt => opt.MapFrom(src => src.VoucherCodes))
                 .ForMember(dest => dest.SellerId, opt => opt.MapFrom(src => src.Voucher.SellerId))

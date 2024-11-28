@@ -219,7 +219,6 @@ namespace Vouchee.Business.Services.Impls
             if (modalId == Guid.Empty)
             {
                 result = _voucherCodeRepository.GetTable()
-                                                 .Include(x => x.Order)
                                                  .Where(x => x.Order.CreateBy == thisUserObj.userId)
                                                  .ProjectTo<GetVoucherCodeDTO>(_mapper.ConfigurationProvider)
                                                  .DynamicFilter(_mapper.Map<GetVoucherCodeDTO>(voucherCodeFilter))
@@ -228,8 +227,6 @@ namespace Vouchee.Business.Services.Impls
             else
             {
                 result = _voucherCodeRepository.GetTable()
-                                 .Include(x => x.Modal)
-                                 .Include(x => x.Order)
                                  .Where(x => x.ModalId == modalId && x.Order.CreateBy == thisUserObj.userId)
                                  .ProjectTo<GetVoucherCodeDTO>(_mapper.ConfigurationProvider)
                                  .DynamicFilter(_mapper.Map<GetVoucherCodeDTO>(voucherCodeFilter))

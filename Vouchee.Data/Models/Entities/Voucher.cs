@@ -51,6 +51,8 @@ namespace Vouchee.Data.Models.Entities
         [Column(TypeName = "decimal(10,1)")]
         public decimal Rating { get; set; }
         public string? Video { get; set; }
+        public int TotalQuantitySold => Modals.Sum(x => x.OrderDetails.Sum(x => x.Quantity));
+        public int Stock => Modals.Sum(x => x.Stock);
 
         public bool IsActive { get; set; }
         public required string Status { get; set; }
