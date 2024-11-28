@@ -81,10 +81,10 @@ namespace Vouchee.Business.Services.Impls
                 }
 
                 // Update the stock of exisedModal
-                exisedModal.Stock += count;
+                //exisedModal.Stock += count;
 
-                // Update voucher stock as well
-                exisedModal.Voucher.Stock += count;
+                //// Update voucher stock as well
+                //exisedModal.Voucher.Stock += count;
 
                 var voucherUpdateSuccess = await _modalRepository.UpdateAsync(exisedModal);
 

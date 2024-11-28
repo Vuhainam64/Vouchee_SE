@@ -44,7 +44,6 @@ namespace Vouchee.API.AppStarts
                                                                                     .FirstOrDefault()))
                 .ForMember(dest => dest.supplierName, opt => opt.MapFrom(src => src.Supplier.Name))
                 .ForMember(dest => dest.supplierImage, opt => opt.MapFrom(src => src.Supplier.Image))
-                .ForMember(dest => dest.stock, opt => opt.MapFrom(src => src.Modals.Sum(m => m.Stock)))
                 .ForMember(dest => dest.image, opt => opt.MapFrom(src => src.Medias.FirstOrDefault(m => m.Index == 0).Url))
                 .ForMember(dest => dest.originalPrice, opt => opt.MapFrom(src => src.Modals.FirstOrDefault(m => m.Index == 0).OriginalPrice))
                 .ForMember(dest => dest.sellPrice, opt => opt.MapFrom(src => src.Modals.FirstOrDefault(m => m.Index == 0).SellPrice))

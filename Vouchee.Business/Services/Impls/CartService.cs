@@ -114,10 +114,10 @@ namespace Vouchee.Business.Services.Impls
             {
                 // Nào fix xong thì mở
                 var modal = await _modalRepository.FindAsync(modalId, false);
-                if (cartModal.Quantity >= modal.Stock)
-                {
-                    throw new ConflictException($"Hiện tại modal này mới có {modal.Stock} code");
-                }
+                //if (cartModal.Quantity >= modal.Stock)
+                //{
+                //    throw new ConflictException($"Hiện tại modal này mới có {modal.Stock} code");
+                //}
                 if (cartModal.Quantity >= 20)
                 {
                     throw new ConflictException("Quantity đã vượt quá 20");
@@ -154,10 +154,10 @@ namespace Vouchee.Business.Services.Impls
                 }
 
                 // tam thoi comment lai
-                if (existedModal.Stock == 0)
-                {
-                    throw new NotFoundException("Modal này không có code nào để sử dụng");
-                }
+                //if (existedModal.Stock == 0)
+                //{
+                //    throw new NotFoundException("Modal này không có code nào để sử dụng");
+                //}
 
                 _user.Carts.Add(new()
                 {
@@ -230,11 +230,11 @@ namespace Vouchee.Business.Services.Impls
 
                 var modal = await _modalRepository.FindAsync(modalId, false);
 
-                if (cartModal.Quantity >= modal.Stock)
-                {
-                    throw new ConflictException($"Hiện tại modal này mới có {modal.Stock} code");
-                }
-                else if (cartModal.Quantity >= 20)
+                //if (cartModal.Quantity >= modal.Stock)
+                //{
+                //    throw new ConflictException($"Hiện tại modal này mới có {modal.Stock} code");
+                //}
+                if (cartModal.Quantity >= 20)
                 {
                     throw new ConflictException($"Modal {modalId} không thể vượt quá 20");
                 }
@@ -325,10 +325,10 @@ namespace Vouchee.Business.Services.Impls
 
                 var modal = await _modalRepository.FindAsync(modalId, false);
 
-                if (quantity > modal.Stock)
-                {
-                    throw new ConflictException($"Hiện tại modal này mới có {modal.Stock} code");
-                }
+                //if (quantity > modal.Stock)
+                //{
+                //    throw new ConflictException($"Hiện tại modal này mới có {modal.Stock} code");
+                //}
                 if (cartVoucher.Quantity > 20)
                 {
                     throw new ConflictException($"Modal {modalId} không thể vượt quá 20");
