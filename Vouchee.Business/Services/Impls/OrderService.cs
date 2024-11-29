@@ -133,7 +133,9 @@ namespace Vouchee.Business.Services.Impls
                     var existedVoucher = await _voucherRepository.GetByIdAsync(modals.Key,
                                                                                     isTracking: true,
                                                                                     includeProperties: x => x.Include(x => x.Modals)
-                                                                                                                .ThenInclude(x => x.Carts));
+                                                                                                                    .ThenInclude(x => x.Carts)
+                                                                                                                .Include(x => x.Modals)
+                                                                                                                    .ThenInclude(x => x.VoucherCodes));
 
                     if (existedVoucher != null)
                     {

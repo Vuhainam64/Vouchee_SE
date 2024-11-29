@@ -69,11 +69,16 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<ResponseMessage<bool>> DeleteCategoryAsync(Guid id)
         {
-            var existedCategory = await _categoryRepository.GetByIdAsync(id, isTracking: true);
+            var existedCategory = await _categoryRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Vouchers), isTracking: true);
 
             if (existedCategory == null)
             {
                 throw new NotFoundException("Không thấy category này");
+            }
+
+            if (existedCategory.Vouchers.Count != 0)
+            {
+                throw new ConflictException("Có các voucher phụ thuộc vào category này");
             }
 
             await _categoryRepository.DeleteAsync(existedCategory);

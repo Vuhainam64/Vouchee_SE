@@ -62,7 +62,6 @@ namespace Vouchee.Business.Services.Impls
             (int, IQueryable<GetDeviceTokenDTO>) result;
 
             result = _userRepository.GetTable()
-                                        .Include(x => x.DeviceTokens)
                                         .Where(x => x.Id == userId)
                         .ProjectTo<GetDeviceTokenDTO>(_mapper.ConfigurationProvider)
                         .DynamicFilter(_mapper.Map<GetDeviceTokenDTO>(deviceTokenFilter))

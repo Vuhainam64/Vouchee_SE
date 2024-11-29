@@ -189,24 +189,29 @@ namespace Vouchee.Business.Services.Impls
                                 .Include(x => x.Seller.ShopPromotions)
                                 .OrderByDescending(v => v.CreateDate)
                                 .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
-                                .Where(x => x.stock > 0 && x.status == VoucherStatusEnum.NONE.ToString() && x.isActive == true)
-                                .Take(numberOfVoucher != 0 ? numberOfVoucher : 10);
+                                .Where(x => x.status == VoucherStatusEnum.NONE.ToString() && x.isActive == true)
+                                .Take(numberOfVoucher != 0 ? numberOfVoucher : 10)
+                                .ToList()
+                                .Where(x => x.stock > 0)
+                                .ToList();
 
-            return await result.ToListAsync();
+            return result;
         }
 
         public async Task<IList<GetVoucherDTO>> GetTopSaleVouchers(int numberOfVoucher)
         {
-            IQueryable<GetVoucherDTO> result;
+            IList<GetVoucherDTO> result;
 
-            result = _voucherRepository.GetTable().Include(x => x.Modals)
-                                                    .ThenInclude(x => x.OrderDetails)
+            result = _voucherRepository.GetTable()
                         .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
-                        .Where(x => x.stock > 0 && x.status == VoucherStatusEnum.NONE.ToString() && x.isActive == true)
+                        .Where(x => x.status == VoucherStatusEnum.NONE.ToString() && x.isActive == true)
+                        .Take(numberOfVoucher != 0 ? numberOfVoucher : 10)
+                        .ToList()
+                        .Where(x => x.stock > 0)
                         .OrderByDescending(x => x.totalQuantitySold)
-                        .Take(numberOfVoucher != 0 ? numberOfVoucher : 10);
+                        .ToList();
 
-            return await result.ToListAsync();
+            return result;
         }
 
         public async Task<dynamic> GetVoucherByIdAsync(Guid id, PagingRequest pagingRequest)
@@ -220,28 +225,15 @@ namespace Vouchee.Business.Services.Impls
                                                                 .Include(x => x.Seller)
                                                                     .ThenInclude(x => x.ShopPromotions)
                                                                 .Include(x => x.Modals)
-                                                                    .ThenInclude(x => x.VoucherCodes)
+                                                                    .ThenInclude(x => x.VoucherCodes.Where(x => x.OrderId == null))
                                                                 .Include(x => x.Medias));
 
             if (existedVoucher != null)
             {
                 var voucher = _mapper.Map<GetDetailVoucherDTO>(existedVoucher);
-                var total = voucher.addresses.Count();
-
-                var pagedAddresses = voucher.addresses
-                    .Skip((pagingRequest.page - 1) * pagingRequest.pageSize)
-                    .Take(pagingRequest.pageSize).ToList();
-
-                voucher.addresses = pagedAddresses;
 
                 return new
                 {
-                    metaData = new
-                    {
-                        page = pagingRequest.page,
-                        size = pagingRequest.pageSize,
-                        total = total
-                    },
                     results = voucher
                 };
             }
@@ -251,18 +243,72 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO)
+        public async Task<ResponseMessage<bool>> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO, ThisUserObj thisUserObj)
         {
-            var existedVoucher = await _voucherRepository.GetByIdAsync(id);
-            if (existedVoucher != null)
-            {
-                var entity = _mapper.Map<Voucher>(updateVoucherDTO);
-                return await _voucherRepository.UpdateAsync(entity);
-            }
-            else
+            List<Guid> imageId = [];
+
+            var existedVoucher = await _voucherRepository.FindAsync(id, isTracking: true);
+            
+            if (existedVoucher == null)
             {
                 throw new NotFoundException("Không tìm thấy voucher");
             }
+
+            var existedBrand = await _brandReposiroty.FindAsync(updateVoucherDTO.brandId);
+            if (existedBrand == null)
+            {
+                throw new NotFoundException($"Không tìm thấy brand với id {updateVoucherDTO.brandId}");
+            }
+
+            var existedSupplier = await _supplierRepository.FindAsync((updateVoucherDTO.supplierId));
+            if (existedSupplier == null)
+            {
+                throw new NotFoundException($"Không tìm thấy supplier với id {updateVoucherDTO.supplierId}");
+            }
+
+            existedVoucher = _mapper.Map(updateVoucherDTO, existedVoucher);
+
+            existedVoucher.Categories.Clear();
+
+            foreach (var categoryId in updateVoucherDTO.categoryId)
+            {
+                var existedCategory = await _categoryRepository.FindAsync(categoryId, true);
+                if (existedCategory == null)
+                {
+                    throw new NotFoundException($"Không thấy category với id {categoryId}");
+                }
+                existedVoucher.Categories.Add(existedCategory);
+            }
+
+            foreach (var media in existedVoucher.Medias.ToList())
+            {
+                await _mediaRepository.DeleteAsync(media);
+            }
+
+            if (updateVoucherDTO.images?.Count != 0)
+            {
+                int index = 0;
+                foreach (var image in updateVoucherDTO.images)
+                {
+                    Media media = new()
+                    {
+                        Url = image,
+                        CreateBy = thisUserObj.userId,
+                        CreateDate = DateTime.Now,
+                        Index = index++,
+                    };
+                    existedVoucher.Medias.Add(media);
+                }
+            }
+
+            await _voucherRepository.UpdateAsync(existedVoucher);
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Cập nhật dữ liệu thành công",
+                result = true,
+                value = true
+            };
         }
         
         public async Task<ResponseMessage<GetVoucherDTO>> UpdateVoucherStatusAsync(Guid id, VoucherStatusEnum voucherStatus)
@@ -358,12 +404,11 @@ namespace Vouchee.Business.Services.Impls
                                                                                                 VoucherFilter voucherFilter,
                                                                                                 IList<Guid>? categoryIds)
         {
-            var result = _voucherRepository.GetTable().Include(x => x.Brand)
-                                                            .ThenInclude(x => x.Addresses)
+            var result = _voucherRepository.GetTable()
                         .ProjectTo<GetNearestVoucherDTO>(_mapper.ConfigurationProvider)
                         .DynamicFilter(_mapper.Map<GetNearestVoucherDTO>(voucherFilter))
                         .Where(x => categoryIds == null || !categoryIds.Any() || x.categories.Any(c => categoryIds.Contains(c.id.Value)))
-                        .Where(x => x.stock > 0 && x.status == VoucherStatusEnum.NONE.ToString() && x.isActive == true)
+                        .Where(x => x.status == VoucherStatusEnum.NONE.ToString() && x.isActive == true)
                         .AsEnumerable()
                         .Select(v =>
                         {
@@ -379,10 +424,11 @@ namespace Vouchee.Business.Services.Impls
                             return v;
                         });
 
-            // không xài được PagingIQueryable, chưa hiểu tại sao
             var pagedVouchers = result
+                    .Where(x => x.stock > 0)
                     .Skip((pagingRequest.page - 1) * pagingRequest.pageSize)
-                    .Take(pagingRequest.pageSize);
+                    .Take(pagingRequest.pageSize)
+                    .ToList();
 
             return new DynamicResponseModel<GetNearestVoucherDTO>()
             {
@@ -392,21 +438,22 @@ namespace Vouchee.Business.Services.Impls
                     size = pagingRequest.pageSize,
                     total = result.Count() // Total vouchers count for metadata
                 },
-                results = pagedVouchers.ToList() // Return the paged voucher list with nearest address and distance
+                results = pagedVouchers
             };
         }
 
         public async Task<IList<GetVoucherDTO>> GetSalestVouchers(int numberOfVoucher)
         {
             var result = _voucherRepository.GetTable()
-                    .Include(x => x.Seller)
-                        .ThenInclude(x => x.ShopPromotions)
                     .OrderByDescending(v => v.CreateDate)
                     .ProjectTo<GetVoucherDTO>(_mapper.ConfigurationProvider)
-                    .Where(x => x.stock > 0 && x.status == VoucherStatusEnum.NONE.ToString() && x.isActive == true && x.shopDiscount != null)
-                    .OrderByDescending(x => x.shopDiscount);
+                    .Where(x => x.status == VoucherStatusEnum.NONE.ToString() && x.isActive == true && x.shopDiscount != null)
+                    .OrderByDescending(x => x.shopDiscount)
+                    .ToList()
+                    .Where(x => x.stock > 0)
+                    .ToList();
 
-            return await result.ToListAsync();
+            return result;
         }
 
         public async Task<DynamicResponseModel<GetVoucherSellerDTO>> GetVoucherBySellerId(Guid sellerId,
@@ -423,9 +470,7 @@ namespace Vouchee.Business.Services.Impls
 
             (int, IQueryable<GetVoucherSellerDTO>) result;
 
-            result = _voucherRepository.GetTable().Include(x => x.Seller)
-                                                    .Include(x => x.Brand)
-                                                    .Where(x => (categoryIds == null || !categoryIds.Any() || x.Categories.Any(c => categoryIds.Contains(c.Id)))
+            result = _voucherRepository.GetTable().Where(x => (categoryIds == null || !categoryIds.Any() || x.Categories.Any(c => categoryIds.Contains(c.Id)))
                                                             && x.SellerId == sellerId)
                                                     .ProjectTo<GetVoucherSellerDTO>(_mapper.ConfigurationProvider)
                                                     .DynamicFilter(_mapper.Map<GetVoucherSellerDTO>(voucherFilter))
@@ -485,7 +530,6 @@ namespace Vouchee.Business.Services.Impls
         public async Task<IList<MiniVoucher>> GetMiniVoucherAsync(string title)
         {
             var result = _voucherRepository.GetTable()
-                                            .Include(x => x.Medias)
                                             .Where(x => x.Title.ToLower().Contains(title.ToLower()))
                                             .Take(10)
                                             .ProjectTo<MiniVoucher>(_mapper.ConfigurationProvider);

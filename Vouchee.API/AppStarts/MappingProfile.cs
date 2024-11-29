@@ -44,7 +44,6 @@ namespace Vouchee.API.AppStarts
                                                                                     .FirstOrDefault()))
                 .ForMember(dest => dest.supplierName, opt => opt.MapFrom(src => src.Supplier.Name))
                 .ForMember(dest => dest.supplierImage, opt => opt.MapFrom(src => src.Supplier.Image))
-                .ForMember(dest => dest.stock, opt => opt.MapFrom(src => src.Modals.Sum(m => m.Stock)))
                 .ForMember(dest => dest.image, opt => opt.MapFrom(src => src.Medias.FirstOrDefault(m => m.Index == 0).Url))
                 .ForMember(dest => dest.originalPrice, opt => opt.MapFrom(src => src.Modals.FirstOrDefault(m => m.Index == 0).OriginalPrice))
                 .ForMember(dest => dest.sellPrice, opt => opt.MapFrom(src => src.Modals.FirstOrDefault(m => m.Index == 0).SellPrice))
@@ -205,11 +204,6 @@ namespace Vouchee.API.AppStarts
                 .ForMember(dest => dest.startDate, opt => opt.MapFrom(src => src.VoucherCodes.Where(x => x.OrderId == null).OrderBy(x => x.StartDate).FirstOrDefault().StartDate))
                 .ForMember(dest => dest.endDate, opt => opt.MapFrom(src => src.VoucherCodes.Where(x => x.OrderId == null).OrderBy(x => x.EndDate).FirstOrDefault().EndDate))
                 .ReverseMap();
-            //CreateMap<Modal, GetPendingModalDTO>()
-            //    .ForMember(dest => dest.brandId, opt => opt.MapFrom(src => src.Voucher.Brand.Id))
-            //    .ForMember(dest => dest.brandName, opt => opt.MapFrom(src => src.Voucher.Brand.Name))
-            //    .ForMember(dest => dest.brandImage, opt => opt.MapFrom(src => src.Voucher.Brand.Image))
-            //    .ReverseMap();
             CreateMap<Modal, GetOrderedModalDTO>()
                 .ForMember(dest => dest.voucherCodes, opt => opt.MapFrom(src => src.VoucherCodes))
                 .ForMember(dest => dest.SellerId, opt => opt.MapFrom(src => src.Voucher.SellerId))

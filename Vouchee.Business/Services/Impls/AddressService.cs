@@ -75,6 +75,11 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Không tìm thấy địa chỉ này");
             }
 
+            if (existedAddress.Brands.Count != 0)
+            {
+                throw new ConflictException("Có các brand phụ thuộc vào địa chỉ này");
+            }
+
             if (await _addressRepository.DeleteAsync(existedAddress))
             {
                 return new ResponseMessage<bool>()

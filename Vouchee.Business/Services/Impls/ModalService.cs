@@ -116,7 +116,6 @@ namespace Vouchee.Business.Services.Impls
             try
             {
                 result = _modalRepository.GetTable()
-                            .Include(x => x.VoucherCodes)
                             .ProjectTo<GetModalDTO>(_mapper.ConfigurationProvider)
                             .DynamicFilter(_mapper.Map<GetModalDTO>(modalFilter))
                             .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
@@ -143,13 +142,6 @@ namespace Vouchee.Business.Services.Impls
         public async Task<DynamicResponseModel<GetOrderedModalDTO>> GetOrderedModals(Guid buyerId, PagingRequest pagingRequest, VoucherCodeFilter voucherCodeFilter)
         {
             var query = _voucherCodeRepository.GetTable()
-                .Include(vc => vc.Order) // Include related Order for filtering
-                .Include(vc => vc.Modal) // Include related Modal for projection
-                    .ThenInclude(x => x.Voucher)
-                        .ThenInclude(x => x.Brand)
-                .Include(vc => vc.Modal) // Include related Modal for projection
-                    .ThenInclude(x => x.Voucher)
-                        .ThenInclude(x => x.Seller)
                 .Where(vc => vc.Order.CreateBy == buyerId); // Filter by buyerId
 
             if (voucherCodeFilter != null)

@@ -43,7 +43,7 @@ namespace Vouchee.Data.Models.Entities
         public int SellPrice { get; set; }
         public int Index { get; set; }
         public string? Image { get; set; }
-        public int Stock { get; set; }
+        public int Stock => VoucherCodes.Count(x => x.OrderId == null);
 
         public bool IsActive { get; set; }
         public required string Status { get; set; }

@@ -74,7 +74,7 @@ namespace Vouchee.Data.Models.DTOs
         public int? index { get; set; }
         public DateOnly? startDate { get; set; }
         public DateOnly? endDate { get; set; }
-        public int? stock { get; set; }
+        public int stock { get; set; } = 0;
         public string? status { get; set; }
         public bool? isActive { get; set; }
     }

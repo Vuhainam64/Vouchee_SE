@@ -64,23 +64,36 @@ namespace Vouchee.Business.Models.DTOs
 
     public class UpdateVoucherDTO
     {
-        public Guid? brandId { get; set; }
-        public Guid? supplierId { get; set; }
-        public Guid? voucherTypeId { get; set; }
-        public Guid? shopId { get; set; }
+        public UpdateVoucherDTO()
+        {
+            categoryId = [];
+            images = [];
+        }
 
-        public string? name { get; set; }
+        [Required(ErrorMessage = "Brand is required.")]
+        public Guid brandId { get; set; }
+
+        [Required(ErrorMessage = "Supplier is required.")]
+        public Guid supplierId { get; set; }
+
+        [Required(ErrorMessage = "At least one category is required.")]
+        public IList<Guid> categoryId { get; set; }
+
+        [Required(ErrorMessage = "Title is required.")]
+        [StringLength(100, ErrorMessage = "Title cannot exceed 100 characters.")]
+        public string? title { get; set; }
+
+        [Required(ErrorMessage = "Description is required.")]
+        [StringLength(10000, ErrorMessage = "Description cannot exceed 10000 characters.")]
         public string? description { get; set; }
-        public int? price { get; set; }
-        public DateTime? starDate { get; set; }
-        public DateTime? endDate { get; set; }
-        public string? policy { get; set; }
-        public int? quantity { get; set; }
-        public VoucherStatusEnum? status { get; set; }
-        public IFormFile? image { get; set; }
 
-        public DateTime? updateDate = DateTime.Now;
-        public Guid? updateBy { get; set; }
+        public IList<string> images { get; set; }
+
+        public string? video { get; set; }
+
+        public bool IsActive { get; set; }
+
+        public DateTime updateDate = DateTime.Now;
     }
 
     public class VoucherDTO
@@ -88,6 +101,7 @@ namespace Vouchee.Business.Models.DTOs
         public VoucherDTO()
         {
             categories = [];
+            modals = [];
         }
 
         public Guid? id { get; set; }
@@ -95,7 +109,7 @@ namespace Vouchee.Business.Models.DTOs
         public string? description { get; set; }
         public decimal? rating { get; set; }
         public string? video { get; set; }
-        public int stock { get; set; }
+        public int stock => modals.Sum(x => x.stock);
         public DateTime? createDate { get; set; }
 
         public int? shopDiscount { get; set; }
@@ -120,7 +134,9 @@ namespace Vouchee.Business.Models.DTOs
 
         public string? status { get; set; }
         public bool? isActive { get; set; }
+
         public virtual ICollection<GetCategoryDTO> categories { get; set; }
+        public virtual ICollection<GetModalDTO> modals { get; set; }
     }
 
     public class GetVoucherDTO : VoucherDTO
@@ -130,12 +146,7 @@ namespace Vouchee.Business.Models.DTOs
 
     public class GetVoucherSellerDTO : VoucherDTO
     {
-        public GetVoucherSellerDTO() 
-        {
-            modals = [];
-        }
 
-        public virtual IEnumerable<GetModalDTO> modals { get; set; }
     }
 
     public class GetNearestVoucherDTO : VoucherDTO
@@ -153,11 +164,9 @@ namespace Vouchee.Business.Models.DTOs
         public GetDetailVoucherDTO()
         {
             addresses = [];
-            modals = [];
             medias = [];
         }
 
-        public virtual ICollection<GetModalDTO> modals { get; set; }
         public virtual IEnumerable<GetAddressDTO> addresses { get; set; }
         public virtual ICollection<GetMediaDTO> medias { get; set; }
     }
