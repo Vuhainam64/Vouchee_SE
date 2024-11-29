@@ -214,7 +214,7 @@ namespace Vouchee.Business.Services.Impls
             return result;
         }
 
-        public async Task<dynamic> GetVoucherByIdAsync(Guid id, PagingRequest pagingRequest)
+        public async Task<dynamic> GetVoucherByIdAsync(Guid id)
         {
             var existedVoucher = await _voucherRepository.GetByIdAsync(id,
                                                 query => query.Include(x => x.Brand)

@@ -15,7 +15,7 @@ namespace Vouchee.Business.Services
         public Task<ResponseMessage<dynamic>> CreateVoucherAsync(CreateVoucherDTO createVoucherDTO, ThisUserObj thisUserObj);
 
         // READ
-        public Task<dynamic> GetVoucherByIdAsync(Guid id, PagingRequest pagingRequest);
+        public Task<dynamic> GetVoucherByIdAsync(Guid id);
         public Task<DynamicResponseModel<GetVoucherDTO>> GetVoucherAsync(PagingRequest pagingRequest,
                                                                             VoucherFilter voucherFilter,
                                                                             SortVoucherEnum sortVoucherEnum);
