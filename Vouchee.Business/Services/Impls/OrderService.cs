@@ -133,7 +133,9 @@ namespace Vouchee.Business.Services.Impls
                     var existedVoucher = await _voucherRepository.GetByIdAsync(modals.Key,
                                                                                     isTracking: true,
                                                                                     includeProperties: x => x.Include(x => x.Modals)
-                                                                                                                .ThenInclude(x => x.Carts));
+                                                                                                                    .ThenInclude(x => x.Carts)
+                                                                                                                .Include(x => x.Modals)
+                                                                                                                    .ThenInclude(x => x.VoucherCodes));
 
                     if (existedVoucher != null)
                     {
@@ -143,10 +145,10 @@ namespace Vouchee.Business.Services.Impls
                             var existedModal = existedVoucher.Modals.FirstOrDefault(x => x.Id == cartModal.id);
 
                             // kiem tra ton kho cua modal
-                            //if (cartModal.quantity > existedModal?.Stock)
-                            //{
-                            //    throw new ConflictException($"Bạn đặt {cartModal.quantity} {cartModal.title} nhưng trong khi chỉ còn {existedModal.Stock}");
-                            //}
+                            if (cartModal.quantity > existedModal?.Stock)
+                            {
+                                throw new ConflictException($"Bạn đặt {cartModal.quantity} {cartModal.title} nhưng trong khi chỉ còn {existedModal.Stock}");
+                            }
 
                             existedModal.Carts.Remove(existedModal.Carts.FirstOrDefault(c => c.ModalId == cartModal.id));
 

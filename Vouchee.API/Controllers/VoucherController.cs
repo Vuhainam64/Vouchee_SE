@@ -22,12 +22,15 @@ namespace Vouchee.API.Controllers
     {
         private readonly IVoucherService _voucherService;
         private readonly IUserService _userService;
+        private readonly IMediaService _mediaService;
 
         public VoucherController(IVoucherService voucherService,
-                                    IUserService userService)
+                                 IUserService userService,
+                                 IMediaService mediaService)
         {
             _voucherService = voucherService;
             _userService = userService;
+            _mediaService = mediaService;
         }
 
         // CREATE
@@ -110,10 +113,13 @@ namespace Vouchee.API.Controllers
         }
 
         // UPDATE
+        [Authorize]
         [HttpPut("update_voucher/{id}")]
         public async Task<IActionResult> UpdateVoucher(Guid id, [FromBody] UpdateVoucherDTO voucherDTO)
         {
-            var result = await _voucherService.UpdateVoucherAsync(id, voucherDTO);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _voucherService.UpdateVoucherAsync(id, voucherDTO, currentUser);
             return Ok(result);
         }
 
@@ -131,20 +137,22 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        [HttpPut("remove_category_from_voucher")]
-        public async Task<IActionResult> RemoveCategoryFromVoucher(Guid categoryId, Guid voucherId)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+        //[HttpPut("remove_category_from_voucher")]
+        //public async Task<IActionResult> RemoveCategoryFromVoucher(Guid categoryId, Guid voucherId)
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _voucherService.RemoveCategoryFromVoucherAsync(categoryId, voucherId, currentUser);
-            return Ok(result);
-        }
+        //    var result = await _voucherService.RemoveCategoryFromVoucherAsync(categoryId, voucherId, currentUser);
+        //    return Ok(result);
+        //}
 
         // DELETE
         [Authorize]
         [HttpDelete("delete_voucher/{id}")]
         public async Task<IActionResult> DeleteVoucher(Guid id)
         {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
             var result = await _voucherService.DeleteVoucherAsync(id);
             return Ok(result);
         }

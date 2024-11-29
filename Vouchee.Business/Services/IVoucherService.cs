@@ -34,7 +34,7 @@ namespace Vouchee.Business.Services
         public Task<IList<MiniVoucher>> GetMiniVoucherAsync(string title);
 
         // UPDATE
-        public Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO);
+        public Task<ResponseMessage<bool>> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO, ThisUserObj thisUserObj);
         public Task<ResponseMessage<GetVoucherDTO>> UpdateVoucherStatusAsync(Guid id, VoucherStatusEnum voucherStatus);
         public Task<ResponseMessage<GetVoucherDTO>> UpdateVoucherisActiveAsync(Guid id, bool isActive);
         public Task<ResponseMessage<bool>> RemoveCategoryFromVoucherAsync(Guid categoryId, Guid voucherId, ThisUserObj thisUserObj);

@@ -243,18 +243,72 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO)
+        public async Task<ResponseMessage<bool>> UpdateVoucherAsync(Guid id, UpdateVoucherDTO updateVoucherDTO, ThisUserObj thisUserObj)
         {
-            var existedVoucher = await _voucherRepository.GetByIdAsync(id);
-            if (existedVoucher != null)
-            {
-                var entity = _mapper.Map<Voucher>(updateVoucherDTO);
-                return await _voucherRepository.UpdateAsync(entity);
-            }
-            else
+            List<Guid> imageId = [];
+
+            var existedVoucher = await _voucherRepository.FindAsync(id, isTracking: true);
+            
+            if (existedVoucher == null)
             {
                 throw new NotFoundException("Không tìm thấy voucher");
             }
+
+            var existedBrand = await _brandReposiroty.FindAsync(updateVoucherDTO.brandId);
+            if (existedBrand == null)
+            {
+                throw new NotFoundException($"Không tìm thấy brand với id {updateVoucherDTO.brandId}");
+            }
+
+            var existedSupplier = await _supplierRepository.FindAsync((updateVoucherDTO.supplierId));
+            if (existedSupplier == null)
+            {
+                throw new NotFoundException($"Không tìm thấy supplier với id {updateVoucherDTO.supplierId}");
+            }
+
+            existedVoucher = _mapper.Map(updateVoucherDTO, existedVoucher);
+
+            existedVoucher.Categories.Clear();
+
+            foreach (var categoryId in updateVoucherDTO.categoryId)
+            {
+                var existedCategory = await _categoryRepository.FindAsync(categoryId, true);
+                if (existedCategory == null)
+                {
+                    throw new NotFoundException($"Không thấy category với id {categoryId}");
+                }
+                existedVoucher.Categories.Add(existedCategory);
+            }
+
+            foreach (var media in existedVoucher.Medias.ToList())
+            {
+                await _mediaRepository.DeleteAsync(media);
+            }
+
+            if (updateVoucherDTO.images?.Count != 0)
+            {
+                int index = 0;
+                foreach (var image in updateVoucherDTO.images)
+                {
+                    Media media = new()
+                    {
+                        Url = image,
+                        CreateBy = thisUserObj.userId,
+                        CreateDate = DateTime.Now,
+                        Index = index++,
+                    };
+                    existedVoucher.Medias.Add(media);
+                }
+            }
+
+            await _voucherRepository.UpdateAsync(existedVoucher);
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Cập nhật dữ liệu thành công",
+                result = true,
+                value = true
+            };
         }
         
         public async Task<ResponseMessage<GetVoucherDTO>> UpdateVoucherStatusAsync(Guid id, VoucherStatusEnum voucherStatus)

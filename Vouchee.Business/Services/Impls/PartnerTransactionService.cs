@@ -145,10 +145,10 @@ namespace Vouchee.Business.Services.Impls
                                 var existedModal = existedVoucher.Modals.FirstOrDefault(x => x.Id == cartModal.ModalId);
 
                                 // kiem tra ton kho cua modal
-                                //if (cartModal.Quantity > existedModal?.Stock)
-                                //{
-                                //    throw new ConflictException($"Bạn đặt {cartModal.Quantity} {cartModal.Modal.Title} nhưng trong khi chỉ còn {existedModal.Stock}");
-                                //}
+                                if (cartModal.Quantity > existedModal?.Stock)
+                                {
+                                    throw new ConflictException($"Bạn đặt {cartModal.Quantity} {cartModal.Modal.Title} nhưng trong khi chỉ còn {existedModal.Stock}. Tiền đã được hoàn trả về ví");
+                                }
 
                                 //existedModal.Stock -= cartModal.Quantity;
 

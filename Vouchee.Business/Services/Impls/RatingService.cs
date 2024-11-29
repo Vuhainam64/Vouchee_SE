@@ -68,12 +68,6 @@ namespace Vouchee.Business.Services.Impls
 
             await _orderRepository.SaveChanges();
 
-            var modalRatings = await _ratingRepository.GetWhereAsync(x => x.ModalId == createRatingDTO.modalId);
-
-            existedOrder.Rating.Modal.Voucher.Rating = (decimal) modalRatings.Average(x => x.Star);
-
-            await _orderRepository.SaveChanges();
-
             return new ResponseMessage<Guid>()
             {
                 message = "Tạo rating thành công",
@@ -148,12 +142,6 @@ namespace Vouchee.Business.Services.Impls
 
             existedRating = _mapper.Map(updateRatingDTO, existedRating);
             existedRating.UpdateBy = thisUserObj.userId;
-
-            await _ratingRepository.SaveChanges();
-
-            var existedRatings = await _ratingRepository.GetWhereAsync(x => x.ModalId == existedRating.ModalId);
-
-            existedRating.Modal.Voucher.Rating = (decimal) existedRatings.Average(x => x.Star);
 
             await _ratingRepository.SaveChanges();
 
