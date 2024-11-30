@@ -54,49 +54,6 @@ namespace Vouchee.Business.Services.Impls
             _orderRepository = orderRepository;
             _mapper = mapper;
         }
-
-        //public async Task<bool> AssignCodeToOrderAsync(string orderId, Guid modalId, VoucherCodeList voucherCodeList)
-        //{
-        //    try
-        //    {
-        //        var existedOrderDetail = await _orderDetailRepository.GetFirstOrDefaultAsync(x => x.OrderId == orderId && x.ModalId == modalId, isTracking: true);
-
-        //        if (voucherCodeList.voucherCodeIds.Count() != existedOrderDetail.Quantity)
-        //        {
-        //            throw new ConflictException($"Khách hàng đã đặt {existedOrderDetail.Quantity} voucher, bạn sẽ bị trừ điểm uy tín nếu không cung cấp đủ voucher");
-        //        }
-
-        //        foreach (var voucherCodeId in voucherCodeList.voucherCodeIds)
-        //        {
-        //            var existedVoucherCode = await _voucherCodeRepository.FindAsync(voucherCodeId, isTracking: true);
-        //            if (existedVoucherCode == null)
-        //            {
-        //                throw new NotFoundException($"Không tìm thấy voucher code với id {voucherCodeId}");
-        //            }
-        //            // check code này có phải là voucher đang đặt không
-        //            if (existedOrderDetail.ModalId != existedVoucherCode.ModalId)
-        //            {
-        //                throw new ConflictException("Voucher code này không thuộc voucher đang đặt");
-        //            }
-
-        //            existedVoucherCode.Status = VoucherCodeStatusEnum.SOLD.ToString();
-        //            existedVoucherCode.OrderId = orderId;
-        //        }
-
-        //        await _voucherCodeRepository.SaveChanges();
-
-        //        existedOrderDetail.Status = OrderStatusEnum.DONE.ToString();
-        //        await _orderDetailRepository.SaveChanges();
-
-        //        return true;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        LoggerService.Logger(ex.Message);
-        //        throw new Exception(ex.Message);
-        //    }
-        //}
-
         public async Task<ResponseMessage<string>> CreateOrderAsync(ThisUserObj thisUserObj, CheckOutViewModel checkOutViewModel)
         {
             var user = await _userRepository.GetByIdAsync(thisUserObj.userId, includeProperties: x => x.Include(x => x.BuyerWallet), isTracking: true);
@@ -199,6 +156,24 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
+        public async Task<GetDetailOrderDTO> GetDetailSellerOrderAsync(string orderId, ThisUserObj thisUserObj)
+        {
+            var existedOrder = await _orderRepository.GetByIdAsync(orderId, includeProperties: x => x.Include(x => x.OrderDetails)
+                                                                                                        .ThenInclude(x => x.Modal)
+                                                                                                            .ThenInclude(x => x.Voucher));
+
+            if (existedOrder == null)
+            {
+                throw new NotFoundException("Không tìm thấy order này");
+            }
+
+            existedOrder.OrderDetails = existedOrder.OrderDetails
+                                            .Where(od => od.Modal.Voucher.SellerId == thisUserObj.userId)
+                                            .ToList();
+
+            return _mapper.Map<GetDetailOrderDTO>(existedOrder);
+        }
+
         public async Task<GetDetailOrderDTO> GetOrderByIdAsync(string id)
         {
             var order = await _orderRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.OrderDetails)
@@ -248,100 +223,27 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        //public async Task<bool> UpdateOrderAsync(string id, UpdateOrderDTO updateOrderDTO, ThisUserObj thisUserObj)
-        //{
-        //    try
-        //    {
-        //        var existedOrder = await _orderRepository.GetByIdAsync(id);
-        //        if (existedOrder != null)
-        //        {
-        //            var entity = _mapper.Map<Order>(updateOrderDTO);
-        //            return await _orderRepository.UpdateAsync(entity);
-        //        }
-        //        else
-        //        {
-        //            throw new NotFoundException("Không tìm thấy order");
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        LoggerService.Logger(ex.Message);
-        //        throw new UpdateObjectException(ex.Message);
-        //    }
-        //}
+        public async Task<DynamicResponseModel<GetOrderDTO>> GetSellerOrderAsync(PagingRequest pagingRequest, OrderFilter orderFilter, ThisUserObj thisUserObj)
+        {
+            (int, IQueryable<GetOrderDTO>) result;
 
-        //public async Task<ResponseMessage<bool>> UpdateOrderTransactionAsync(string id, Guid partnerTransactionId, ThisUserObj thisUserObj)
-        //{
-        //    try
-        //    {
-        //        var existedOrder = await _orderRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.OrderDetails)
-        //                                                                                                .ThenInclude(x => x.Modal)
-        //                                                                                                    .ThenInclude(x => x.Voucher)
-        //                                                                                                        .ThenInclude(x => x.Seller)
-        //                                                                                                            .ThenInclude(x => x.SellerWallet)
-        //                                                                , isTracking: true);
+            result = _orderRepository.GetTable()
+                                        .Where(o => o.OrderDetails.Any(od => od.Modal.Voucher.SellerId == thisUserObj.userId))
+                                        .ProjectTo<GetOrderDTO>(_mapper.ConfigurationProvider)
+                                        .DynamicFilter(_mapper.Map<GetOrderDTO>(orderFilter))
+                                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
-        //        if (existedOrder == null)
-        //        {
-        //            throw new NotFoundException("Không tìm thấy order này");
-        //        }
-
-        //        var groupedModals = existedOrder.OrderDetails.GroupBy(x => x.Modal.Voucher.SellerId);
-        //        foreach (var groupedModal in groupedModals)
-        //        {
-        //            var existedSeller = await _userRepository.GetByIdAsync(groupedModal.Key, includeProperties: x => x.Include(x => x.SellerWallet)
-        //                                                                                                                .ThenInclude(x => x.SellerWalletTransactions)                                    
-        //                                                                    , isTracking: true);
-
-        //            if (existedSeller == null)
-        //            {
-        //                throw new NotFoundException($"Không tìm thấy seller {groupedModal.Key}");
-        //            }
-
-        //            if (existedSeller.SellerWallet == null)
-        //            {
-        //                throw new NotFiniteNumberException($"Không tìm thấy ví seller {groupedModal.Key}");
-        //            }
-
-        //            WalletTransaction walletTransaction = new()
-        //            {
-        //                Type = "AMOUNT_OUT",
-        //                CreateBy = thisUserObj.userId,
-        //                CreateDate = DateTime.Now,
-        //                Status = WalletTransactionStatusEnum.DONE.ToString(),
-        //                Amount = groupedModal.Sum(x => x.FinalPrice),
-        //                PartnerTransactionId = partnerTransactionId,
-        //                SellerWalletId = existedSeller.Id,
-        //            };
-
-        //            existedSeller.SellerWallet.SellerWalletTransactions.Add(walletTransaction);
-        //            existedSeller.SellerWallet.Balance += groupedModal.Sum(x => x.FinalPrice);
-        //        }
-
-        //        await _userRepository.SaveChanges();
-
-        //        existedOrder.Status = partnerTransactionId == Guid.Empty ? OrderStatusEnum.ERROR_AT_TRANSACTION.ToString() : OrderStatusEnum.FINISH_TRANSACTION.ToString();
-
-        //        var result = await _orderRepository.UpdateAsync(existedOrder);
-
-        //        return new ResponseMessage<bool>()
-        //        {
-        //            message = "Cập nhật trạng thái thành công",
-        //            result = result,
-        //            value = result
-        //        };
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        LoggerService.Logger(ex.Message);
-        //        throw new UpdateObjectException(ex.Message);
-        //    }
-        //}
-
-        //public Task<bool> UpdateUserPointAsync(Guid orderId)
-        //{
-        //    throw new NotImplementedException();
-        //}
+            return new DynamicResponseModel<GetOrderDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = result.Item2.ToList() // Return the paged voucher list with nearest address and distance
+            };
+        }
     }
 }
 

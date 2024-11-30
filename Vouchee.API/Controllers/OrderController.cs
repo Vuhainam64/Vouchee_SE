@@ -61,12 +61,32 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
+        [Authorize]
+        [HttpGet("get_seller_order")]
+        public async Task<IActionResult> GetSellerOrder([FromQuery] PagingRequest pagingRequest, [FromQuery] OrderFilter orderFilter)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _orderService.GetSellerOrderAsync(pagingRequest, orderFilter, currentUser);
+            return Ok(result);
+        }
+
         [HttpGet("get_order/{id}")]
         [Authorize]
         public async Task<IActionResult> GetOrderById(string id)
         {
             var order = await _orderService.GetOrderByIdAsync(id);
             return Ok(order);
+        }
+
+        [Authorize]
+        [HttpGet("get_detail_seller_order/{id}")]
+        public async Task<IActionResult> GetDetailSellerOrder(string id)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _orderService.GetDetailSellerOrderAsync(id, currentUser);
+            return Ok(result);
         }
 
         // UPDATE
