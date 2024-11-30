@@ -8,6 +8,6 @@ namespace Vouchee.Business.Services
 {
     public interface IAuthService
     {
-        public Task<AuthResponse> GetToken(string firebaseToken, DevicePlatformEnum? devicePlatformEnum , string? deviceToken);
+        public Task<AuthResponse> GetToken(string firebaseToken , string? deviceToken);
     }
 }

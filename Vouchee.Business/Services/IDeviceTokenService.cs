@@ -20,6 +20,6 @@ namespace Vouchee.Business.Services
         public Task<DynamicResponseModel<GetDeviceTokenDTO>> GetDeviceTokenAsync(PagingRequest pagingRequest, DeviceTokenFilter deviceTokenFilter, Guid userId);
 
         // DELETE
-        public Task<ResponseMessage<bool>> RemoveDeviceTokenAsync(Guid userId, string deviceToken, DevicePlatformEnum devicePlatformEnum);
+        public Task<ResponseMessage<bool>> RemoveDeviceTokenAsync(Guid userId, string deviceToken);
     }
 }

@@ -41,7 +41,7 @@ namespace Vouchee.Business.Services.Impls
             _deviceTokenRepository = deviceTokenRepository;
         }
 
-        public async Task<AuthResponse> GetToken(string firebaseToken, DevicePlatformEnum? devicePlatformEnum, string? deviceToken)
+        public async Task<AuthResponse> GetToken(string firebaseToken, string? deviceToken)
         {
             AuthResponse response = new();
 
@@ -83,7 +83,6 @@ namespace Vouchee.Business.Services.Impls
                     newUser.DeviceTokens.Add(new()
                     {
                         CreateDate = DateTime.Now,
-                        Platform = devicePlatformEnum.ToString(),
                         Token = deviceToken.Trim(),
                     });
                 }
@@ -105,20 +104,17 @@ namespace Vouchee.Business.Services.Impls
                 if (deviceToken != null)
                 {
                     // check user nay co trung device token chua, chua thi add, co r thi k
-                    var existedDeviceToken = user.DeviceTokens.FirstOrDefault(x => x.Token.Equals(deviceToken)
-                                                                                    && x.Platform.Equals(devicePlatformEnum.ToString()));
+                    var existedDeviceToken = user.DeviceTokens.FirstOrDefault(x => x.Token.Equals(deviceToken));
 
                     if (existedDeviceToken == null)
                     {
                         // kiem tra xem db co token nay chua, neu co r thi add cai co san vao trong user, neu chua co thi tao moi
-                        existedDeviceToken = await _deviceTokenRepository.GetFirstOrDefaultAsync(x => x.Token.Equals(deviceToken)
-                                                                                    && x.Platform.Equals(devicePlatformEnum.ToString()));
+                        existedDeviceToken = await _deviceTokenRepository.GetFirstOrDefaultAsync(x => x.Token.Equals(deviceToken));
 
                         if (existedDeviceToken == null)
                         {
                             user.DeviceTokens.Add(new()
                             {
-                                Platform = devicePlatformEnum.ToString(),
                                 CreateDate = DateTime.Now,
                                 Token = deviceToken,
                             });
