@@ -48,19 +48,4 @@ namespace Vouchee.Business.Models.DTOs
 
         public virtual ICollection<GetOrderDetailDTO>? orderDetails { get; set; }
     }
-
-    public class GetDetailSellerOrderDTO
-    {
-        public GetDetailSellerOrderDTO()
-        {
-            orderDetails = [];
-        }
-
-        public int? totalPrice => orderDetails.Sum(x => x.totalPrice);
-        public int? discountPrice => orderDetails.Sum(x => x.discountPrice);
-        public int? finalPrice => orderDetails.Sum(x => x.finalPrice);
-        public DateTime? createDate { get; set; }
-
-        public virtual ICollection<GetOrderDetailDTO>? orderDetails { get; set; }
-    }
 }

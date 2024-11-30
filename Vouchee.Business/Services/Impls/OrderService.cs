@@ -156,30 +156,6 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<GetDetailSellerOrderDTO> GetDetailSellerOrderAsync(string orderId, ThisUserObj thisUserObj)
-        {
-            var existedOrder = await _orderRepository.GetByIdAsync(orderId, includeProperties: x => x.Include(x => x.OrderDetails)
-                                                                                                        .ThenInclude(x => x.Modal)
-                                                                                                            .ThenInclude(x => x.Voucher));
-
-            if (existedOrder == null)
-            {
-                throw new NotFoundException("Không tìm thấy order này");
-            }
-
-            existedOrder.OrderDetails = existedOrder.OrderDetails
-                                            .Where(od => od.Modal.Voucher.SellerId == thisUserObj.userId)
-                                            .ToList();
-
-            GetDetailSellerOrderDTO getDetailSellerOrderDTO = new()
-            {
-                orderDetails = _mapper.Map<IList<GetOrderDetailDTO>>(existedOrder.OrderDetails),
-                createDate = existedOrder.CreateDate
-            };
-
-            return getDetailSellerOrderDTO;
-        }
-
         public async Task<GetDetailOrderDTO> GetOrderByIdAsync(string id)
         {
             var order = await _orderRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.OrderDetails)
@@ -229,17 +205,78 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<DynamicResponseModel<GetOrderDTO>> GetSellerOrderAsync(PagingRequest pagingRequest, OrderFilter orderFilter, ThisUserObj thisUserObj)
+        public async Task<DynamicResponseModel<GetOrderDetailDTO>> GetSellerOrderAsync(
+                                                                                        PagingRequest pagingRequest,
+                                                                                        OrderDetailFilter orderDetailFilter,
+                                                                                        ThisUserObj thisUserObj)
         {
-            (int, IQueryable<GetOrderDTO>) result;
+            // Base query for OrderDetails
+            var query = _orderRepository.GetTable()
+                .SelectMany(o => o.OrderDetails)
+                .Where(od => od.Modal.Voucher.SellerId == thisUserObj.userId);
 
-            result = _orderRepository.GetTable()
-                                        .Where(o => o.OrderDetails.Any(od => od.Modal.Voucher.SellerId == thisUserObj.userId))
-                                        .ProjectTo<GetOrderDTO>(_mapper.ConfigurationProvider)
-                                        .DynamicFilter(_mapper.Map<GetOrderDTO>(orderFilter))
-                                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+            // Apply OrderDetailFilter conditions
+            if (!string.IsNullOrEmpty(orderDetailFilter.orderId))
+            {
+                query = query.Where(od => od.OrderId == orderDetailFilter.orderId);
+            }
 
-            return new DynamicResponseModel<GetOrderDTO>()
+            if (orderDetailFilter.startDate.HasValue)
+            {
+                query = query.Where(od => od.Order.CreateDate >= orderDetailFilter.startDate.Value);
+            }
+
+            if (orderDetailFilter.endDate.HasValue)
+            {
+                query = query.Where(od => od.Order.CreateDate <= orderDetailFilter.endDate.Value);
+            }
+
+            if (orderDetailFilter.sortOrderEnum != null)
+            {
+                DateTime now = DateTime.UtcNow.Date; // Truncate time part
+                query = orderDetailFilter.sortOrderEnum switch
+                {
+                    SortOrderEnum.TODAY => query.Where(od => od.Order.CreateDate.Value.Date == now),
+                    SortOrderEnum.YESTERDAY => query.Where(od => od.Order.CreateDate.Value.Date == now.AddDays(-1)),
+                    SortOrderEnum.ONE_WEEK_BEFORE => query.Where(od => od.Order.CreateDate <= now.AddDays(-7)),
+                    SortOrderEnum.ONE_MONTH_BEFORE => query.Where(od => od.Order.CreateDate <= now.AddMonths(-1)),
+                    _ => query
+                };
+            }
+
+            // Apply paging to OrderDetails
+            var pagedOrderDetails = await query
+                .Skip((pagingRequest.page - 1) * pagingRequest.pageSize)
+                .Take(pagingRequest.pageSize)
+                .ProjectTo<GetOrderDetailDTO>(_mapper.ConfigurationProvider) // Map to DTO
+                .ToListAsync();
+
+            // Calculate total count of OrderDetails
+            var totalOrderDetailsCount = await query.CountAsync();
+
+            // Return result
+            return new DynamicResponseModel<GetOrderDetailDTO>
+            {
+                metaData = new()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = totalOrderDetailsCount
+                },
+                results = pagedOrderDetails
+            };
+        }
+
+        public async Task<DynamicResponseModel<GetVoucherCodeDTO>> GetSellerOrderedVoucherCodeAsync(string orderId, Guid modalId, PagingRequest pagingRequest)
+        {
+            (int, IQueryable<GetVoucherCodeDTO>) result;
+
+            result = _voucherCodeRepository.GetTable()
+                        .Where(x => x.ModalId == modalId && x.OrderId == orderId)
+                        .ProjectTo<GetVoucherCodeDTO>(_mapper.ConfigurationProvider)
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            return new DynamicResponseModel<GetVoucherCodeDTO>()
             {
                 metaData = new MetaData()
                 {

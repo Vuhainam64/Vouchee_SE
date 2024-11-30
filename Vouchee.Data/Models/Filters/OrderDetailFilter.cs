@@ -4,15 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Vouchee.Data.Models.Constants.Enum.Sort;
-using Vouchee.Data.Models.Constants.Enum.Status;
 
 namespace Vouchee.Data.Models.Filters
 {
-    public class OrderFilter
+
+    public class OrderDetailFilter
     {
-        public OrderStatusEnum? status { get; set; }
+        public SortOrderEnum? sortOrderEnum { get; set; }
 
         public DateTime? startDate { get; set; }
         public DateTime? endDate { get; set; }
+
+        public string? orderId { get; set; }
     }
 }
