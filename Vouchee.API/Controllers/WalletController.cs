@@ -24,16 +24,6 @@ namespace Vouchee.API.Controllers
         }
 
         [Authorize]
-        [HttpPost("create_wallet")]
-        public async Task<IActionResult> CreateWallet()
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
-
-            var result = await _walletService.CreateWalletAsync(currentUser);
-            return Ok(result);
-        }
-
-        [Authorize]
         [HttpGet("get_seller_wallet")]
         public async Task<IActionResult> GetSellerWallet()
         {
