@@ -156,7 +156,7 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<GetDetailOrderDTO> GetDetailSellerOrderAsync(string orderId, ThisUserObj thisUserObj)
+        public async Task<GetDetailSellerOrderDTO> GetDetailSellerOrderAsync(string orderId, ThisUserObj thisUserObj)
         {
             var existedOrder = await _orderRepository.GetByIdAsync(orderId, includeProperties: x => x.Include(x => x.OrderDetails)
                                                                                                         .ThenInclude(x => x.Modal)
@@ -171,7 +171,13 @@ namespace Vouchee.Business.Services.Impls
                                             .Where(od => od.Modal.Voucher.SellerId == thisUserObj.userId)
                                             .ToList();
 
-            return _mapper.Map<GetDetailOrderDTO>(existedOrder);
+            GetDetailSellerOrderDTO getDetailSellerOrderDTO = new()
+            {
+                orderDetails = _mapper.Map<IList<GetOrderDetailDTO>>(existedOrder.OrderDetails),
+                createDate = existedOrder.CreateDate
+            };
+
+            return getDetailSellerOrderDTO;
         }
 
         public async Task<GetDetailOrderDTO> GetOrderByIdAsync(string id)
