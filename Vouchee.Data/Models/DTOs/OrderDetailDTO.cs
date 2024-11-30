@@ -42,6 +42,9 @@ namespace Vouchee.Business.Models.DTOs
         public string? brandName { get; set; }
         public string? brandImage { get; set; }
 
+        public Guid? sellerId { get; set; }
+        public string? sellerName { get; set; }
+
         public int? unitPrice { get; set; }
         public int? shopDiscountPercent { get; set; }
         public int? shopDiscountMoney { get; set; }
@@ -50,6 +53,7 @@ namespace Vouchee.Business.Models.DTOs
         public int? finalPrice => totalPrice - discountPrice;
 
         public string? status { get; set; }
+        public DateTime? createDate { get; set; }
 
         public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
     }

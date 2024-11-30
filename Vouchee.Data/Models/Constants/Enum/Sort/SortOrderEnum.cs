@@ -8,6 +8,9 @@ namespace Vouchee.Data.Models.Constants.Enum.Sort
 {
     public enum SortOrderEnum
     {
-
+        TODAY,
+        YESTERDAY,
+        ONE_WEEK_BEFORE,
+        ONE_MONTH_BEFORE
     }
 }

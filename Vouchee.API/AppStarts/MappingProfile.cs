@@ -106,8 +106,11 @@ namespace Vouchee.API.AppStarts
                 .ForMember(dest => dest.brandImage, opt => opt.MapFrom(src => src.Modal.Voucher.Brand.Image))
                 .ForMember(dest => dest.image, opt => opt.MapFrom(src => src.Modal.Image))
                 .ForMember(dto => dto.voucherCodes, opt => opt.MapFrom(od => od.Order.VoucherCodes))
+                .ForMember(dest => dest.sellerId, opt => opt.MapFrom(src => src.Modal.Voucher.SellerId))
+                .ForMember(dest => dest.sellerName, opt => opt.MapFrom(src => src.Modal.Voucher.Seller.Name))
                 .ReverseMap()
                 .ForPath(od => od.Order.VoucherCodes, opt => opt.Ignore());
+
 
             // ORDER
             CreateMap<Order, OrderDTO>().ReverseMap();
@@ -116,7 +119,6 @@ namespace Vouchee.API.AppStarts
             CreateMap<Order, GetOrderDTO>().ReverseMap();
             CreateMap<Order, GetDetailOrderDTO>().ReverseMap();
             CreateMap<GetOrderDTO, OrderFilter>().ReverseMap();
-
             // ADDRESS
             CreateMap<Address, CreateAddressDTO>().ReverseMap();
             CreateMap<Address, UpdateAddressDTO>().ReverseMap();
