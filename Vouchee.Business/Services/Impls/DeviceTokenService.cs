@@ -43,7 +43,6 @@ namespace Vouchee.Business.Services.Impls
             }
 
             var deviceToken = _mapper.Map<DeviceToken>(createDeviceTokenDTO);
-            deviceToken.Platform = devicePlatformEnum.ToString();
 
             existedUser.DeviceTokens.Add(deviceToken);
 
@@ -79,7 +78,7 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<ResponseMessage<bool>> RemoveDeviceTokenAsync(Guid userId, string deviceToken, DevicePlatformEnum devicePlatformEnum)
+        public async Task<ResponseMessage<bool>> RemoveDeviceTokenAsync(Guid userId, string deviceToken)
         {
             var existedUser = await _userRepository.GetByIdAsync(userId, includeProperties: x => x.Include(x => x.DeviceTokens), isTracking: true);
 

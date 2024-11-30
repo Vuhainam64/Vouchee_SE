@@ -34,25 +34,18 @@ namespace Vouchee.API.Controllers
         [HttpPost("login_with_google_token")]
         [AllowAnonymous]
         public async Task<IActionResult> LoginWithGoogle([FromQuery] string token,
-                                                            [FromQuery] DevicePlatformEnum? platform,
                                                             [FromQuery] string? deviceToken)
         {
-            if ((platform == null && deviceToken != null) || (platform != null && deviceToken == null))
-            {
-                return Conflict("Cần phải chọn cả platform và device token");
-            }
-
-            var result = await _authService.GetToken(token, platform, deviceToken);
+            var result = await _authService.GetToken(token, deviceToken);
             return Ok(result);
         }
 
         [HttpDelete("logout")]
-        public async Task<IActionResult> Logout([FromQuery] string token,
-                                                    [FromQuery] DevicePlatformEnum platform = 0)
+        public async Task<IActionResult> Logout([FromQuery] string deviceToken)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _deviceTokenService.RemoveDeviceTokenAsync(currentUser.userId, token, platform);
+            var result = await _deviceTokenService.RemoveDeviceTokenAsync(currentUser.userId, deviceToken);
             return Ok(result);
         }
     }

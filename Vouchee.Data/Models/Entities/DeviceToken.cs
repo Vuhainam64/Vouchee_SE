@@ -24,7 +24,6 @@ namespace Vouchee.Data.Models.Entities
         public Guid Id { get; set; }
 
         public string? Token { get; set; }
-        public string? Platform { get; set; }
 
         public DateTime? CreateDate { get; set; }
     }

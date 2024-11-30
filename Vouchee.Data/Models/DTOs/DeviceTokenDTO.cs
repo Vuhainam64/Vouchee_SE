@@ -22,7 +22,6 @@ namespace Vouchee.Data.Models.DTOs
         public Guid id { get; set; }
 
         public string? token { get; set; }
-        public string? platform { get; set; }
 
         public DateTime? createDate { get; set; }
     }
