@@ -15,7 +15,7 @@ namespace Vouchee.Business.Services
         public Task<ResponseMessage<Guid>> CreateRatingAsync(CreateRatingDTO createRatingDTO, ThisUserObj thisUserObj);
 
         // READ
-        public Task<DynamicResponseModel<GetRatingDTO>> GetRatingAsync(PagingRequest pagingRequest, RatingFilter ratingFilter, ThisUserObj thisUserObj);
+        public Task<DynamicResponseModel<GetRatingDTO>> GetRatingAsync(PagingRequest pagingRequest, RatingFilter ratingFilter);
         public Task<GetRatingDTO> GetRatingByIdAsync(Guid id);
 
         // UPDATE
