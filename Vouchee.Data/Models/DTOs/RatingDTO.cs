@@ -25,7 +25,11 @@ namespace Vouchee.Data.Models.DTOs
         public virtual ICollection<CreateMediaDTO> medias { get; set; }
 
         [Range(1, 5, ErrorMessage = "Số sao phải nằm trong khoảng từ 1 đến 5.")]
-        public int star { get; set; }
+        public int qualityStar { get; set; }
+        [Range(1, 5, ErrorMessage = "Số sao phải nằm trong khoảng từ 1 đến 5.")]
+        public int serviceStar { get; set; }
+        [Range(1, 5, ErrorMessage = "Số sao phải nằm trong khoảng từ 1 đến 5.")]
+        public int sellerStar { get; set; }
 
         [StringLength(500, ErrorMessage = "Bình luận không được vượt quá 500 ký tự.")]
         public string? comment { get; set; }
@@ -36,7 +40,11 @@ namespace Vouchee.Data.Models.DTOs
     public class UpdateRatingDTO
     {
         [Range(1, 5, ErrorMessage = "Số sao phải nằm trong khoảng từ 1 đến 5.")]
-        public int star { get; set; }
+        public int qualityStar { get; set; }
+        [Range(1, 5, ErrorMessage = "Số sao phải nằm trong khoảng từ 1 đến 5.")]
+        public int serviceStar { get; set; }
+        [Range(1, 5, ErrorMessage = "Số sao phải nằm trong khoảng từ 1 đến 5.")]
+        public int sellerStar { get; set; }
 
         [StringLength(500, ErrorMessage = "Bình luận không được vượt quá 500 ký tự.")]
         public string? comment { get; set; }
@@ -52,9 +60,17 @@ namespace Vouchee.Data.Models.DTOs
         }
 
         public string? orderId { get; set; }
-        public Guid? modalId { get; set; }  
+        public Guid? modalId { get; set; }
 
-        public int? star { get; set; }
+        public decimal? totalStar =>
+            qualityStar.HasValue && serviceStar.HasValue && sellerStar.HasValue
+                ? Math.Round((decimal)(qualityStar + serviceStar + sellerStar) / 3, 1)
+                : (decimal?)null;
+
+        public int? qualityStar { get; set; }
+        public int? serviceStar { get; set; }
+        public int? sellerStar { get; set; }
+
         public string? comment { get; set; }
         public string? rep { get; set; }
 

@@ -49,8 +49,14 @@ namespace Vouchee.Data.Models.Entities
         public required string Title { get; set; }
         public string? Description { get; set; }
         public string? Video { get; set; }
-        public decimal Rating => (decimal) (Modals.SelectMany(modal => modal.Ratings).Any() 
-                                            ? Modals.SelectMany(modal => modal.Ratings).Average(rating => rating.Star) : 0);
+        public decimal AverageRating => Modals.Any(modal => modal.AverageRating > 0)
+            ? Math.Round(
+                Modals
+                    .Where(modal => modal.AverageRating > 0)
+                    .Average(modal => modal.AverageRating),
+                1)
+            : 0;
+
         public int TotalQuantitySold => Modals.Sum(x => x.OrderDetails.Sum(x => x.Quantity));
         public int Stock => Modals.Sum(x => x.Stock);
 
