@@ -77,6 +77,7 @@ namespace Vouchee.Data.Models.DTOs
         public int stock { get; set; } = 0;
         public string? status { get; set; }
         public bool? isActive { get; set; }
+        public decimal? averageRating { get; set; } = 0;
     }
 
     public class GetModalDTO : ModalDTO

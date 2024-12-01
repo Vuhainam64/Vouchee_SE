@@ -107,7 +107,6 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? id { get; set; }
         public string? title { get; set; }
         public string? description { get; set; }
-        public decimal? rating { get; set; }
         public string? video { get; set; }
         public int stock => modals.Sum(x => x.stock);
         public DateTime? createDate { get; set; }
@@ -117,6 +116,7 @@ namespace Vouchee.Business.Models.DTOs
         public int? sellPrice { get; set; }
         public int? salePrice => sellPrice - ((sellPrice * shopDiscount) / 100);
         public int? totalQuantitySold { get; set; }
+        public decimal? averageRating { get; set; } = 0;
 
         public string? image { get; set; }
 

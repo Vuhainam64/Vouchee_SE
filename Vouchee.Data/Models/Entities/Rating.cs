@@ -33,10 +33,13 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty(nameof(Media.Rating))]
         public virtual ICollection<Media> Medias { get; set; }
 
-        public int Star { get; set; }
+        public int QualityStar { get; set; }
+        public int ServiceStar { get; set; }
+        public int SellerStar { get; set; }
         public string? Comment { get; set; }
         public string? Reply { get; set; }
 
+        public string? Status { get; set; }
         public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
         public DateTime? UpdateDate { get; set; }
