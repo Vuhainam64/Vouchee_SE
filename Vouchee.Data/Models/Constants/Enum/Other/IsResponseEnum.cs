@@ -6,8 +6,15 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Constants.Enum.Other
 {
-    public enum WalletTransactionTypeEnum
+    public enum IsResponseEnum
     {
-        WITHDRAW,
+        REP,
+        NO_REP
+    }
+
+    public enum HaveContentEnum
+    {
+        HAVE_CONTENT,
+        HAVE_MEDIA
     }
 }
