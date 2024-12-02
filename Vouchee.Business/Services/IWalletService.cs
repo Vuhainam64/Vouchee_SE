@@ -7,6 +7,7 @@ using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.DTOs;
+using Vouchee.Data.Models.Entities;
 
 namespace Vouchee.Business.Services
 {
@@ -16,7 +17,7 @@ namespace Vouchee.Business.Services
         public Task<ResponseMessage<GetUserDTO>> CreateWalletAsync(ThisUserObj currenUser);
 
         // GET
-        public Task<GetSellerWallet> GetSellerWalletAsync(ThisUserObj currentUser);
-        public Task<GetBuyerWallet> GetBuyerWalletAsync(ThisUserObj currentUser);
+        public Task<dynamic> GetSellerWalletAsync(ThisUserObj currentUser, PagingRequest pagingRequest, SellerWalletTransactionFilter sellerWalletTransactionFilter);
+        public Task<dynamic> GetBuyerWalletAsync(ThisUserObj currentUser, PagingRequest pagingRequest, BuyerWalletTransactionFilter buyerWalletTransactionFilter);
     }
 }

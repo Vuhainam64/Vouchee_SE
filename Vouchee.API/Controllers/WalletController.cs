@@ -5,6 +5,7 @@ using Vouchee.API.Helpers;
 using Vouchee.Business.Models;
 using Vouchee.Business.Services;
 using Vouchee.Data.Models.Constants.Enum.Other;
+using Vouchee.Data.Models.Entities;
 
 namespace Vouchee.API.Controllers
 {
@@ -25,21 +26,23 @@ namespace Vouchee.API.Controllers
 
         [Authorize]
         [HttpGet("get_seller_wallet")]
-        public async Task<IActionResult> GetSellerWallet()
+        public async Task<IActionResult> GetSellerWallet([FromQuery] PagingRequest pagingRequest,
+                                                            [FromQuery] SellerWalletTransactionFilter sellerWalletTransactionFilter)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _walletService.GetSellerWalletAsync(currentUser);
+            var result = await _walletService.GetSellerWalletAsync(currentUser, pagingRequest, sellerWalletTransactionFilter);
             return Ok(result);
         }
 
         [Authorize]
         [HttpGet("get_buyer_wallet")]
-        public async Task<IActionResult> GetBuyerWallet()
+        public async Task<IActionResult> GetBuyerWallet([FromQuery] PagingRequest pagingRequest,
+                                                            [FromQuery] BuyerWalletTransactionFilter buyerWalletTransactionFilter)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _walletService.GetBuyerWalletAsync(currentUser);
+            var result = await _walletService.GetBuyerWalletAsync(currentUser, pagingRequest, buyerWalletTransactionFilter);
             return Ok(result);
         }
     }
