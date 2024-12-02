@@ -37,12 +37,12 @@ namespace Vouchee.API.Controllers
 
         // READ
         [Authorize]
-        [HttpGet("get_all_rating")]
+        [HttpGet("get_all_rating_by_buyer")]
         public async Task<IActionResult> GetAllRating([FromQuery] PagingRequest pagingRequest, [FromQuery] RatingFilter ratingFilter)
         {
-            /*ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);*/
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _ratingService.GetRatingAsync(pagingRequest, ratingFilter);
+            var result = await _ratingService.GetRatingAsync(pagingRequest, ratingFilter, currentUser);
             return Ok(result);
         }
 
