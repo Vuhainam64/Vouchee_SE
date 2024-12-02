@@ -84,145 +84,27 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<dynamic> GetBuyerWalletAsync(ThisUserObj currentUser, PagingRequest pagingRequest, BuyerWalletTransactionFilter buyerWalletTransactionFilter)
+        public async Task<GetBuyerWallet> GetBuyerWalletAsync(ThisUserObj currentuser)
         {
-            // Retrieve the user along with their BuyerWallet and associated transactions
-            var user = await _userRepository.GetByIdAsync(currentUser.userId, includeProperties: x => x.Include(x => x.BuyerWallet.BuyerWalletTransactions));
+            var user = await _userRepository.GetByIdAsync(currentuser.userId, includeProperties: x => x.Include(x => x.BuyerWallet.BuyerWalletTransactions));
 
             if (user.BuyerWallet == null)
             {
                 throw new NotFoundException("Người dùng này chưa có ví buyer");
             }
 
-            // Apply filtering based on the filter criteria
-            if (buyerWalletTransactionFilter.startDate.HasValue)
-            {
-                user.BuyerWallet.BuyerWalletTransactions = user.BuyerWallet.BuyerWalletTransactions
-                    .Where(t => t.CreateDate >= buyerWalletTransactionFilter.startDate.Value).ToList();
-            }
-
-            if (buyerWalletTransactionFilter.endDate.HasValue)
-            {
-                user.BuyerWallet.BuyerWalletTransactions = user.BuyerWallet.BuyerWalletTransactions
-                    .Where(t => t.CreateDate <= buyerWalletTransactionFilter.endDate.Value).ToList();
-            }
-
-            if (!string.IsNullOrEmpty(buyerWalletTransactionFilter.orderId))
-            {
-                user.BuyerWallet.BuyerWalletTransactions = user.BuyerWallet.BuyerWalletTransactions
-                    .Where(t => t.OrderId == buyerWalletTransactionFilter.orderId).ToList();
-            }
-
-            // Create chart data by grouping transactions by month and year
-            var chartData = user.BuyerWallet.BuyerWalletTransactions
-                .GroupBy(t => new
-                {
-                    Year = t.CreateDate.Value.Year,
-                    Month = t.CreateDate.Value.Month
-                })
-                .Select(g => new
-                {
-                    Year = g.Key.Year,
-                    Month = g.Key.Month,
-                    TotalAmount = g.Sum(t => t.Amount)
-                })
-                .OrderBy(x => x.Year).ThenBy(x => x.Month) // Ensure the data is ordered by year and month
-                .ToList();
-
-            // Count total transactions after filtering
-            var totalTransactions = user.BuyerWallet.BuyerWalletTransactions.Count();
-
-            // Implement pagination
-            var transactions = user.BuyerWallet.BuyerWalletTransactions
-                .Skip((pagingRequest.page - 1) * pagingRequest.pageSize)
-                .Take(pagingRequest.pageSize)
-                .ToList();
-
-            // Prepare the result object
-            var result = new
-            {
-                metadata = new
-                {
-                    page = pagingRequest.page,
-                    pageSize = pagingRequest.pageSize,
-                    total = totalTransactions
-                },
-                chartData,
-                walletId = user.BuyerWallet.Id,
-                balance = user.BuyerWallet.Balance,
-                status = user.BuyerWallet.Status,
-                buyerWalletTransactions = _mapper.Map<IList<GetBuyerWalletTransactionDTO>>(transactions),
-            };
-
-            return result;
+            return _mapper.Map<GetBuyerWallet>(user.BuyerWallet);
         }
 
-        public async Task<dynamic> GetSellerWalletAsync(ThisUserObj currentUser, PagingRequest pagingRequest, SellerWalletTransactionFilter sellerWalletTransactionFilter)
+        public async Task<GetSellerWallet> GetSellerWalletAsync(ThisUserObj currentUser)
         {
+            var user = await _userRepository.GetByIdAsync(currentUser.userId, includeProperties: x => x.Include(x => x.SellerWallet.SellerWalletTransactions));
+            
+            if (user.SellerWallet == null)
             {
-                var user = await _userRepository.GetByIdAsync(currentUser.userId, includeProperties: x => x.Include(x => x.SellerWallet.SellerWalletTransactions));
-
-                if (user.SellerWallet == null)
-                {
-                    throw new NotFoundException("Người dùng này chưa có ví seller");
-                }
-
-                if (sellerWalletTransactionFilter.startDate.HasValue)
-                {
-                    user.SellerWallet.SellerWalletTransactions = user.SellerWallet.SellerWalletTransactions
-                                                                    .Where(t => t.CreateDate >= sellerWalletTransactionFilter.startDate.Value).ToList();
-                }
-
-                if (sellerWalletTransactionFilter.endDate.HasValue)
-                {
-                    user.SellerWallet.SellerWalletTransactions = user.SellerWallet.SellerWalletTransactions
-                                                                    .Where(t => t.CreateDate <= sellerWalletTransactionFilter.endDate.Value).ToList();
-                }
-
-                if (!string.IsNullOrEmpty(sellerWalletTransactionFilter.orderId))
-                {
-                    user.SellerWallet.SellerWalletTransactions = user.SellerWallet.SellerWalletTransactions
-                                                                    .Where(t => t.OrderId == sellerWalletTransactionFilter.orderId).ToList();
-                }
-
-                var chartData = user.SellerWallet.SellerWalletTransactions.ToList()
-                                    .GroupBy(t => new
-                                    {
-                                        Year = t.CreateDate.Value.Year,
-                                        Month = t.CreateDate.Value.Month
-                                    })
-                                    .Select(g => new
-                                    {
-                                        Year = g.Key.Year,
-                                        Month = g.Key.Month,
-                                        TotalAmount = g.Sum(t => t.Amount)
-                                    })
-                                    .OrderBy(x => x.Year).ThenBy(x => x.Month) // Ensure the data is ordered by year and month
-                                    .ToList();
-
-                var totalTransactions = user.SellerWallet.SellerWalletTransactions.Count();
-                var transactions = user.SellerWallet.SellerWalletTransactions
-                                    .Skip((pagingRequest.page - 1) * pagingRequest.pageSize)
-                                    .Take(pagingRequest.pageSize)
-                                    .ToList();
-
-                var result = new
-                {
-                    metadata = new
-                    {
-                        page = pagingRequest.page,
-                        pageSize = pagingRequest.pageSize,
-                        total = totalTransactions
-                    },
-                    chartData,
-                    walletId = user.SellerWallet.Id,
-                    balance = user.SellerWallet.Balance,
-                    status = user.SellerWallet.Status,
-                    sellerWalletTransactions = _mapper.Map<IList<GetSellerWalletTransaction>>(transactions),
-                };
-
-                return result;
+                throw new NotFoundException("Người dùng này chưa có ví seller");
             }
+            return _mapper.Map<GetSellerWallet>(user.SellerWallet);
         }
     }
 }
