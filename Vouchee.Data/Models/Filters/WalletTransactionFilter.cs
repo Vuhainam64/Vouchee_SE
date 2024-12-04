@@ -9,6 +9,6 @@ namespace Vouchee.Data.Models.Filters
 {
     public class WalletTransactionFilter
     {
-        public WalletTransactionStatusEnum status { get; set; }
+        public WalletTransactionStatusEnum? status { get; set; }
     }
 }

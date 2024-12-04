@@ -197,6 +197,7 @@ namespace Vouchee.Business.Services.Impls
                                 OrderId = existedOrder.Id,
                                 BeforeBalance = existedOrder.Buyer.BuyerWallet.Balance,
                                 AfterBalance = existedOrder.Buyer.BuyerWallet.Balance - existedOrder.UsedBalance,
+                                Note = $"Thanh toán đơn hàng {existedOrder.Id}"
                             });
                             existedOrder.Buyer.BuyerWallet.Balance -= existedOrder.UsedBalance;
                         }
@@ -222,7 +223,8 @@ namespace Vouchee.Business.Services.Impls
                                 Amount = amount,
                                 OrderId = existedOrder.Id,
                                 BeforeBalance = existedSeller.SellerWallet.Balance,
-                                AfterBalance = existedSeller.SellerWallet.Balance + amount
+                                AfterBalance = existedSeller.SellerWallet.Balance + amount,
+                                Note = $"Nhận tiền từ đơn {existedOrder.Id}"
                             });
 
                             existedSeller.SellerWallet.Balance += amount;

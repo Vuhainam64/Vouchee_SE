@@ -31,8 +31,10 @@ namespace Vouchee.Data.Models.DTOs
         public GetSellerWallet()
         {
             sellerWalletTransactions = [];
+            monthlyTransactions = [];
         }
 
+        public virtual ICollection<GetSellerWalletTransaction> monthlyTransactions { get; set; }
         public virtual ICollection<GetSellerWalletTransaction> sellerWalletTransactions { get; set; }
     }
 

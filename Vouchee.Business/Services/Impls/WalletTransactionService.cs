@@ -21,41 +21,68 @@ namespace Vouchee.Business.Services.Impls
 {
     public class WalletTransactionService : IWalletTransactionService
     {
+        private readonly IBaseRepository<User> _userRepository;
         private readonly IBaseRepository<Order> _orderRepository;
         private readonly IBaseRepository<WalletTransaction> _walletTransactionRepository;
         private readonly IMapper _mapper;
 
-        public WalletTransactionService(IBaseRepository<Order> orderRepository, 
-                                            IBaseRepository<WalletTransaction> walletTransactionRepository, 
-                                            IMapper mapper)
+        public WalletTransactionService(IBaseRepository<User> userRepository,
+                                        IBaseRepository<Order> orderRepository,
+                                        IBaseRepository<WalletTransaction> walletTransactionRepository,
+                                        IMapper mapper)
         {
+            _userRepository = userRepository;
             _orderRepository = orderRepository;
             _walletTransactionRepository = walletTransactionRepository;
             _mapper = mapper;
         }
 
-        public Task<bool> CreateTopUpWalletTransactionAsync(int amount, ThisUserObj currenUser)
+        public async Task<DynamicResponseModel<GetBuyerWalletTransactionDTO>> GetBuyerWalletTransactionsAsync(PagingRequest pagingRequest, 
+                                                                                                                BuyerWalletTransactionFilter buyerWalletTransactionFilter, 
+                                                                                                                ThisUserObj currentUser)
         {
-            throw new NotImplementedException();
+            var startDateTime = buyerWalletTransactionFilter.startDate?.ToDateTime(TimeOnly.MinValue);
+            var endDateTime = buyerWalletTransactionFilter.endDate?.ToDateTime(TimeOnly.MaxValue);
+
+            var existedUser = await _userRepository.FindAsync(currentUser.userId);
+
+            (int, IQueryable<GetBuyerWalletTransactionDTO>) result;
+
+            result = _walletTransactionRepository.GetTable()
+                        .Where(x => x.BuyerWalletId == existedUser.BuyerWallet.Id &&
+                                    x.CreateDate >= startDateTime &&
+                                    x.CreateDate <= endDateTime &&
+                                    (buyerWalletTransactionFilter.id == null || x.Id == buyerWalletTransactionFilter.id))
+                        .ProjectTo<GetBuyerWalletTransactionDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetBuyerWalletTransactionDTO>(buyerWalletTransactionFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            return new DynamicResponseModel<GetBuyerWalletTransactionDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+            };
         }
 
-        public async Task<DynamicResponseModel<GetSellerWalletTransaction>> GetWalletTransactionsAsync(PagingRequest pagingRequest, 
+        public async Task<DynamicResponseModel<GetSellerWalletTransaction>> GetSellerWalletTransactionsAsync(PagingRequest pagingRequest, 
                                                                                                         WalletTransactionFilter walletTransactionFilter, 
                                                                                                         ThisUserObj currentUser)
         {
+            var existedUser = await _userRepository.FindAsync(currentUser.userId);
+
             (int, IQueryable<GetSellerWalletTransaction>) result;
-            try
-            {
-                result = _walletTransactionRepository.GetTable()
-                            .ProjectTo<GetSellerWalletTransaction>(_mapper.ConfigurationProvider)
-                            .DynamicFilter(_mapper.Map<GetSellerWalletTransaction>(walletTransactionFilter))
-                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new LoadException(ex.Message);
-            }
+
+            result = _walletTransactionRepository.GetTable()
+                        .Where(x => x.SellerWalletId == existedUser.SellerWallet.Id)
+                        .ProjectTo<GetSellerWalletTransaction>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetSellerWalletTransaction>(walletTransactionFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
             return new DynamicResponseModel<GetSellerWalletTransaction>()
             {
                 metaData = new MetaData()
