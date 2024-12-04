@@ -53,6 +53,15 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("get_rating_dashboard")]
+        public async Task<IActionResult> GetRatingDashboard()
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _ratingService.GetRatingDashboard(currentUser);
+            return Ok(result);
+        }
+
         // UPDATE
         [Authorize]
         [HttpPut("update_rating/{id}")]
