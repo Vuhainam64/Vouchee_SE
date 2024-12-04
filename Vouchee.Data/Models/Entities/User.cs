@@ -26,7 +26,6 @@ namespace Vouchee.Data.Models.Entities
         public virtual Wallet? SellerWallet { get; set; }
         [InverseProperty(nameof(Supplier.User))]
         public virtual Supplier? Supplier { get; set; }
-
         [InverseProperty(nameof(Order.Buyer))]
         public virtual ICollection<Order> Orders { get; set; }
         [InverseProperty(nameof(Voucher.Seller))]
@@ -58,6 +57,7 @@ namespace Vouchee.Data.Models.Entities
         public string? Role { get; set; }
         public string? BankName { get; set; }
         public string? BankNumber { get; set; }
+        public string? BankAccount { get; set; }
 
         public bool IsActive { get; set; }
         public required string Status { get; set; }

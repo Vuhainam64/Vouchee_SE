@@ -13,8 +13,6 @@ namespace Vouchee.Business.Models.DTOs
         public string? name { get; set; }
         public string? phoneNumber { get; set; }
         public string? image { get; set; }
-        public string? bankName { get; set; }
-        public string? bankAccount { get; set; }
     }
 
     public class CreateUserDTO : UserDTO
@@ -42,6 +40,9 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? id { get; set; }
         public string? email { get; set; }
         public string? role { get; set; }
+        public string? bankAccount { get; set; }
+        public string? bankNumber { get; set; }
+        public string? bankName { get; set; }
         public GetBuyerWallet? buyerWallet { get; set; }
         public GetSellerWallet? sellerWallet { get; set; }
 
@@ -58,31 +59,13 @@ namespace Vouchee.Business.Models.DTOs
         [InverseProperty(nameof(Notification.Sender))]
         public virtual ICollection<GetNotificationDTO> notificationFromUser { get; set; }
     }
-
-    public class RegisterDTO
+    
+    public class UpdateUserBankDTO
     {
-        public string? phoneNumber { get; set; }
+        public string? bankAccount { get; set; }
+        public string? bankNumber { get; set; }
+        public string? bankName { get; set; }
 
-        [EmailAddress(ErrorMessage = "Invalid email address.")]
-        public string? email { get; set; }
-
-        [Required(ErrorMessage = "Password is required.")]
-        public string? hashPassword { get; set; }
-
-        [Required(ErrorMessage = "Name is required.")]
-        [StringLength(50, ErrorMessage = "Name cannot exceed 50 characters.")]
-        public string? name { get; set; }
-    }
-
-    public class LoginByEmailDTO
-    {
-        public string? email { get; set; }
-        public string? hashPassword { get; set; }
-    }
-
-    public class LoginByPhoneNumberDTO
-    {
-        public string? phoneNumber { get; set; }
-        public string? password { get; set; }
+        public DateTime? updateDate = DateTime.Now;
     }
 }
