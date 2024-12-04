@@ -80,6 +80,29 @@ namespace Vouchee.Data.Helpers
             modelBuilder.Entity<OrderDetail>()
                             .HasKey(od => new { od.OrderId, od.ModalId });
 
+            modelBuilder.Entity<Modal>()
+                            .HasMany(p => p.VoucherCodes)
+                            .WithOne(c => c.Modal)
+                            .HasForeignKey(c => c.ModalId)
+                            .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Voucher>()
+                            .HasMany(p => p.Medias)
+                            .WithOne(c => c.Voucher)
+                            .HasForeignKey(c => c.VoucherId)
+                            .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Cart>()
+                           .HasOne(c => c.Buyer)
+                           .WithMany(u => u.Carts)
+                           .HasForeignKey(c => c.BuyerId)
+                           .OnDelete(DeleteBehavior.Cascade); // Enable cascade delete
+
+            modelBuilder.Entity<User>()
+                            .HasMany(u => u.Carts)
+                            .WithOne(c => c.Buyer)
+                            .OnDelete(DeleteBehavior.Cascade); // Prevent cascade on the other side
+
             base.OnModelCreating(modelBuilder);
         }
 

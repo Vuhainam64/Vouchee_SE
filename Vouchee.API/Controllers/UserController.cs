@@ -47,19 +47,33 @@ namespace Vouchee.API.Controllers
         }
 
         [Authorize]
-        [HttpPut("update_user/{id}")]
-        public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUserDTO updateUserDTO)
+        [HttpPut("update_user")]
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDTO updateUserDTO)
         {
-            ThisUserObj thisUserObj = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService); // Ensure current user is fetched here
-            var result = await _userService.UpdateUserAsync(id, updateUserDTO, thisUserObj);
+            ThisUserObj thisUserObj = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService); 
+
+            var result = await _userService.UpdateUserAsync(updateUserDTO, thisUserObj);
             return Ok(result);
         }
 
-        //[HttpDelete("delete_user/{id}")]
-        //public async Task<IActionResult> DeleteUser(Guid id)
-        //{
-        //    var result = await _userService.DeleteUserAsync(id);
-        //    return Ok(result);
-        //}
+        [Authorize]
+        [HttpPut("update_user_bank")]
+        public async Task<IActionResult> UpdateUserBank([FromBody] UpdateUserBankDTO updateUserBankDTO)
+        {
+            ThisUserObj thisUserObj = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _userService.UpdateUserBankAsync(updateUserBankDTO, thisUserObj);
+            return Ok(result);
+        }
+
+        // DELETE
+        [HttpDelete("delete_user/{id}")]
+        public async Task<IActionResult> DeleteUser(Guid id)
+        {
+            ThisUserObj thisUserObj = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _userService.DeleteUserAsync(id, thisUserObj);
+            return Ok(result);
+        }
     }
 }

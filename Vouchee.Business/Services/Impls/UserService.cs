@@ -17,12 +17,24 @@ namespace Vouchee.Business.Services.Impls
 {
     public class UserService : IUserService
     {
+        private readonly IBaseRepository<MoneyRequest> _moneyRequestRepository;
+        private readonly IBaseRepository<Promotion> _promotionRepository;
+        private readonly IBaseRepository<Voucher> _voucherRepository;
+        private readonly IBaseRepository<Wallet> _walletRepository;
         private readonly IBaseRepository<User> _userRepository;
         private readonly IMapper _mapper;
 
-        public UserService(IBaseRepository<User> userRepository,
-                            IMapper mapper)
+        public UserService(IBaseRepository<MoneyRequest> moneyRequestRepository,
+                           IBaseRepository<Promotion> promotionRepository,
+                           IBaseRepository<Voucher> voucherRepository,
+                           IBaseRepository<Wallet> walletRepository,
+                           IBaseRepository<User> userRepository,
+                           IMapper mapper)
         {
+            _moneyRequestRepository = moneyRequestRepository;
+            _promotionRepository = promotionRepository;
+            _voucherRepository = voucherRepository;
+            _walletRepository = walletRepository;
             _userRepository = userRepository;
             _mapper = mapper;
         }
@@ -38,19 +50,62 @@ namespace Vouchee.Business.Services.Impls
             return userId;
         }
 
-        public async Task<bool> DeleteUserAsync(Guid id)
+        // giữ lại các transaction như order, wallet
+        public async Task<ResponseMessage<bool>> DeleteUserAsync(Guid id, ThisUserObj thisUserObj)
         {
-            bool result = false;
-            var user = await _userRepository.GetByIdAsync(id);
-            if (user != null)
+            var existedUser = await _userRepository.FindAsync(id);
+
+            if (existedUser == null)
             {
-                result = await _userRepository.DeleteAsync(user);
+                throw new NotFoundException("Không tìm thấy user này");
+            }
+
+            bool canCompletelyDelete = !(existedUser.BuyerWallet?.BuyerWalletTransactions?.Any() ?? false) &&
+                                           !(existedUser.SellerWallet?.SellerWalletTransactions?.Any() ?? false) &&
+                                           !existedUser.Orders.Any() &&
+                                           !existedUser.Orders.Any(order => order.VoucherCodes.Any()) &&
+                                           !existedUser.MoneyRequests.Any(r => r.TopUpWalletTransaction != null || r.WithdrawWalletTransaction != null) &&
+                                           !existedUser.Vouchers.SelectMany(v => v.Modals.SelectMany(m => m.OrderDetails)).Any();
+
+            if (existedUser.Vouchers != null)
+            {
+                foreach (var voucher in existedUser.Vouchers)
+                {
+                    voucher.IsActive = false;
+                    voucher.Status = VoucherStatusEnum.DELETED.ToString();
+                    voucher.UpdateDate = DateTime.Now;
+                    voucher.UpdateBy = thisUserObj.userId;
+
+                    foreach (var modal in voucher.Modals)
+                    {
+                        modal.IsActive = false;
+                        modal.Status = VoucherStatusEnum.DELETED.ToString();
+                        modal.UpdateBy = thisUserObj.userId;
+                        modal.UpdateDate = DateTime.Now;
+                    }
+                }
+            }
+
+            if (canCompletelyDelete)
+            {
+                await _userRepository.DeleteAsync(existedUser);
             }
             else
             {
-                throw new NotFoundException($"Không tìm thấy user với id {id}");
+                existedUser.IsActive = false;
+                existedUser.Status = UserStatusEnum.INACTIVE.ToString();
+                existedUser.UpdateDate = DateTime.Now;
+                existedUser.UpdateBy = thisUserObj.userId;
+
+                await _userRepository.SaveChanges();
             }
-            return result;
+
+            return new ResponseMessage<bool>
+            {
+                message = "Đã xóa user thành công",
+                result = true,
+                value = true
+            };
         }
 
         public async Task<GetUserDTO> GetUserByEmailAsync(string email)
@@ -107,12 +162,34 @@ namespace Vouchee.Business.Services.Impls
             return result.ToList();
         }
 
-        public async Task<ResponseMessage<GetUserDTO>> UpdateUserAsync(Guid id, UpdateUserDTO updateUserDTO, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<GetUserDTO>> UpdateUserAsync(UpdateUserDTO updateUserDTO, ThisUserObj thisUserObj)
         {
-            var existedUser = await _userRepository.GetByIdAsync(id, isTracking: true);
+            var existedUser = await _userRepository.GetByIdAsync(thisUserObj.userId, isTracking: true);
             if (existedUser != null)
             {
                 var entity = _mapper.Map(updateUserDTO, existedUser);
+                entity.UpdateBy = thisUserObj.userId;
+                await _userRepository.UpdateAsync(entity);
+
+                return new ResponseMessage<GetUserDTO>()
+                {
+                    message = "Cập nhật thành công",
+                    result = true,
+                    value = _mapper.Map<GetUserDTO>(entity)
+                };
+            }
+            else
+            {
+                throw new NotFoundException("Không tìm thấy user");
+            }
+        }
+
+        public async Task<ResponseMessage<GetUserDTO>> UpdateUserBankAsync(UpdateUserBankDTO updateUserBankDTO, ThisUserObj thisUserObj)
+        {
+            var existedUser = await _userRepository.GetByIdAsync(thisUserObj.userId, isTracking: true);
+            if (existedUser != null)
+            {
+                var entity = _mapper.Map(updateUserBankDTO, existedUser);
                 entity.UpdateBy = thisUserObj.userId;
                 await _userRepository.UpdateAsync(entity);
 

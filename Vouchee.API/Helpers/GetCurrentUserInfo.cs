@@ -5,6 +5,7 @@ using Vouchee.Business.Services;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Business.Services.Impls;
 using Vouchee.Data.Models.DTOs;
+using Vouchee.Business.Exceptions;
 
 namespace Vouchee.API.Helpers
 {
@@ -16,19 +17,16 @@ namespace Vouchee.API.Helpers
             ThisUserObj currentUser = new();
 
             var checkUser = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber);
-            if (checkUser == null)
+
+            currentUser.userId = Guid.Parse(httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value);
+            currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
+            currentUser.role = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+            currentUser.fullName = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Actor).Value;
+
+            var existedUser = await _userService.GetUserByEmailAsync(currentUser.email);
+            if (existedUser == null)
             {
-                currentUser.userId = Guid.Empty;
-                currentUser.email = "";
-                currentUser.role = "";
-                currentUser.fullName = "";
-            }
-            else
-            {
-                currentUser.userId = Guid.Parse(httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value);
-                currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
-                currentUser.role = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
-                currentUser.fullName = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Actor).Value;
+                throw new NotFoundException("Không tìm thấy user này");
             }
 
             return currentUser;
