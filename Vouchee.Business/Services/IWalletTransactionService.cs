@@ -15,8 +15,11 @@ namespace Vouchee.Business.Services
     public interface IWalletTransactionService
     {
         // READ
-        public Task<DynamicResponseModel<GetSellerWalletTransaction>> GetWalletTransactionsAsync(PagingRequest pagingRequest,
-                                                                                                    WalletTransactionFilter walletTransactionFilter,
-                                                                                                    ThisUserObj currentUser);
+        public Task<DynamicResponseModel<GetSellerWalletTransaction>> GetSellerWalletTransactionsAsync(PagingRequest pagingRequest,
+                                                                                                            WalletTransactionFilter buyerWalletTransactionFilter,
+                                                                                                            ThisUserObj currentUser);
+        public Task<DynamicResponseModel<GetBuyerWalletTransactionDTO>> GetBuyerWalletTransactionsAsync(PagingRequest pagingRequest,
+                                                                                                            BuyerWalletTransactionFilter buyerWalletTransactionFilter,
+                                                                                                            ThisUserObj currentUser);
     }
 }

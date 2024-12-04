@@ -25,5 +25,16 @@ namespace Vouchee.API.Controllers
             _walletTransactionService = walletTransactionService;
             _userService = userService;
         }
+
+        //[Authorize]
+        //[HttpGet("get_seller__transactions")]
+        //public async Task<IActionResult> GetSellerTransactions([FromQuery] PagingRequest pagingRequest,
+        //                                                            [FromQuery] WalletTransactionFilter walletTransactionFilter)
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+        //    var result = await _walletTransactionService.GetSellerWalletTransactionsAsync(pagingRequest, walletTransactionFilter, currentUser);
+        //    return Ok(result);
+        //}
     }
 }
