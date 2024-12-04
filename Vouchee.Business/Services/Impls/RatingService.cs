@@ -19,16 +19,19 @@ namespace Vouchee.Business.Services.Impls
 {
     public class RatingService : IRatingService
     {
+        private readonly IBaseRepository<User> _userRepository;
         private readonly IBaseRepository<Modal> _modalRepository;
         private readonly IBaseRepository<Order> _orderRepository;
         private readonly IBaseRepository<Rating> _ratingRepository;
         private readonly IMapper _mapper;
 
-        public RatingService(IBaseRepository<Modal> modalRepository,
+        public RatingService(IBaseRepository<User> userRepository,
+                             IBaseRepository<Modal> modalRepository,
                              IBaseRepository<Order> orderRepository,
                              IBaseRepository<Rating> ratingRepository,
                              IMapper mapper)
         {
+            _userRepository = userRepository;
             _modalRepository = modalRepository;
             _orderRepository = orderRepository;
             _ratingRepository = ratingRepository;
@@ -106,6 +109,62 @@ namespace Vouchee.Business.Services.Impls
             }
 
             return _mapper.Map<GetRatingDTO>(existedRating);
+        }
+
+        public async Task<dynamic> GetRatingDashboard(ThisUserObj thisUserObj)
+        {
+            var existedUser = await _userRepository.FindAsync(thisUserObj.userId);
+
+            // Count modals with orders but no ratings
+            int modalNotRatingCount = existedUser.Vouchers
+                .SelectMany(v => v.Modals) // Flatten all Modals across all Vouchers
+                .Where(m => m.OrderDetails.Any() && !m.Ratings.Any()) // Modals with Orders but no Ratings
+                .Count(); // Count the filtered results
+
+            // Count modals with orders where ratings have not been replied to
+            int countNotReplied = existedUser.Vouchers
+                .SelectMany(v => v.Modals) // Flatten all Modals across all Vouchers
+                .Where(m => m.OrderDetails.Any() && // Filter Modals with OrderDetails
+                             m.Ratings.Any(r => r.Reply == null)) // Check if any Rating has a null Reply
+                .Count(); // Count the filtered results
+
+            // Total ordered modals
+            int totalOrderedModals = existedUser.Vouchers
+                .SelectMany(v => v.Modals)
+                .Where(m => m.OrderDetails.Any()) // Modals with Orders
+                .Count();
+
+            // Percentage of ordered modals that have no ratings
+            double percentageNotRated = totalOrderedModals == 0
+                ? 0
+                : Math.Round((double)modalNotRatingCount / totalOrderedModals * 100, 2);
+
+            // Total ratings for all modals
+            int totalRatings = existedUser.Vouchers
+                .SelectMany(v => v.Modals)
+                .SelectMany(m => m.Ratings)
+                .Count();
+
+            // Ratings with sellerStar > 3
+            int goodRatings = existedUser.Vouchers
+                .SelectMany(v => v.Modals)
+                .SelectMany(m => m.Ratings)
+                .Where(r => r.SellerStar > 3)
+                .Count();
+
+            // Percentage of ratings with sellerStar > 3
+            double percentageGoodRatings = totalRatings == 0
+                ? 0
+                : Math.Round((double)goodRatings / totalRatings * 100, 2);
+
+            // Return all results
+            return new
+            {
+                modalNotRatingCount = modalNotRatingCount,
+                countNotReplied = countNotReplied,
+                percentageNotRated = percentageNotRated,
+                percentageGoodRatings = percentageGoodRatings
+            };
         }
 
         public async Task<ResponseMessage<bool>> ReplyRatingAsync(Guid id, string reply, ThisUserObj thisUserObj)
