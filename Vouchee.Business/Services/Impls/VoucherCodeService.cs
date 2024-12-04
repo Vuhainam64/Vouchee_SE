@@ -244,5 +244,32 @@ namespace Vouchee.Business.Services.Impls
                 results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
             };
         }
+
+        public async Task<IList<GetVoucherCodeDTO>> UpdateCodeVoucherCodeAsync(IList<UpdateCodeVoucherCodeDTO> updateCodeVoucherCodeDTO, ThisUserObj thisUserObj)
+        {
+            var voucherCodes = _voucherCodeRepository.GetTable();
+            IList<GetVoucherCodeDTO> list = new List<GetVoucherCodeDTO>();
+            foreach (var code in updateCodeVoucherCodeDTO)
+            {
+                var updatecode = voucherCodes.Where(c => c.Code == code.code)
+                    .FirstOrDefaultAsync();
+                if (updatecode != null)
+                {
+                    var result = await updatecode;
+                    result.IsVerified = true;
+                    result.UpdateDate = DateTime.Now;
+                    result.Code = code.newcode;
+                    result.UpdateBy = thisUserObj.userId;
+                    _voucherCodeRepository.UpdateAsync(result);
+                    list.Add(_mapper.Map<GetVoucherCodeDTO>(result));
+                }
+                else
+                {
+                    throw new Exception("Khong tim thay code");
+                }
+                return list;
+            }
+            throw new Exception("loi khong xac dinh");
+        }
     }
 }
