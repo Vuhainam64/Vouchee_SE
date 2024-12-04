@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Constants.Enum.Other
 {
-    public enum BuyerWalletStatusEnum
+    public enum BuyerWalletTransactionStatusEnum
     {
         TRANSACTION_SUCCESS, // Thanh toán thành công
         TRANSACTION_FAIL, // Thanh toán thất bại

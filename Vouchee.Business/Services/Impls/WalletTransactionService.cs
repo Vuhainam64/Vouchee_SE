@@ -70,18 +70,29 @@ namespace Vouchee.Business.Services.Impls
         }
 
         public async Task<DynamicResponseModel<GetSellerWalletTransaction>> GetSellerWalletTransactionsAsync(PagingRequest pagingRequest, 
-                                                                                                        WalletTransactionFilter walletTransactionFilter, 
-                                                                                                        ThisUserObj currentUser)
+                                                                                                                SellerWalletTransactionFilter sellerWalletTransactionFilter, 
+                                                                                                                ThisUserObj currentUser)
         {
+            var startDateTime = sellerWalletTransactionFilter.startDate?.ToDateTime(TimeOnly.MinValue);
+            var endDateTime = sellerWalletTransactionFilter.endDate?.ToDateTime(TimeOnly.MaxValue);
+
             var existedUser = await _userRepository.FindAsync(currentUser.userId);
+
+            if (existedUser.SellerWallet == null)
+            {
+                throw new NotFoundException("Không tìm thấy ví bán hàng");
+            }
 
             (int, IQueryable<GetSellerWalletTransaction>) result;
 
             result = _walletTransactionRepository.GetTable()
-                        .Where(x => x.SellerWalletId == existedUser.SellerWallet.Id)
-                        .ProjectTo<GetSellerWalletTransaction>(_mapper.ConfigurationProvider)
-                        .DynamicFilter(_mapper.Map<GetSellerWalletTransaction>(walletTransactionFilter))
-                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+                .Where(x => x.SellerWalletId == existedUser.SellerWallet.Id &&
+                            (startDateTime == null || x.CreateDate >= startDateTime) &&
+                            (endDateTime == null || x.CreateDate <= endDateTime) &&
+                            (sellerWalletTransactionFilter.orderId == null || x.OrderId == sellerWalletTransactionFilter.orderId))
+                .ProjectTo<GetSellerWalletTransaction>(_mapper.ConfigurationProvider)
+                .DynamicFilter(_mapper.Map<GetSellerWalletTransaction>(sellerWalletTransactionFilter))
+                .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
             return new DynamicResponseModel<GetSellerWalletTransaction>()
             {
