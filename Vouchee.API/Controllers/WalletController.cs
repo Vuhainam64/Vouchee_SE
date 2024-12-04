@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using DocumentFormat.OpenXml.Drawing;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Vouchee.API.Helpers;
@@ -15,14 +16,17 @@ namespace Vouchee.API.Controllers
     [EnableCors("MyAllowSpecificOrigins")]
     public class WalletController : ControllerBase
     {
+        private readonly IExcelExportService _excelExportService;
         private readonly IUserService _userService;
         private readonly IWalletService _walletService;
         private readonly IWalletTransactionService _walletTransactionService;
 
-        public WalletController(IUserService userService,
+        public WalletController(IExcelExportService excelExportService,
+                                IUserService userService,
                                 IWalletService walletService,
                                 IWalletTransactionService walletTransactionService)
         {
+            _excelExportService = excelExportService;
             _userService = userService;
             _walletService = walletService;
             _walletTransactionService = walletTransactionService;
@@ -68,6 +72,21 @@ namespace Vouchee.API.Controllers
 
             var result = await _walletTransactionService.GetBuyerWalletTransactionsAsync(pagingRequest, buyerWalletTransactionFilter, currentUser);
             return Ok(result);
+        }
+
+        [Authorize]
+        [HttpGet("export_seller_transactions")]
+        public async Task<IActionResult> ExportSellerTransaction([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _excelExportService.GenerateStatementExcel(currentUser, startDate, endDate);
+
+            var fileName = $"Seller_Wallet_Statement_{currentUser.userId}_{startDate:yyyyMMdd}_{endDate:yyyyMMdd}.xlsx";
+
+            var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+            return File(result, contentType, fileName);
         }
     }
 }
