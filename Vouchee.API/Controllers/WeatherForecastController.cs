@@ -79,16 +79,5 @@ namespace Vouchee.API.Controllers
             var result = await _deviceTokenService.GetDeviceTokenAsync(pagingRequest, deviceTokenFilter, currentUser.userId);
             return Ok(result);
         }
-
-        [Authorize]
-        [HttpGet("get_wallet_transactions_by_user")]
-        public async Task<IActionResult> GetWalletById([FromQuery] PagingRequest pagingRequest,
-                                                [FromQuery] WalletTransactionFilter walletTransactionFilter)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
-
-            var result = await _walletTransactionService.GetSellerWalletTransactionsAsync(pagingRequest, walletTransactionFilter, currentUser);
-            return Ok(result);
-        }
     }
 }

@@ -51,11 +51,11 @@ namespace Vouchee.API.Controllers
         [Authorize]
         [HttpGet("get_seller_transactions")]
         public async Task<IActionResult> GetSellerTransactions([FromQuery] PagingRequest pagingRequest,
-                                                                [FromQuery] WalletTransactionFilter walletTransactionFilter)
+                                                                [FromQuery] SellerWalletTransactionFilter sellerWalletTransactionFilter)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _walletTransactionService.GetSellerWalletTransactionsAsync(pagingRequest, walletTransactionFilter, currentUser);
+            var result = await _walletTransactionService.GetSellerWalletTransactionsAsync(pagingRequest, sellerWalletTransactionFilter, currentUser);
             return Ok(result);
         }
 

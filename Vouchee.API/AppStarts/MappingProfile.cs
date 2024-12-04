@@ -239,7 +239,7 @@ namespace Vouchee.API.AppStarts
             CreateMap<WalletTransaction, GetSellerWalletTransaction>().ReverseMap();
             CreateMap<WalletTransaction, GetBuyerWalletTransactionDTO>().ReverseMap();
             CreateMap<GetWalletTransactionDTO, WalletTransactionFilter>().ReverseMap();
-            CreateMap<GetSellerWalletTransaction, WalletTransactionFilter>().ReverseMap();
+            CreateMap<GetSellerWalletTransaction, SellerWalletTransactionFilter>().ReverseMap();
             CreateMap<GetBuyerWalletTransactionDTO, BuyerWalletTransactionFilter>().ReverseMap();
 
             // MONEY REQUEST
