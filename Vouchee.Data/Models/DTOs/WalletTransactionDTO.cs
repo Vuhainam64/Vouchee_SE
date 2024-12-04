@@ -49,6 +49,6 @@ namespace Vouchee.Data.Models.DTOs
 
     public class GetBuyerWalletTransactionDTO : GetWalletTransactionDTO
     {
-        public Guid? topUpRequestId { get; set; }
+        public string? topUpRequestId { get; set; }
     }
 }

@@ -10,8 +10,8 @@ namespace Vouchee.Data.Models.Entities
     {
         public Wallet()
         {
-            SellerWalletTransactions = new List<WalletTransaction>();
-            BuyerWalletTransactions = new List<WalletTransaction>();
+            SellerWalletTransactions = [];
+            BuyerWalletTransactions = [];
         }
 
         [InverseProperty(nameof(WalletTransaction.SellerWallet))]
