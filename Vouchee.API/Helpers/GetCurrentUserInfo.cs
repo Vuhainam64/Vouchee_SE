@@ -23,11 +23,11 @@ namespace Vouchee.API.Helpers
             currentUser.role = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
             currentUser.fullName = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Actor).Value;
 
-            //var existedUser = await _userService.GetUserByEmailAsync(currentUser.email);
-            //if (existedUser == null)
-            //{
-            //    throw new NotFoundException("Không tìm thấy user này");
-            //}
+            var existedUser = await _userService.GetUserByEmailAsync(currentUser.email);
+            if (existedUser == null)
+            {
+                throw new NotFoundException("Không tìm thấy user này");
+            }
 
             return currentUser;
         }

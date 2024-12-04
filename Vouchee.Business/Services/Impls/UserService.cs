@@ -110,7 +110,10 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<GetUserDTO> GetUserByEmailAsync(string email)
         {
-            var user = await _userRepository.GetFirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()));
+            var user = await _userRepository.GetFirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()), 
+                                                                            includeProperties: x => x.Include(x => x.Carts)
+                                                                                                .Include(x => x.BuyerWallet)
+                                                                                                .Include(x => x.SellerWallet));
             if (user != null)
             {
                 GetUserDTO userDTO = _mapper.Map<GetUserDTO>(user);
