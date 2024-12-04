@@ -173,7 +173,7 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        
+
         public async Task<bool> UpdateVoucherCodeAsync(Guid id, UpdateVoucherCodeDTO updateVoucherCodeDTO)
         {
             var existedVoucherCode = await _voucherCodeRepository.FindAsync(id, false);
@@ -189,7 +189,7 @@ namespace Vouchee.Business.Services.Impls
 
             return result;
         }
-        
+
         public async Task<ResponseMessage<GetVoucherCodeDTO>> UpdateStatusVoucherCodeAsync(Guid id, VoucherCodeStatusEnum voucherCodeStatus)
         {
             var existedVoucherCode = await _voucherCodeRepository.FindAsync(id, true);
@@ -211,7 +211,7 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<DynamicResponseModel<GetVoucherCodeDTO>> GetOrderedVoucherCode(Guid modalId, ThisUserObj thisUserObj, 
+        public async Task<DynamicResponseModel<GetVoucherCodeDTO>> GetOrderedVoucherCode(Guid modalId, ThisUserObj thisUserObj,
                                                                                     PagingRequest pagingRequest, VoucherCodeFilter voucherCodeFilter)
         {
             (int, IQueryable<GetVoucherCodeDTO>) result;
@@ -256,6 +256,7 @@ namespace Vouchee.Business.Services.Impls
                 if (updatecode != null)
                 {
                     var result = await updatecode;
+                    result.Status = VoucherCodeStatusEnum.UNUSED.ToString();
                     result.IsVerified = true;
                     result.UpdateDate = DateTime.Now;
                     result.Code = code.newcode;
@@ -271,5 +272,39 @@ namespace Vouchee.Business.Services.Impls
             }
             throw new Exception("loi khong xac dinh");
         }
+
+        public async Task<ResponseMessage<GetVoucherCodeDTO>> UpdatePosVoucherCodeAsync(string code, ThisUserObj thisUserObj)
+        {
+            var voucherCodes = _voucherCodeRepository.GetTable();
+            var findcode = voucherCodes.Where(c => c.Code == code.ToString())
+                .FirstOrDefaultAsync();
+            var updatecode = await findcode;
+            if (updatecode != null && updatecode.Status == VoucherCodeStatusEnum.UNUSED.ToString())
+            {
+
+                updatecode.Status = VoucherCodeStatusEnum.USED.ToString();
+                updatecode.UpdateDate = DateTime.Now;
+                updatecode.UpdateBy = thisUserObj.userId;
+                _voucherCodeRepository.UpdateAsync(updatecode);
+
+                return new ResponseMessage<GetVoucherCodeDTO>()
+                {
+                    message = "Sử dụng thành công",
+                    result = true,
+                    value = _mapper.Map<GetVoucherCodeDTO>(updatecode)
+                };
+            }
+            else if (updatecode == null)
+            {
+                throw new Exception("Không tìm thấy code");
+            }
+            else if (updatecode != null && updatecode.Status != VoucherCodeStatusEnum.UNUSED.ToString())
+            {
+                throw new Exception("Voucher Code bị " + updatecode.Status);
+            }
+            throw new Exception("loi khong xac dinh");
+        }
+
+
     }
 }
