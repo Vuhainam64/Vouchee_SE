@@ -37,4 +37,12 @@ namespace Vouchee.Business.Models.DTOs
 
         public string? status { get; set; }
     }
+
+    public class UpdateCodeVoucherCodeDTO 
+    {
+        [Required]
+        public string code { get; set; }
+        [Required]
+        public string newcode { get; set; }
+    }
 }
