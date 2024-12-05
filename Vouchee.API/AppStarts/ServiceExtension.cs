@@ -46,6 +46,7 @@ namespace Vouchee.API.AppStarts
             services.AddScoped<IDeviceTokenService, DeviceTokenService>();
             services.AddScoped<IMediaService, MediaService>();
             services.AddScoped<IExcelExportService, ExcelExportService>();
+            services.AddScoped<IWithdrawService, WithdrawService>();
         }
 
         public static void AddSwaggerServices(this IServiceCollection services, IConfiguration configuration)
