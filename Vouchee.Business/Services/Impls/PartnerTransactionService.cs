@@ -24,7 +24,7 @@ namespace Vouchee.Business.Services.Impls
         private readonly IBaseRepository<VoucherCode> _voucherCodeRepository;
         private readonly IBaseRepository<Notification> _notificationRepository;
         private readonly IBaseRepository<Voucher> _voucherRepository;
-        private readonly IBaseRepository<MoneyRequest> _topUpRequestRepository;
+        private readonly IBaseRepository<MoneyRequest> _moneyRequestRepository;
         private readonly IBaseRepository<Wallet> _wallerRepository;
         private readonly IBaseRepository<User> _userRepository;
         private readonly IBaseRepository<Order> _orderRepository;
@@ -46,7 +46,7 @@ namespace Vouchee.Business.Services.Impls
             _voucherCodeRepository = voucherCodeRepository;
             _notificationRepository = notificationRepository;
             _voucherRepository = voucherRepository;
-            _topUpRequestRepository = topUpRequestRepository;
+            _moneyRequestRepository = topUpRequestRepository;
             _wallerRepository = wallerRepository;
             _userRepository = userRepository;
             _orderRepository = orderRepository;
@@ -61,7 +61,7 @@ namespace Vouchee.Business.Services.Impls
             string input = createPartnerTransaction.code;
 
             // Unified regex for ORDER and TOPUP
-            Regex regex = new Regex(@"\b(ORD|TOP)([a-zA-Z0-9]{1,})\b");
+            Regex regex = new Regex(@"\b(ORD|TOP|WIT)([a-zA-Z0-9]{1,})\b");
 
             PartnerTransaction partnerTransaction = _mapper.Map<PartnerTransaction>(createPartnerTransaction);
             partnerTransaction.PartnerTransactionId = createPartnerTransaction.id;
@@ -265,7 +265,7 @@ namespace Vouchee.Business.Services.Impls
                     {
                         string topUpRequestId = identifier;
 
-                        var existedTopUpRequest = await _topUpRequestRepository.GetByIdAsync(topUpRequestId, includeProperties: x => x.Include(x => x.TopUpWalletTransaction)
+                        var existedTopUpRequest = await _moneyRequestRepository.GetByIdAsync(topUpRequestId, includeProperties: x => x.Include(x => x.TopUpWalletTransaction)
                                                                                                                              .ThenInclude(x => x.BuyerWallet),
                                                                                                                              isTracking: true);
 
@@ -283,7 +283,43 @@ namespace Vouchee.Business.Services.Impls
                         existedTopUpRequest.TopUpWalletTransaction.BuyerWallet.Balance += (int)partnerTransaction.AmountIn;
                         existedTopUpRequest.TopUpWalletTransaction.BuyerWallet.UpdateDate = DateTime.Now;
 
-                        await _topUpRequestRepository.SaveChanges();
+                        await _moneyRequestRepository.SaveChanges();
+
+                        return new
+                        {
+                            message = "Tạo transaction thành công",
+                            result = true,
+                            value = partnerTransactionId,
+                            success = true
+                        };
+                    }
+                    else if (transactionType == "WIT")
+                    {
+                        var existedWithdrawRequest = await _moneyRequestRepository.GetByIdAsync(identifier, isTracking: true);
+
+                        if (existedWithdrawRequest == null)
+                        {
+                            throw new NotFoundException("Không tìm thấy lệnh rút tiền này");
+                        }
+
+                        existedWithdrawRequest.Status = "PAID";
+                        existedWithdrawRequest.UpdateDate = DateTime.Now;
+
+                        existedWithdrawRequest.WithdrawWalletTransaction.Status = "PAID";
+                        existedWithdrawRequest.WithdrawWalletTransaction.PartnerTransactionId = partnerTransactionId;
+
+                        if (existedWithdrawRequest.WithdrawWalletTransaction.BuyerWallet != null)
+                        {
+                            existedWithdrawRequest.WithdrawWalletTransaction.BuyerWallet.Balance -= (int) createPartnerTransaction.transferAmount;
+                            existedWithdrawRequest.WithdrawWalletTransaction.BuyerWallet.UpdateDate = DateTime.Now;
+                        }
+                        else if (existedWithdrawRequest.WithdrawWalletTransaction.SellerWallet != null)
+                        {
+                            existedWithdrawRequest.WithdrawWalletTransaction.SellerWallet.Balance -= (int)createPartnerTransaction.transferAmount;
+                            existedWithdrawRequest.WithdrawWalletTransaction.SellerWallet.UpdateDate = DateTime.Now;
+                        }
+
+                        await _moneyRequestRepository.SaveChanges();
 
                         return new
                         {

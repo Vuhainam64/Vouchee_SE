@@ -36,6 +36,9 @@ namespace Vouchee.Data.Models.DTOs
         public Guid? sellerWalletId { get; set; }
         public Guid? buyerWalletId { get; set; }
 
+        public int? beforeBalance { get; set; }
+        public int? afterBalance { get; set; }
+
         public string? status { get; set; }
         public DateTime? createDate { get; set; }
         public Guid? createBy { get; set; }

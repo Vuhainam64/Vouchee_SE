@@ -272,6 +272,11 @@ namespace Vouchee.API.AppStarts
             CreateMap<DeviceToken, CreateDeviceTokenDTO>().ReverseMap();
             CreateMap<DeviceToken, GetDeviceTokenDTO>().ReverseMap();
             CreateMap<GetDeviceTokenDTO, DeviceTokenFilter>().ReverseMap();
+
+            // WITHDRAW REQUEST
+            CreateMap<MoneyRequest, CreateWithdrawRequestDTO>().ReverseMap();
+            CreateMap<MoneyRequest, GetWithdrawRequestDTO>().ReverseMap();
+            CreateMap<WithdrawRequestFilter, GetWithdrawRequestDTO>().ReverseMap();
         }
     }
 }
