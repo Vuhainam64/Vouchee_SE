@@ -8,7 +8,8 @@ namespace Vouchee.Business.Models.DTOs
 {
     public class VoucherCodeDTO
     {
-        public string? code { get; set; } = null;
+        [Required(ErrorMessage = "Voucher code là bắt buộc")]
+        public string? code { get; set; } 
         public string? image { get; set; } = null;
 
         public DateOnly? startDate { get; set; }
