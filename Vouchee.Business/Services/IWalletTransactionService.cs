@@ -21,5 +21,7 @@ namespace Vouchee.Business.Services
         public Task<DynamicResponseModel<GetBuyerWalletTransactionDTO>> GetBuyerWalletTransactionsAsync(PagingRequest pagingRequest,
                                                                                                             BuyerWalletTransactionFilter buyerWalletTransactionFilter,
                                                                                                             ThisUserObj currentUser);
+
+        public Task<dynamic> GetWalletTransactionsAsync(ThisUserObj currentUser);
     }
 }

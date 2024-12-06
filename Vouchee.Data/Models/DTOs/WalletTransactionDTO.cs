@@ -39,6 +39,8 @@ namespace Vouchee.Data.Models.DTOs
         public int? beforeBalance { get; set; }
         public int? afterBalance { get; set; }
 
+        public string? note { get; set; }
+
         public string? status { get; set; }
         public DateTime? createDate { get; set; }
         public Guid? createBy { get; set; }
