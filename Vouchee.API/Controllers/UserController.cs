@@ -55,7 +55,13 @@ namespace Vouchee.API.Controllers
             var result = await _userService.UpdateUserAsync(updateUserDTO, thisUserObj);
             return Ok(result);
         }
-
+        [Authorize]
+        [HttpPut("update_user_role")]
+        public async Task<IActionResult> UpdateUserRole([FromBody] UpdateUserRoleDTO updateUserRoleDTO)
+        {
+            var result = await _userService.UpdateUserRoleAsync(updateUserRoleDTO);
+            return Ok(result);
+        }
         [Authorize]
         [HttpPut("update_user_bank")]
         public async Task<IActionResult> UpdateUserBank([FromBody] UpdateUserBankDTO updateUserBankDTO)
