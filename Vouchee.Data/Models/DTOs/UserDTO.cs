@@ -25,7 +25,12 @@ namespace Vouchee.Business.Models.DTOs
     {
         public DateTime? updateDate = DateTime.Now;
     }
-
+    public class UpdateUserRoleDTO
+    {
+        public Guid userId { get; set; }
+        public RoleEnum role { get; set; }
+        public DateTime? updateDate = DateTime.Now;
+    }
     public class GetUserDTO : UserDTO
     {
         public GetUserDTO()

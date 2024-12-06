@@ -18,8 +18,10 @@ namespace Vouchee.Business.Services
         // UPDATE
         public Task<ResponseMessage<GetUserDTO>> UpdateUserAsync(UpdateUserDTO updateUserDTO, ThisUserObj thisUserObj);
         public Task<ResponseMessage<GetUserDTO>> UpdateUserBankAsync(UpdateUserBankDTO updateUserBankDTO, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<GetUserDTO>> UpdateUserRoleAsync(UpdateUserRoleDTO updateUserRoleDTO);
 
         // DELETE
         public Task<ResponseMessage<bool>> DeleteUserAsync(Guid id, ThisUserObj thisUserObj);
+
     }
 }

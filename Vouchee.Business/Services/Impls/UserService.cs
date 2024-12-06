@@ -208,5 +208,28 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Không tìm thấy user");
             }
         }
+
+        public async Task<ResponseMessage<GetUserDTO>> UpdateUserRoleAsync(UpdateUserRoleDTO updateUserRoleDTO)
+        {
+            var existedUser = await _userRepository.GetByIdAsync(updateUserRoleDTO.userId, isTracking: true);
+            if (existedUser != null)
+            {
+                existedUser.Role = updateUserRoleDTO.role.ToString();
+                existedUser.UpdateBy = updateUserRoleDTO.userId;
+                existedUser.UpdateDate = updateUserRoleDTO.updateDate;
+                await _userRepository.UpdateAsync(existedUser);
+
+                return new ResponseMessage<GetUserDTO>()
+                {
+                    message = "Cập nhật thành công",
+                    result = true,
+                    value = _mapper.Map<GetUserDTO>(existedUser)
+                };
+            }
+            else
+            {
+                throw new NotFoundException("Không tìm thấy user");
+            }
+        }
     }
 }
