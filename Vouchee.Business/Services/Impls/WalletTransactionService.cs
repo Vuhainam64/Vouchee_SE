@@ -105,5 +105,48 @@ namespace Vouchee.Business.Services.Impls
                 results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
             };
         }
+
+        public async Task<dynamic> GetWalletTransactionsAsync(ThisUserObj currentUser)
+        {
+            var existedUser = await _userRepository.FindAsync(currentUser.userId);
+
+            if (existedUser == null)
+            {
+                throw new NotFoundException("Không tìm thấy user này");
+            }
+
+            var recentBuyerTransactions = existedUser.BuyerWallet.BuyerWalletTransactions.OrderByDescending(x => x.CreateDate).Take(5);
+
+            var buyerTransactionDashboard = existedUser.BuyerWallet.BuyerWalletTransactions
+                    .GroupBy(t => new { t.CreateDate.Value.Year, t.CreateDate.Value.Month })
+                    .Select(g => new
+                    {
+                        Year = g.Key.Year,
+                        Month = g.Key.Month,
+                        Increase = g.Where(t => t.TopUpRequest != null).Sum(t => t.Amount),
+                        Decrease = g.Where(t => (t.Order != null || t.WithDrawRequest != null)).Sum(t => t.Amount),
+                        //Increase = g.Where(t => t.TopUpRequest != null && t.Status == "PAID").Sum(t => t.Amount),
+                        //Decrease = g.Where(t => (t.Order != null || t.WithDrawRequest != null) && t.Status == "PAID").Sum(t => t.Amount),
+                    })
+                    .OrderByDescending(x => x.Year)
+                    .ThenByDescending(x => x.Month)
+                    .ToList();
+
+            return new
+            {
+                totalBalance = existedUser.BuyerWallet.Balance,
+                totalTopUpRequestAmount = existedUser.MoneyRequests.Where(x => x.TopUpWalletTransaction.Status.Equals("PAID")).Sum(x => x.TopUpWalletTransaction.Amount),
+                totalWithdrawRequestAmount = existedUser.MoneyRequests.Where(x => x.WithdrawWalletTransaction.Status.Equals("PAID")).Sum(x => x.WithdrawWalletTransaction.Amount),
+                totalOrderAmount = existedUser.Orders.Sum(x => x.FinalPrice),
+                numerOfTransaction = new
+                {
+                    topUpRequest = existedUser.MoneyRequests.Count(x => x.TopUpWalletTransaction != null),
+                    withdrawRequest = existedUser.MoneyRequests.Count(x => x.WithdrawWalletTransaction != null),
+                    order = existedUser.BuyerWallet.BuyerWalletTransactions.Count()
+                },
+                recentBuyerTransactions = _mapper.Map<IList<GetBuyerWalletTransactionDTO>>(recentBuyerTransactions.ToList()),
+                dashboard = buyerTransactionDashboard
+            };
+        }
     }
 }
