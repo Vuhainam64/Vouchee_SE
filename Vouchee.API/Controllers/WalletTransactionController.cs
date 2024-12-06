@@ -26,14 +26,14 @@ namespace Vouchee.API.Controllers
             _userService = userService;
         }
 
-        [Authorize]
-        [HttpGet("get_dashboard_transaction")]
-        public async Task<IActionResult> GetDashboardTransactions()
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+        //[Authorize]
+        //[HttpGet("get_dashboard_transaction")]
+        //public async Task<IActionResult> GetDashboardTransactions()
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _walletTransactionService.GetWalletTransactionsAsync(currentUser);
-            return Ok(result);
-        }
+        //    var result = await _walletTransactionService.GetWalletTransactionsAsync(currentUser);
+        //    return Ok(result);
+        //}
     }
 }

@@ -49,13 +49,13 @@ namespace Vouchee.Business.Services.Impls
             (int, IQueryable<GetBuyerWalletTransactionDTO>) result;
 
             result = _walletTransactionRepository.GetTable()
-                        .Where(x => x.BuyerWalletId == existedUser.BuyerWallet.Id &&
-                                    x.CreateDate >= startDateTime &&
-                                    x.CreateDate <= endDateTime &&
-                                    (buyerWalletTransactionFilter.id == null || x.Id == buyerWalletTransactionFilter.id))
-                        .ProjectTo<GetBuyerWalletTransactionDTO>(_mapper.ConfigurationProvider)
-                        .DynamicFilter(_mapper.Map<GetBuyerWalletTransactionDTO>(buyerWalletTransactionFilter))
-                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+                             .Where(x => x.BuyerWalletId == existedUser.BuyerWallet.Id &&
+                                         (startDateTime == null || x.CreateDate >= startDateTime) &&
+                                         (endDateTime == null || x.CreateDate <= endDateTime) &&
+                                         (buyerWalletTransactionFilter.id == null || x.Id == buyerWalletTransactionFilter.id))
+                             .ProjectTo<GetBuyerWalletTransactionDTO>(_mapper.ConfigurationProvider)
+                             .DynamicFilter(_mapper.Map<GetBuyerWalletTransactionDTO>(buyerWalletTransactionFilter))
+                             .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
             return new DynamicResponseModel<GetBuyerWalletTransactionDTO>()
             {

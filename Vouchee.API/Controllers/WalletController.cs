@@ -88,5 +88,15 @@ namespace Vouchee.API.Controllers
 
             return File(result, contentType, fileName);
         }
+
+        [Authorize]
+        [HttpGet("get_dashboard_transaction")]
+        public async Task<IActionResult> GetDashboardTransactions()
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _walletTransactionService.GetWalletTransactionsAsync(currentUser);
+            return Ok(result);
+        }
     }
 }
