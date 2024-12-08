@@ -38,7 +38,7 @@ namespace Vouchee.API.Controllers
         }
 
         [Authorize]
-        [HttpGet("get_user")]
+        [HttpGet("get_current_user")]
         public async Task<IActionResult> GetUser()
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
