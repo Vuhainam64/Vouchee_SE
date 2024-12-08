@@ -42,6 +42,7 @@ namespace Vouchee.Business.Models.DTOs
         public string? bankAccount { get; set; }
         public string? bankNumber { get; set; }
         public string? bankName { get; set; }
+        public bool? isActive { get; set; }
 
         public string? status { get; set; }
         public DateTime? createDate { get; set; }

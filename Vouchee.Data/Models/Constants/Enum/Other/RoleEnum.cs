@@ -10,6 +10,6 @@ namespace Vouchee.Data.Models.Constants.Enum.Other
     {
         ADMIN,
         USER,
-        STAFF
+        SUPPLIER
     }
 }
