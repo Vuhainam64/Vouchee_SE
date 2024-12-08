@@ -55,6 +55,7 @@ namespace Vouchee.API.Controllers
             var result = await _userService.UpdateUserAsync(updateUserDTO, thisUserObj);
             return Ok(result);
         }
+
         [Authorize]
         [HttpPut("update_user_role")]
         public async Task<IActionResult> UpdateUserRole([FromBody] UpdateUserRoleDTO updateUserRoleDTO)
@@ -62,6 +63,7 @@ namespace Vouchee.API.Controllers
             var result = await _userService.UpdateUserRoleAsync(updateUserRoleDTO);
             return Ok(result);
         }
+
         [Authorize]
         [HttpPut("update_user_bank")]
         public async Task<IActionResult> UpdateUserBank([FromBody] UpdateUserBankDTO updateUserBankDTO)
@@ -69,6 +71,16 @@ namespace Vouchee.API.Controllers
             ThisUserObj thisUserObj = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _userService.UpdateUserBankAsync(updateUserBankDTO, thisUserObj);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpPut("ban_user")]
+        public async Task<IActionResult> BanUser(Guid userId, bool isBan, string reason)
+        {
+            ThisUserObj thisUserObj = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _userService.BanUserAsync(userId, thisUserObj, isBan, reason);
             return Ok(result);
         }
 

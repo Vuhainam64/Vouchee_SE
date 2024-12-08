@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Constants.Enum.Status
 {
-    public enum VoucherStatusEnum
+    public enum ModalStatusEnum
     {
         NONE,
         PENDING, 

@@ -139,6 +139,7 @@ namespace Vouchee.API.AppStarts
             CreateMap<User, CreateUserDTO>().ReverseMap();
             CreateMap<User, UpdateUserDTO>().ReverseMap();
             CreateMap<User, UpdateUserBankDTO>().ReverseMap();
+            CreateMap<User, GetDetailUserDTO>().ReverseMap();
             CreateMap<User, GetUserDTO>().ReverseMap();
             CreateMap<GetUserDTO, UserFilter>().ReverseMap();
 

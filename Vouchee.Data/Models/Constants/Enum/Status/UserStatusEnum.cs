@@ -11,6 +11,7 @@ namespace Vouchee.Data.Models.Constants.Enum.Status
         INACTIVE,
         ACTIVE,
         SUSPICIOUS,
-        BANNED
+        BANNED,
+        NONE
     }
 }

@@ -50,6 +50,7 @@ namespace Vouchee.Data.Models.Entities
         public required string Name { get; set; }
         public required string Email { get; set; }
         public string? HashPassword { get; set; }
+        public string? Description { get; set; }
         public string? Image { get; set; }
         public string? PhoneNumber { get; set; }
         public int ResponsibilityScore { get; set; }
