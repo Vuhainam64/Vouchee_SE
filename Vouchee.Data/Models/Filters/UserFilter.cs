@@ -3,26 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Vouchee.Data.Models.Constants.Enum.Other;
+using Vouchee.Data.Models.Constants.Enum.Status;
 
 namespace Vouchee.Data.Models.Filters
 {
     public class UserFilter
     {
-        public string? description { get; }
-        public string? lastName { get; }
-        public string? firstName { get; }
-        public string? phoneNumber { get; }
-        public string? email { get; }
-        public string? gender { get; }
-        public string? dateOfBirth { get; }
-        public string? city { get; }
-        public string? district { get; }
+        public string? name { get; set; }
+        public string? phoneNumber { get; set; }
+        public string? email { get; set; }
+        public RoleEnum? role { get; set; }
 
-        public string? status { get; }
-        public DateTime? createDate { get; }
-        public Guid? createBy { get; }
-        public DateTime? updateDate { get; }
-        public Guid? updateBy { get; }
+        public UserStatusEnum? status { get; set; }
+        public bool? isActive { get; set; }
     }
 
 }

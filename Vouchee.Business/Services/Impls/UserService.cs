@@ -11,6 +11,7 @@ using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Constants.Number;
+using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
 
@@ -215,20 +216,25 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<IList<GetUserDTO>> GetUsersAsync()
+        public async Task<DynamicResponseModel<GetUserDTO>> GetUsersAsync(PagingRequest pagingRequest, UserFilter userFilter)
         {
-            IQueryable<GetUserDTO> result;
-            try
+            (int, IQueryable<GetUserDTO>) result;
+
+            result = _userRepository.GetTable()
+                        .ProjectTo<GetUserDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetUserDTO>(userFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            return new DynamicResponseModel<GetUserDTO>()
             {
-                result = _userRepository.GetTable()
-                            .ProjectTo<GetUserDTO>(_mapper.ConfigurationProvider);
-            }
-            catch (Exception ex)
-            {
-                LoggerService.Logger(ex.Message);
-                throw new LoadException(ex.Message);
-            }
-            return result.ToList();
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+            };
         }
 
         public async Task<ResponseMessage<GetUserDTO>> UpdateUserAsync(UpdateUserDTO updateUserDTO, ThisUserObj thisUserObj)

@@ -23,9 +23,10 @@ namespace Vouchee.API.Controllers
         }
 
         [HttpGet("get_all_user")]
-        public async Task<IActionResult> GetUsers()
+        public async Task<IActionResult> GetUsers([FromQuery] PagingRequest pagingRequest, 
+                                                    [FromQuery] UserFilter userFilter)
         {
-            var result = await _userService.GetUsersAsync();
+            var result = await _userService.GetUsersAsync(pagingRequest, userFilter);
             return Ok(result);
         }
 
