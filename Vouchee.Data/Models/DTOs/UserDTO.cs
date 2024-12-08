@@ -31,9 +31,28 @@ namespace Vouchee.Business.Models.DTOs
         public RoleEnum role { get; set; }
         public DateTime? updateDate = DateTime.Now;
     }
+
     public class GetUserDTO : UserDTO
     {
-        public GetUserDTO()
+        public Guid? id { get; set; }
+        public string? email { get; set; }
+        public string? role { get; set; }
+        public string? description { get; set; }
+
+        public string? bankAccount { get; set; }
+        public string? bankNumber { get; set; }
+        public string? bankName { get; set; }
+
+        public string? status { get; set; }
+        public DateTime? createDate { get; set; }
+        public Guid? createBy { get; set; }
+        public DateTime? updateDate { get; set; }
+        public Guid? updateBy { get; set; }
+    }
+    
+    public class GetDetailUserDTO : GetUserDTO
+    {
+        public GetDetailUserDTO()
         {
             orders = [];
             vouchers = [];
@@ -42,20 +61,8 @@ namespace Vouchee.Business.Models.DTOs
             notificationToUser = [];
         }
 
-        public Guid? id { get; set; }
-        public string? email { get; set; }
-        public string? role { get; set; }
-        public string? bankAccount { get; set; }
-        public string? bankNumber { get; set; }
-        public string? bankName { get; set; }
         public GetBuyerWallet? buyerWallet { get; set; }
         public GetSellerWallet? sellerWallet { get; set; }
-
-        public string? status { get; set; }
-        public DateTime? createDate { get; set; }
-        public Guid? createBy { get; set; }
-        public DateTime? updateDate { get; set; }
-        public Guid? updateBy { get; set; }
 
         public virtual ICollection<CartDTO> carts { get; set; }
         public virtual ICollection<GetVoucherDTO> vouchers { get; set; }
@@ -64,7 +71,7 @@ namespace Vouchee.Business.Models.DTOs
         [InverseProperty(nameof(Notification.Sender))]
         public virtual ICollection<GetNotificationDTO> notificationFromUser { get; set; }
     }
-    
+
     public class UpdateUserBankDTO
     {
         public string? bankAccount { get; set; }

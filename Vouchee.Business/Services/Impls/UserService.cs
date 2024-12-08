@@ -7,6 +7,7 @@ using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Data.Helpers;
 using Vouchee.Data.Helpers.Base;
+using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Constants.Number;
@@ -37,6 +38,73 @@ namespace Vouchee.Business.Services.Impls
             _walletRepository = walletRepository;
             _userRepository = userRepository;
             _mapper = mapper;
+        }
+
+        public async Task<ResponseMessage<bool>> BanUserAsync(Guid userId, ThisUserObj thisUserObj, bool isBan, string reason)
+        {
+            var existedUser = await _userRepository.GetByIdAsync(userId, isTracking: true);
+
+            if (existedUser == null)
+            {
+                throw new NotFoundException("Không tim thấy user này");
+            }
+
+            existedUser.UpdateDate = DateTime.Now;
+            existedUser.UpdateBy = thisUserObj.userId;
+
+            if (isBan)
+            {
+                existedUser.IsActive = false;
+                existedUser.Status = UserStatusEnum.BANNED.ToString();
+                existedUser.Description = reason;
+
+                foreach (var voucher in existedUser.Vouchers)
+                {
+                    voucher.Status = VoucherStatusEnum.INACTIVE_BY_BANNED_USER.ToString();
+                    voucher.IsActive = false;
+                    voucher.UpdateDate = DateTime.Now;
+                    voucher.UpdateBy = thisUserObj.userId;
+
+                    foreach (var modal in voucher.Modals)
+                    {
+                        modal.Status = ModalStatusEnum.INACTIVE_BY_BANNED_USER.ToString();
+                        voucher.IsActive = false;
+                        voucher.UpdateDate = DateTime.Now;
+                        voucher.UpdateBy = thisUserObj.userId;
+                    }
+                }
+            }
+            else
+            {
+                existedUser.IsActive = true;
+                existedUser.Status = UserStatusEnum.NONE.ToString();
+                existedUser.Description = null;
+
+                foreach (var voucher in existedUser.Vouchers)
+                {
+                    voucher.Status = VoucherStatusEnum.NONE.ToString();
+                    voucher.IsActive = true;
+                    voucher.UpdateDate = DateTime.Now;
+                    voucher.UpdateBy = thisUserObj.userId;
+
+                    foreach (var modal in voucher.Modals)
+                    {
+                        modal.Status = ModalStatusEnum.INACTIVE_BY_BANNED_USER.ToString();
+                        voucher.IsActive = true;
+                        voucher.UpdateDate = DateTime.Now;
+                        voucher.UpdateBy = thisUserObj.userId;
+                    }
+                }
+            }
+
+            await _userRepository.SaveChanges();
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Đã cập nhật member thành công",
+                result = true,
+                value = true
+            };
         }
 
         public async Task<Guid?> CreateUserAsync(CreateUserDTO createUserDTO, ThisUserObj thisUserObj)
@@ -125,16 +193,14 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<GetUserDTO> GetUserByIdAsync(Guid id)
+        public async Task<GetDetailUserDTO> GetUserByIdAsync(Guid id)
         {
             try
             {
-                var user = await _userRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Carts)
-                                                                                                .Include(x => x.BuyerWallet)
-                                                                                                .Include(x => x.SellerWallet));
+                var user = await _userRepository.FindAsync(id);
                 if (user != null)
                 {
-                    GetUserDTO userDTO = _mapper.Map<GetUserDTO>(user);
+                    GetDetailUserDTO userDTO = _mapper.Map<GetDetailUserDTO>(user);
                     return userDTO;
                 }
                 else

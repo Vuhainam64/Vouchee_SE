@@ -12,13 +12,14 @@ namespace Vouchee.Business.Services
 
         // READ
         public Task<GetUserDTO> GetUserByEmailAsync(string email);
-        public Task<GetUserDTO> GetUserByIdAsync(Guid id);
+        public Task<GetDetailUserDTO> GetUserByIdAsync(Guid id);
         public Task<IList<GetUserDTO>> GetUsersAsync();
 
         // UPDATE
         public Task<ResponseMessage<GetUserDTO>> UpdateUserAsync(UpdateUserDTO updateUserDTO, ThisUserObj thisUserObj);
         public Task<ResponseMessage<GetUserDTO>> UpdateUserBankAsync(UpdateUserBankDTO updateUserBankDTO, ThisUserObj thisUserObj);
         public Task<ResponseMessage<GetUserDTO>> UpdateUserRoleAsync(UpdateUserRoleDTO updateUserRoleDTO);
+        public Task<ResponseMessage<bool>> BanUserAsync(Guid userId, ThisUserObj thisUserObj, bool isBan, string reason);
 
         // DELETE
         public Task<ResponseMessage<bool>> DeleteUserAsync(Guid id, ThisUserObj thisUserObj);
