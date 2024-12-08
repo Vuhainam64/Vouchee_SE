@@ -9,10 +9,12 @@ namespace Vouchee.Data.Models.Filters
 {
     public class RatingFilter
     {
-        [Required]
-        public Guid modalId { get; set; }
+        //[Required]
+        public Guid? modalId { get; set; }
         public int? qualityStar { get; set; }
         public int? serviceStar { get; set; }
         public int? sellerStar { get; set; }
+        public int? minAverageStar { get; set; }
+        public int? maxAverageStar { get; set; }
     }
 }

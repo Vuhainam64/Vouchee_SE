@@ -36,16 +36,23 @@ namespace Vouchee.API.Controllers
         }
 
         // READ
-        [Authorize]
         [HttpGet("get_all_rating")]
         public async Task<IActionResult> GetAllRating([FromQuery] PagingRequest pagingRequest, [FromQuery] RatingFilter ratingFilter)
         {
-            /*ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);*/
-
             var result = await _ratingService.GetRatingAsync(pagingRequest, ratingFilter);
             return Ok(result);
         }
 
+        [Authorize]
+        [HttpGet("get_all_rating_by_seller")]
+        public async Task<IActionResult> GetRatingsBySeller([FromQuery] PagingRequest pagingRequest, [FromQuery] RatingFilter ratingFilter)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _ratingService.GetSellerRatingAsync(pagingRequest, ratingFilter, currentUser);
+            return Ok(result);
+        } 
+        
         [HttpGet("get_rating_by_id/{id}")]
         public async Task<IActionResult> GetRatingById(Guid id)
         {
