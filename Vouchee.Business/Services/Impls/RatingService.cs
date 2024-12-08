@@ -79,27 +79,6 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<DynamicResponseModel<GetRatingDTO>> GetRatingAsync(PagingRequest pagingRequest, RatingFilter ratingFilter)
-        {
-            (int, IQueryable<GetRatingDTO>) result;
-
-            result = _ratingRepository.GetTable()
-                        .ProjectTo<GetRatingDTO>(_mapper.ConfigurationProvider)
-                        .DynamicFilter(_mapper.Map<GetRatingDTO>(ratingFilter))
-                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
-
-            return new DynamicResponseModel<GetRatingDTO>()
-            {
-                metaData = new MetaData()
-                {
-                    page = pagingRequest.page,
-                    size = pagingRequest.pageSize,
-                    total = result.Item1 // Total vouchers count for metadata
-                },
-                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
-            };
-        }
-
         public async Task<GetRatingDTO> GetRatingByIdAsync(Guid id)
         {
             var existedRating = await _ratingRepository.FindAsync(id);
@@ -164,6 +143,55 @@ namespace Vouchee.Business.Services.Impls
                 countNotReplied = countNotReplied,
                 percentageNotRated = percentageNotRated,
                 percentageGoodRatings = percentageGoodRatings
+            };
+        }
+
+        public async Task<DynamicResponseModel<GetRatingDTO>> GetSellerRatingAsync(PagingRequest pagingRequest, RatingFilter ratingFilter, ThisUserObj thisUserObj)
+        {
+            var existedUser = await _userRepository.FindAsync(thisUserObj.userId);
+
+            if (existedUser == null)
+            {
+                throw new NotFoundException("Không tìm thấy user này");
+            }
+
+            var query = _modalRepository.GetTable()
+                            .Where(v => v.Voucher.SellerId == existedUser.Id) // Filter vouchers by the seller
+                            .SelectMany(x => x.Ratings)
+                            .ProjectTo<GetRatingDTO>(_mapper.ConfigurationProvider)
+                            .DynamicFilter(_mapper.Map<GetRatingDTO>(ratingFilter))
+                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            return new DynamicResponseModel<GetRatingDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = query.Item1 // Total vouchers count for metadata
+                },
+                results = await query.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+            };
+        }
+
+        public async Task<DynamicResponseModel<GetRatingDTO>> GetRatingAsync(PagingRequest pagingRequest, RatingFilter ratingFilter)
+        {
+            (int, IQueryable<GetRatingDTO>) result;
+
+            result = _ratingRepository.GetTable()
+                        .ProjectTo<GetRatingDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetRatingDTO>(ratingFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            return new DynamicResponseModel<GetRatingDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
             };
         }
 
