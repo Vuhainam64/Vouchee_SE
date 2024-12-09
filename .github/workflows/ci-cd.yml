@@ -80,6 +80,7 @@ jobs:
             -e GOOGLE_APPLICATION_CREDENTIALS="${{ secrets.GG_PATH }}" \
             -v "${{ secrets.GG_PATH}}:${{ secrets.GG_PATH}}" \
             --restart unless-stopped ${{ secrets.DOCKER_USERNAME }}/myimage:1
+
       
             echo "Deployment complete."
           EOF
