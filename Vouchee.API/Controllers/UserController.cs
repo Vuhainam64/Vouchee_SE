@@ -17,10 +17,12 @@ namespace Vouchee.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly ISendEmailService _sendEmailService;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService,ISendEmailService sendEmailService)
         {
             _userService = userService;
+            _sendEmailService = sendEmailService;
         }
 
         [HttpPost("create_user")]
@@ -28,6 +30,18 @@ namespace Vouchee.API.Controllers
         {
             var result = await _userService.CreateUserAsync(createUserDTO, deviceToken);
             return Ok(result);
+        }
+        [HttpGet("email")]
+        public async Task<IActionResult> email()
+        {
+            var emailSubject = "Welcome to Our Service";
+            var emailBody = "Hello, your account has been successfully created!";
+
+            // Just await the method
+            await _sendEmailService.SendEmailAsync("caothang7a7@gmail.com", emailSubject, emailBody);
+
+            // Return a success response
+            return Ok(new { message = "Email sent successfully" });
         }
 
         [HttpGet("get_all_user")]

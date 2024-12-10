@@ -18,14 +18,22 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task SendEmailAsync(string to, string subject, string body)
         {
-            var mailMessage = new MailMessage("advouchee@gmail.com", to)
+            try
             {
-                Subject = subject,
-                Body = body,
-                IsBodyHtml = false
-            };
+                var mailMessage = new MailMessage("advouchee@gmail.com", to)
+                {
+                    Subject = subject,
+                    Body = body,
+                    IsBodyHtml = false
+                };
 
-            await _smtpClient.SendMailAsync(mailMessage);
+                await _smtpClient.SendMailAsync(mailMessage);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+           
         }
     }
 }
