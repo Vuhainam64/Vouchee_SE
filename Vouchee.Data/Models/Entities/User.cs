@@ -47,8 +47,8 @@ namespace Vouchee.Data.Models.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
-        public required string Name { get; set; }
-        public required string Email { get; set; }
+        public string? Name { get; set; }
+        public string? Email { get; set; }
         public string? HashPassword { get; set; }
         public string? Description { get; set; }
         public string? Image { get; set; }

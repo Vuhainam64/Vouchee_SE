@@ -8,7 +8,7 @@ namespace Vouchee.Business.Services
     public interface IUserService
     {
         // CREATE
-        public Task<Guid?> CreateUserAsync(CreateUserDTO createUserDTO, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<Guid>> CreateUserAsync(CreateUserDTO createUserDTO, string deviceToken);
 
         // READ
         public Task<GetUserDTO> GetUserByEmailAsync(string email);
@@ -20,6 +20,7 @@ namespace Vouchee.Business.Services
         public Task<ResponseMessage<GetUserDTO>> UpdateUserBankAsync(UpdateUserBankDTO updateUserBankDTO, ThisUserObj thisUserObj);
         public Task<ResponseMessage<GetUserDTO>> UpdateUserRoleAsync(UpdateUserRoleDTO updateUserRoleDTO);
         public Task<ResponseMessage<bool>> BanUserAsync(Guid userId, ThisUserObj thisUserObj, bool isBan, string reason);
+        public Task<ResponseMessage<bool>> ChangePasswordAsync(string email, string hashPassword);
 
         // DELETE
         public Task<ResponseMessage<bool>> DeleteUserAsync(Guid id, ThisUserObj thisUserObj);

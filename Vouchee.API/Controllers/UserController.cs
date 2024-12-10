@@ -5,6 +5,7 @@ using Vouchee.API.Helpers;
 using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Services;
+using Vouchee.Business.Services.Impls;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Filters;
 
@@ -21,6 +22,13 @@ namespace Vouchee.API.Controllers
         {
             _userService = userService;
         }
+
+        //[HttpPost("create_user")]
+        //public async Task<IActionResult> CreateUser([FromBody] CreateUserDTO createUserDTO, [FromQuery] string? deviceToken)
+        //{
+        //    var result = await _userService.CreateUserAsync(createUserDTO, deviceToken);
+        //    return Ok(result);
+        //}
 
         [HttpGet("get_all_user")]
         public async Task<IActionResult> GetUsers([FromQuery] PagingRequest pagingRequest, 
