@@ -33,9 +33,9 @@ namespace Vouchee.Business.Services.Impls
                 using (MailMessage mail = new MailMessage())
                 {
                     mail.From = new MailAddress("advouchee@gmail.com");
-                    mail.To.Add("nguyenquyphat2711@gmail.com");
-                    mail.Subject = "Hello World";
-                    mail.Body = "<h1>Hello</h1>";
+                    mail.To.Add(to);
+                    mail.Subject = subject;
+                    mail.Body = body;
                     mail.IsBodyHtml = true;
 
                     using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
