@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Vouchee.Business.Services;
+using Vouchee.Data.Models.Constants.Enum.Other;
 
 namespace Vouchee.API.Controllers
 {
@@ -17,9 +18,9 @@ namespace Vouchee.API.Controllers
         }
 
         [HttpGet("get_order_dashboard")]
-        public async Task<IActionResult> GetOrderDashboard(int? year)
+        public async Task<IActionResult> GetOrderDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum filterType)
         {
-            var result = await _dashboardService.GetOrderDashboard(year);
+            var result = await _dashboardService.GetOrderDashboard(fromDate, toDate, today, filterType);
             return Ok(result);
         }
     }

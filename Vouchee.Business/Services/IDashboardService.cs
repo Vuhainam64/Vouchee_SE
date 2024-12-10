@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Vouchee.Data.Models.Constants.Enum.Other;
 
 namespace Vouchee.Business.Services
 {
@@ -11,10 +12,11 @@ namespace Vouchee.Business.Services
         // CREATE
 
         // READ
-        public Task<dynamic> GetUserDashboard();
-        public Task<dynamic> GetVoucherDashboard();
-        public Task<dynamic> GetOrderDashboard(int? year);
-        public Task<dynamic> GetTransactionDashboard();
+        public Task<dynamic> GetUserDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum dateFilterTypeEnum);
+        public Task<dynamic> GetVoucherDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum dateFilterTypeEnum);
+        public Task<dynamic> GetOrderDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum dateFilterTypeEnum);
+        public Task<dynamic> GetTransactionDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum dateFilterTypeEnum);
+
         // UPDATE
 
         // DELETE
