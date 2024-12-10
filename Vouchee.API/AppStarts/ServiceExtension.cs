@@ -48,6 +48,7 @@ namespace Vouchee.API.AppStarts
             services.AddScoped<IExcelExportService, ExcelExportService>();
             services.AddScoped<IWithdrawService, WithdrawService>();
             services.AddScoped<IDashboardService, DashboardService>();
+            services.AddScoped<ISendEmailService,SendEmailService>();
         }
 
         public static void AddSwaggerServices(this IServiceCollection services, IConfiguration configuration)

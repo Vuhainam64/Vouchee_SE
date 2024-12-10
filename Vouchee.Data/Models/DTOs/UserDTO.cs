@@ -22,6 +22,8 @@ namespace Vouchee.Business.Models.DTOs
         [Required(ErrorMessage = "Mật khẩu là cần thiết")]
         public string? hashPassword { get; set; }
         public DateTime? createDate = DateTime.Now;
+
+        public RoleEnum role { get; set; }
     }
 
     public class UpdateUserDTO : UserDTO
