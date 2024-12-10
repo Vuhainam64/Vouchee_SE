@@ -171,6 +171,7 @@ namespace Vouchee.Business.Services.Impls
             var user = _mapper.Map<User>(createUserDTO);
 
             // Default values for user
+            user.Name = "Vouchee member";
             user.Status = UserStatusEnum.ACTIVE.ToString();
             user.BuyerWallet = new()
             {
