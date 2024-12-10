@@ -4,6 +4,8 @@ using Vouchee.API.AppStarts;
 using Vouchee.Business.Middelwares;
 using Microsoft.AspNetCore.DataProtection;
 using Newtonsoft.Json;
+using System.Net.Mail;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,7 +42,13 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
-
+builder.Services.AddSingleton(new SmtpClient
+{
+    Host = "smtp.gmail.com",
+    Port = 587,
+    Credentials = new NetworkCredential("advouchee@gmail.com", "advouchee123"),
+    EnableSsl = true
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

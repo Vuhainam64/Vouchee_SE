@@ -26,13 +26,15 @@ namespace Vouchee.Business.Services.Impls
         private readonly IBaseRepository<Wallet> _walletRepository;
         private readonly IBaseRepository<User> _userRepository;
         private readonly IMapper _mapper;
+        private readonly ISendEmailService _sendEmailService;
 
         public UserService(IBaseRepository<MoneyRequest> moneyRequestRepository,
                            IBaseRepository<Promotion> promotionRepository,
                            IBaseRepository<Voucher> voucherRepository,
                            IBaseRepository<Wallet> walletRepository,
                            IBaseRepository<User> userRepository,
-                           IMapper mapper)
+                           IMapper mapper,
+                           ISendEmailService sendEmailService)
         {
             _moneyRequestRepository = moneyRequestRepository;
             _promotionRepository = promotionRepository;
@@ -40,6 +42,7 @@ namespace Vouchee.Business.Services.Impls
             _walletRepository = walletRepository;
             _userRepository = userRepository;
             _mapper = mapper;
+            _sendEmailService = sendEmailService;
         }
 
         public async Task<ResponseMessage<bool>> BanUserAsync(Guid userId, ThisUserObj thisUserObj, bool isBan, string reason)
@@ -163,7 +166,7 @@ namespace Vouchee.Business.Services.Impls
             {
                 throw new ConflictException("Email này đã được dùng");
             }
-
+            
             // Map the DTO to the user entity
             var user = _mapper.Map<User>(createUserDTO);
 
@@ -171,12 +174,12 @@ namespace Vouchee.Business.Services.Impls
             user.Status = UserStatusEnum.ACTIVE.ToString();
             user.BuyerWallet = new()
             {
-                CreateDate = DateTime.UtcNow,
+                CreateDate = DateTime.Now,
                 Status = ObjectStatusEnum.ACTIVE.ToString(),
             };
             user.SellerWallet = new()
             {
-                CreateDate = DateTime.UtcNow,
+                CreateDate = DateTime.Now,
                 Status = ObjectStatusEnum.ACTIVE.ToString(),
             };
 
@@ -203,7 +206,9 @@ namespace Vouchee.Business.Services.Impls
 
                 // Save the user in your database
                 var result = await _userRepository.AddAsync(user);
-
+                var emailSubject = "Welcome to Our Service";
+                var emailBody = $"Hello {createUserDTO.email},\n\nYour account has been successfully created!";
+                await _sendEmailService.SendEmailAsync(createUserDTO.email, emailSubject, emailBody);
                 return new ResponseMessage<Guid>
                 {
                     message = "User created successfully",
