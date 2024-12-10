@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using FirebaseAdmin.Auth;
 using Microsoft.EntityFrameworkCore;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
@@ -108,15 +109,128 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<Guid?> CreateUserAsync(CreateUserDTO createUserDTO, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<bool>> ChangePasswordAsync(string email, string hashPassword)
         {
+            // Retrieve the user from the local database
+            var existedUser = await _userRepository.GetFirstOrDefaultAsync(
+                x => x.Email.ToLower().Equals(email.ToLower()),
+                isTracking: true);
+
+            if (existedUser == null)
+            {
+                throw new NotFoundException("Không tìm thấy user này");
+            }
+
+            try
+            {
+                // Update password in Firebase Authentication
+                var userRecord = await FirebaseAuth.DefaultInstance.GetUserByEmailAsync(email);
+
+                await FirebaseAuth.DefaultInstance.UpdateUserAsync(new FirebaseAdmin.Auth.UserRecordArgs
+                {
+                    Uid = userRecord.Uid,
+                    Password = hashPassword // Set the new password
+                });
+
+                // Optionally update the hashPassword in your local database
+                existedUser.HashPassword = hashPassword;
+                existedUser.UpdateDate = DateTime.Now;
+
+                await _userRepository.UpdateAsync(existedUser);
+
+                return new ResponseMessage<bool>
+                {
+                    message = "Cập nhật mật khẩu thành công",
+                    result = true,
+                    value = true
+                };
+            }
+            catch (FirebaseAuthException ex)
+            {
+                throw new Exception($"Firebase error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error: {ex.Message}");
+            }
+        }
+
+        public async Task<ResponseMessage<Guid>> CreateUserAsync(CreateUserDTO createUserDTO, string? deviceToken)
+        {
+            var existedUser = await _userRepository.GetFirstOrDefaultAsync(x => x.Email.ToLower().Equals(createUserDTO.email.ToLower()));
+
+            if (existedUser != null)
+            {
+                throw new ConflictException("Email này đã được dùng");
+            }
+
+            // Map the DTO to the user entity
             var user = _mapper.Map<User>(createUserDTO);
 
-            user.CreateBy = thisUserObj.userId;
+            // Default values for user
             user.Status = UserStatusEnum.ACTIVE.ToString();
+            user.BuyerWallet = new()
+            {
+                CreateDate = DateTime.UtcNow,
+                Status = ObjectStatusEnum.ACTIVE.ToString(),
+            };
+            user.SellerWallet = new()
+            {
+                CreateDate = DateTime.UtcNow,
+                Status = ObjectStatusEnum.ACTIVE.ToString(),
+            };
 
-            var userId = await _userRepository.AddAsync(user);
-            return userId;
+            try
+            {
+                // Create the user in Firebase Authentication
+                var firebaseUser = await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.CreateUserAsync(new UserRecordArgs
+                {
+                    Email = createUserDTO.email,
+                    Password = createUserDTO.hashPassword,
+                    EmailVerified = false,
+                    Disabled = false
+                });
+
+                // Optionally store device token in your system
+                if (!string.IsNullOrEmpty(deviceToken))
+                {
+                    user.DeviceTokens.Add(new()
+                    {
+                        CreateDate = DateTime.UtcNow,
+                        Token = deviceToken,
+                    });
+                }
+
+                // Save the user in your database
+                var result = await _userRepository.AddAsync(user);
+
+                return new ResponseMessage<Guid>
+                {
+                    message = "User created successfully",
+                    result = true,
+                    value = (Guid) result
+                };
+            }
+            catch (FirebaseAuthException ex)
+            {
+                // Handle Firebase Authentication errors
+                return new ResponseMessage<Guid>
+                {
+                    message = $"Firebase error: {ex.Message}",
+                    result = false,
+                    value = Guid.Empty
+                };
+            }
+            catch (Exception ex)
+            {
+                // Handle general errors
+                return new ResponseMessage<Guid>
+                {
+                    message = $"Error: {ex.Message}",
+                    result = false,
+                    value = Guid.Empty
+                };
+            }
         }
 
         // giữ lại các transaction như order, wallet

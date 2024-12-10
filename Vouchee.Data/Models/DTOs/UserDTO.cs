@@ -15,9 +15,12 @@ namespace Vouchee.Business.Models.DTOs
         public string? image { get; set; }
     }
 
-    public class CreateUserDTO : UserDTO
+    public class CreateUserDTO
     {
+        [Required(ErrorMessage = "Email là cần thiết")]
         public string? email { get; set; }
+        [Required(ErrorMessage = "Mật khẩu là cần thiết")]
+        public string? hashPassword { get; set; }
         public DateTime? createDate = DateTime.Now;
     }
 
