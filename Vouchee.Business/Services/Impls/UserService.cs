@@ -206,9 +206,14 @@ namespace Vouchee.Business.Services.Impls
 
                 // Save the user in your database
                 var result = await _userRepository.AddAsync(user);
-                var emailSubject = "Welcome to Our Service";
-                var emailBody = $"Hello {createUserDTO.email},\n\nYour account has been successfully created!";
+
+                string roleName = user.Role.Equals(RoleEnum.ADMIN.ToString()) ? "quản trị viên" : "nhà cung cấp";
+                var emailSubject = $"Tài khoản {roleName} Vouchee";
+
+                var emailBody = $"Tài khoản email: {user.Email}\n" +
+                                    $"Mật khẩu: {user.HashPassword}";
                 await _sendEmailService.SendEmailAsync(createUserDTO.email, emailSubject, emailBody);
+
                 return new ResponseMessage<Guid>
                 {
                     message = "User created successfully",
@@ -249,11 +254,11 @@ namespace Vouchee.Business.Services.Impls
             }
 
             bool canCompletelyDelete = !(existedUser.BuyerWallet?.BuyerWalletTransactions?.Any() ?? false) &&
-                                           !(existedUser.SellerWallet?.SellerWalletTransactions?.Any() ?? false) &&
-                                           !existedUser.Orders.Any() &&
-                                           !existedUser.Orders.Any(order => order.VoucherCodes.Any()) &&
-                                           !existedUser.MoneyRequests.Any(r => r.TopUpWalletTransaction != null || r.WithdrawWalletTransaction != null) &&
-                                           !existedUser.Vouchers.SelectMany(v => v.Modals.SelectMany(m => m.OrderDetails)).Any();
+                                       !(existedUser.SellerWallet?.SellerWalletTransactions?.Any() ?? false) &&
+                                       !existedUser.Orders.Any() &&
+                                       !existedUser.Orders.Any(order => order.VoucherCodes.Any()) &&
+                                       !existedUser.MoneyRequests.Any(r => r.TopUpWalletTransaction != null || r.WithdrawWalletTransaction != null) &&
+                                       !existedUser.Vouchers.SelectMany(v => v.Modals.SelectMany(m => m.OrderDetails)).Any();
 
             if (existedUser.Vouchers != null)
             {
@@ -272,6 +277,27 @@ namespace Vouchee.Business.Services.Impls
                         modal.UpdateDate = DateTime.Now;
                     }
                 }
+            }
+
+            // Firebase Email Deletion
+            try
+            {
+                var firebaseAuth = FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance;
+
+                // Retrieve the user by email and delete them
+                if (!string.IsNullOrEmpty(existedUser.Email))
+                {
+                    var userRecord = await firebaseAuth.GetUserByEmailAsync(existedUser.Email);
+                    if (userRecord != null)
+                    {
+                        await firebaseAuth.DeleteUserAsync(userRecord.Uid);
+                    }
+                }
+            }
+            catch (FirebaseAdmin.Auth.FirebaseAuthException ex)
+            {
+                // Log exception or handle accordingly
+                throw new ApplicationException("Failed to delete the user's email in Firebase.", ex);
             }
 
             if (canCompletelyDelete)
