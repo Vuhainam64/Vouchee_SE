@@ -66,5 +66,6 @@ namespace Vouchee.Data.Models.Entities
         public Guid? CreateBy { get; set; }
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
+        public DateTime? LastAccessTime { get; set; }
     }
 }
