@@ -23,12 +23,12 @@ namespace Vouchee.API.Controllers
             _userService = userService;
         }
 
-        [HttpPost("create_user")]
-        public async Task<IActionResult> CreateUser([FromBody] CreateUserDTO createUserDTO, [FromQuery] string? deviceToken)
-        {
-            var result = await _userService.CreateUserAsync(createUserDTO, deviceToken);
-            return Ok(result);
-        }
+        //[HttpPost("create_user")]
+        //public async Task<IActionResult> CreateUser([FromBody] CreateUserDTO createUserDTO, [FromQuery] string? deviceToken)
+        //{
+        //    var result = await _userService.CreateUserAsync(createUserDTO, deviceToken);
+        //    return Ok(result);
+        //}
 
         [HttpGet("get_all_user")]
         public async Task<IActionResult> GetUsers([FromQuery] PagingRequest pagingRequest, 
