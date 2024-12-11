@@ -56,6 +56,13 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 -i ~/.ssh/id_rsa ${{ secrets.SSH_PRIVATE_NAME }}@${{ secrets.SSH_PRIVATE_IP }} << 'EOF'
             set -e  # Dừng ngay khi một lệnh thất bại
+
+            echo "Cleaning up system logs..."
+            sudo journalctl --vacuum-size=50M || echo "Failed to clean journal logs"
+            sudo rm -rf /var/log/*.log || echo "Failed to remove /var/log/*.log"
+
+            echo "Cleaning up Docker logs..."
+            docker ps -q | xargs -r -I {} sh -c 'echo "" > $(docker inspect --format="{{.LogPath}}" {})' || echo "No Docker logs to clean."
             
             echo "Pulling the latest Docker image..."
             docker pull ${{ secrets.DOCKER_USERNAME }}/myimage:1 || { echo "Failed to pull image"; exit 1; }
