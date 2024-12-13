@@ -9,6 +9,7 @@ namespace Vouchee.Data.Models.Constants.Enum.Status
     public enum WithdrawRequestStatusEnum
     {
         PENDING,
-        PAID
+        PAID,
+        FAIL
     }
 }

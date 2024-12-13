@@ -280,12 +280,10 @@ namespace Vouchee.Business.Services.Impls
                 }
             }
 
-            // Firebase Email Deletion
             try
             {
                 var firebaseAuth = FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance;
 
-                // Retrieve the user by email and delete them
                 if (!string.IsNullOrEmpty(existedUser.Email))
                 {
                     var userRecord = await firebaseAuth.GetUserByEmailAsync(existedUser.Email);
@@ -295,9 +293,9 @@ namespace Vouchee.Business.Services.Impls
                     }
                 }
             }
-            catch (FirebaseAdmin.Auth.FirebaseAuthException ex)
+            catch (FirebaseAdmin.Auth.FirebaseAuthException ex) when (ex.Message.Contains("Failed to get user with email"))
             {
-                throw new ConflictException(ex.Message);
+
             }
 
             if (canCompletelyDelete)

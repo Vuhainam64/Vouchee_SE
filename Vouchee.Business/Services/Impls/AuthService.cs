@@ -98,6 +98,9 @@ namespace Vouchee.Business.Services.Impls
                 response.role = newUser.Role;
                 response.deviceTokens = _mapper.Map<IList<GetDeviceTokenDTO>>(newUser.DeviceTokens);
                 response = await GenerateTokenAsync(response, RoleEnum.USER.ToString());
+                newUser.LastAccessTime = DateTime.Now;
+
+                await _userRepository.SaveChanges();
             }
             else
             {
@@ -123,8 +126,6 @@ namespace Vouchee.Business.Services.Impls
                         {
                             user.DeviceTokens.Add(existedDeviceToken);
                         }
-
-                        await _userRepository.SaveChanges();
                     }
                 }
 
@@ -137,6 +138,9 @@ namespace Vouchee.Business.Services.Impls
                 response.role = user.Role;
                 response.deviceTokens = _mapper.Map<IList<GetDeviceTokenDTO>>(user.DeviceTokens);
                 response = await GenerateTokenAsync(response, user.Role);
+                user.LastAccessTime = DateTime.Now;
+
+                await _userRepository.SaveChanges();
             }
 
             return response;

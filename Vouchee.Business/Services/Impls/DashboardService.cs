@@ -31,6 +31,11 @@ namespace Vouchee.Business.Services.Impls
             _voucherRepository = voucherRepository;
         }
 
+        public Task<dynamic> GetActiveUserDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum dateFilterTypeEnum)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<dynamic> GetOrderDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum dateFilterTypeEnum)
         {
             var result = await _orderRepository.GetTable().ToListAsync();
@@ -95,9 +100,43 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public Task<dynamic> GetTransactionDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum dateFilterTypeEnum)
+        public async Task<dynamic> GetTransactionDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum dateFilterTypeEnum)
         {
-            throw new NotImplementedException();
+            var result = await _walletTransactionRepository.GetTable().ToListAsync();
+
+            return new
+            {
+                transactionDashboard = new
+                {
+                    withdraw = result.Where(x => x.WithdrawRequestId != null),
+                    topUp = result.Where(x => x.TopUpRequestId != null),
+                    order = result.Where(x => x.OrderId != null),
+                },
+                withdrawDashboard = new
+                {
+                    success = result.Where(x => x.WithdrawRequestId != null && x.Status == WithdrawRequestStatusEnum.PAID.ToString()), 
+                    fail = result.Where(x => x.WithdrawRequestId != null && x.Status == WithdrawRequestStatusEnum.FAIL.ToString()),
+                    other = result.Where(x => x.WithdrawRequestId != null 
+                                                    && x.Status != WithdrawRequestStatusEnum.PAID.ToString() 
+                                                    && x.Status != WithdrawRequestStatusEnum.FAIL.ToString()) 
+                },
+                topUpDashboard = new
+                {
+                    success = result.Where(x => x.TopUpRequestId != null && x.Status == TopUpRequestStatusEnum.PAID.ToString()),
+                    fail = result.Where(x => x.TopUpRequestId != null && x.Status == TopUpRequestStatusEnum.FAIL.ToString()),
+                    other = result.Where(x => x.TopUpRequestId != null
+                                                    && x.Status != TopUpRequestStatusEnum.PAID.ToString()
+                                                    && x.Status != TopUpRequestStatusEnum.FAIL.ToString())
+                },
+                orderDashboard = new
+                {
+                    success = result.Where(x => x.OrderId != null && x.Status == OrderStatusEnum.PAID.ToString()),
+                    fail = result.Where(x => x.OrderId != null && x.Status == OrderStatusEnum.FAIL.ToString()),
+                    other = result.Where(x => x.OrderId != null
+                                                    && x.Status != OrderStatusEnum.PAID.ToString()
+                                                    && x.Status != OrderStatusEnum.FAIL.ToString())
+                }
+            };
         }
 
         public Task<dynamic> GetUserDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum dateFilterTypeEnum)
