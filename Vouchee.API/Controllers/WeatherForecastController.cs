@@ -16,26 +16,28 @@ namespace Vouchee.API.Controllers
     [EnableCors("MyAllowSpecificOrigins")]
     public class WeatherForecastController : ControllerBase
     {
+        private readonly ISendEmailService _sendEmailService;
+
         private readonly IDeviceTokenService _deviceTokenService;
         private readonly IUserService _userService;
         private readonly INotificationService _notificationService;
         private readonly IWalletService _walletService;
         private readonly IWalletTransactionService _walletTransactionService;
 
-        public WeatherForecastController(IDeviceTokenService deviceTokenService,
+        public WeatherForecastController(ISendEmailService sendEmailService,
+                                         IDeviceTokenService deviceTokenService,
                                          IUserService userService,
                                          INotificationService notificationService,
                                          IWalletService walletService,
                                          IWalletTransactionService walletTransactionService)
         {
+            _sendEmailService = sendEmailService;
             _deviceTokenService = deviceTokenService;
             _userService = userService;
             _notificationService = notificationService;
             _walletService = walletService;
             _walletTransactionService = walletTransactionService;
         }
-
-
 
         // CREATE
         [HttpPost("create_device_token")]
@@ -77,6 +79,34 @@ namespace Vouchee.API.Controllers
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _deviceTokenService.GetDeviceTokenAsync(pagingRequest, deviceTokenFilter, currentUser.userId);
+            return Ok(result);
+        }
+
+        [HttpGet("email")]
+        public async Task<IActionResult> email()
+        {
+            var emailSubject = "Welcome to Our Service";
+            var emailBody = "Hello, your account has been successfully created!";
+
+            // Just await the method
+            await _sendEmailService.SendEmailAsync("caothang7a7@gmail.com", emailSubject, emailBody);
+
+            // Return a success response
+            return Ok(new { message = "Email sent successfully" });
+        }
+
+        [HttpGet("get_user_from_firebase")]
+        public async Task<IActionResult> GetUserFromFirebase(string email)
+        {
+            var result = await _userService.GetUserFromFirebase(email);
+            return Ok(result);
+        }
+
+        // DELETE
+        [HttpDelete("remove_email_from_firebase")]
+        public async Task<IActionResult> RemoveEmailFromFirebase(string email)
+        {
+            var result = await _userService.DeleteUserFromFirebaseAsync(email);
             return Ok(result);
         }
     }
