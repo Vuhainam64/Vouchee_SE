@@ -14,6 +14,7 @@ namespace Vouchee.Business.Services
         public Task<GetUserDTO> GetUserByEmailAsync(string email);
         public Task<GetDetailUserDTO> GetUserByIdAsync(Guid id);
         public Task<DynamicResponseModel<GetUserDTO>> GetUsersAsync(PagingRequest pagingRequest, UserFilter userFilter);
+        public Task<string> GetUserFromFirebase(string email);
 
         // UPDATE
         public Task<ResponseMessage<GetUserDTO>> UpdateUserAsync(UpdateUserDTO updateUserDTO, ThisUserObj thisUserObj);
@@ -24,6 +25,6 @@ namespace Vouchee.Business.Services
 
         // DELETE
         public Task<ResponseMessage<bool>> DeleteUserAsync(Guid id, ThisUserObj thisUserObj);
-
+        public Task<ResponseMessage<bool>> DeleteUserFromFirebaseAsync(string email);
     }
 }

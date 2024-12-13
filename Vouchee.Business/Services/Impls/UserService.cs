@@ -297,8 +297,7 @@ namespace Vouchee.Business.Services.Impls
             }
             catch (FirebaseAdmin.Auth.FirebaseAuthException ex)
             {
-                // Log exception or handle accordingly
-                throw new ApplicationException("Failed to delete the user's email in Firebase.", ex);
+                throw new ConflictException(ex.Message);
             }
 
             if (canCompletelyDelete)
@@ -321,6 +320,55 @@ namespace Vouchee.Business.Services.Impls
                 result = true,
                 value = true
             };
+        }
+
+        public async Task<ResponseMessage<bool>> DeleteUserFromFirebaseAsync(string email)
+        {
+            try
+            {
+                // Find the user by email
+                var user = await FirebaseAuth.DefaultInstance.GetUserByEmailAsync(email);
+
+                if (user == null)
+                {
+                    return new ResponseMessage<bool>
+                    {
+                        result = false,
+                        message = "User not found.",
+                        value = false
+                    };
+                }
+
+                // Delete the user by UID
+                await FirebaseAuth.DefaultInstance.DeleteUserAsync(user.Uid);
+
+                return new ResponseMessage<bool>
+                {
+                    result = true,
+                    message = "User successfully deleted.",
+                    value = true
+                };
+            }
+            catch (FirebaseAuthException ex)
+            {
+                // Handle Firebase authentication-specific exceptions
+                return new ResponseMessage<bool>
+                {
+                    value = false,
+                    message = $"Firebase error: {ex.Message}",
+                    result = false
+                };
+            }
+            catch (Exception ex)
+            {
+                // Handle other general exceptions
+                return new ResponseMessage<bool>
+                {
+                    result = false,
+                    message = $"An error occurred: {ex.Message}",
+                    value = false
+                };
+            }
         }
 
         public async Task<GetUserDTO> GetUserByEmailAsync(string email)
@@ -359,6 +407,38 @@ namespace Vouchee.Business.Services.Impls
             {
                 LoggerService.Logger(ex.Message);
                 throw new LoadException(ex.Message);
+            }
+        }
+
+        public async Task<string> GetUserFromFirebase(string email)
+        {
+            try
+            {
+                // Find the user by email
+                var user = await FirebaseAuth.DefaultInstance.GetUserByEmailAsync(email);
+
+                if (user == null)
+                {
+                    return "User not found.";
+                }
+
+                // Return user details as a JSON string (or customize as needed)
+                return $"User ID: {user.Uid}, Email: {user.Email}, Name: {user.DisplayName}";
+            }
+            catch (FirebaseAuthException ex) when (ex.Message.Contains("Failed to get user with email"))
+            {
+                // Handle case where email does not exist in Firebase
+                return "User with the provided email does not exist in Firebase.";
+            }
+            catch (FirebaseAuthException ex)
+            {
+                // Handle other Firebase-specific exceptions
+                return $"Firebase error: {ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                // Handle general exceptions
+                return $"An error occurred: {ex.Message}";
             }
         }
 
