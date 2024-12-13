@@ -96,6 +96,7 @@ namespace Vouchee.API.Controllers
         }
 
         // DELETE
+        [Authorize]
         [HttpDelete("delete_user/{id}")]
         public async Task<IActionResult> DeleteUser(Guid id)
         {
