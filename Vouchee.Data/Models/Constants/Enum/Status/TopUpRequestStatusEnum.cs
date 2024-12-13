@@ -8,8 +8,8 @@ namespace Vouchee.Data.Models.Constants.Enum.Status
 {
     public enum TopUpRequestStatusEnum
     {
+        PAID,
         PENDING,
-        DONE,
-        ERROR
+        FAIL
     }
 }
