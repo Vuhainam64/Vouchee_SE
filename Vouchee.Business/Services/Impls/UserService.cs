@@ -247,7 +247,7 @@ namespace Vouchee.Business.Services.Impls
         // giữ lại các transaction như order, wallet
         public async Task<ResponseMessage<bool>> DeleteUserAsync(Guid id, ThisUserObj thisUserObj)
         {
-            var existedUser = await _userRepository.FindAsync(id);
+            var existedUser = await _userRepository.FindAsync(id, isTracking: true);
 
             if (existedUser == null)
             {
