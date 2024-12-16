@@ -149,7 +149,7 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<IList<GetVoucherCodeDTO>> GetVoucherCodesAsync()
+        public async Task<IList<GetVoucherCodeDTO>> GetVoucherCodesAsync(VoucherCodeFilter voucherCodeFilter)
         {
             try
             {
@@ -157,7 +157,8 @@ namespace Vouchee.Business.Services.Impls
                 try
                 {
                     result = _voucherCodeRepository.GetTable()
-                                .ProjectTo<GetVoucherCodeDTO>(_mapper.ConfigurationProvider);
+                                .ProjectTo<GetVoucherCodeDTO>(_mapper.ConfigurationProvider)
+                                .DynamicFilter(_mapper.Map<GetVoucherCodeDTO>(voucherCodeFilter));
                 }
                 catch (Exception ex)
                 {
