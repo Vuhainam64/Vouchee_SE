@@ -21,7 +21,8 @@ namespace Vouchee.Business.Services
         public Task<ResponseMessage<GetUserDTO>> UpdateUserBankAsync(UpdateUserBankDTO updateUserBankDTO, ThisUserObj thisUserObj);
         public Task<ResponseMessage<GetUserDTO>> UpdateUserRoleAsync(UpdateUserRoleDTO updateUserRoleDTO);
         public Task<ResponseMessage<bool>> BanUserAsync(Guid userId, ThisUserObj thisUserObj, bool isBan, string reason);
-        public Task<ResponseMessage<bool>> ChangePasswordAsync(string email, string hashPassword);
+        public Task<ResponseMessage<bool>> ChangePasswordAsync(string hashPassword, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<bool>> ReactiveUserAsync(Guid userId, ThisUserObj currentUser);
 
         // DELETE
         public Task<ResponseMessage<bool>> DeleteUserAsync(Guid id, ThisUserObj thisUserObj);

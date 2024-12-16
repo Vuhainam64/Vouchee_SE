@@ -95,6 +95,26 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
+        [Authorize]
+        [HttpPut("change_password")]
+        public async Task<IActionResult> ChangePassword(string password)
+        {
+            ThisUserObj thisUserObj = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _userService.ChangePasswordAsync(password, thisUserObj);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpPut("reactive_user")]
+        public async Task<IActionResult> ReactiveUser(Guid userId)
+        {
+            ThisUserObj thisUserObj = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _userService.ReactiveUserAsync(userId, thisUserObj);
+            return Ok(result);
+        }
+
         // DELETE
         [Authorize]
         [HttpDelete("delete_user/{id}")]

@@ -24,8 +24,12 @@ namespace Vouchee.Data.Models.Entities
         public virtual Wallet? BuyerWallet { get; set; }
         [InverseProperty(nameof(Wallet.Seller))]
         public virtual Wallet? SellerWallet { get; set; }
-        [InverseProperty(nameof(Supplier.User))]
+
+        public Guid? SupplierId { get; set; }
+        [ForeignKey(nameof(SupplierId))]
+        [InverseProperty(nameof(Supplier.Users))]
         public virtual Supplier? Supplier { get; set; }
+
         [InverseProperty(nameof(Order.Buyer))]
         public virtual ICollection<Order> Orders { get; set; }
         [InverseProperty(nameof(Voucher.Seller))]

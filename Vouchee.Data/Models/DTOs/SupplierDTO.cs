@@ -31,7 +31,7 @@ namespace Vouchee.Business.Models.DTOs
 
     public class GetSupplierDTO : SupplierDTO
     {
-
+        public int totalQuantitySold { get; set; }
     }
 
     public class GetDetailSupplierDTO : SupplierDTO
