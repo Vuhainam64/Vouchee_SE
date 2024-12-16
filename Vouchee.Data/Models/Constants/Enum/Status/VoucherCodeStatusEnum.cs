@@ -8,6 +8,7 @@ namespace Vouchee.Data.Models.Constants.Enum.Status
 {
     public enum VoucherCodeStatusEnum
     {
+        PENDING,
         UNUSED,
         USED,
         EXPIRED,
