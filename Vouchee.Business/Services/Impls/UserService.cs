@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using FirebaseAdmin.Auth;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
@@ -45,7 +46,7 @@ namespace Vouchee.Business.Services.Impls
             _sendEmailService = sendEmailService;
         }
 
-        public async Task<ResponseMessage<bool>> BanUserAsync(Guid userId, ThisUserObj thisUserObj, bool isBan, string reason)
+        public async Task<ResponseMessage<bool>> BanUserAsync(Guid userId, ThisUserObj thisUserObj, bool isBan, string? reason)
         {
             var existedUser = await _userRepository.GetByIdAsync(userId, isTracking: true);
 
@@ -59,6 +60,7 @@ namespace Vouchee.Business.Services.Impls
 
             if (isBan)
             {
+                if (!reason.IsNullOrEmpty()) { 
                 existedUser.IsActive = false;
                 existedUser.Status = UserStatusEnum.BANNED.ToString();
                 existedUser.Description = reason;
@@ -78,12 +80,17 @@ namespace Vouchee.Business.Services.Impls
                         voucher.UpdateBy = thisUserObj.userId;
                     }
                 }
+                }
+                else
+                {
+                    throw new ConflictException("Phải có lý do");
+                }
             }
             else
             {
                 existedUser.IsActive = true;
                 existedUser.Status = UserStatusEnum.NONE.ToString();
-                existedUser.Description = null;
+                existedUser.Description = reason;
 
                 foreach (var voucher in existedUser.Vouchers)
                 {
