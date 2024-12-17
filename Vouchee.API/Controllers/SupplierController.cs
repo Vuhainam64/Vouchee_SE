@@ -68,6 +68,16 @@ namespace Vouchee.API.Controllers
             return Ok(supplier);
         }
 
+        [Authorize]
+        [HttpGet("get_supplier_dashboard")]
+        public async Task<IActionResult> GetSupplierDashboard()
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var supplier = await _supplierService.GetSupplierDashboard(currentUser);
+            return Ok(supplier);
+        }
+
         // UPDATE
         [HttpPut("update_supplier/{id}")]
         public async Task<IActionResult> UpdateSupplier(Guid id, [FromBody] UpdateSupplierDTO updateSupplierDTO)

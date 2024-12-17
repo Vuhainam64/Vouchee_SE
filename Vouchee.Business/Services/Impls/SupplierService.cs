@@ -21,18 +21,21 @@ namespace Vouchee.Business.Services.Impls
 {
     public class SupplierService : ISupplierService
     {
+        private readonly IBaseRepository<VoucherCode> _voucherCodeRepository;
         private readonly IBaseRepository<WalletTransaction> _walletTransactionRepository;
         private readonly IBaseRepository<User> _userRepository;
         private readonly IBaseRepository<Wallet> _walletRepository;
         private readonly IBaseRepository<Supplier> _supplierRepository;
         private readonly IMapper _mapper;
 
-        public SupplierService(IBaseRepository<WalletTransaction> walletTransactionRepository,
+        public SupplierService(IBaseRepository<VoucherCode> voucherCodeRepository,
+                               IBaseRepository<WalletTransaction> walletTransactionRepository,
                                IBaseRepository<User> userRepository,
                                IBaseRepository<Wallet> walletRepository,
                                IBaseRepository<Supplier> supplierRepository,
                                IMapper mapper)
         {
+            _voucherCodeRepository = voucherCodeRepository;
             _walletTransactionRepository = walletTransactionRepository;
             _userRepository = userRepository;
             _walletRepository = walletRepository;
@@ -148,6 +151,53 @@ namespace Vouchee.Business.Services.Impls
                 LoggerService.Logger(ex.Message);
                 throw new LoadException(ex.Message);
             }
+        }
+
+        public async Task<dynamic> GetSupplierDashboard(ThisUserObj currentUser)
+        {
+            // Fetch the current user along with their Supplier data
+            var existedUser = await _userRepository.GetByIdAsync(
+                currentUser.userId,
+                includeProperties: x => x.Include(x => x.Supplier).ThenInclude(s => s.SupplierWallet)
+            );
+
+            if (existedUser?.Supplier == null)
+                throw new Exception("Supplier not found for the current user.");
+
+            // Query for voucher data linked to the supplier
+            var voucherCodes = _voucherCodeRepository.GetTable()
+                .Where(x => x.Modal.Voucher.Supplier.Id == existedUser.Supplier.Id);
+
+            // Query for wallet transactions linked to the supplier's wallet
+            var walletTransactions = _walletTransactionRepository.GetTable()
+                .Where(x => x.SupplierWalletId == existedUser.Supplier.SupplierWallet.Id);
+
+            // Calculate statistics
+            var pendingVouchers = await voucherCodes
+                .CountAsync(x => x.Status == VoucherCodeStatusEnum.PENDING.ToString());
+
+            var approvedVouchers = await voucherCodes
+                .CountAsync(x => x.Status == VoucherCodeStatusEnum.UNUSED.ToString());
+
+            // Group transactions by month
+            var monthDashboard = await walletTransactions
+                .GroupBy(x => new { x.CreateDate.Value.Year, x.CreateDate.Value.Month })
+                .Select(g => new
+                {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    TotalTransactions = g.Count(),
+                    TotalAmount = g.Sum(t => t.Amount) // Assuming there's an Amount property
+                })
+                .ToListAsync();
+
+            // Return the dashboard data
+            return new
+            {
+                pendingVouchers,
+                approvedVouchers,
+                monthDashboard
+            };
         }
 
         public async Task<IList<GetSupplierDTO>> GetSuppliersAsync()
