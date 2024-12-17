@@ -182,6 +182,9 @@ namespace Vouchee.Business.Services.Impls
                 throw new ConflictException("Email này đã được dùng");
             }
 
+            // Map the DTO to the user entity
+            var user = _mapper.Map<User>(createUserDTO);
+
             if (createUserDTO.supplierId != null)
             {
                 var existedSupplier = await _supplierRepository.GetByIdAsync(createUserDTO.supplierId);
@@ -190,9 +193,6 @@ namespace Vouchee.Business.Services.Impls
                     throw new NotFoundException("Không tìm thấy supplỉer này");
                 }
             }
-            
-            // Map the DTO to the user entity
-            var user = _mapper.Map<User>(createUserDTO);
 
             // Default values for user
             user.Name = "Vouchee member";

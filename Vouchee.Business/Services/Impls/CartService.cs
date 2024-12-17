@@ -69,6 +69,11 @@ namespace Vouchee.Business.Services.Impls
 
             CartDTO cartDTO = new();
 
+            if (_user.BuyerWallet == null)
+            {
+                throw new NotFoundException("Người này có không ví mua");
+            }
+
             cartDTO.vPoint = _user.VPoint;
             cartDTO.balance = _user.BuyerWallet.Balance;
 

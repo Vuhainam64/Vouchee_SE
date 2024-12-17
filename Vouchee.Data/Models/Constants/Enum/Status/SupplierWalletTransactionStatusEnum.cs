@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Vouchee.Data.Models.Constants.Enum.Other
+namespace Vouchee.Data.Models.Constants.Enum.Status
 {
-    public enum WalletTypeEnum
+    public enum SupplierWalletTransactionStatusEnum
     {
-        BUYER,
-        SELLER,
-        SUPPLIER
+        PENDING,
+        PAID
     }
 }

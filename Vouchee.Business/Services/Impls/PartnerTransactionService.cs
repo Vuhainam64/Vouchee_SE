@@ -253,14 +253,14 @@ namespace Vouchee.Business.Services.Impls
                                 CreateBy = existedOrder.Buyer.Id,
                                 CreateDate = DateTime.Now,
                                 Status = SellerWalletTransactionStatusEnum.DONE.ToString(),
-                                Amount = amount - (amount * 7 / 100),
+                                Amount = amount - (amount * 10 / 100),
                                 OrderId = existedOrder.Id,
                                 BeforeBalance = existedSeller.SellerWallet.Balance,
-                                AfterBalance = existedSeller.SellerWallet.Balance + amount,
+                                AfterBalance = existedSeller.SellerWallet.Balance + (amount - (amount * 10 / 100)),
                                 Note = $"Nhận tiền từ đơn {existedOrder.Id}"
                             });
 
-                            existedSeller.SellerWallet.Balance += amount - (amount * 7 / 100);
+                            existedSeller.SellerWallet.Balance += amount - (amount * 10 / 100);
 
                             string description = $"Đơn hàng số {existedOrder.Id}\n";
 
@@ -290,8 +290,6 @@ namespace Vouchee.Business.Services.Impls
 
                             var existedSupplier = await _supplierRepository.GetByIdAsync(supplier.Key, includeProperties: x => x.Include(x => x.SupplierWallet)
                                                                                                                                         .ThenInclude(x => x.SupplierWalletTransactions)
-                                                                                                                                    .Include(x => x.Users)
-                                                                                                                                        .ThenInclude(x => x.Supplier)
                                                                                                                                     , isTracking: true);
 
                             existedSupplier.SupplierWallet.SupplierWalletTransactions.Add(new()
@@ -300,11 +298,11 @@ namespace Vouchee.Business.Services.Impls
                                 Type = "AMOUNT_IN",
                                 OrderId = existedOrder.Id,
                                 BeforeBalance = existedSupplier.SupplierWallet.Balance,
-                                Amount = amount * 5 / 100,
-                                AfterBalance = existedSupplier.SupplierWallet.Balance + (amount * 5 / 100),
+                                Amount = amount * 10 / 100,
+                                AfterBalance = existedSupplier.SupplierWallet.Balance + (amount * 10 / 100),
                                 CreateDate = DateTime.Now
                             });
-                            existedSupplier.SupplierWallet.Balance += amount * 5 / 100;
+                            existedSupplier.SupplierWallet.Balance += amount * 10 / 100;
 
                             foreach (var supplierToSendEmail in existedSupplier.Users)
                             {
