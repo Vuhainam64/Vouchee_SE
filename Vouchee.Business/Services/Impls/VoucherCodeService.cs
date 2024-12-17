@@ -280,10 +280,10 @@ namespace Vouchee.Business.Services.Impls
             var findcode = voucherCodes.Where(c => c.Code == code.ToString())
                 .FirstOrDefaultAsync();
             var updatecode = await findcode;
-            if (updatecode != null && updatecode.Status == VoucherCodeStatusEnum.PENDING.ToString())
+            if (updatecode != null && updatecode.Status == VoucherCodeStatusEnum.UNUSED.ToString())
             {
 
-                updatecode.Status = VoucherCodeStatusEnum.UNUSED.ToString();
+                updatecode.Status = VoucherCodeStatusEnum.USED.ToString();
                 updatecode.UpdateDate = DateTime.Now;
                 updatecode.UpdateBy = thisUserObj.userId;
                 _voucherCodeRepository.UpdateAsync(updatecode);
