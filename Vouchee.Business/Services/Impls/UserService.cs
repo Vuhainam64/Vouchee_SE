@@ -94,7 +94,7 @@ namespace Vouchee.Business.Services.Impls
 
                     foreach (var modal in voucher.Modals)
                     {
-                        modal.Status = ModalStatusEnum.INACTIVE_BY_BANNED_USER.ToString();
+                        modal.Status = ModalStatusEnum.NONE.ToString();
                         voucher.IsActive = true;
                         voucher.UpdateDate = DateTime.Now;
                         voucher.UpdateBy = thisUserObj.userId;
