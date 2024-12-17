@@ -31,7 +31,9 @@ namespace Vouchee.Business.Models.DTOs
     public class GetVoucherCodeDTO : VoucherCodeDTO
     {
         public Guid id { get; set; }
+        public string name { get; set; }
 
+        public string brand { get; set; }
         public Guid? modalId { get; set; }
         public string? orderId { get; set; }
         public Guid? buyerId { get; set; }

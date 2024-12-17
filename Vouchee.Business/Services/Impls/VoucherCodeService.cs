@@ -72,7 +72,7 @@ namespace Vouchee.Business.Services.Impls
                 {
                     var voucherCode = _mapper.Map<VoucherCode>(createVoucherCode);
                     voucherCode.ModalId = exisedModal.Id;
-                    voucherCode.Status = VoucherCodeStatusEnum.NONE.ToString();
+                    voucherCode.Status = VoucherCodeStatusEnum.PENDING.ToString();
                     voucherCode.CreateBy = thisUserObj.userId;
 
                     exisedModal.VoucherCodes.Add(voucherCode);
@@ -149,7 +149,7 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<IList<GetVoucherCodeDTO>> GetVoucherCodesAsync()
+        public async Task<IList<GetVoucherCodeDTO>> GetVoucherCodesAsync(VoucherCodeFilter voucherCodeFilter)
         {
             try
             {
@@ -157,7 +157,8 @@ namespace Vouchee.Business.Services.Impls
                 try
                 {
                     result = _voucherCodeRepository.GetTable()
-                                .ProjectTo<GetVoucherCodeDTO>(_mapper.ConfigurationProvider);
+                                .ProjectTo<GetVoucherCodeDTO>(_mapper.ConfigurationProvider)
+                                .DynamicFilter(_mapper.Map<GetVoucherCodeDTO>(voucherCodeFilter));
                 }
                 catch (Exception ex)
                 {
@@ -279,10 +280,10 @@ namespace Vouchee.Business.Services.Impls
             var findcode = voucherCodes.Where(c => c.Code == code.ToString())
                 .FirstOrDefaultAsync();
             var updatecode = await findcode;
-            if (updatecode != null && updatecode.Status == VoucherCodeStatusEnum.UNUSED.ToString())
+            if (updatecode != null && updatecode.Status == VoucherCodeStatusEnum.PENDING.ToString())
             {
 
-                updatecode.Status = VoucherCodeStatusEnum.USED.ToString();
+                updatecode.Status = VoucherCodeStatusEnum.UNUSED.ToString();
                 updatecode.UpdateDate = DateTime.Now;
                 updatecode.UpdateBy = thisUserObj.userId;
                 _voucherCodeRepository.UpdateAsync(updatecode);
@@ -298,7 +299,7 @@ namespace Vouchee.Business.Services.Impls
             {
                 throw new Exception("Không tìm thấy code");
             }
-            else if (updatecode != null && updatecode.Status != VoucherCodeStatusEnum.UNUSED.ToString())
+            else if (updatecode != null && updatecode.Status != VoucherCodeStatusEnum.USED.ToString())
             {
                 throw new Exception("Voucher Code bị " + updatecode.Status);
             }
