@@ -78,6 +78,17 @@ namespace Vouchee.API.Controllers
             return Ok(supplier);
         }
 
+        [Authorize]
+        [HttpGet("get_supplier_order_dashboard")]
+        public async Task<IActionResult> GetSupplierOrderDashboard([FromQuery] PagingRequest pagingRequest,
+                                                                        [FromQuery] OrderFilter orderFilter)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var supplier = await _supplierService.GetSupplierOrderAsync(currentUser, pagingRequest, orderFilter);
+            return Ok(supplier);
+        }
+
         // UPDATE
         [HttpPut("update_supplier/{id}")]
         public async Task<IActionResult> UpdateSupplier(Guid id, [FromBody] UpdateSupplierDTO updateSupplierDTO)

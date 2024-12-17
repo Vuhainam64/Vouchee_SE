@@ -18,6 +18,7 @@ namespace Vouchee.Business.Services
         public Task<IList<GetSupplierDTO>> GetSuppliersAsync();
         public Task<IList<BestSuppleriDTO>> GetBestSuppliers();
         public Task<dynamic> GetSupplierWalletTransactionAsync(ThisUserObj currentUser, PagingRequest pagingRequest, SupplierWalletTransactionFilter supplierWalletTransactionFilter);
+        public Task<dynamic> GetSupplierOrderAsync(ThisUserObj currentUser, PagingRequest pagingRequest, OrderFilter orderFilter);
         public Task<dynamic> GetSupplierDashboard(ThisUserObj currentUser);
 
         // UPDATE

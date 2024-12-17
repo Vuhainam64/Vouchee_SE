@@ -21,6 +21,7 @@ namespace Vouchee.Business.Services.Impls
 {
     public class SupplierService : ISupplierService
     {
+        private readonly IBaseRepository<Order> _orderRepository;
         private readonly IBaseRepository<VoucherCode> _voucherCodeRepository;
         private readonly IBaseRepository<WalletTransaction> _walletTransactionRepository;
         private readonly IBaseRepository<User> _userRepository;
@@ -28,13 +29,15 @@ namespace Vouchee.Business.Services.Impls
         private readonly IBaseRepository<Supplier> _supplierRepository;
         private readonly IMapper _mapper;
 
-        public SupplierService(IBaseRepository<VoucherCode> voucherCodeRepository,
+        public SupplierService(IBaseRepository<Order> orderRepository,
+                               IBaseRepository<VoucherCode> voucherCodeRepository,
                                IBaseRepository<WalletTransaction> walletTransactionRepository,
                                IBaseRepository<User> userRepository,
                                IBaseRepository<Wallet> walletRepository,
                                IBaseRepository<Supplier> supplierRepository,
                                IMapper mapper)
         {
+            _orderRepository = orderRepository;
             _voucherCodeRepository = voucherCodeRepository;
             _walletTransactionRepository = walletTransactionRepository;
             _userRepository = userRepository;
@@ -197,6 +200,64 @@ namespace Vouchee.Business.Services.Impls
                 pendingVouchers,
                 approvedVouchers,
                 monthDashboard
+            };
+        }
+
+        public async Task<dynamic> GetSupplierOrderAsync(ThisUserObj currentUser, PagingRequest pagingRequest, OrderFilter orderFilter)
+        {
+            // Fetch the current user and supplier
+            var existedUser = await _userRepository.GetByIdAsync(
+                currentUser.userId,
+                includeProperties: x => x.Include(x => x.Supplier)
+            );
+
+            if (existedUser == null)
+            {
+                throw new NotFoundException("Không tìm thấy user nào");
+            }
+
+            if (existedUser.Supplier == null)
+            {
+                throw new NotFoundException("Không tìm thấy supplier nào từ user này");
+            }
+
+            // Supplier ID for filtering
+            var supplierId = existedUser.Supplier.Id;
+
+            // Query orders where the Modal belongs to the supplier
+            var ordersQuery = _orderRepository.GetTable()
+                .Where(order => order.OrderDetails.Any(od => od.Modal.Voucher.SupplierId == supplierId));
+
+            // Apply filters from OrderFilter
+            if (orderFilter != null)
+            {
+                if (orderFilter.startDate.HasValue)
+                {
+                    ordersQuery = ordersQuery.Where(order => order.CreateDate >= orderFilter.startDate.Value);
+                }
+
+                if (orderFilter.endDate.HasValue)
+                {
+                    ordersQuery = ordersQuery.Where(order => order.CreateDate <= orderFilter.endDate.Value);
+                }
+
+                if (!string.IsNullOrEmpty(orderFilter.status.ToString()))
+                {
+                    ordersQuery = ordersQuery.Where(order => order.Status == orderFilter.status.ToString());
+                }
+            }
+
+            // Project to DTO using AutoMapper
+            var paginatedOrders = await ordersQuery
+                .ProjectTo<GetOrderDTO>(_mapper.ConfigurationProvider)
+                .Skip((pagingRequest.page - 1) * pagingRequest.pageSize)
+                .Take(pagingRequest.pageSize)
+                .ToListAsync();
+
+            // Return the result
+            return new
+            {
+                orders = paginatedOrders
             };
         }
 
