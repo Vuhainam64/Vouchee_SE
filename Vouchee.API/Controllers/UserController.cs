@@ -87,7 +87,7 @@ namespace Vouchee.API.Controllers
 
         [Authorize]
         [HttpPut("ban_user")]
-        public async Task<IActionResult> BanUser(Guid userId, bool isBan, string reason)
+        public async Task<IActionResult> BanUser(Guid userId, bool isBan, string? reason)
         {
             ThisUserObj thisUserObj = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
