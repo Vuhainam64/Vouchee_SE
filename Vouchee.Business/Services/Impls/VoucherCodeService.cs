@@ -318,6 +318,7 @@ namespace Vouchee.Business.Services.Impls
                 {
                     var result = await updatecode;
                     result.Status = VoucherCodeStatusEnum.CONVERTING.ToString();
+                    _voucherCodeRepository.UpdateAsync(result);
                     list.Add(_mapper.Map<GetVoucherCodeDTO>(result));
                 }
                 else
