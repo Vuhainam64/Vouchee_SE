@@ -13,6 +13,7 @@ namespace Vouchee.Data.Models.Constants.Enum.Status
         USED,
         EXPIRED,
         VIOLENT,
-        NONE
+        NONE,
+        CONVERTING
     }
 }

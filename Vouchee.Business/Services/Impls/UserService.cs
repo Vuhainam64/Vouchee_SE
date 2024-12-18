@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using FirebaseAdmin.Auth;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
@@ -48,7 +49,7 @@ namespace Vouchee.Business.Services.Impls
             _sendEmailService = sendEmailService;
         }
 
-        public async Task<ResponseMessage<bool>> BanUserAsync(Guid userId, ThisUserObj thisUserObj, bool isBan, string reason)
+        public async Task<ResponseMessage<bool>> BanUserAsync(Guid userId, ThisUserObj thisUserObj, bool isBan, string? reason)
         {
             var existedUser = await _userRepository.GetByIdAsync(userId, isTracking: true);
 
@@ -62,6 +63,7 @@ namespace Vouchee.Business.Services.Impls
 
             if (isBan)
             {
+                if (!reason.IsNullOrEmpty()) { 
                 existedUser.IsActive = false;
                 existedUser.Status = UserStatusEnum.BANNED.ToString();
                 existedUser.Description = reason;
@@ -83,17 +85,17 @@ namespace Vouchee.Business.Services.Impls
                         voucher.UpdateBy = thisUserObj.userId;
                     }
                 }
-
-                await _sendEmailService.SendEmailAsync(existedUser.Email, "Trạng thái tài khoản", $"Tài khoản của bạn đã bị ban vào lúc {existedUser.UpdateDate}\n" +
-                                                                            $"Lý do: {reason}");
+                }
+                else
+                {
+                    throw new ConflictException("Phải có lý do");
+                }
             }
             else
             {
                 existedUser.IsActive = true;
                 existedUser.Status = UserStatusEnum.NONE.ToString();
-                existedUser.UpdateDate= DateTime.Now;
-                existedUser.UpdateBy = thisUserObj.userId;
-                existedUser.Description = null;
+                existedUser.Description = reason;
 
                 foreach (var voucher in existedUser.Vouchers)
                 {
@@ -104,7 +106,7 @@ namespace Vouchee.Business.Services.Impls
 
                     foreach (var modal in voucher.Modals)
                     {
-                        modal.Status = ModalStatusEnum.INACTIVE_BY_BANNED_USER.ToString();
+                        modal.Status = ModalStatusEnum.NONE.ToString();
                         voucher.IsActive = true;
                         voucher.UpdateDate = DateTime.Now;
                         voucher.UpdateBy = thisUserObj.userId;

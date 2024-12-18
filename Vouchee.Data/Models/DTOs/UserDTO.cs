@@ -63,7 +63,7 @@ namespace Vouchee.Business.Models.DTOs
         public GetDetailUserDTO()
         {
             orders = [];
-            vouchers = [];
+            //vouchers = [];
             carts = [];
             notificationFromUser = [];
             notificationToUser = [];
@@ -73,7 +73,7 @@ namespace Vouchee.Business.Models.DTOs
         public GetSellerWallet? sellerWallet { get; set; }
 
         public virtual ICollection<CartDTO> carts { get; set; }
-        public virtual ICollection<GetVoucherDTO> vouchers { get; set; }
+        //public virtual ICollection<GetVoucherDTO> vouchers { get; set; }
         public virtual ICollection<GetOrderDTO>? orders { get; set; }
         public virtual ICollection<GetNotificationDTO> notificationToUser { get; set; }
         [InverseProperty(nameof(Notification.Sender))]
