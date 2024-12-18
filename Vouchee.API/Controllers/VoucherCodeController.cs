@@ -81,7 +81,14 @@ namespace Vouchee.API.Controllers
             var result = await _voucherCodeService.UpdateCodeVoucherCodeAsync(updateCodeVoucherCodeDTOs, currentUser);
             return Ok(result);
         }
-
+        [HttpPut("update_list_code_status_converting_voucher_code")]
+        [Authorize]
+        public async Task<IActionResult> UpdateListCodeStatustoConvertingVoucherCode(IList<Guid> updateCodeVoucherCodeDTOs)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+            var result = await _voucherCodeService.UpdateVoucherCodeStatusConvertingAsync(updateCodeVoucherCodeDTOs, currentUser);
+            return Ok(result);
+        }
         // DELETE
         [HttpDelete("delete_voucher_code/{id}")]
         public async Task<IActionResult> DeleteVoucherCode(Guid id)
