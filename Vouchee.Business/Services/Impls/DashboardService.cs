@@ -31,9 +31,72 @@ namespace Vouchee.Business.Services.Impls
             _voucherRepository = voucherRepository;
         }
 
-        public Task<dynamic> GetActiveUserDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum dateFilterTypeEnum)
+        public async Task<dynamic> GetActiveUserDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum dateFilterTypeEnum)
         {
-            throw new NotImplementedException();
+            // Adjust fromDate and toDate if today is true
+            if (today)
+            {
+                fromDate = DateOnly.FromDateTime(DateTime.Today);
+                toDate = DateOnly.FromDateTime(DateTime.Today);
+            }
+
+            // Convert DateOnly to DateTime for filtering
+            DateTime fromDateTime = fromDate.ToDateTime(TimeOnly.MinValue);
+            DateTime toDateTime = toDate.ToDateTime(TimeOnly.MaxValue);
+
+            // Fetch all users
+            var users = await _userRepository.GetTable().ToListAsync();
+
+            // Filter users based on activity within the specified date range
+            var activeUsers = users.Where(user =>
+                user.LastAccessTime >= fromDateTime && user.LastAccessTime <= toDateTime);
+
+            // Group active users by the specified date filter type
+            IEnumerable<IGrouping<object, dynamic>> groupedActiveUsers;
+
+            switch (dateFilterTypeEnum)
+            {
+                case DateFilterTypeEnum.DAILY:
+                    groupedActiveUsers = activeUsers.GroupBy(user => (object)user.LastAccessTime.Value.Date);
+                    break;
+                case DateFilterTypeEnum.WEEKLY:
+                    groupedActiveUsers = activeUsers.GroupBy(user => (object)CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(user.LastAccessTime.Value.Date, CalendarWeekRule.FirstDay, DayOfWeek.Monday));
+                    break;
+                case DateFilterTypeEnum.MONTHLY:
+                    groupedActiveUsers = activeUsers.GroupBy(user => (object)user.LastAccessTime.Value.Month);
+                    break;
+                case DateFilterTypeEnum.YEARLY:
+                    groupedActiveUsers = activeUsers.GroupBy(user => (object)user.LastAccessTime.Value.Year);
+                    break;
+                default:
+                    throw new ArgumentException("Invalid date filter type");
+            }
+
+            // Generate the dashboard data
+            var activeUserDashboard = groupedActiveUsers.Select(g => new
+            {
+                Period = g.Key,
+                ActiveUsers = g.Count()
+            }).OrderBy(x => x.Period).ToList();
+
+            // Create summary metrics
+            var activeUserSummary = new
+            {
+                TotalActiveUsers = activeUsers.Count(),
+                NewUsers = activeUsers.Count(user => user.CreateDate >= fromDateTime && user.CreateDate <= toDateTime),
+                ReturningUsers = activeUsers.Count(user => user.CreateDate < fromDateTime)
+            };
+
+            return new
+            {
+                inactivatedAccounts = users.Count(x => x.Status.Equals(UserStatusEnum.INACTIVE.ToString())),
+                bannedAccounts = users.Count(x => x.Status.Equals(UserStatusEnum.BANNED.ToString())),
+                adminAccounts = users.Count(x => x.Role.Equals(RoleEnum.ADMIN.ToString())),
+                supplierAccounts = users.Count(x => x.Role.Equals(RoleEnum.SUPPLIER.ToString())),
+                memberAccounts = users.Count(x => x.Role.Equals(RoleEnum.USER.ToString())),
+                activeUserSummary,
+                activeUserDashboard
+            };
         }
 
         public async Task<dynamic> GetOrderDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum dateFilterTypeEnum)
