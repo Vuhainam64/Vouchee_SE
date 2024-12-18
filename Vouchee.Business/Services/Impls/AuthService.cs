@@ -104,6 +104,19 @@ namespace Vouchee.Business.Services.Impls
             }
             else
             {
+                if (user.Status == UserStatusEnum.BANNED.ToString())
+                {
+                    throw new ConflictException($"Bạn đã bị ban vào ngày {user.UpdateDate}\n" +
+                                                    $"Lý do: {user.Description}" +
+                                                    $"Nếu có thắc mắc xin vui lòng liên hệ với admin qua địa chỉ adminvouchee@gmail.com để được xem xét và kích hoạt lại");
+                }
+                else if (user.Status == UserStatusEnum.INACTIVE.ToString())
+                {
+                    throw new ConflictException($"Tài khoản của bạn đã dừng hoạt động vào ngày {user.UpdateDate}." +
+                                                    $"Lý do: {user.Description}" +
+                                                    $"Bạn vui lòng kích hoạt lại để có thể sử dụng tiếp");
+                }
+
                 if (deviceToken != null)
                 {
                     // check user nay co trung device token chua, chua thi add, co r thi k

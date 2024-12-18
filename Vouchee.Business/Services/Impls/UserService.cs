@@ -21,6 +21,7 @@ namespace Vouchee.Business.Services.Impls
 {
     public class UserService : IUserService
     {
+        private readonly IBaseRepository<Supplier> _supplierRepository;
         private readonly IBaseRepository<MoneyRequest> _moneyRequestRepository;
         private readonly IBaseRepository<Promotion> _promotionRepository;
         private readonly IBaseRepository<Voucher> _voucherRepository;
@@ -29,7 +30,8 @@ namespace Vouchee.Business.Services.Impls
         private readonly IMapper _mapper;
         private readonly ISendEmailService _sendEmailService;
 
-        public UserService(IBaseRepository<MoneyRequest> moneyRequestRepository,
+        public UserService(IBaseRepository<Supplier> supplierRepository,
+                           IBaseRepository<MoneyRequest> moneyRequestRepository,
                            IBaseRepository<Promotion> promotionRepository,
                            IBaseRepository<Voucher> voucherRepository,
                            IBaseRepository<Wallet> walletRepository,
@@ -37,6 +39,7 @@ namespace Vouchee.Business.Services.Impls
                            IMapper mapper,
                            ISendEmailService sendEmailService)
         {
+            _supplierRepository = supplierRepository;
             _moneyRequestRepository = moneyRequestRepository;
             _promotionRepository = promotionRepository;
             _voucherRepository = voucherRepository;
@@ -64,6 +67,8 @@ namespace Vouchee.Business.Services.Impls
                 existedUser.IsActive = false;
                 existedUser.Status = UserStatusEnum.BANNED.ToString();
                 existedUser.Description = reason;
+                existedUser.UpdateDate = DateTime.Now;
+                existedUser.UpdateBy = thisUserObj.userId;
 
                 foreach (var voucher in existedUser.Vouchers)
                 {
@@ -107,6 +112,8 @@ namespace Vouchee.Business.Services.Impls
                         voucher.UpdateBy = thisUserObj.userId;
                     }
                 }
+
+                await _sendEmailService.SendEmailAsync(existedUser.Email, "Trạng thái tài khoản", $"Tài khoản của bạn đã được gỡ ban vào lúc {existedUser.UpdateDate}");
             }
 
             await _userRepository.SaveChanges();
@@ -119,11 +126,11 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<ResponseMessage<bool>> ChangePasswordAsync(string email, string hashPassword)
+        public async Task<ResponseMessage<bool>> ChangePasswordAsync(string hashPassword, ThisUserObj thisUserObj)
         {
             // Retrieve the user from the local database
             var existedUser = await _userRepository.GetFirstOrDefaultAsync(
-                x => x.Email.ToLower().Equals(email.ToLower()),
+                x => x.Email.ToLower().Equals(thisUserObj.email.ToLower()),
                 isTracking: true);
 
             if (existedUser == null)
@@ -134,7 +141,7 @@ namespace Vouchee.Business.Services.Impls
             try
             {
                 // Update password in Firebase Authentication
-                var userRecord = await FirebaseAuth.DefaultInstance.GetUserByEmailAsync(email);
+                var userRecord = await FirebaseAuth.DefaultInstance.GetUserByEmailAsync(thisUserObj.email);
 
                 await FirebaseAuth.DefaultInstance.UpdateUserAsync(new FirebaseAdmin.Auth.UserRecordArgs
                 {
@@ -145,6 +152,9 @@ namespace Vouchee.Business.Services.Impls
                 // Optionally update the hashPassword in your local database
                 existedUser.HashPassword = hashPassword;
                 existedUser.UpdateDate = DateTime.Now;
+                existedUser.UpdateBy = thisUserObj.userId;
+
+                await _sendEmailService.SendEmailAsync(existedUser.Email, "Trạng thái tài khoản", $"Tài khoản đã được thay đổi mật khẩu vào lúc {existedUser.UpdateDate}");
 
                 await _userRepository.UpdateAsync(existedUser);
 
@@ -173,9 +183,18 @@ namespace Vouchee.Business.Services.Impls
             {
                 throw new ConflictException("Email này đã được dùng");
             }
-            
+
             // Map the DTO to the user entity
             var user = _mapper.Map<User>(createUserDTO);
+
+            if (createUserDTO.supplierId != null)
+            {
+                var existedSupplier = await _supplierRepository.GetByIdAsync(createUserDTO.supplierId);
+                if (existedSupplier == null)
+                {
+                    throw new NotFoundException("Không tìm thấy supplỉer này");
+                }
+            }
 
             // Default values for user
             user.Name = "Vouchee member";
@@ -261,12 +280,17 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Không tìm thấy user này");
             }
 
-            bool canCompletelyDelete = !(existedUser.BuyerWallet?.BuyerWalletTransactions?.Any() ?? false) &&
-                                       !(existedUser.SellerWallet?.SellerWalletTransactions?.Any() ?? false) &&
-                                       !existedUser.Orders.Any() &&
-                                       !existedUser.Orders.Any(order => order.VoucherCodes.Any()) &&
-                                       !existedUser.MoneyRequests.Any(r => r.TopUpWalletTransaction != null || r.WithdrawWalletTransaction != null) &&
-                                       !existedUser.Vouchers.SelectMany(v => v.Modals.SelectMany(m => m.OrderDetails)).Any();
+            if (existedUser.Role == RoleEnum.ADMIN.ToString())
+            {
+                throw new ConflictException("Không thể xóa tài khoản admin");
+            }
+
+            //bool canCompletelyDelete = !(existedUser.BuyerWallet?.BuyerWalletTransactions?.Any() ?? false) &&
+            //                           !(existedUser.SellerWallet?.SellerWalletTransactions?.Any() ?? false) &&
+            //                           !existedUser.Orders.Any() &&
+            //                           !existedUser.Orders.Any(order => order.VoucherCodes.Any()) &&
+            //                           !existedUser.MoneyRequests.Any(r => r.TopUpWalletTransaction != null || r.WithdrawWalletTransaction != null) &&
+            //                           !existedUser.Vouchers.SelectMany(v => v.Modals.SelectMany(m => m.OrderDetails)).Any();
 
             if (existedUser.Vouchers != null)
             {
@@ -287,37 +311,47 @@ namespace Vouchee.Business.Services.Impls
                 }
             }
 
-            try
-            {
-                var firebaseAuth = FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance;
+            //try
+            //{
+            //    var firebaseAuth = FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance;
 
-                if (!string.IsNullOrEmpty(existedUser.Email))
-                {
-                    var userRecord = await firebaseAuth.GetUserByEmailAsync(existedUser.Email);
-                    if (userRecord != null)
-                    {
-                        await firebaseAuth.DeleteUserAsync(userRecord.Uid);
-                    }
-                }
-            }
-            catch (FirebaseAdmin.Auth.FirebaseAuthException ex) when (ex.Message.Contains("Failed to get user with email"))
-            {
+            //    if (!string.IsNullOrEmpty(existedUser.Email))
+            //    {
+            //        var userRecord = await firebaseAuth.GetUserByEmailAsync(existedUser.Email);
+            //        if (userRecord != null)
+            //        {
+            //            await firebaseAuth.DeleteUserAsync(userRecord.Uid);
+            //        }
+            //    }
+            //}
+            //catch (FirebaseAdmin.Auth.FirebaseAuthException ex) when (ex.Message.Contains("Failed to get user with email"))
+            //{
 
-            }
+            //}
 
-            if (canCompletelyDelete)
-            {
-                await _userRepository.DeleteAsync(existedUser);
-            }
-            else
-            {
-                existedUser.IsActive = false;
-                existedUser.Status = UserStatusEnum.INACTIVE.ToString();
-                existedUser.UpdateDate = DateTime.Now;
-                existedUser.UpdateBy = thisUserObj.userId;
+            //if (canCompletelyDelete)
+            //{
+            //    await _userRepository.DeleteAsync(existedUser);
+            //}
+            //else
+            //{
+            //    existedUser.IsActive = false;
+            //    existedUser.Status = UserStatusEnum.INACTIVE.ToString();
+            //    existedUser.UpdateDate = DateTime.Now;
+            //    existedUser.UpdateBy = thisUserObj.userId;
 
-                await _userRepository.SaveChanges();
-            }
+            //    await _userRepository.SaveChanges();
+            //}
+
+            existedUser.IsActive = false;
+            existedUser.Status = UserStatusEnum.INACTIVE.ToString();
+            existedUser.UpdateDate = DateTime.Now;
+            existedUser.UpdateBy = thisUserObj.userId;
+            existedUser.Description = "Dã xóa bởi người dùng";
+
+            await _sendEmailService.SendEmailAsync(existedUser.Email, "Trạng thái tài khoản", $"Tài khoản của bạn đã bị xóa vào lúc {existedUser.UpdateDate} bởi người dùng");
+
+            await _userRepository.SaveChanges();
 
             return new ResponseMessage<bool>
             {
@@ -468,6 +502,54 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
+        public async Task<ResponseMessage<bool>> ReactiveUserAsync(Guid userId, ThisUserObj currentUser)
+        {
+            var existedUser = await _userRepository.FindAsync(userId, isTracking: true);
+
+            if (existedUser == null)
+            {
+                throw new NotFoundException("Không tìm thấy user này"); 
+            }
+
+            if (existedUser.IsActive == false && existedUser.Status == UserStatusEnum.INACTIVE.ToString())
+            {
+                throw new ConflictException("User này đã xóa trước đó");
+            }
+
+            existedUser.Description = null;
+            existedUser.IsActive = true;
+            existedUser.Status = UserStatusEnum.ACTIVE.ToString();
+            existedUser.UpdateDate = DateTime.Now;
+            existedUser.UpdateBy = currentUser.userId;
+
+            foreach (var voucher in existedUser.Vouchers)
+            {
+                voucher.Status = VoucherStatusEnum.NONE.ToString();
+                voucher.IsActive = true;
+                voucher.UpdateBy = currentUser.userId;
+                voucher.UpdateDate = DateTime.Now;
+
+                foreach (var modal in voucher.Modals)
+                {
+                    modal.Status = ModalStatusEnum.NONE.ToString();
+                    modal.IsActive = true;
+                    modal.UpdateBy = currentUser.userId;
+                    modal.UpdateDate = DateTime.Now;
+                }
+            }
+
+            await _sendEmailService.SendEmailAsync(existedUser.Email, "Trạng thái tài khoản", $"Tài khoản của bạn đã được kích hoạt lại vào lúc {existedUser.UpdateDate}");
+
+            await _userRepository.SaveChanges();
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Kích hoạt lại user thành công",
+                result = true,
+                value = true
+            };
+        }
+
         public async Task<ResponseMessage<GetUserDTO>> UpdateUserAsync(UpdateUserDTO updateUserDTO, ThisUserObj thisUserObj)
         {
             var existedUser = await _userRepository.GetByIdAsync(thisUserObj.userId, isTracking: true);
@@ -514,6 +596,11 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<ResponseMessage<GetUserDTO>> UpdateUserRoleAsync(UpdateUserRoleDTO updateUserRoleDTO)
         {
+            if (updateUserRoleDTO.supplierId != null && updateUserRoleDTO.role.Equals(RoleEnum.SUPPLIER.ToString()))
+            {
+                throw new ConflictException("Role supplier cần phải có supplier");
+            }
+
             var existedUser = await _userRepository.GetByIdAsync(updateUserRoleDTO.userId, isTracking: true);
             if (existedUser != null)
             {

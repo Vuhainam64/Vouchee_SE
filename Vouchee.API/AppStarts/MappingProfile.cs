@@ -130,6 +130,7 @@ namespace Vouchee.API.AppStarts
             // SUPPLIER
             CreateMap<Supplier, CreateSupplierDTO>().ReverseMap();
             CreateMap<Supplier, UpdateSupplierDTO>().ReverseMap();
+            CreateMap<Supplier, UpdateBankSupplierDTO>().ReverseMap();
             CreateMap<Supplier, GetSupplierDTO>().ReverseMap();
             CreateMap<GetSupplierDTO, SupplierFilter>().ReverseMap();
             CreateMap<Supplier, BestSuppleriDTO>().ReverseMap();
@@ -153,6 +154,7 @@ namespace Vouchee.API.AppStarts
                 .ForMember(dest => dest.buyerId, opt => opt.MapFrom(src => src.Order.CreateBy))
                 .ForMember(dest => dest.name, opt => opt.MapFrom(src => src.Modal.Voucher.Title))
                 .ForMember(dest => dest.brand, opt => opt.MapFrom(src => src.Modal.Voucher.Brand.Name))
+                .ForMember(dest => dest.modalname, opt => opt.MapFrom(src => src.Modal.Title))
                 .ReverseMap();
             CreateMap<GetVoucherCodeDTO, VoucherCodeFilter>().ReverseMap();
 
@@ -243,13 +245,18 @@ namespace Vouchee.API.AppStarts
             CreateMap<WalletTransaction, GetWalletTransactionDTO>().ReverseMap();
             CreateMap<WalletTransaction, GetSellerWalletTransaction>().ReverseMap();
             CreateMap<WalletTransaction, GetBuyerWalletTransactionDTO>().ReverseMap();
+            CreateMap<WalletTransaction, GetSupplierWalletTransactionDTO>()
+                .ForMember(dest => dest.supplierName, opt => opt.MapFrom(src => src.SupplierWallet.Supplier.Name))
+                .ReverseMap();
             CreateMap<GetWalletTransactionDTO, WalletTransactionFilter>().ReverseMap();
             CreateMap<GetSellerWalletTransaction, SellerWalletTransactionFilter>().ReverseMap();
             CreateMap<GetBuyerWalletTransactionDTO, BuyerWalletTransactionFilter>().ReverseMap();
+            CreateMap<GetSupplierWalletTransactionDTO, SupplierWalletTransactionFilter>().ReverseMap();
 
             // MONEY REQUEST
             CreateMap<MoneyRequest, CreateTopUpRequestDTO>().ReverseMap();
             CreateMap<MoneyRequest, GetTopUpRequestDTO>().ReverseMap();
+            CreateMap<TopUpRequestFilter, GetTopUpRequestDTO>().ReverseMap();
 
             // PARTNER TRANSACTION
             CreateMap<PartnerTransaction, SePayTransactionDTO>().ReverseMap();

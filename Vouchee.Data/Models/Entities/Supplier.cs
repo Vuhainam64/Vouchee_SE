@@ -15,15 +15,16 @@ namespace Vouchee.Data.Models.Entities
         public Supplier()
         {
             Vouchers = [];
+            Users = [];
         }
+
+        [InverseProperty(nameof(Wallet.Supplier))]
+        public virtual Wallet? SupplierWallet { get; set; }
 
         [InverseProperty(nameof(Voucher.Supplier))]
         public virtual ICollection<Voucher> Vouchers { get; set; }
-
-        public Guid? UserId { get; set; }
-        [ForeignKey(nameof(UserId))]
         [InverseProperty(nameof(User.Supplier))]
-        public required virtual User? User { get; set; }
+        public virtual ICollection<User> Users { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
@@ -33,9 +34,12 @@ namespace Vouchee.Data.Models.Entities
         public string? Contact { get; set; }
         public bool IsVerified { get; set; }
         public string? Image { get; set; }
-        public int? TotalQuantitySold { get; set; }
+        public string? BankName { get; set; }
+        public string? BankNumber { get; set; }
+        public string? BankAccount { get; set; }
+        public int? TotalQuantitySold => Vouchers.Sum(x => x.Modals.Sum(x => x.OrderDetails.Sum(x => x.Quantity)));
 
-        public bool IsActive = true;
+        public bool IsActive { get; set; }
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }

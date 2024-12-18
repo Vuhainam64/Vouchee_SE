@@ -6,14 +6,9 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Constants.Enum.Status
 {
-    public enum VoucherCodeStatusEnum
+    public enum SupplierWalletTransactionStatusEnum
     {
         PENDING,
-        UNUSED,
-        USED,
-        EXPIRED,
-        VIOLENT,
-        NONE,
-        CONVERTING
+        PAID
     }
 }

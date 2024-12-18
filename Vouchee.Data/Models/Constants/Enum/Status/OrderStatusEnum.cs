@@ -15,6 +15,7 @@ namespace Vouchee.Data.Models.Constants.Enum.Status
         ERROR_AT_TRANSACTION,
         FINISH_TRANSACTION,
         PAID,
-        UN_PAID
+        UN_PAID,
+        EXPIRED
     }
 }

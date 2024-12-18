@@ -23,6 +23,7 @@ namespace Vouchee.Business.Models.DTOs
         public string? Name { get; set; }
         [Required(ErrorMessage = "Mật khẩu là cần thiết")]
         public string? hashPassword { get; set; }
+        public Guid? supplierId { get; set; }
         public DateTime? createDate = DateTime.Now;
 
         public RoleEnum role { get; set; }
@@ -36,6 +37,7 @@ namespace Vouchee.Business.Models.DTOs
     {
         public Guid userId { get; set; }
         public RoleEnum role { get; set; }
+        public Guid? supplierId { get; set; }
         public DateTime? updateDate = DateTime.Now;
     }
 
@@ -63,7 +65,7 @@ namespace Vouchee.Business.Models.DTOs
         public GetDetailUserDTO()
         {
             orders = [];
-            vouchers = [];
+            //vouchers = [];
             carts = [];
             notificationFromUser = [];
             notificationToUser = [];
@@ -73,7 +75,7 @@ namespace Vouchee.Business.Models.DTOs
         public GetSellerWallet? sellerWallet { get; set; }
 
         public virtual ICollection<CartDTO> carts { get; set; }
-        public virtual ICollection<GetVoucherDTO> vouchers { get; set; }
+        //public virtual ICollection<GetVoucherDTO> vouchers { get; set; }
         public virtual ICollection<GetOrderDTO>? orders { get; set; }
         public virtual ICollection<GetNotificationDTO> notificationToUser { get; set; }
         [InverseProperty(nameof(Notification.Sender))]

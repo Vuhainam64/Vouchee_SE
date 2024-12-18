@@ -32,7 +32,7 @@ namespace Vouchee.Business.Models.DTOs
     {
         public Guid id { get; set; }
         public string name { get; set; }
-
+        public string modalname { get; set; }
         public string brand { get; set; }
         public Guid? modalId { get; set; }
         public string? orderId { get; set; }
@@ -47,5 +47,12 @@ namespace Vouchee.Business.Models.DTOs
         public string code { get; set; }
         [Required]
         public string newcode { get; set; }
+    }
+    public class UpdateVoucherCodeStatusDTO
+    {
+        [Required]
+        public VoucherCodeStatusEnum status { get; set; }
+        [Required]
+        public Guid id { get; set; }
     }
 }

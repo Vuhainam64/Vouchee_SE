@@ -18,6 +18,7 @@ namespace Vouchee.API.Controllers
     {
         private readonly ISendEmailService _sendEmailService;
 
+        private readonly ISupplierService _supplierService;
         private readonly IDeviceTokenService _deviceTokenService;
         private readonly IUserService _userService;
         private readonly INotificationService _notificationService;
@@ -25,6 +26,7 @@ namespace Vouchee.API.Controllers
         private readonly IWalletTransactionService _walletTransactionService;
 
         public WeatherForecastController(ISendEmailService sendEmailService,
+                                         ISupplierService supplierService,
                                          IDeviceTokenService deviceTokenService,
                                          IUserService userService,
                                          INotificationService notificationService,
@@ -32,12 +34,15 @@ namespace Vouchee.API.Controllers
                                          IWalletTransactionService walletTransactionService)
         {
             _sendEmailService = sendEmailService;
+            _supplierService = supplierService;
             _deviceTokenService = deviceTokenService;
             _userService = userService;
             _notificationService = notificationService;
             _walletService = walletService;
             _walletTransactionService = walletTransactionService;
         }
+
+
 
         // CREATE
         [HttpPost("create_device_token")]
@@ -69,9 +74,14 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
+        [HttpPost("create_supplier_wallet")]
+        public async Task<IActionResult> CreateSupplierWallet(Guid supplierId)
+        {
+            var result = await _supplierService.CreateSupplierWalletAsync(supplierId);
+            return Ok(result);
+        }
 
         // READ
-
         [Authorize]
         [HttpGet("get_all_device_token")]
         public async Task<IActionResult> GetAllDeviceToken([FromQuery] PagingRequest pagingRequest, [FromQuery] DeviceTokenFilter deviceTokenFilter)
