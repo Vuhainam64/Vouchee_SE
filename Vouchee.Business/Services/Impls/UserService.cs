@@ -197,7 +197,10 @@ namespace Vouchee.Business.Services.Impls
             }
 
             // Default values for user
+<<<<<<< HEAD
             /*user.Name = "Vouchee member";*/
+=======
+>>>>>>> ca562ac9701728d41e44f13ef8818841dd4cba21
             user.Status = UserStatusEnum.ACTIVE.ToString();
             user.BuyerWallet = new()
             {

@@ -64,6 +64,7 @@ namespace Vouchee.Business.Services.Impls
                     Image = imageUrl,
                     Role = RoleEnum.USER.ToString(),
                     Name = lastName,
+                    PhoneNumber = phoneNumber,
                     Status = ObjectStatusEnum.ACTIVE.ToString(),
                     CreateDate = DateTime.Now,
                     BuyerWallet = new()
@@ -94,7 +95,7 @@ namespace Vouchee.Business.Services.Impls
                 response.uid = uid;
                 response.image = imageUrl;
                 response.phoneNumber = phoneNumber;
-                response.name = userRecord.DisplayName;
+                response.name = lastName;
                 response.role = newUser.Role;
                 response.deviceTokens = _mapper.Map<IList<GetDeviceTokenDTO>>(newUser.DeviceTokens);
                 response = await GenerateTokenAsync(response, RoleEnum.USER.ToString());
@@ -145,7 +146,7 @@ namespace Vouchee.Business.Services.Impls
                 response.email = email;
                 response.id = user.Id.ToString();
                 response.uid = uid;
-                response.image = user.Image ?? imageUrl;
+                response.image = imageUrl;
                 response.name = user.Name;
                 response.phoneNumber = user.PhoneNumber;
                 response.role = user.Role;
