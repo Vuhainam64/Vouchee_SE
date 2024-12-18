@@ -19,8 +19,10 @@ namespace Vouchee.Business.Services.Impls
 {
     public class PartnerTransactionService : IPartnerTransactionService
     {
+        private readonly ISendEmailService _sendEmailService;
         private readonly INotificationService _notificationService;
 
+        private readonly IBaseRepository<Supplier> _supplierRepository;
         private readonly IBaseRepository<VoucherCode> _voucherCodeRepository;
         private readonly IBaseRepository<Notification> _notificationRepository;
         private readonly IBaseRepository<Voucher> _voucherRepository;
@@ -31,7 +33,9 @@ namespace Vouchee.Business.Services.Impls
         private readonly IBaseRepository<PartnerTransaction> _partnerTransactionRepository;
         private readonly IMapper _mapper;
 
-        public PartnerTransactionService(INotificationService notificationService,
+        public PartnerTransactionService(IBaseRepository<Supplier> supplierRepository,
+                                         ISendEmailService sendEmailService,
+                                         INotificationService notificationService,
                                          IBaseRepository<VoucherCode> voucherCodeRepository,
                                          IBaseRepository<Notification> notificationRepository,
                                          IBaseRepository<Voucher> voucherRepository,
@@ -42,6 +46,8 @@ namespace Vouchee.Business.Services.Impls
                                          IBaseRepository<PartnerTransaction> partnerTransactionRepository,
                                          IMapper mapper)
         {
+            _supplierRepository = supplierRepository;
+            _sendEmailService = sendEmailService;
             _notificationService = notificationService;
             _voucherCodeRepository = voucherCodeRepository;
             _notificationRepository = notificationRepository;
@@ -96,6 +102,7 @@ namespace Vouchee.Business.Services.Impls
                                                                                                                             .ThenInclude(x => x.Modal.Voucher.Seller)
                                                                                                                          .Include(x => x.Buyer)
                                                                                                                             .ThenInclude(x => x.BuyerWallet)
+                                                                                                                                .ThenInclude(x => x.BuyerWalletTransactions)
                                                                                                                          .Include(x => x.OrderDetails)
                                                                                                                             .ThenInclude(x => x.Modal)
                                                                                                                                 .ThenInclude(x => x.Voucher),
@@ -111,9 +118,29 @@ namespace Vouchee.Business.Services.Impls
                             CreateNotificationDTO errorNoti = new()
                             {
                                 title = "Thanh toán đơn hàng lỗi",
-                                body = $"Đơn hàng {orderId} đã hết hạn lúc {existedOrder.CreateDate.Value.AddMinutes(2)}",
+                                body = $"Đơn hàng {orderId} đã hết hạn lúc {existedOrder.CreateDate.Value.AddMinutes(2)}, số tiền bạn đã nạp trước đó sẽ được hoàn về ví mua và số dư vpoint và số dư ví sẽ không bị trừ",
                                 receiverId = existedOrder.Buyer.Id
                             };
+
+                            existedOrder.Status = OrderStatusEnum.EXPIRED.ToString();
+                            existedOrder.UpdateDate = DateTime.Now;
+                            existedOrder.Buyer.BuyerWallet.UpdateDate = DateTime.Now;
+                            existedOrder.Buyer.BuyerWallet.BuyerWalletTransactions.Add(new()
+                            {
+                                Status = "PAID",
+                                Type = "AMOUNT_IN",
+                                BeforeBalance = existedOrder.Buyer.BuyerWallet.Balance,
+                                Amount = (int) createPartnerTransaction.transferAmount,
+                                AfterBalance = existedOrder.Buyer.BuyerWallet.Balance + (int)createPartnerTransaction.transferAmount,
+                                CreateDate = DateTime.Now,
+                                Note = "Hoàn tiền về ví do hết hạn giao dịch",
+                                PartnerTransactionId = partnerTransactionId
+                            });
+                            existedOrder.Buyer.BuyerWallet.Balance += (int)createPartnerTransaction.transferAmount;
+
+                            await _orderRepository.SaveChanges();
+
+                            await _sendEmailService.SendEmailAsync(existedOrder.Buyer.Email, "Trạng thái đơn hàng", $"Đơn hàng {existedOrder.Id} lỗi do hết thời gian");
 
                             await _notificationService.CreateNotificationAsync(Guid.Parse("DEEE9638-DA34-4230-BE77-34137AA5FCFF"), errorNoti);
 
@@ -129,6 +156,8 @@ namespace Vouchee.Business.Services.Impls
 
                         await _notificationService.CreateNotificationAsync(Guid.Parse("DEEE9638-DA34-4230-BE77-34137AA5FCFF"), successNoti);
 
+                        await _sendEmailService.SendEmailAsync("advouchee@gmail.com", "Tiền về ngân hàng của Nam", $"Ngân hàng của Nam được nhận {existedOrder.FinalPrice * 2 / 100} từ đơn hàng {existedOrder.Id}");
+                        
                         foreach (var orderDetail in existedOrder.OrderDetails.GroupBy(x => x.Modal.VoucherId))
                         {
                             // gop tung modal co cung voucher id
@@ -202,12 +231,16 @@ namespace Vouchee.Business.Services.Impls
                             existedOrder.Buyer.BuyerWallet.Balance -= existedOrder.UsedBalance;
                         }
 
+                        await _sendEmailService.SendEmailAsync(existedOrder.Buyer.Email, "Thông báo trạng thái đơn hàng", $"{existedOrder.Id} đã thanh toán thành công");
+
                         // Process seller wallet updates
                         foreach (var seller in existedOrder.OrderDetails.GroupBy(x => x.Modal.Voucher.SellerId))
                         {
                             var amount = seller.Sum(x => x.FinalPrice);
 
-                            var existedSeller = await _userRepository.GetByIdAsync(seller.Key, includeProperties: x => x.Include(x => x.SellerWallet), isTracking: true);
+                            var existedSeller = await _userRepository.GetByIdAsync(seller.Key, includeProperties: x => x.Include(x => x.SellerWallet)
+                                                                                                                            .ThenInclude(x => x.SellerWalletTransactions)
+                                                                                                                            , isTracking: true);
 
                             if (existedSeller.SellerWallet == null)
                             {
@@ -220,14 +253,14 @@ namespace Vouchee.Business.Services.Impls
                                 CreateBy = existedOrder.Buyer.Id,
                                 CreateDate = DateTime.Now,
                                 Status = SellerWalletTransactionStatusEnum.DONE.ToString(),
-                                Amount = amount,
+                                Amount = amount - (amount * 10 / 100),
                                 OrderId = existedOrder.Id,
                                 BeforeBalance = existedSeller.SellerWallet.Balance,
-                                AfterBalance = existedSeller.SellerWallet.Balance + amount,
+                                AfterBalance = existedSeller.SellerWallet.Balance + (amount - (amount * 10 / 100)),
                                 Note = $"Nhận tiền từ đơn {existedOrder.Id}"
                             });
 
-                            existedSeller.SellerWallet.Balance += amount;
+                            existedSeller.SellerWallet.Balance += amount - (amount * 10 / 100);
 
                             string description = $"Đơn hàng số {existedOrder.Id}\n";
 
@@ -246,7 +279,37 @@ namespace Vouchee.Business.Services.Impls
                                 Seen = false,
                             };
 
+                            await _sendEmailService.SendEmailAsync(existedSeller.Email, "Thông báo có đơn hàng mới từ người mua", $"{description} và đã được chuyển {amount - (amount * 7 / 100)} về ví");
+
                             await _notificationRepository.AddAsync(sellerNotification);
+                        }
+
+                        foreach (var supplier in existedOrder.OrderDetails.GroupBy(x => x.Modal.Voucher.SupplierId))
+                        {
+                            var amount = supplier.Sum(x => x.FinalPrice);
+
+                            var existedSupplier = await _supplierRepository.GetByIdAsync(supplier.Key, includeProperties: x => x.Include(x => x.SupplierWallet)
+                                                                                                                                        .ThenInclude(x => x.SupplierWalletTransactions)
+                                                                                                                                    , isTracking: true);
+
+                            existedSupplier.SupplierWallet.SupplierWalletTransactions.Add(new()
+                            {
+                                Status = WalletTransactionStatusEnum.PAID.ToString(),
+                                Type = "AMOUNT_IN",
+                                OrderId = existedOrder.Id,
+                                BeforeBalance = existedSupplier.SupplierWallet.Balance,
+                                Amount = amount * 10 / 100,
+                                AfterBalance = existedSupplier.SupplierWallet.Balance + (amount * 10 / 100),
+                                CreateDate = DateTime.Now
+                            });
+                            existedSupplier.SupplierWallet.Balance += amount * 10 / 100;
+
+                            foreach (var supplierToSendEmail in existedSupplier.Users)
+                            {
+                                await _sendEmailService.SendEmailAsync(supplierToSendEmail.Email, "Tiền được thanh toán", $"Nhà cung cấp {supplierToSendEmail.Supplier} đã được trả {amount * 5 / 100} cho đơn hàng {existedOrder.Id}");
+                            }
+
+                            await _supplierRepository.SaveChanges();
                         }
 
                         await _userRepository.SaveChanges();
@@ -266,7 +329,8 @@ namespace Vouchee.Business.Services.Impls
                         string topUpRequestId = identifier;
 
                         var existedTopUpRequest = await _moneyRequestRepository.GetByIdAsync(topUpRequestId, includeProperties: x => x.Include(x => x.TopUpWalletTransaction)
-                                                                                                                             .ThenInclude(x => x.BuyerWallet),
+                                                                                                                                        .ThenInclude(x => x.BuyerWallet)
+                                                                                                                                    .Include(x => x.User),
                                                                                                                              isTracking: true);
 
                         if (existedTopUpRequest == null)
@@ -283,6 +347,8 @@ namespace Vouchee.Business.Services.Impls
                         existedTopUpRequest.TopUpWalletTransaction.BuyerWallet.Balance += (int)partnerTransaction.AmountIn;
                         existedTopUpRequest.TopUpWalletTransaction.BuyerWallet.UpdateDate = DateTime.Now;
 
+                        await _sendEmailService.SendEmailAsync(existedTopUpRequest.User.Email, "Cập nhật biến động số dư", $"Bạn đã nạp thành công {existedTopUpRequest.Amount} vào tài khoản");
+
                         await _moneyRequestRepository.SaveChanges();
 
                         return new
@@ -295,7 +361,13 @@ namespace Vouchee.Business.Services.Impls
                     }
                     else if (transactionType == "WIT")
                     {
-                        var existedWithdrawRequest = await _moneyRequestRepository.GetByIdAsync(identifier, isTracking: true);
+                        var existedWithdrawRequest = await _moneyRequestRepository.GetByIdAsync(identifier, includeProperties: x => x.Include(x => x.WithdrawWalletTransaction)
+                                                                                                                                        .ThenInclude(x => x.BuyerWallet)
+                                                                                                                                            .ThenInclude(x => x.Buyer)
+                                                                                                                                        .Include(x => x.WithdrawWalletTransaction)
+                                                                                                                                            .ThenInclude(x => x.SellerWallet)
+                                                                                                                                                .ThenInclude(x => x.Seller)
+                                                                                                                                                , isTracking: true);
 
                         if (existedWithdrawRequest == null)
                         {
@@ -312,11 +384,15 @@ namespace Vouchee.Business.Services.Impls
                         {
                             existedWithdrawRequest.WithdrawWalletTransaction.BuyerWallet.Balance -= (int) createPartnerTransaction.transferAmount;
                             existedWithdrawRequest.WithdrawWalletTransaction.BuyerWallet.UpdateDate = DateTime.Now;
+
+                            await _sendEmailService.SendEmailAsync(existedWithdrawRequest.WithdrawWalletTransaction.BuyerWallet.Buyer.Email, "Cập nhật trạng thái rút tiền", $"Yêu cầu rút {existedWithdrawRequest.Amount} đã được rút từ ví mua về ngân hàng của bạn");
                         }
                         else if (existedWithdrawRequest.WithdrawWalletTransaction.SellerWallet != null)
                         {
                             existedWithdrawRequest.WithdrawWalletTransaction.SellerWallet.Balance -= (int)createPartnerTransaction.transferAmount;
                             existedWithdrawRequest.WithdrawWalletTransaction.SellerWallet.UpdateDate = DateTime.Now;
+
+                            await _sendEmailService.SendEmailAsync(existedWithdrawRequest.WithdrawWalletTransaction.SellerWallet.Seller.Email, "Cập nhật trạng thái rút tiền", $"Yêu cầu rút {existedWithdrawRequest.Amount} đã được rút từ ví bán về ngần hàng của bạn");
                         }
 
                         await _moneyRequestRepository.SaveChanges();

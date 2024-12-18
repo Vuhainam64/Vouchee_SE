@@ -72,10 +72,10 @@ namespace Vouchee.Data.Helpers
             modelBuilder.Entity<DeviceToken>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
 
             // modelBuilder.Seed();
-            modelBuilder.Entity<User>()
-                            .HasOne(u => u.Supplier)
-                            .WithOne(s => s.User)
-                            .HasForeignKey<Supplier>(s => s.UserId);
+            //modelBuilder.Entity<User>()
+            //                .HasOne(u => u.Supplier)
+            //                .WithOne(s => s.User)
+            //                .HasForeignKey<Supplier>(s => s.UserId);
 
             modelBuilder.Entity<OrderDetail>()
                             .HasKey(od => new { od.OrderId, od.ModalId });

@@ -12,13 +12,15 @@ namespace Vouchee.Data.Models.Entities
         {
             SellerWalletTransactions = [];
             BuyerWalletTransactions = [];
+            SupplierWalletTransactions = [];
         }
 
         [InverseProperty(nameof(WalletTransaction.SellerWallet))]
         public virtual ICollection<WalletTransaction> SellerWalletTransactions { get; set; }
-
         [InverseProperty(nameof(WalletTransaction.BuyerWallet))]
         public virtual ICollection<WalletTransaction> BuyerWalletTransactions { get; set; }
+        [InverseProperty(nameof(WalletTransaction.SupplierWallet))]
+        public virtual ICollection<WalletTransaction> SupplierWalletTransactions { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
@@ -33,6 +35,11 @@ namespace Vouchee.Data.Models.Entities
         [ForeignKey(nameof(SellerId))]
         [InverseProperty(nameof(User.SellerWallet))]
         public virtual User? Seller { get; set; }
+
+        public Guid? SupplierId { get; set; }
+        [ForeignKey(nameof(SupplierId))]
+        [InverseProperty(nameof(Supplier.SupplierWallet))]
+        public virtual Supplier? Supplier { get; set; }
 
         public int Balance { get; set; }
 

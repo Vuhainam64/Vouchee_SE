@@ -31,6 +31,11 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty(nameof(BuyerWallet.BuyerWalletTransactions))]
         public virtual Wallet? BuyerWallet { get; set; }
 
+        public Guid? SupplierWalletId { get; set; }
+        [ForeignKey(nameof(SupplierWalletId))]
+        [InverseProperty(nameof(Wallet.SupplierWalletTransactions))]
+        public virtual Wallet? SupplierWallet { get; set; }
+
         public string? TopUpRequestId { get; set; }
         [ForeignKey(nameof(TopUpRequestId))]
         [InverseProperty(nameof(MoneyRequest.TopUpWalletTransaction))]

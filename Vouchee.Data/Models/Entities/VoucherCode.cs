@@ -27,6 +27,7 @@ namespace Vouchee.Data.Models.Entities
         public Guid Id { get; set; }
 
         public string? Code { get; set; }
+        public string? NewCode { get; set; }
         public string? Image { get; set; }
         public DateOnly? StartDate { get; set; }
         public DateOnly? EndDate { get; set; }

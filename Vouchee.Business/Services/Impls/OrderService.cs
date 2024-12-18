@@ -23,6 +23,7 @@ namespace Vouchee.Business.Services.Impls
 {
     public class OrderService : IOrderService
     {
+        private readonly ISendEmailService _sendEmailService; 
         private readonly INotificationService _notificationService;
         private readonly ICartService _cartService;
 
@@ -34,7 +35,8 @@ namespace Vouchee.Business.Services.Impls
         private readonly IBaseRepository<Order> _orderRepository;
         private readonly IMapper _mapper;
 
-        public OrderService(INotificationService notificationService,
+        public OrderService(ISendEmailService sendEmailService,
+                            INotificationService notificationService,
                             ICartService cartService,
                             IBaseRepository<Modal> modalRepository,
                             IBaseRepository<User> userRepository,
@@ -44,6 +46,7 @@ namespace Vouchee.Business.Services.Impls
                             IBaseRepository<Order> orderRepository,
                             IMapper mapper)
         {
+            _sendEmailService = sendEmailService;
             _notificationService = notificationService;
             _cartService = cartService;
             _modalRepository = modalRepository;
@@ -145,6 +148,8 @@ namespace Vouchee.Business.Services.Impls
                 title = "Đơn hàng mới",
                 receiverId = thisUserObj.userId,
             };
+
+            await _sendEmailService.SendEmailAsync(order.Buyer.Email, "Đơn hang mới", orderId);
 
             await _notificationService.CreateNotificationAsync(Guid.Parse("DEEE9638-DA34-4230-BE77-34137AA5FCFF"), createNotificationDTO);
 
