@@ -19,6 +19,8 @@ namespace Vouchee.Business.Models.DTOs
     {
         [Required(ErrorMessage = "Email là cần thiết")]
         public string? email { get; set; }
+        [Required(ErrorMessage = "name là cần thiết")]
+        public string? Name { get; set; }
         [Required(ErrorMessage = "Mật khẩu là cần thiết")]
         public string? hashPassword { get; set; }
         public DateTime? createDate = DateTime.Now;
