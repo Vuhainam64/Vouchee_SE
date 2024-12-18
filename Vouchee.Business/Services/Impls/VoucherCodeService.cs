@@ -260,7 +260,7 @@ namespace Vouchee.Business.Services.Impls
                     result.Status = VoucherCodeStatusEnum.UNUSED.ToString();
                     result.IsVerified = true;
                     result.UpdateDate = DateTime.Now;
-                    result.Code = code.newcode;
+                    result.NewCode = code.newcode;
                     result.UpdateBy = thisUserObj.userId;
                     _voucherCodeRepository.UpdateAsync(result);
                     list.Add(_mapper.Map<GetVoucherCodeDTO>(result));
