@@ -156,6 +156,11 @@ namespace Vouchee.API.AppStarts
                 .ForMember(dest => dest.brand, opt => opt.MapFrom(src => src.Modal.Voucher.Brand.Name))
                 .ForMember(dest => dest.modalname, opt => opt.MapFrom(src => src.Modal.Title))
                 .ReverseMap();
+            CreateMap<VoucherCode, GetVoucherCodechangeStatusDTO>()
+                .ForMember(dest => dest.name, opt => opt.MapFrom(src => src.Modal.Voucher.Title))
+                .ForMember(dest => dest.brand, opt => opt.MapFrom(src => src.Modal.Voucher.Brand.Name))
+                .ForMember(dest => dest.modalname, opt => opt.MapFrom(src => src.Modal.Title))
+                .ReverseMap();
             CreateMap<GetVoucherCodeDTO, VoucherCodeFilter>().ReverseMap();
 
             // VOUCHER TYPE

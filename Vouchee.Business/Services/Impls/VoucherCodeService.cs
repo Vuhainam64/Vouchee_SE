@@ -306,10 +306,10 @@ namespace Vouchee.Business.Services.Impls
             throw new Exception("loi khong xac dinh");
         }
 
-        public async Task<IList<GetVoucherCodeDTO>> UpdateVoucherCodeStatusConvertingAsync(IList<Guid> id, ThisUserObj thisUserObj)
+        public async Task<IList<GetVoucherCodechangeStatusDTO>> UpdateVoucherCodeStatusConvertingAsync(IList<Guid> id, ThisUserObj thisUserObj)
         {
             var voucherCodes = _voucherCodeRepository.GetTable();
-            IList<GetVoucherCodeDTO> list = new List<GetVoucherCodeDTO>();
+            IList<GetVoucherCodechangeStatusDTO> list = new List<GetVoucherCodechangeStatusDTO>();
             foreach (var code in id)
             {
                 var updatecode = voucherCodes.Where(c => c.Id == code)
@@ -319,7 +319,7 @@ namespace Vouchee.Business.Services.Impls
                     var result = await updatecode;
                     result.Status = VoucherCodeStatusEnum.CONVERTING.ToString();
                     _voucherCodeRepository.UpdateAsync(result);
-                    list.Add(_mapper.Map<GetVoucherCodeDTO>(result));
+                    list.Add(_mapper.Map<GetVoucherCodechangeStatusDTO>(result));
                 }
                 else
                 {
