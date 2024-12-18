@@ -306,7 +306,7 @@ namespace Vouchee.Business.Services.Impls
             throw new Exception("loi khong xac dinh");
         }
 
-        public async Task<IList<GetVoucherCodechangeStatusDTO>> UpdateVoucherCodeStatusConvertingAsync(IList<Guid> id, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<IList<GetVoucherCodechangeStatusDTO>>> UpdateVoucherCodeStatusConvertingAsync(IList<Guid> id, ThisUserObj thisUserObj)
         {
             var voucherCodes = _voucherCodeRepository.GetTable();
             IList<GetVoucherCodechangeStatusDTO> list = new List<GetVoucherCodechangeStatusDTO>();
@@ -325,7 +325,12 @@ namespace Vouchee.Business.Services.Impls
                 {
                     throw new Exception("Khong tim thay code");
                 }
-                return list;
+                return new ResponseMessage<IList<GetVoucherCodechangeStatusDTO>>()
+                {
+                    message = "Cập nhật thành công",
+                    result = true,
+                    value = list
+                };
             }
             throw new Exception("loi khong xac dinh");
         }
