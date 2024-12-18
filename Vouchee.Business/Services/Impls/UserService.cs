@@ -187,14 +187,14 @@ namespace Vouchee.Business.Services.Impls
             // Map the DTO to the user entity
             var user = _mapper.Map<User>(createUserDTO);
 
-            if (createUserDTO.supplierId != null)
+            /*if (createUserDTO.supplierId != null)
             {
                 var existedSupplier = await _supplierRepository.GetByIdAsync(createUserDTO.supplierId);
                 if (existedSupplier == null)
                 {
                     throw new NotFoundException("Không tìm thấy supplỉer này");
                 }
-            }
+            }*/
 
             // Default values for user
             user.Status = UserStatusEnum.ACTIVE.ToString();
