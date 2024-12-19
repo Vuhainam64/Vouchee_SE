@@ -170,7 +170,7 @@ namespace Vouchee.Business.Services.Impls
             // Query for voucher data linked to the supplier
             var voucherCodes = _voucherCodeRepository.GetTable()
                 .Where(x => x.Modal.Voucher.Supplier.Id == existedUser.Supplier.Id);
-
+            
             // Query for wallet transactions linked to the supplier's wallet
             var walletTransactions = _walletTransactionRepository.GetTable()
                 .Where(x => x.SupplierWalletId == existedUser.Supplier.SupplierWallet.Id);
@@ -180,8 +180,20 @@ namespace Vouchee.Business.Services.Impls
                 .CountAsync(x => x.Status == VoucherCodeStatusEnum.PENDING.ToString());
 
             var approvedVouchers = await voucherCodes
-                .CountAsync(x => x.Status == VoucherCodeStatusEnum.UNUSED.ToString());
+                .CountAsync(x => x.Status == VoucherCodeStatusEnum.NONE.ToString());
 
+            var totalVouchers = await voucherCodes.CountAsync();
+
+            var convertingVouchers = await voucherCodes
+                .CountAsync(x => x.Status == VoucherCodeStatusEnum.CONVERTING.ToString());
+            
+            var usedorexpireVouchers = await voucherCodes
+                .CountAsync(x => x.Status == VoucherCodeStatusEnum.EXPIRED.ToString() 
+                            && x.Status == VoucherCodeStatusEnum.USED.ToString() 
+                            && x.Status == VoucherCodeStatusEnum.VIOLENT.ToString());
+
+            var convertedVouchers = await voucherCodes
+                .CountAsync(x => x.Status == VoucherCodeStatusEnum.UNUSED.ToString());
             // Generate all months of the current year
             var currentYear = DateTime.Now.Year;
             var allMonths = Enumerable.Range(1, 12)
@@ -217,12 +229,21 @@ namespace Vouchee.Business.Services.Impls
                 .OrderBy(x => x.Year)
                 .ThenBy(x => x.Month)
                 .ToList();
-
+            var suppliernameandamount = new GetSupplierNameandMoney
+            {
+                name = existedUser.Supplier.Name,
+                amount = completeMonthDashboard.Sum(x => x.TotalAmount),
+            };
             // Return the dashboard data
             return new
             {
+                suppliernameandamount,
                 pendingVouchers,
                 approvedVouchers,
+                totalVouchers,
+                convertedVouchers,
+                convertingVouchers,
+                usedorexpireVouchers,
                 monthDashboard = completeMonthDashboard
             };
         }
