@@ -40,7 +40,15 @@ namespace Vouchee.Business.Models.DTOs
 
         public string? status { get; set; }
     }
-
+    public class GetVoucherCodechangeStatusDTO : VoucherCodeDTO
+    {
+        public Guid id { get; set; }
+        public string name { get; set; }
+        public string modalname { get; set; }
+        public string brand { get; set; }
+        public Guid? modalId { get; set; }
+        public string? status { get; set; }
+    }
     public class UpdateCodeVoucherCodeDTO 
     {
         [Required]

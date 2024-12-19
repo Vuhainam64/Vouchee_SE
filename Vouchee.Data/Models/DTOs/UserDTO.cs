@@ -21,7 +21,7 @@ namespace Vouchee.Business.Models.DTOs
         public string? email { get; set; }
         [Required(ErrorMessage = "Mật khẩu là cần thiết")]
         public string? hashPassword { get; set; }
-        public Guid? supplierId { get; set; }
+        /*public Guid? supplierId { get; set; }*/
         public DateTime? createDate = DateTime.Now;
         [Required(ErrorMessage = "Tên là cần thiết")]
         public string? name { get; set; }

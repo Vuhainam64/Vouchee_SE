@@ -260,7 +260,7 @@ namespace Vouchee.Business.Services.Impls
                     result.Status = VoucherCodeStatusEnum.UNUSED.ToString();
                     result.IsVerified = true;
                     result.UpdateDate = DateTime.Now;
-                    result.Code = code.newcode;
+                    result.NewCode = code.newcode;
                     result.UpdateBy = thisUserObj.userId;
                     _voucherCodeRepository.UpdateAsync(result);
                     list.Add(_mapper.Map<GetVoucherCodeDTO>(result));
@@ -306,10 +306,10 @@ namespace Vouchee.Business.Services.Impls
             throw new Exception("loi khong xac dinh");
         }
 
-        public async Task<IList<GetVoucherCodeDTO>> UpdateVoucherCodeStatusConvertingAsync(IList<Guid> id, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<IList<GetVoucherCodechangeStatusDTO>>> UpdateVoucherCodeStatusConvertingAsync(IList<Guid> id, ThisUserObj thisUserObj)
         {
             var voucherCodes = _voucherCodeRepository.GetTable();
-            IList<GetVoucherCodeDTO> list = new List<GetVoucherCodeDTO>();
+            IList<GetVoucherCodechangeStatusDTO> list = new List<GetVoucherCodechangeStatusDTO>();
             foreach (var code in id)
             {
                 var updatecode = voucherCodes.Where(c => c.Id == code)
@@ -318,12 +318,19 @@ namespace Vouchee.Business.Services.Impls
                 {
                     var result = await updatecode;
                     result.Status = VoucherCodeStatusEnum.CONVERTING.ToString();
+                    _voucherCodeRepository.UpdateAsync(result);
+                    list.Add(_mapper.Map<GetVoucherCodechangeStatusDTO>(result));
                 }
                 else
                 {
                     throw new Exception("Khong tim thay code");
                 }
-                return list;
+                return new ResponseMessage<IList<GetVoucherCodechangeStatusDTO>>()
+                {
+                    message = "Cập nhật thành công",
+                    result = true,
+                    value = list
+                };
             }
             throw new Exception("loi khong xac dinh");
         }
