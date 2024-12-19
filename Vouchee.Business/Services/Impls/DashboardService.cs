@@ -15,16 +15,22 @@ namespace Vouchee.Business.Services.Impls
 {
     public class DashboardService : IDashboardService
     {
+        private readonly IBaseRepository<Modal> _modalRepository;
+        private readonly IBaseRepository<VoucherCode> _voucherCodeRepository;
         private readonly IBaseRepository<WalletTransaction> _walletTransactionRepository;
         private readonly IBaseRepository<Order> _orderRepository;
         private readonly IBaseRepository<User> _userRepository;
         private readonly IBaseRepository<Voucher> _voucherRepository;
 
-        public DashboardService(IBaseRepository<WalletTransaction> walletTransactionRepository,
+        public DashboardService(IBaseRepository<Modal> modalRepository,
+                                IBaseRepository<VoucherCode> voucherCodeRepository,
+                                IBaseRepository<WalletTransaction> walletTransactionRepository,
                                 IBaseRepository<Order> orderRepository,
                                 IBaseRepository<User> userRepository,
                                 IBaseRepository<Voucher> voucherRepository)
         {
+            _modalRepository = modalRepository;
+            _voucherCodeRepository = voucherCodeRepository;
             _walletTransactionRepository = walletTransactionRepository;
             _orderRepository = orderRepository;
             _userRepository = userRepository;
@@ -99,6 +105,11 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
+        public Task<dynamic> GetModalDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum dateFilterTypeEnum)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<dynamic> GetOrderDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum dateFilterTypeEnum)
         {
             var result = await _orderRepository.GetTable().ToListAsync();
@@ -163,6 +174,11 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
+        public Task<dynamic> GetOtherDashboard()
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<dynamic> GetTransactionDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum dateFilterTypeEnum)
         {
             var result = await _walletTransactionRepository.GetTable().ToListAsync();
@@ -202,14 +218,72 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public Task<dynamic> GetUserDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum dateFilterTypeEnum)
+        public Task<dynamic> GetVoucherCodeDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum dateFilterTypeEnum)
         {
             throw new NotImplementedException();
         }
 
-        public Task<dynamic> GetVoucherDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum dateFilterTypeEnum)
+        public async Task<dynamic> GetVoucherDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum dateFilterTypeEnum)
         {
-            throw new NotImplementedException();
+            // Adjust fromDate and toDate if today is true
+            if (today)
+            {
+                fromDate = DateOnly.FromDateTime(DateTime.Today);
+                toDate = DateOnly.FromDateTime(DateTime.Today);
+            }
+
+            // Convert DateOnly to DateTime for filtering
+            DateTime fromDateTime = fromDate.ToDateTime(TimeOnly.MinValue);
+            DateTime toDateTime = toDate.ToDateTime(TimeOnly.MaxValue);
+
+            // Fetch all vouchers
+            var vouchers = await _voucherRepository.GetTable().ToListAsync();
+
+            // Filter vouchers based on the date range
+            var filteredVouchers = vouchers.Where(voucher =>
+                voucher.CreateDate >= fromDateTime && voucher.CreateDate <= toDateTime);
+
+            // Group vouchers based on the specified date filter type
+            IEnumerable<IGrouping<object, dynamic>> groupedVouchers;
+
+            switch (dateFilterTypeEnum)
+            {
+                case DateFilterTypeEnum.DAILY:
+                    groupedVouchers = filteredVouchers.GroupBy(voucher => (object)voucher.CreateDate.Value.Date);
+                    break;
+                case DateFilterTypeEnum.WEEKLY:
+                    groupedVouchers = filteredVouchers.GroupBy(voucher => (object)CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(voucher.CreateDate.Value.Date, CalendarWeekRule.FirstDay, DayOfWeek.Monday));
+                    break;
+                case DateFilterTypeEnum.MONTHLY:
+                    groupedVouchers = filteredVouchers.GroupBy(voucher => (object)voucher.CreateDate.Value.Month);
+                    break;
+                case DateFilterTypeEnum.YEARLY:
+                    groupedVouchers = filteredVouchers.GroupBy(voucher => (object)voucher.CreateDate.Value.Year);
+                    break;
+                default:
+                    throw new ArgumentException("Invalid date filter type");
+            }
+
+            // Generate the dashboard data
+            var voucherDashboard = groupedVouchers.Select(g => new
+            {
+                Period = g.Key,
+                TotalVouchers = g.Count(),
+            }).OrderBy(x => x.Period).ToList();
+
+            // Create summary metrics
+            var voucherSummary = new
+            {
+                TotalVouchers = filteredVouchers.Count(),
+                NewVouchers = filteredVouchers.Count(v => v.CreateDate >= fromDateTime && v.CreateDate <= toDateTime),
+            };
+
+            return new
+            {
+                voucherSummary,
+                voucherDashboard
+            };
         }
+
     }
 }
