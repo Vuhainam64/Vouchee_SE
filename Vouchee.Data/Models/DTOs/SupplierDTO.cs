@@ -60,4 +60,10 @@ namespace Vouchee.Business.Models.DTOs
 
         public virtual ICollection<GetVoucherDTO>? vouchers { get; set; }
     }
+
+    public class GetSupplierNameandMoney
+    {
+        public string name { get; set; }
+        public int amount { get; set; }
+    }
 }
