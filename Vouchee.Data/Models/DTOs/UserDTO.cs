@@ -57,6 +57,7 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? createBy { get; set; }
         public DateTime? updateDate { get; set; }
         public Guid? updateBy { get; set; }
+        public string SupplierName {  get; set; }
     }
     
     public class GetDetailUserDTO : GetUserDTO
