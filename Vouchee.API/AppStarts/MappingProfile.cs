@@ -143,7 +143,9 @@ namespace Vouchee.API.AppStarts
             CreateMap<User, UpdateUserDTO>().ReverseMap();
             CreateMap<User, UpdateUserBankDTO>().ReverseMap();
             CreateMap<User, GetDetailUserDTO>().ReverseMap();
-            CreateMap<User, GetUserDTO>().ReverseMap();
+            CreateMap<User, GetUserDTO>()
+                .ForMember(dest => dest.SupplierName, opt => opt.MapFrom(src => src.Supplier.Name))
+                .ReverseMap();
             CreateMap<GetUserDTO, UserFilter>().ReverseMap();
 
             // VOUCHER CODE
