@@ -182,6 +182,12 @@ namespace Vouchee.Business.Services.Impls
             var approvedVouchers = await voucherCodes
                 .CountAsync(x => x.Status == VoucherCodeStatusEnum.UNUSED.ToString());
 
+            // Generate all months of the current year
+            var currentYear = DateTime.Now.Year;
+            var allMonths = Enumerable.Range(1, 12)
+                .Select(m => new { Year = currentYear, Month = m })
+                .ToList();
+
             // Group transactions by month
             var monthDashboard = await walletTransactions
                 .GroupBy(x => new { x.CreateDate.Value.Year, x.CreateDate.Value.Month })
@@ -194,14 +200,33 @@ namespace Vouchee.Business.Services.Impls
                 })
                 .ToListAsync();
 
+            // Merge with all months to ensure each month is included
+            var completeMonthDashboard = allMonths
+                .GroupJoin(
+                    monthDashboard,
+                    all => new { all.Year, all.Month },
+                    db => new { db.Year, db.Month },
+                    (all, dbGroup) => new
+                    {
+                        Year = all.Year,
+                        Month = all.Month,
+                        TotalTransactions = dbGroup.FirstOrDefault()?.TotalTransactions ?? 0,
+                        TotalAmount = dbGroup.FirstOrDefault()?.TotalAmount ?? 0
+                    }
+                )
+                .OrderBy(x => x.Year)
+                .ThenBy(x => x.Month)
+                .ToList();
+
             // Return the dashboard data
             return new
             {
                 pendingVouchers,
                 approvedVouchers,
-                monthDashboard
+                monthDashboard = completeMonthDashboard
             };
         }
+
 
         public async Task<dynamic> GetSupplierOrderAsync(ThisUserObj currentUser, PagingRequest pagingRequest, OrderFilter orderFilter)
         {
