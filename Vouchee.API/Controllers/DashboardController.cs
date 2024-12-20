@@ -23,5 +23,19 @@ namespace Vouchee.API.Controllers
             var result = await _dashboardService.GetOrderDashboard(fromDate, toDate, today, filterType);
             return Ok(result);
         }
+
+        [HttpGet("get_active_user_dashboard")]
+        public async Task<IActionResult> GetActiveUserDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum filterType)
+        {
+            var result = await _dashboardService.GetActiveUserDashboard(fromDate, toDate, today, filterType);
+            return Ok(result);
+        }
+
+        [HttpGet("get_voucher_dashboard")]
+        public async Task<IActionResult> GetVoucherDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum filterType)
+        {
+            var result = await _dashboardService.GetVoucherDashboard(fromDate, toDate, today, filterType);
+            return Ok(result);
+        }
     }
 }
