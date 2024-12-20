@@ -69,7 +69,7 @@ namespace Vouchee.API.Controllers
         }
 
         [Authorize]
-        [HttpGet("get_supplier_dashboard")]
+        [HttpGet("get_supplier_income")]
         public async Task<IActionResult> GetSupplierDashboard()
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
@@ -78,7 +78,7 @@ namespace Vouchee.API.Controllers
             return Ok(supplier);
         }
         [Authorize]
-        [HttpGet("get_supplier_dashboard_by_day")]
+        [HttpGet("get_supplier_dashboard")]
         public async Task<IActionResult> GetSupplierDashboardbyDay()
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
