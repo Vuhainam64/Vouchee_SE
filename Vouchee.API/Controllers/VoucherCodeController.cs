@@ -80,7 +80,12 @@ namespace Vouchee.API.Controllers
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var voucherCode = await _excelExportService.GenerateVoucherCodeExcel(currentUser, startDate, endDate);
-            return Ok(voucherCode);
+
+            var fileName = $"Voucher_code_{currentUser.userId}_{startDate:yyyyMMdd}_{endDate:yyyyMMdd}.xlsx";
+
+            var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+            return File(voucherCode, contentType, fileName);
         }
 
         // UPDATE
