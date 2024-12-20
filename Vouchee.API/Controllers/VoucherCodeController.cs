@@ -23,14 +23,17 @@ namespace Vouchee.API.Controllers
         private readonly IUserService _userService;
         private readonly IVoucherCodeService _voucherCodeService;
         private readonly IVoucherService _voucherService;
+        private readonly IExcelExportService _excelExportService;
 
         public VoucherCodeController(IUserService userService,
-                                        IVoucherCodeService voucherCodeService,
-                                        IVoucherService voucherService)
+                                     IVoucherCodeService voucherCodeService,
+                                     IVoucherService voucherService,
+                                     IExcelExportService excelExportService)
         {
             _userService = userService;
             _voucherCodeService = voucherCodeService;
             _voucherService = voucherService;
+            _excelExportService = excelExportService;
         }
 
         // CREATE
@@ -67,6 +70,16 @@ namespace Vouchee.API.Controllers
         public async Task<IActionResult> GetVoucherCodeById(Guid id)
         {
             var voucherCode = await _voucherCodeService.GetVoucherCodeByIdAsync(id);
+            return Ok(voucherCode);
+        }
+
+        [Authorize]
+        [HttpGet("export_voucher_code_excel")]
+        public async Task<IActionResult> ExportVoucherCodeExcel([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var voucherCode = await _excelExportService.GenerateVoucherCodeExcel(currentUser, startDate, endDate);
             return Ok(voucherCode);
         }
 

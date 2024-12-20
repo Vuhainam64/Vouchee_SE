@@ -31,6 +31,7 @@ namespace Vouchee.Business.Services
         public Task<ResponseMessage< IList<GetVoucherCodechangeStatusDTO>>> UpdateVoucherCodeStatusConvertingAsync(IList<Guid> id, ThisUserObj thisUserObj);
         public Task<IList<GetVoucherCodeDTO>> UpdateCodeVoucherCodeAsync(IList<UpdateCodeVoucherCodeDTO> updateCodeVoucherCodeDTO, ThisUserObj thisUserObj);
         public Task<ResponseMessage<GetVoucherCodeDTO>> UpdatePosVoucherCodeAsync(string code, ThisUserObj thisUserObj);
+        
         // DELETE
         public Task<bool> DeleteVoucherCodeAsync(Guid id);
     }
