@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using DocumentFormat.OpenXml.Office2019.Drawing.Model3D;
 using Google.Api;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -333,6 +334,40 @@ namespace Vouchee.Business.Services.Impls
                 };
             }
             throw new Exception("loi khong xac dinh");
+        }
+
+        public async Task<DynamicResponseModel<GetVoucherCodeDTO>> GetSupplierVoucherCodeAsync(ThisUserObj thisUserObj, PagingRequest pagingRequest, VoucherCodeFilter voucherCodeFilter)
+        {
+            var existedUser = await _userRepository.GetByIdAsync(thisUserObj.userId);
+
+            if (existedUser == null)
+            {
+                throw new NotFoundException("Không tìm thấy user này");
+            }
+
+            if (existedUser.Supplier == null)
+            {
+                throw new NotFoundException("Tài khoản này không phải tài khoản supplier");
+            }
+
+            (int, IQueryable<GetVoucherCodeDTO>) result;
+
+            result = _voucherCodeRepository.GetTable()
+                                            .Where(x => x.Modal.Voucher.SupplierId == existedUser.SupplierId)
+                                            .ProjectTo<GetVoucherCodeDTO>(_mapper.ConfigurationProvider)
+                                            .DynamicFilter(_mapper.Map<GetVoucherCodeDTO>(voucherCodeFilter))
+                                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            return new DynamicResponseModel<GetVoucherCodeDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+            };
         }
     }
 }

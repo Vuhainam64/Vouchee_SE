@@ -39,6 +39,9 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? buyerId { get; set; }
 
         public string? status { get; set; }
+        public string? newCode { get; set; }
+
+        public DateTime? updateDate { get; set; }
     }
     public class GetVoucherCodechangeStatusDTO : VoucherCodeDTO
     {
