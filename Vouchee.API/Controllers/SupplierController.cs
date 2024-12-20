@@ -77,7 +77,15 @@ namespace Vouchee.API.Controllers
             var supplier = await _supplierService.GetSupplierDashboard(currentUser);
             return Ok(supplier);
         }
+        [Authorize]
+        [HttpGet("get_supplier_dashboard_by_day")]
+        public async Task<IActionResult> GetSupplierDashboardbyDay()
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
+            var supplier = await _supplierService.GetSupplierDashboardbyday(currentUser);
+            return Ok(supplier);
+        }
         [Authorize]
         [HttpGet("get_supplier_order_dashboard")]
         public async Task<IActionResult> GetSupplierOrderDashboard([FromQuery] PagingRequest pagingRequest,

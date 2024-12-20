@@ -247,6 +247,106 @@ namespace Vouchee.Business.Services.Impls
                 monthDashboard = completeMonthDashboard
             };
         }
+        public async Task<dynamic> GetSupplierDashboardbyday(ThisUserObj currentUser)
+        {
+            // Fetch the current user along with their Supplier data
+            var existedUser = await _userRepository.GetByIdAsync(
+                currentUser.userId,
+                includeProperties: x => x.Include(x => x.Supplier).ThenInclude(s => s.SupplierWallet)
+            );
+
+            if (existedUser?.Supplier == null)
+                throw new Exception("Supplier not found for the current user.");
+
+            // Query for voucher data linked to the supplier
+            var voucherCodes = _voucherCodeRepository.GetTable()
+                .Where(x => x.Modal.Voucher.Supplier.Id == existedUser.Supplier.Id);
+
+            // Query for wallet transactions linked to the supplier's wallet
+            var walletTransactions = _walletTransactionRepository.GetTable()
+                .Where(x => x.SupplierWalletId == existedUser.Supplier.SupplierWallet.Id);
+
+            // Calculate statistics
+            var pendingVouchers = await voucherCodes
+                .CountAsync(x => x.Status == VoucherCodeStatusEnum.PENDING.ToString());
+
+            var approvedVouchers = await voucherCodes
+                .CountAsync(x => x.Status == VoucherCodeStatusEnum.NONE.ToString());
+
+            var totalVouchers = await voucherCodes.CountAsync();
+
+            var convertingVouchers = await voucherCodes
+                .CountAsync(x => x.Status == VoucherCodeStatusEnum.CONVERTING.ToString());
+
+            var usedorexpireVouchers = await voucherCodes
+                .CountAsync(x => x.Status == VoucherCodeStatusEnum.EXPIRED.ToString()
+                            && x.Status == VoucherCodeStatusEnum.USED.ToString()
+                            && x.Status == VoucherCodeStatusEnum.VIOLENT.ToString());
+
+            var convertedVouchers = await voucherCodes
+                .CountAsync(x => x.Status == VoucherCodeStatusEnum.UNUSED.ToString());
+            // Generate all months of the current year
+            var currentYear = DateTime.Now.Year;
+            var currentMonth = DateTime.Now.Month;
+            var daysInMonth = DateTime.DaysInMonth(currentYear, currentMonth);
+
+            // Generate all days in the current month
+            var allDays = Enumerable.Range(1, daysInMonth)
+                .Select(d => new { Year = currentYear, Month = currentMonth, Day = d })
+                .ToList();
+
+            // Group transactions by day
+            var dayDashboard = await walletTransactions
+                .GroupBy(x => new { x.CreateDate.Value.Year, x.CreateDate.Value.Month, x.CreateDate.Value.Day })
+                .Select(g => new
+                {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    Day = g.Key.Day,
+                    TotalTransactions = g.Count(),
+                    TotalAmount = g.Sum(t => t.Amount) // Assuming there's an Amount property
+                })
+                .ToListAsync();
+
+            // Merge with all days to ensure each day is included
+            var completeDayDashboard = allDays
+                .GroupJoin(
+                    dayDashboard,
+                    all => new { all.Year, all.Month, all.Day },
+                    db => new { db.Year, db.Month, db.Day },
+                    (all, dbGroup) => new
+                    {
+                        Year = all.Year,
+                        Month = all.Month,
+                        Day = all.Day,
+                        TotalTransactions = dbGroup.FirstOrDefault()?.TotalTransactions ?? 0,
+                        TotalAmount = dbGroup.FirstOrDefault()?.TotalAmount ?? 0
+                    }
+                )
+                .OrderBy(x => x.Year)
+                .ThenBy(x => x.Month)
+                .ThenBy(x => x.Day)
+                .ToList();
+
+            var supplierNameAndAmount = new GetSupplierNameandMoney
+            {
+                name = existedUser.Supplier.Name,
+                amount = completeDayDashboard.Sum(x => x.TotalAmount), // Total for the month
+            };
+
+            // Return the dashboard data
+            return new
+            {
+                supplierNameAndAmount,
+                pendingVouchers,
+                approvedVouchers,
+                totalVouchers,
+                convertedVouchers,
+                convertingVouchers,
+                usedorexpireVouchers,
+                dayDashboard = completeDayDashboard
+            };
+        }
 
 
         public async Task<dynamic> GetSupplierOrderAsync(ThisUserObj currentUser, PagingRequest pagingRequest, OrderFilter orderFilter)
