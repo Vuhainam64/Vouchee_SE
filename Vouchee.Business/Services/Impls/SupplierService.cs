@@ -182,6 +182,17 @@ namespace Vouchee.Business.Services.Impls
             var approvedVouchers = await voucherCodes
                 .CountAsync(x => x.Status == VoucherCodeStatusEnum.UNUSED.ToString());
 
+            var convertingVouchers = await voucherCodes
+                .CountAsync(x => x.Status == VoucherCodeStatusEnum.CONVERTING.ToString());
+
+            var successConvertingVouchers = await voucherCodes
+                .CountAsync(x => x.Status == VoucherCodeStatusEnum.NONE.ToString());
+
+            var usedVouchers = await voucherCodes
+                .CountAsync(x => x.Status == VoucherCodeStatusEnum.UNUSED.ToString() || x.Status == VoucherCodeStatusEnum.EXPIRED.ToString());
+
+            var totalVouchers = await voucherCodes.CountAsync();
+
             // Group transactions by month
             var monthDashboard = await walletTransactions
                 .GroupBy(x => new { x.CreateDate.Value.Year, x.CreateDate.Value.Month })
@@ -199,6 +210,10 @@ namespace Vouchee.Business.Services.Impls
             {
                 pendingVouchers,
                 approvedVouchers,
+                convertingVouchers,
+                successConvertingVouchers,
+                usedVouchers,
+                totalVouchers,
                 monthDashboard
             };
         }
