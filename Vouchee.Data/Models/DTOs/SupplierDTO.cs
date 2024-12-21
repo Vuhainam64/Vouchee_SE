@@ -64,6 +64,6 @@ namespace Vouchee.Business.Models.DTOs
     public class GetSupplierNameandMoney
     {
         public string name { get; set; }
-        public int amount { get; set; }
+        public int amountofyear { get; set; }
     }
 }

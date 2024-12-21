@@ -277,7 +277,7 @@ namespace Vouchee.Business.Services.Impls
         public async Task<ResponseMessage<GetVoucherCodeDTO>> UpdatePosVoucherCodeAsync(string code, ThisUserObj thisUserObj)
         {
             var voucherCodes = _voucherCodeRepository.GetTable();
-            var findcode = voucherCodes.Where(c => c.Code == code.ToString())
+            var findcode = voucherCodes.Where(c => c.NewCode == code.ToString())
                 .FirstOrDefaultAsync();
             var updatecode = await findcode;
             if (updatecode != null && updatecode.Status == VoucherCodeStatusEnum.UNUSED.ToString())

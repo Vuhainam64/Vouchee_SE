@@ -17,10 +17,10 @@ namespace Vouchee.Business.Services
         public Task<GetSupplierDTO> GetSupplierByIdAsync(Guid id);
         public Task<IList<GetSupplierDTO>> GetSuppliersAsync();
         public Task<IList<BestSuppleriDTO>> GetBestSuppliers();
-        public Task<dynamic> GetSupplierWalletTransactionAsync(ThisUserObj currentUser, PagingRequest pagingRequest, SupplierWalletTransactionFilter supplierWalletTransactionFilter);
+        public Task<ResponseMessage<dynamic>> GetSupplierWalletTransactionAsync(ThisUserObj currentUser, PagingRequest pagingRequest, SupplierWalletTransactionFilter supplierWalletTransactionFilter);
         public Task<dynamic> GetSupplierOrderAsync(ThisUserObj currentUser, PagingRequest pagingRequest, OrderFilter orderFilter);
-        public Task<dynamic> GetSupplierDashboard(ThisUserObj currentUser);
-        public Task<dynamic> GetSupplierDashboardbyday(ThisUserObj currentUser);
+        public Task<ResponseMessage<dynamic>> GetSupplierDashboard(ThisUserObj currentUser);
+        public Task<ResponseMessage<dynamic>> GetSupplierDashboardbyday(ThisUserObj currentUser);
 
         // UPDATE
         public Task<bool> UpdateSupplierAsync(Guid id, UpdateSupplierDTO updateSupplierDTO);
