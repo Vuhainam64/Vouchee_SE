@@ -12,5 +12,6 @@ namespace Vouchee.Business.Services
     {
         Task<byte[]> GenerateStatementExcel(ThisUserObj thisUserObj, DateTime startTime, DateTime endTime);
         Task<byte[]> GenerateVoucherCodeExcel(ThisUserObj thisUserObj, DateTime startTime, DateTime endTime);
+        Task<byte[]> GenerateWithdrawRequestExcel();
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Vouchee.API.Helpers;
@@ -17,12 +18,15 @@ namespace Vouchee.API.Controllers
     {
         private readonly IUserService _userService;
         private readonly IWithdrawService _withdrawService;
+        private readonly IExcelExportService _excelExportService;
 
         public WithdrawController(IUserService userService,
-                                  IWithdrawService withdrawService)
+                                  IWithdrawService withdrawService,
+                                  IExcelExportService excelExportService)
         {
             _userService = userService;
             _withdrawService = withdrawService;
+            _excelExportService = excelExportService;
         }
 
         [HttpPost("create_withdraw_request")]
@@ -43,6 +47,21 @@ namespace Vouchee.API.Controllers
 
             var result = await _withdrawService.GetWithdrawRequestById(id);
             return Ok(result);
+        }
+
+        [HttpGet("export_withdraw")]
+        [Authorize]
+        public async Task<IActionResult> ExportWithdraw()
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _excelExportService.GenerateWithdrawRequestExcel();
+
+            var fileName = $"WITHDRAW.xlsx";
+
+            var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+            return File(result, contentType, fileName);
         }
     }
 }
