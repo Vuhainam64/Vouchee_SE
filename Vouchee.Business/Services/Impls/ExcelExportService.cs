@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -10,6 +12,7 @@ using System.Threading.Tasks;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Models;
 using Vouchee.Data.Helpers.Base;
+using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 
@@ -17,14 +20,17 @@ namespace Vouchee.Business.Services.Impls
 {
     public class ExcelExportService : IExcelExportService
     {
+        private readonly IBaseRepository<MoneyRequest> _moneyRequestRepository;
         private readonly IBaseRepository<VoucherCode> _voucherCodeRepository;
         private readonly IBaseRepository<WalletTransaction> _walletTransactionRepository;
         private readonly IBaseRepository<User> _userRepository;
 
-        public ExcelExportService(IBaseRepository<VoucherCode> voucherCodeRepository,
+        public ExcelExportService(IBaseRepository<MoneyRequest> moneyRequestRepository,
+                                  IBaseRepository<VoucherCode> voucherCodeRepository,
                                   IBaseRepository<WalletTransaction> walletTransactionRepository,
                                   IBaseRepository<User> userRepository)
         {
+            _moneyRequestRepository = moneyRequestRepository;
             _voucherCodeRepository = voucherCodeRepository;
             _walletTransactionRepository = walletTransactionRepository;
             _userRepository = userRepository;
@@ -142,6 +148,64 @@ namespace Vouchee.Business.Services.Impls
                 worksheet.Cells[1, 1, voucherCodes.Count + 1, 7].AutoFitColumns();
 
                 // Return the Excel file as a byte array
+                return package.GetAsByteArray();
+            }
+        }
+
+        public async Task<byte[]> GenerateWithdrawRequestExcel()
+        {
+            var result = await _moneyRequestRepository.GetTable()
+                .Where(x => x.WithdrawWalletTransaction != null && x.Status == WithdrawRequestStatusEnum.PENDING.ToString())
+                .ToListAsync();
+
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Withdraw Requests");
+
+                // Set headers
+                worksheet.Cells["A1"].Value = "DANH SÁCH GIAO DỊCH (LIST OF TRANSACTIONS)";
+                worksheet.Cells["A1:F1"].Merge = true;
+                worksheet.Cells["A1"].Style.Font.Bold = true;
+                worksheet.Cells["A1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+                worksheet.Cells["A2"].Value = "STT (Ord. No.)";
+                worksheet.Cells["B2"].Value = "Số tài khoản (Account No.)";
+                worksheet.Cells["C2"].Value = "Tên người thụ hưởng (Beneficiary)";
+                worksheet.Cells["D2"].Value = "Ngân hàng thụ hưởng/Chi nhánh (Beneficiary Bank)";
+                worksheet.Cells["E2"].Value = "Số tiền (Amount)";
+                worksheet.Cells["F2"].Value = "Nội dung chuyển khoản (Payment Detail)";
+
+                // Style header
+                using (var range = worksheet.Cells["A2:F2"])
+                {
+                    range.Style.Font.Bold = true;
+                    range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    range.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                    range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    range.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                }
+
+                // Populate rows
+                int row = 3;
+                foreach (var item in result)
+                {
+                    worksheet.Cells[row, 1].Value = row - 2; // Ord. No.
+                    worksheet.Cells[row, 2].Value = item.WithdrawWalletTransaction.BuyerWallet.Buyer.BankNumber; // Account No.
+                    worksheet.Cells[row, 3].Value = item.WithdrawWalletTransaction.BuyerWallet.Buyer.BankAccount; // Beneficiary
+                    worksheet.Cells[row, 4].Value = item.WithdrawWalletTransaction.BuyerWallet.Buyer.BankName; // Beneficiary Bank
+                    worksheet.Cells[row, 5].Value = item.Amount; // Amount
+                    worksheet.Cells[row, 6].Value = "Chuyển khoản"; // Payment Detail
+
+                    // Format currency
+                    worksheet.Cells[row, 5].Style.Numberformat.Format = "#,##0.00";
+
+                    row++;
+                }
+
+                // Auto-fit columns
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+                // Return Excel file as byte array
                 return package.GetAsByteArray();
             }
         }
