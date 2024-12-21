@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Linq.Dynamic.Core;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
@@ -156,7 +157,7 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<dynamic> GetSupplierDashboard(ThisUserObj currentUser)
+        public async Task<ResponseMessage<dynamic>> GetSupplierDashboard(ThisUserObj currentUser)
         {
             // Fetch the current user along with their Supplier data
             var existedUser = await _userRepository.GetByIdAsync(
@@ -232,11 +233,15 @@ namespace Vouchee.Business.Services.Impls
             var suppliernameandamount = new GetSupplierNameandMoney
             {
                 name = existedUser.Supplier.Name,
-                amount = completeMonthDashboard.Sum(x => x.TotalAmount),
+                amountofyear = completeMonthDashboard.Sum(x => x.TotalAmount),
             };
             // Return the dashboard data
-            return new
+            return new ResponseMessage<dynamic>()
             {
+                message = "Đã lấy dữ liệu cho supplier thành công",
+                result = true,
+                value = new
+                {
                 suppliernameandamount,
                 pendingVouchers,
                 approvedVouchers,
@@ -244,10 +249,11 @@ namespace Vouchee.Business.Services.Impls
                 convertedVouchers,
                 convertingVouchers,
                 usedorexpireVouchers,
-                monthDashboard = completeMonthDashboard
+                monthDashboard = completeMonthDashboard 
+                },
             };
         }
-        public async Task<dynamic> GetSupplierDashboardbyday(ThisUserObj currentUser)
+        public async Task<ResponseMessage<dynamic>> GetSupplierDashboardbyday(ThisUserObj currentUser)
         {
             // Fetch the current user along with their Supplier data
             var existedUser = await _userRepository.GetByIdAsync(
@@ -331,20 +337,27 @@ namespace Vouchee.Business.Services.Impls
             var supplierNameAndAmount = new GetSupplierNameandMoney
             {
                 name = existedUser.Supplier.Name,
-                amount = completeDayDashboard.Sum(x => x.TotalAmount), // Total for the month
+                amountofyear = completeDayDashboard.Sum(x => x.TotalAmount), // Total for the month
             };
 
+            var sumAmount = walletTransactions.Sum(x => x.Amount);
             // Return the dashboard data
-            return new
+            return new ResponseMessage<dynamic>()
             {
-                supplierNameAndAmount,
-                pendingVouchers,
-                approvedVouchers,
-                totalVouchers,
-                convertedVouchers,
-                convertingVouchers,
-                usedorexpireVouchers,
-                dayDashboard = completeDayDashboard
+                message = "Đã lấy dữ liệu cho supplier thành công",
+                result = true,
+                value = new
+                {
+                    supplierNameAndAmount,
+                    sumAmount,
+                    pendingVouchers,
+                    approvedVouchers,
+                    totalVouchers,
+                    convertedVouchers,
+                    convertingVouchers,
+                    usedorexpireVouchers,
+                    dayDashboard = completeDayDashboard
+                }
             };
         }
 
@@ -423,7 +436,7 @@ namespace Vouchee.Business.Services.Impls
             return result.ToList();
         }
 
-        public async Task<dynamic> GetSupplierWalletTransactionAsync(ThisUserObj currentUser, PagingRequest pagingRequest, SupplierWalletTransactionFilter supplierWalletTransactionFilter)
+        public async Task<ResponseMessage<dynamic>> GetSupplierWalletTransactionAsync(ThisUserObj currentUser, PagingRequest pagingRequest, SupplierWalletTransactionFilter supplierWalletTransactionFilter)
         {
             var existedUser = await _userRepository.GetByIdAsync(currentUser.userId, includeProperties: x => x.Include(x => x.Supplier)
                                                                                                                 .ThenInclude(x => x.SupplierWallet));
@@ -436,19 +449,24 @@ namespace Vouchee.Business.Services.Impls
                          .DynamicFilter(_mapper.Map<GetSupplierWalletTransactionDTO>(supplierWalletTransactionFilter))
                          .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
-            return new
+            return new ResponseMessage<dynamic>()
             {
-                balance = existedUser.Supplier.SupplierWallet.Balance,
-                supplierWalletId = existedUser.Supplier.SupplierWallet.Id,
-                transasctions = new DynamicResponseModel<GetSupplierWalletTransactionDTO>()
+                message = "Đã lấy dữ liệu cho supplier thành công",
+                result = true,
+                value = new
                 {
-                    metaData = new MetaData()
+                    balance = existedUser.Supplier.SupplierWallet.Balance,
+                    supplierWalletId = existedUser.Supplier.SupplierWallet.Id,
+                    transasctions = new DynamicResponseModel<GetSupplierWalletTransactionDTO>()
                     {
-                        page = pagingRequest.page,
-                        size = pagingRequest.pageSize,
-                        total = result.Item1 // Total vouchers count for metadata
-                    },
-                    results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+                        metaData = new MetaData()
+                        {
+                            page = pagingRequest.page,
+                            size = pagingRequest.pageSize,
+                            total = result.Item1 // Total vouchers count for metadata
+                        },
+                        results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+                    }
                 }
             };
         }
