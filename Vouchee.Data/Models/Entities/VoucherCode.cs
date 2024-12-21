@@ -31,6 +31,7 @@ namespace Vouchee.Data.Models.Entities
         public string? Image { get; set; }
         public DateOnly? StartDate { get; set; }
         public DateOnly? EndDate { get; set; }
+        public Guid? UpdateId { get; set; }
 
         public bool IsVerified { get; set; }
         public bool IsActive { get; set; }
