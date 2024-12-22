@@ -1,14 +1,18 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Vouchee.Business.Exceptions;
+using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
 using Vouchee.Data.Helpers.Base;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Status;
+using Vouchee.Data.Models.Constants.Number;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
@@ -32,7 +36,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<ResponseMessage<string>> CreateWithdrawRequestAsync(WalletTypeEnum walletTypeEnum, CreateWithdrawRequestDTO createWithdrawRequestDTO, ThisUserObj thisUserObj)
         {
-            var existedUser = await _userRepository.FindAsync(thisUserObj.userId);
+            var existedUser = await _userRepository.FindAsync(thisUserObj.userId, isTracking: true);
 
             MoneyRequest moneyRequest = new()
             {
@@ -56,28 +60,57 @@ namespace Vouchee.Business.Services.Impls
 
             if (walletTypeEnum == WalletTypeEnum.BUYER)
             {
+                if (createWithdrawRequestDTO.amount > existedUser.BuyerWallet.Balance)
+                {
+                    throw new ConflictException($"Số tiền trong ví hiện tại không đủ, số dư hiện tại {existedUser.BuyerWallet.Balance}");
+                }
+
                 moneyRequest.WithdrawWalletTransaction.BuyerWalletId = existedUser.BuyerWallet.Id;
                 moneyRequest.WithdrawWalletTransaction.Note = "Rút tiền từ ví mua";
                 moneyRequest.WithdrawWalletTransaction.BeforeBalance = existedUser.BuyerWallet.Balance;
                 moneyRequest.WithdrawWalletTransaction.Amount = createWithdrawRequestDTO.amount;
                 moneyRequest.WithdrawWalletTransaction.AfterBalance = existedUser.BuyerWallet.Balance - createWithdrawRequestDTO.amount;
+
+                existedUser.BuyerWallet.Balance -= createWithdrawRequestDTO.amount;
+                existedUser.BuyerWallet.UpdateDate = DateTime.Now;
+                existedUser.BuyerWallet.UpdateBy = thisUserObj.userId;
             }
             else if (walletTypeEnum == WalletTypeEnum.SELLER)
             {
+                if (createWithdrawRequestDTO.amount > existedUser.BuyerWallet.Balance)
+                {
+                    throw new ConflictException($"Số tiền trong ví hiện tại không đủ, số dư hiện tại {existedUser.SellerWallet.Balance}");
+                }
+
                 moneyRequest.WithdrawWalletTransaction.SellerWalletId = existedUser.SellerWallet.Id;
                 moneyRequest.WithdrawWalletTransaction.Note = "Rút tiền từ ví bán";
                 moneyRequest.WithdrawWalletTransaction.BeforeBalance = existedUser.SellerWallet.Balance;
                 moneyRequest.WithdrawWalletTransaction.Amount = createWithdrawRequestDTO.amount;
                 moneyRequest.WithdrawWalletTransaction.AfterBalance = existedUser.SellerWallet.Balance - createWithdrawRequestDTO.amount;
+
+                existedUser.SellerWallet.Balance -= createWithdrawRequestDTO.amount;
+                existedUser.SellerWallet.UpdateDate = DateTime.Now;
+                existedUser.SellerWallet.UpdateBy = thisUserObj.userId;
             }
             else if (walletTypeEnum == WalletTypeEnum.SUPPLIER)
             {
+                if (createWithdrawRequestDTO.amount > existedUser.BuyerWallet.Balance)
+                {
+                    throw new ConflictException($"Số tiền trong ví hiện tại không đủ, số dư hiện tại {existedUser.Supplier.SupplierWallet.Balance}");
+                }
+
                 moneyRequest.WithdrawWalletTransaction.SupplierWalletId = existedUser.Supplier.SupplierWallet.Id;
                 moneyRequest.WithdrawWalletTransaction.Note = "Rút tiền từ ví supplier";
                 moneyRequest.WithdrawWalletTransaction.BeforeBalance = existedUser.SellerWallet.Balance;
                 moneyRequest.WithdrawWalletTransaction.Amount = createWithdrawRequestDTO.amount;
                 moneyRequest.WithdrawWalletTransaction.AfterBalance = existedUser.SellerWallet.Balance - createWithdrawRequestDTO.amount;
+
+                existedUser.Supplier.SupplierWallet.Balance -= createWithdrawRequestDTO.amount;
+                existedUser.Supplier.SupplierWallet.UpdateDate = DateTime.Now;
+                existedUser.Supplier.SupplierWallet.UpdateBy = thisUserObj.userId;
             }
+
+            await _userRepository.SaveChanges();
 
             string? result = await _moneyRequestRepository.AddReturnString(moneyRequest);
 
@@ -94,9 +127,26 @@ namespace Vouchee.Business.Services.Impls
             throw new NotImplementedException();
         }
 
-        public Task<DynamicResponseModel<GetWithdrawRequestDTO>> GetWithdrawRequestAsync(PagingRequest pagingRequest, WithdrawRequestFilter withdrawRequestFilter, ThisUserObj thisUserObj)
+        public async Task<DynamicResponseModel<GetWithdrawRequestDTO>> GetWithdrawRequestAsync(PagingRequest pagingRequest, WithdrawRequestFilter withdrawRequestFilter, ThisUserObj thisUserObj)
         {
-            throw new NotImplementedException();
+            (int, IQueryable<GetWithdrawRequestDTO>) result;
+
+            result = _moneyRequestRepository.GetTable()
+                        .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()) && x.UserId == thisUserObj.userId)
+                        .ProjectTo<GetWithdrawRequestDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetWithdrawRequestDTO>(withdrawRequestFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            return new DynamicResponseModel<GetWithdrawRequestDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+            };
         }
 
         public async Task<GetWithdrawRequestDTO> GetWithdrawRequestById(string id)
@@ -108,6 +158,51 @@ namespace Vouchee.Business.Services.Impls
             }
 
             return _mapper.Map<GetWithdrawRequestDTO>(existedWithdrawRequest);
+        }
+
+        public async Task<DynamicResponseModel<GetWalletTransactionDTO>> GetWithdrawWalletTransactionAsync(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter, ThisUserObj thisUserObj)
+        {
+            (int, IQueryable<GetWalletTransactionDTO>) result;
+
+            result = _moneyRequestRepository.GetTable()
+                        .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()) && x.UserId == thisUserObj.userId)
+                        .ProjectTo<GetWalletTransactionDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetWalletTransactionDTO>(walletTransactionFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            return new DynamicResponseModel<GetWalletTransactionDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+            };
+        }
+
+        public async Task<ResponseMessage<bool>> UpdateWithdrawRequest(Guid id, WithdrawRequestStatusEnum withdrawRequestStatusEnum, ThisUserObj thisUserObj)
+        {
+            var withdrawRequest = await _moneyRequestRepository.GetByIdAsync(id, isTracking: true);
+
+            if (withdrawRequest == null)
+            {
+                throw new NotFoundException("Không tìm thấy request với id này");
+            }
+
+            withdrawRequest.Status = withdrawRequestStatusEnum.ToString();
+            withdrawRequest.UpdateDate = DateTime.Now;
+            withdrawRequest.UpdateBy = thisUserObj.userId;
+
+            await _moneyRequestRepository.SaveChanges();
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Cập nhật thành công",
+                result = true,
+                value = true
+            };
         }
     }
 }

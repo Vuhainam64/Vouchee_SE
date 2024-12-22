@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Vouchee.Business.Models;
 using Vouchee.Data.Models.Constants.Enum.Other;
+using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Filters;
 
@@ -17,7 +18,10 @@ namespace Vouchee.Business.Services
 
         // READ
         public Task<GetWithdrawRequestDTO> GetWithdrawRequestById(string id);
-        public Task<DynamicResponseModel<GetWithdrawRequestDTO>> GetWithdrawRequestAsync(PagingRequest pagingRequest, WithdrawRequestFilter withdrawRequestFilter);
         public Task<DynamicResponseModel<GetWithdrawRequestDTO>> GetWithdrawRequestAsync(PagingRequest pagingRequest, WithdrawRequestFilter withdrawRequestFilter, ThisUserObj thisUserObj);
+        public Task<DynamicResponseModel<GetWalletTransactionDTO>> GetWithdrawWalletTransactionAsync(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter, ThisUserObj thisUserObj);
+
+        // UPDATE
+        public Task<ResponseMessage<bool>> UpdateWithdrawRequest(Guid id, WithdrawRequestStatusEnum withdrawRequestStatusEnum, ThisUserObj thisUserObj);
     }
 }
