@@ -39,6 +39,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<ResponseMessage<string>> CreateWithdrawRequestAsync(WalletTypeEnum walletTypeEnum, CreateWithdrawRequestDTO createWithdrawRequestDTO, ThisUserObj thisUserObj)
         {
+            var generateId = Guid.NewGuid();
             var existedUser = await _userRepository.FindAsync(thisUserObj.userId, isTracking: true);
 
             MoneyRequest moneyRequest = new()
@@ -73,6 +74,7 @@ namespace Vouchee.Business.Services.Impls
                 moneyRequest.WithdrawWalletTransaction.BeforeBalance = existedUser.BuyerWallet.Balance;
                 moneyRequest.WithdrawWalletTransaction.Amount = createWithdrawRequestDTO.amount;
                 moneyRequest.WithdrawWalletTransaction.AfterBalance = existedUser.BuyerWallet.Balance - createWithdrawRequestDTO.amount;
+                moneyRequest.WithdrawWalletTransaction.UpdateId = generateId;
 
                 existedUser.BuyerWallet.Balance -= createWithdrawRequestDTO.amount;
                 existedUser.BuyerWallet.UpdateDate = DateTime.Now;
@@ -90,6 +92,7 @@ namespace Vouchee.Business.Services.Impls
                 moneyRequest.WithdrawWalletTransaction.BeforeBalance = existedUser.SellerWallet.Balance;
                 moneyRequest.WithdrawWalletTransaction.Amount = createWithdrawRequestDTO.amount;
                 moneyRequest.WithdrawWalletTransaction.AfterBalance = existedUser.SellerWallet.Balance - createWithdrawRequestDTO.amount;
+                moneyRequest.WithdrawWalletTransaction.UpdateId = generateId;
 
                 existedUser.SellerWallet.Balance -= createWithdrawRequestDTO.amount;
                 existedUser.SellerWallet.UpdateDate = DateTime.Now;
@@ -107,6 +110,7 @@ namespace Vouchee.Business.Services.Impls
                 moneyRequest.WithdrawWalletTransaction.BeforeBalance = existedUser.SellerWallet.Balance;
                 moneyRequest.WithdrawWalletTransaction.Amount = createWithdrawRequestDTO.amount;
                 moneyRequest.WithdrawWalletTransaction.AfterBalance = existedUser.SellerWallet.Balance - createWithdrawRequestDTO.amount;
+                moneyRequest.WithdrawWalletTransaction.UpdateId = generateId;
 
                 existedUser.Supplier.SupplierWallet.Balance -= createWithdrawRequestDTO.amount;
                 existedUser.Supplier.SupplierWallet.UpdateDate = DateTime.Now;

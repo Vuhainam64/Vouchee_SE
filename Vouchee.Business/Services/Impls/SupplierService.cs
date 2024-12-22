@@ -17,6 +17,7 @@ using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.DTOs.Dashboard;
 using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
+using static Google.Cloud.Firestore.V1.StructuredAggregationQuery.Types.Aggregation.Types;
 
 namespace Vouchee.Business.Services.Impls
 {
@@ -172,10 +173,6 @@ namespace Vouchee.Business.Services.Impls
             var voucherCodes = _voucherCodeRepository.GetTable()
                 .Where(x => x.Modal.Voucher.Supplier.Id == existedUser.Supplier.Id);
             
-            // Query for wallet transactions linked to the supplier's wallet
-            var walletTransactions = _walletTransactionRepository.GetTable()
-                .Where(x => x.SupplierWalletId == existedUser.Supplier.SupplierWallet.Id);
-
             // Calculate statistics
             var pendingVouchers = await voucherCodes
                 .CountAsync(x => x.Status == VoucherCodeStatusEnum.PENDING.ToString());
@@ -195,6 +192,17 @@ namespace Vouchee.Business.Services.Impls
 
             var convertedVouchers = await voucherCodes
                 .CountAsync(x => x.Status == VoucherCodeStatusEnum.UNUSED.ToString());
+
+            // Query for wallet transactions linked to the supplier's wallet
+            var walletTransactions = _walletTransactionRepository.GetTable()
+                .Where(x => x.SupplierWalletId == existedUser.Supplier.SupplierWallet.Id);
+
+            var waitingforpayment = walletTransactions
+                .Where(x => x.Status == WalletTransactionStatusEnum.PENDING.ToString())
+                .Sum(x => x.Amount);
+
+            var totalamountthatcanbereceived = voucherCodes.SumAsync(x => x.Modal.SellPrice * x.Modal.Index * 0.1);
+            
             // Generate all months of the current year
             var currentYear = DateTime.Now.Year;
             var allMonths = Enumerable.Range(1, 12)
@@ -249,6 +257,8 @@ namespace Vouchee.Business.Services.Impls
                 convertedVouchers,
                 convertingVouchers,
                 usedorexpireVouchers,
+                waitingforpayment,
+                totalamountthatcanbereceived,
                 monthDashboard = completeMonthDashboard 
                 },
             };
@@ -267,10 +277,6 @@ namespace Vouchee.Business.Services.Impls
             // Query for voucher data linked to the supplier
             var voucherCodes = _voucherCodeRepository.GetTable()
                 .Where(x => x.Modal.Voucher.Supplier.Id == existedUser.Supplier.Id);
-
-            // Query for wallet transactions linked to the supplier's wallet
-            var walletTransactions = _walletTransactionRepository.GetTable()
-                .Where(x => x.SupplierWalletId == existedUser.Supplier.SupplierWallet.Id);
 
             // Calculate statistics
             var pendingVouchers = await voucherCodes
@@ -291,6 +297,11 @@ namespace Vouchee.Business.Services.Impls
 
             var convertedVouchers = await voucherCodes
                 .CountAsync(x => x.Status == VoucherCodeStatusEnum.UNUSED.ToString());
+
+            // Query for wallet transactions linked to the supplier's wallet
+            var walletTransactions = _walletTransactionRepository.GetTable()
+                .Where(x => x.SupplierWalletId == existedUser.Supplier.SupplierWallet.Id);
+
             // Generate all months of the current year
             var currentYear = DateTime.Now.Year;
             var currentMonth = DateTime.Now.Month;
