@@ -51,6 +51,7 @@ namespace Vouchee.Business.Models.DTOs
         public string brand { get; set; }
         public Guid? modalId { get; set; }
         public string? status { get; set; }
+        public Guid? UpdateId { get; set; }
     }
     public class UpdateCodeVoucherCodeDTO 
     {
