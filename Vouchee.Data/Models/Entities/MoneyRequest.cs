@@ -33,6 +33,7 @@ namespace Vouchee.Data.Models.Entities
 
         public int Amount { get; set; }
         public string? Type { get; set; }
+        public Guid? UpdateId { get; set; }
 
         public required string Status { get; set; }
         public DateTime? CreateDate { get; set; }
