@@ -185,7 +185,7 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<ResponseMessage<bool>> UpdateWithdrawRequest(Guid id, WithdrawRequestStatusEnum withdrawRequestStatusEnum, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<bool>> UpdateWithdrawRequest(string id, WithdrawRequestStatusEnum withdrawRequestStatusEnum, ThisUserObj thisUserObj)
         {
             var withdrawRequest = await _moneyRequestRepository.GetByIdAsync(id, isTracking: true);
 
