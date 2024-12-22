@@ -309,6 +309,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<ResponseMessage<IList<GetVoucherCodechangeStatusDTO>>> UpdateVoucherCodeStatusConvertingAsync(IList<Guid> id, ThisUserObj thisUserObj)
         {
+            var gennerateid = Guid.NewGuid();
             var voucherCodes = _voucherCodeRepository.GetTable();
             IList<GetVoucherCodechangeStatusDTO> list = new List<GetVoucherCodechangeStatusDTO>();
             foreach (var code in id)
@@ -319,6 +320,7 @@ namespace Vouchee.Business.Services.Impls
                 {
                     var result = await updatecode;
                     result.Status = VoucherCodeStatusEnum.CONVERTING.ToString();
+                    result.UpdateId = gennerateid;
                     _voucherCodeRepository.UpdateAsync(result);
                     list.Add(_mapper.Map<GetVoucherCodechangeStatusDTO>(result));
                 }
