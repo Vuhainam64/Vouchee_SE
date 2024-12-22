@@ -21,14 +21,17 @@ namespace Vouchee.Business.Services.Impls
 {
     public class WithdrawService : IWithdrawService
     {
+        private readonly IBaseRepository<WalletTransaction> _walletTransactionRepository;
         private readonly IBaseRepository<User> _userRepository;
         private readonly IBaseRepository<MoneyRequest> _moneyRequestRepository;
         private readonly IMapper _mapper;
 
-        public WithdrawService(IBaseRepository<User> userRepository,
+        public WithdrawService(IBaseRepository<WalletTransaction> walletTransactionRepository,
+                               IBaseRepository<User> userRepository,
                                IBaseRepository<MoneyRequest> moneyRequestRepository,
                                IMapper mapper)
         {
+            _walletTransactionRepository = walletTransactionRepository;
             _userRepository = userRepository;
             _moneyRequestRepository = moneyRequestRepository;
             _mapper = mapper;
@@ -164,8 +167,8 @@ namespace Vouchee.Business.Services.Impls
         {
             (int, IQueryable<GetWalletTransactionDTO>) result;
 
-            result = _moneyRequestRepository.GetTable()
-                        .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()) && x.UserId == thisUserObj.userId)
+            result = _walletTransactionRepository.GetTable()
+                        .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()) && x.BuyerWallet.BuyerId == thisUserObj.userId)
                         .ProjectTo<GetWalletTransactionDTO>(_mapper.ConfigurationProvider)
                         .DynamicFilter(_mapper.Map<GetWalletTransactionDTO>(walletTransactionFilter))
                         .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
