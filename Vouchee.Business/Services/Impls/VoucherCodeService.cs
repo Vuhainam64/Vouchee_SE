@@ -262,6 +262,7 @@ namespace Vouchee.Business.Services.Impls
                     result.IsVerified = true;
                     result.UpdateDate = DateTime.Now;
                     result.NewCode = code.newcode;
+                    result.Comment = code.Comment;
                     result.UpdateBy = thisUserObj.userId;
                     _voucherCodeRepository.UpdateAsync(result);
                     list.Add(_mapper.Map<GetVoucherCodeDTO>(result));
