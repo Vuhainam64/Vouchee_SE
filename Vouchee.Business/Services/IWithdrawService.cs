@@ -15,6 +15,7 @@ namespace Vouchee.Business.Services
     {
         // CREATE
         public Task<ResponseMessage<string>> CreateWithdrawRequestAsync(WalletTypeEnum walletTypeEnum, CreateWithdrawRequestDTO createWithdrawRequestDTO, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<bool>> CreateWithdrawRequestInAllWalletAsync();
 
         // READ
         public Task<GetWithdrawRequestDTO> GetWithdrawRequestById(string id);
