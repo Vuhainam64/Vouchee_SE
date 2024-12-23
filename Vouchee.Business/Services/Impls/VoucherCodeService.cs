@@ -412,6 +412,7 @@ namespace Vouchee.Business.Services.Impls
                                     UpdateId = g.Key,
                                     Count = g.Count(),
                                     UpdateTime = g.Max(x => x.UpdateDate),
+                                    Status = g.Any(x => x.NewCode != null) ? "Đã xử lý":"Chưa sử lý",
                                     FirstItem = _mapper.Map<GetVoucherCodeDTO>(g.FirstOrDefault())
                                 })
                                 .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
