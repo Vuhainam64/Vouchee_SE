@@ -43,6 +43,7 @@ namespace Vouchee.Business.Models.DTOs
 
         public DateTime? updateDate { get; set; }
         public Guid? UpdateId { get; set; }
+        public string? Comment { get; set; }
 
     }
     public class GetVoucherCodechangeStatusDTO : VoucherCodeDTO
@@ -54,6 +55,7 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? modalId { get; set; }
         public string? status { get; set; }
         public Guid? UpdateId { get; set; }
+        public string? Comment { get; set; }
     }
     public class UpdateCodeVoucherCodeDTO 
     {
@@ -61,6 +63,8 @@ namespace Vouchee.Business.Models.DTOs
         public Guid id { get; set; }
         [Required]
         public string newcode { get; set; }
+
+        public string? Comment { get; set; }
     }
     public class UpdateVoucherCodeStatusDTO
     {
