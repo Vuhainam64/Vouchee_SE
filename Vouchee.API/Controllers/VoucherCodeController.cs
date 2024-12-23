@@ -64,12 +64,30 @@ namespace Vouchee.API.Controllers
             var result = await _voucherCodeService.GetSupplierVoucherCodeAsync(currentUser, pagingRequest, voucherCodeFilter);
             return Ok(result);
         }
+        [Authorize]
+        [HttpGet("get_supplier_voucher_code_converting")]
+        public async Task<IActionResult> GetConvertedVoucherCodesConverting([FromQuery] PagingRequest pagingRequest)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
+            var result = await _voucherCodeService.GetSupplierVoucherCodeConvertingAsync(currentUser, pagingRequest);
+            return Ok(result);
+        }
         // GET BY ID
         [HttpGet("get_voucher_code/{id}")]
         public async Task<IActionResult> GetVoucherCodeById(Guid id)
         {
             var voucherCode = await _voucherCodeService.GetVoucherCodeByIdAsync(id);
+            return Ok(voucherCode);
+        }
+
+        [Authorize]
+        [HttpGet("get_voucher_code_by_Update/{id}")]
+        public async Task<IActionResult> GetVoucherCodeByUpdateId(Guid id, [FromQuery] PagingRequest pagingRequest)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var voucherCode = await _voucherCodeService.GetVoucherCodeByUpdateIdAsync(currentUser, id, pagingRequest);
             return Ok(voucherCode);
         }
 
