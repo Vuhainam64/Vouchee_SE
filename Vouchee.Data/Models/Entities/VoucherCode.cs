@@ -12,6 +12,9 @@ namespace Vouchee.Data.Models.Entities
     [Table("VoucherCode")]
     public partial class VoucherCode
     {
+        [InverseProperty(nameof(RefundRequest.VoucherCode))]
+        public virtual RefundRequest? RefundRequest { get; set; }
+
         public string? OrderId { get; set; }
         [ForeignKey(nameof(OrderId))]
         [InverseProperty(nameof(Order.VoucherCodes))]
@@ -33,6 +36,7 @@ namespace Vouchee.Data.Models.Entities
         public DateOnly? EndDate { get; set; }
         public Guid? UpdateId { get; set; }
         public string? Comment { get; set; }
+        public string? UpdateStatus { get; set; }
 
         public bool IsVerified { get; set; }
         public bool IsActive { get; set; }

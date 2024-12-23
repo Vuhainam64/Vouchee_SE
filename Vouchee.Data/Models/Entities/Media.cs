@@ -22,6 +22,11 @@ namespace Vouchee.Data.Models.Entities
         [InverseProperty(nameof(Rating.Medias))]
         public virtual Rating? Rating { get; set; }
 
+        public Guid? RefundRequestId { get; set; }
+        [ForeignKey(nameof(RefundRequestId))]
+        [InverseProperty(nameof(RefundRequest.Medias))]
+        public virtual RefundRequest? RefundRequest { get; set; }
+
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
