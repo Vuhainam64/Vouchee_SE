@@ -18,6 +18,7 @@ namespace Vouchee.API.Controllers
     {
         private readonly ISendEmailService _sendEmailService;
 
+        private readonly IWithdrawService _withdrawService;
         private readonly ISupplierService _supplierService;
         private readonly IDeviceTokenService _deviceTokenService;
         private readonly IUserService _userService;
@@ -26,6 +27,7 @@ namespace Vouchee.API.Controllers
         private readonly IWalletTransactionService _walletTransactionService;
 
         public WeatherForecastController(ISendEmailService sendEmailService,
+                                         IWithdrawService withdrawService,
                                          ISupplierService supplierService,
                                          IDeviceTokenService deviceTokenService,
                                          IUserService userService,
@@ -34,6 +36,7 @@ namespace Vouchee.API.Controllers
                                          IWalletTransactionService walletTransactionService)
         {
             _sendEmailService = sendEmailService;
+            _withdrawService = withdrawService;
             _supplierService = supplierService;
             _deviceTokenService = deviceTokenService;
             _userService = userService;
@@ -41,8 +44,6 @@ namespace Vouchee.API.Controllers
             _walletService = walletService;
             _walletTransactionService = walletTransactionService;
         }
-
-
 
         // CREATE
         [HttpPost("create_device_token")]
@@ -118,6 +119,14 @@ namespace Vouchee.API.Controllers
         {
             var result = await _userService.DeleteUserFromFirebaseAsync(email);
             return Ok(result);
+        }
+
+        // Endpoint to manually trigger the withdraw job
+        [HttpPost("withdraw/all-wallets")]
+        public async Task<IActionResult> TriggerWithdrawJob()
+        {
+            var response = await _withdrawService.CreateWithdrawRequestInAllWalletAsync();
+            return Ok(response);
         }
     }
 }

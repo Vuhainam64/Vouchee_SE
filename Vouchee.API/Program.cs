@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.DataProtection;
 using Newtonsoft.Json;
 using System.Net.Mail;
 using System.Net;
+using Hangfire;
+using Hangfire.SqlServer;
+using Vouchee.Business.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +17,20 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 builder.Services.AddDependencyInjection(builder.Configuration);
 builder.Services.AddDistributedMemoryCache();
+builder.Services.AddHangfire(config =>
+    config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+          .UseSimpleAssemblyNameTypeSerializer()
+          .UseRecommendedSerializerSettings()
+          .UseSqlServerStorage(builder.Configuration.GetConnectionString("PROD"), new SqlServerStorageOptions
+          {
+              CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+              SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+              QueuePollInterval = TimeSpan.Zero,
+              UseRecommendedIsolationLevel = true,
+              UsePageLocksOnDequeue = true,
+              DisableGlobalLocks = true
+          }));
+builder.Services.AddHangfireServer();
 
 IConfiguration configuration = builder.Configuration;
 
@@ -75,6 +92,14 @@ app.UseMiddleware<AuthorizeMiddleware>(); // Place before UseAuthorization
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseHangfireDashboard("/hangfire");
+
+RecurringJob.AddOrUpdate<IWithdrawService>(
+    "Withdraw_AllWallets",
+    service => service.CreateWithdrawRequestInAllWalletAsync(),
+    Cron.Weekly(DayOfWeek.Tuesday, 10, 0), // Every Tuesday at 10:00 AM
+    TimeZoneInfo.Local);
 
 app.Run();
 

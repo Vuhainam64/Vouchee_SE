@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Castle.Core.Smtp;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -21,16 +22,23 @@ namespace Vouchee.Business.Services.Impls
 {
     public class WithdrawService : IWithdrawService
     {
+        private readonly ISendEmailService _sendEmailService;
+
+        private readonly IBaseRepository<Wallet> _walletRepository;
         private readonly IBaseRepository<WalletTransaction> _walletTransactionRepository;
         private readonly IBaseRepository<User> _userRepository;
         private readonly IBaseRepository<MoneyRequest> _moneyRequestRepository;
         private readonly IMapper _mapper;
 
-        public WithdrawService(IBaseRepository<WalletTransaction> walletTransactionRepository,
+        public WithdrawService(ISendEmailService sendEmailService,
+                               IBaseRepository<Wallet> walletRepository,
+                               IBaseRepository<WalletTransaction> walletTransactionRepository,
                                IBaseRepository<User> userRepository,
                                IBaseRepository<MoneyRequest> moneyRequestRepository,
                                IMapper mapper)
         {
+            _sendEmailService = sendEmailService;
+            _walletRepository = walletRepository;
             _walletTransactionRepository = walletTransactionRepository;
             _userRepository = userRepository;
             _moneyRequestRepository = moneyRequestRepository;
@@ -129,9 +137,73 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public Task<DynamicResponseModel<GetWithdrawRequestDTO>> GetWithdrawRequestAsync(PagingRequest pagingRequest, WithdrawRequestFilter withdrawRequestFilter)
+        public async Task<ResponseMessage<bool>> CreateWithdrawRequestInAllWalletAsync()
         {
-            throw new NotImplementedException();
+            var wallets = await _walletRepository.GetTable().AsTracking().ToListAsync();
+
+            foreach (var wallet in wallets.ToList())
+            {
+                if (wallet.Balance > 0)
+                {
+                    wallet.Balance = 0;
+
+                    string note = string.Empty;
+
+                    if (wallet.BuyerId != null)
+                    {
+                        note = $"Tự động rút {wallet.Balance} từ ví mua, {wallet.Buyer}";
+
+                        await _sendEmailService.SendEmailAsync(wallet.Buyer.Email, "Tự động rút tiền", note);
+                    }
+                    else if (wallet.SellerId != null)
+                    {
+                        note = $"Tự động rút  {wallet.Balance} từ ví bán, {wallet.Balance}";
+
+                        await _sendEmailService.SendEmailAsync(wallet.Seller.Email, "Tự động rút tiền", note);
+                    }
+                    else if (wallet.SupplierId != null)
+                    {
+                        note = $"Tự động rút  {wallet.Balance} từ ví supplier, {wallet.Balance}";
+
+                        foreach (var supplierAccount in wallet.Supplier.Users)
+                        {
+                            await _sendEmailService.SendEmailAsync(supplierAccount.Email, "Tự động rút tiền", note);
+                        }
+                    }
+
+                    MoneyRequest moneyRequest = new MoneyRequest()
+                    {
+                        Status = "PENDING",
+                        Amount = wallet.Balance,
+                        CreateDate = DateTime.Now,
+                        Type = "WITHDRAW",
+                        WithdrawWalletTransaction = new()
+                        {
+                            Status = "PENDING",
+                            Amount = wallet.Balance,
+                            CreateDate = DateTime.Now,
+                            Type = "WITHDRAW",
+                            BeforeBalance = wallet.Balance,
+                            AfterBalance = 0,
+                            Note = note,
+                            BuyerWalletId = wallet?.Buyer?.BuyerWallet?.Id,
+                            SellerWalletId = wallet?.Seller?.SellerWallet?.Id,
+                            SupplierWalletId = wallet?.Supplier?.SupplierWallet?.Id,
+                        }
+                    };
+
+                    await _moneyRequestRepository.Add(moneyRequest);
+                }
+            }
+
+            await _walletRepository.SaveChanges();
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Đã tạo rút tiền thành công",
+                result = true,
+                value = true
+            };
         }
 
         public async Task<DynamicResponseModel<GetWithdrawRequestDTO>> GetWithdrawRequestAsync(PagingRequest pagingRequest, WithdrawRequestFilter withdrawRequestFilter, ThisUserObj thisUserObj)
