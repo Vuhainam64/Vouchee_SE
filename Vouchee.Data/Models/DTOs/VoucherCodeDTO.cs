@@ -58,7 +58,7 @@ namespace Vouchee.Business.Models.DTOs
     public class UpdateCodeVoucherCodeDTO 
     {
         [Required]
-        public string code { get; set; }
+        public Guid id { get; set; }
         [Required]
         public string newcode { get; set; }
     }
