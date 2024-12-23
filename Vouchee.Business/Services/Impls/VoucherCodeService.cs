@@ -312,31 +312,38 @@ namespace Vouchee.Business.Services.Impls
             var gennerateid = Guid.NewGuid();
             var voucherCodes = _voucherCodeRepository.GetTable();
             IList<GetVoucherCodechangeStatusDTO> list = new List<GetVoucherCodechangeStatusDTO>();
+
             foreach (var code in id)
             {
-                var updatecode = voucherCodes.Where(c => c.Id == code)
-                    .FirstOrDefaultAsync();
+                // Await directly when fetching the voucher code
+                var updatecode = await voucherCodes.FirstOrDefaultAsync(c => c.Id == code);
+
                 if (updatecode != null)
                 {
-                    var result = await updatecode;
-                    result.Status = VoucherCodeStatusEnum.CONVERTING.ToString();
-                    result.UpdateId = gennerateid;
-                    _voucherCodeRepository.UpdateAsync(result);
-                    list.Add(_mapper.Map<GetVoucherCodechangeStatusDTO>(result));
+                    // Update the status and update ID
+                    updatecode.Status = VoucherCodeStatusEnum.CONVERTING.ToString();
+                    updatecode.UpdateId = gennerateid;
+
+                    // Await the update operation
+                    await _voucherCodeRepository.UpdateAsync(updatecode);
+
+                    // Map the updated result and add it to the list
+                    list.Add(_mapper.Map<GetVoucherCodechangeStatusDTO>(updatecode));
                 }
                 else
                 {
-                    throw new Exception("Khong tim thay code");
+                    throw new Exception("Không tìm thấy code");
                 }
-                return new ResponseMessage<IList<GetVoucherCodechangeStatusDTO>>()
-                {
-                    message = "Cập nhật thành công",
-                    result = true,
-                    value = list
-                };
             }
-            throw new Exception("loi khong xac dinh");
+
+            return new ResponseMessage<IList<GetVoucherCodechangeStatusDTO>>()
+            {
+                message = "Cập nhật thành công",
+                result = true,
+                value = list
+            };
         }
+
 
         public async Task<DynamicResponseModel<GetVoucherCodeDTO>> GetSupplierVoucherCodeAsync(ThisUserObj thisUserObj, PagingRequest pagingRequest, VoucherCodeFilter voucherCodeFilter)
         {
