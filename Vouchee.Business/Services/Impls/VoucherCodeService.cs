@@ -280,7 +280,6 @@ namespace Vouchee.Business.Services.Impls
                 }
             }
             return list;
-            throw new Exception("loi khong xac dinh");
         }
 
         public async Task<ResponseMessage<GetVoucherCodeDTO>> UpdatePosVoucherCodeAsync(string code, ThisUserObj thisUserObj)
