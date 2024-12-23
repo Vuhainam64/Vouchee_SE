@@ -372,7 +372,7 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<DynamicResponseModel<GetVoucherCodeDTO>> GetSupplierVoucherCodeConvertingAsync(ThisUserObj thisUserObj, PagingRequest pagingRequest)
+        public async Task<DynamicResponseModel<GroupedVoucherCodeDTO>> GetSupplierVoucherCodeConvertingAsync(ThisUserObj thisUserObj, PagingRequest pagingRequest)
         {
             var existedUser = await _userRepository.GetByIdAsync(thisUserObj.userId);
 
@@ -386,16 +386,23 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Tài khoản này không phải tài khoản supplier");
             }
 
-            (int, IQueryable<GetVoucherCodeDTO>) result;
+            (int, IQueryable<GroupedVoucherCodeDTO>) result;
 
             result = _voucherCodeRepository.GetTable()
-                                            .Where(x => x.Modal.Voucher.SupplierId == existedUser.SupplierId)
-                                            .Where(x => x.UpdateId != null)
-                                            .GroupBy(x => x.UpdateId)
-                                            .ProjectTo<GetVoucherCodeDTO>(_mapper.ConfigurationProvider)
-                                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+                                .Where(x => x.Modal.Voucher.SupplierId == existedUser.SupplierId)
+                                .Where(x => x.UpdateId != null)
+                                .Where(x => x.Status == VoucherCodeStatusEnum.CONVERTING.ToString())
+                                .GroupBy(x => x.UpdateId)
+                                .Select(g => new GroupedVoucherCodeDTO
+                                {
+                                    UpdateId = g.Key,
+                                    Count = g.Count(),
+                                    FirstItem = _mapper.Map<GetVoucherCodeDTO>(g.FirstOrDefault())
+                                })
+                                .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
-            return new DynamicResponseModel<GetVoucherCodeDTO>()
+
+            return new DynamicResponseModel<GroupedVoucherCodeDTO>()
             {
                 metaData = new MetaData()
                 {

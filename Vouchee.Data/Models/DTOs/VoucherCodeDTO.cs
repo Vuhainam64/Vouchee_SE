@@ -42,6 +42,8 @@ namespace Vouchee.Business.Models.DTOs
         public string? newCode { get; set; }
 
         public DateTime? updateDate { get; set; }
+        public Guid? UpdateId { get; set; }
+
     }
     public class GetVoucherCodechangeStatusDTO : VoucherCodeDTO
     {
@@ -67,4 +69,12 @@ namespace Vouchee.Business.Models.DTOs
         [Required]
         public Guid id { get; set; }
     }
+
+    public class GroupedVoucherCodeDTO
+    {
+        public Guid? UpdateId { get; set; }
+        public int Count { get; set; } // Number of items in the group
+        public GetVoucherCodeDTO FirstItem { get; set; } // Example of holding one representative item
+    }
+
 }
