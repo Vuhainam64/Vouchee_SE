@@ -253,7 +253,7 @@ namespace Vouchee.Business.Services.Impls
             IList<GetVoucherCodeDTO> list = new List<GetVoucherCodeDTO>();
             foreach (var code in updateCodeVoucherCodeDTO)
             {
-                var updatecode = voucherCodes.Where(c => c.Code == code.code)
+                var updatecode = voucherCodes.Where(c => c.Id == code.id)
                     .FirstOrDefaultAsync();
                 if (updatecode != null)
                 {
