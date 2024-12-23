@@ -323,7 +323,7 @@ namespace Vouchee.Business.Services.Impls
                     // Update the status and update ID
                     updatecode.Status = VoucherCodeStatusEnum.CONVERTING.ToString();
                     updatecode.UpdateId = gennerateid;
-
+                    updatecode.UpdateDate = DateTime.Now;
                     // Await the update operation
                     await _voucherCodeRepository.UpdateAsync(updatecode);
 
