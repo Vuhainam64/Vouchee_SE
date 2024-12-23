@@ -75,7 +75,7 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? UpdateId { get; set; }
         public int Count { get; set; } // Number of items in the group
 
-        public DateTime? GetDate { get; set; }
+        public DateTime? UpdateTime { get; set; }
         public GetVoucherCodeDTO FirstItem { get; set; } // Example of holding one representative item
     }
 
