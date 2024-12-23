@@ -271,15 +271,15 @@ namespace Vouchee.Business.Services.Impls
                     else { 
                         result.IsVerified = false; 
                     }
-                    _voucherCodeRepository.UpdateAsync(result);
+                    await _voucherCodeRepository.UpdateAsync(result);
                     list.Add(_mapper.Map<GetVoucherCodeDTO>(result));
                 }
                 else
                 {
                     throw new Exception("Khong tim thay code");
                 }
-                return list;
             }
+            return list;
             throw new Exception("loi khong xac dinh");
         }
 
