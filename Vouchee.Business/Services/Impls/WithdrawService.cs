@@ -145,8 +145,6 @@ namespace Vouchee.Business.Services.Impls
             {
                 if (wallet.Balance > 0)
                 {
-                    wallet.Balance = 0;
-
                     string note = string.Empty;
 
                     if (wallet.BuyerId != null)
@@ -193,6 +191,8 @@ namespace Vouchee.Business.Services.Impls
                     };
 
                     await _moneyRequestRepository.Add(moneyRequest);
+
+                    wallet.Balance = 0;
                 }
             }
 
