@@ -61,10 +61,12 @@ namespace Vouchee.Business.Models.DTOs
     {
         [Required]
         public Guid id { get; set; }
-        [Required]
-        public string newcode { get; set; }
+        
+        public string? newcode { get; set; }
 
         public string? Comment { get; set; }
+
+        public UpdateStatusEnum? UpdateStatus { get; set; }
     }
     public class UpdateVoucherCodeStatusDTO
     {

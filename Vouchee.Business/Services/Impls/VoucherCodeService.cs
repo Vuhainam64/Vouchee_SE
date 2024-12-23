@@ -259,11 +259,18 @@ namespace Vouchee.Business.Services.Impls
                 {
                     var result = await updatecode;
                     result.Status = VoucherCodeStatusEnum.UNUSED.ToString();
-                    result.IsVerified = true;
                     result.UpdateDate = DateTime.Now;
                     result.NewCode = code.newcode;
                     result.Comment = code.Comment;
                     result.UpdateBy = thisUserObj.userId;
+                    result.UpdateStatus = code.UpdateStatus.ToString();
+                    if (code.UpdateStatus == UpdateStatusEnum.SUCCESS)
+                    {
+                        result.IsVerified = true;
+                    }
+                    else { 
+                        result.IsVerified = false; 
+                    }
                     _voucherCodeRepository.UpdateAsync(result);
                     list.Add(_mapper.Map<GetVoucherCodeDTO>(result));
                 }
