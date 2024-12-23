@@ -82,6 +82,16 @@ namespace Vouchee.API.Controllers
         }
 
         [Authorize]
+        [HttpGet("get_voucher_code_by_Update/{id}")]
+        public async Task<IActionResult> GetVoucherCodeByUpdateId(Guid id, [FromQuery] PagingRequest pagingRequest)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var voucherCode = await _voucherCodeService.GetVoucherCodeByUpdateIdAsync(currentUser, id, pagingRequest);
+            return Ok(voucherCode);
+        }
+
+        [Authorize]
         [HttpGet("export_voucher_code_excel")]
         public async Task<IActionResult> ExportVoucherCodeExcel([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
         {
