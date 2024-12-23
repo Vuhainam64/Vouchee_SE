@@ -278,8 +278,8 @@ namespace Vouchee.Business.Services.Impls
                 {
                     throw new Exception("Khong tim thay code");
                 }
-                return list;
             }
+            return list;
             throw new Exception("loi khong xac dinh");
         }
 
