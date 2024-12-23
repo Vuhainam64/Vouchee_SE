@@ -58,7 +58,7 @@ namespace Vouchee.Business.Models.DTOs
     public class UpdateCodeVoucherCodeDTO 
     {
         [Required]
-        public string code { get; set; }
+        public Guid id { get; set; }
         [Required]
         public string newcode { get; set; }
     }
@@ -74,6 +74,8 @@ namespace Vouchee.Business.Models.DTOs
     {
         public Guid? UpdateId { get; set; }
         public int Count { get; set; } // Number of items in the group
+
+        public DateTime? UpdateTime { get; set; }
         public GetVoucherCodeDTO FirstItem { get; set; } // Example of holding one representative item
     }
 
