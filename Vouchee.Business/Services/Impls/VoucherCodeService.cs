@@ -371,5 +371,40 @@ namespace Vouchee.Business.Services.Impls
                 results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
             };
         }
+
+        public async Task<DynamicResponseModel<GetVoucherCodeDTO>> GetSupplierVoucherCodeConvertingAsync(ThisUserObj thisUserObj, PagingRequest pagingRequest)
+        {
+            var existedUser = await _userRepository.GetByIdAsync(thisUserObj.userId);
+
+            if (existedUser == null)
+            {
+                throw new NotFoundException("Không tìm thấy user này");
+            }
+
+            if (existedUser.Supplier == null)
+            {
+                throw new NotFoundException("Tài khoản này không phải tài khoản supplier");
+            }
+
+            (int, IQueryable<GetVoucherCodeDTO>) result;
+
+            result = _voucherCodeRepository.GetTable()
+                                            .Where(x => x.Modal.Voucher.SupplierId == existedUser.SupplierId)
+                                            .Where(x => x.UpdateId != null)
+                                            .GroupBy(x => x.UpdateId)
+                                            .ProjectTo<GetVoucherCodeDTO>(_mapper.ConfigurationProvider)
+                                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            return new DynamicResponseModel<GetVoucherCodeDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+            };
+        }
     }
 }
