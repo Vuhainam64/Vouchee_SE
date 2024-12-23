@@ -271,7 +271,7 @@ namespace Vouchee.Business.Services.Impls
                     else { 
                         result.IsVerified = false; 
                     }
-                    _voucherCodeRepository.UpdateAsync(result);
+                    await _voucherCodeRepository.UpdateAsync(result);
                     list.Add(_mapper.Map<GetVoucherCodeDTO>(result));
                 }
                 else
