@@ -405,14 +405,14 @@ namespace Vouchee.Business.Services.Impls
             result = _voucherCodeRepository.GetTable()
                                 .Where(x => x.Modal.Voucher.SupplierId == existedUser.SupplierId)
                                 .Where(x => x.UpdateId != null)
-                                .Where(x => x.Status == VoucherCodeStatusEnum.CONVERTING.ToString())
+                                .Where(x => x.Status == VoucherCodeStatusEnum.CONVERTING.ToString() || x.Status == VoucherCodeStatusEnum.UNUSED.ToString())
                                 .GroupBy(x => x.UpdateId)
                                 .Select(g => new GroupedVoucherCodeDTO
                                 {
                                     UpdateId = g.Key,
                                     Count = g.Count(),
                                     UpdateTime = g.Max(x => x.UpdateDate),
-                                    Status = g.Any(x => x.NewCode != null) ? "Đã xử lý":"Chưa sử lý",
+                                    Status = g.Any(x => x.Status == VoucherCodeStatusEnum.UNUSED.ToString()) ? "Đã xử lý":"Chưa sử lý",
                                     FirstItem = _mapper.Map<GetVoucherCodeDTO>(g.FirstOrDefault())
                                 })
                                 .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
