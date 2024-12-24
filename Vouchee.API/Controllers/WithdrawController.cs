@@ -66,7 +66,9 @@ namespace Vouchee.API.Controllers
 
             var result = await _excelExportService.GenerateWithdrawRequestExcel();
 
-            var fileName = $"WITHDRAW.xlsx";
+            // Get the current time and format it
+            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            var fileName = $"WITHDRAW_{timestamp}.xlsx";
 
             var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
