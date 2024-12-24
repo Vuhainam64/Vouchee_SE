@@ -17,8 +17,9 @@ namespace Vouchee.Business.Services
 
         // READ
         public Task<DynamicResponseModel<GetRefundRequestDTO>> GetAllRefundRequestAsync(PagingRequest pagingRequest, RefundRequestFilter refundRequestFilter);
-        public Task<DynamicResponseModel<GetRefundRequestDTO>> GetRefundRequestAsync(ThisUserObj thisUserObj, PagingRequest pagingRequest, RefundRequestFilter refundRequestFilter);
+        public Task<DynamicResponseModel<GetRefundRequestDTO>> GetSupplierRefundRequestAsync(ThisUserObj thisUserObj, PagingRequest pagingRequest, RefundRequestFilter refundRequestFilter);
         public Task<GetRefundRequestDTO> GetRefundRequestByIdAsync(Guid id);
+        public Task<DynamicResponseModel<GetRefundRequestDTO>> GetBuyerRefundRequestAsync(ThisUserObj thisUserObj, PagingRequest pagingRequest, RefundRequestFilter refundRequestFilter);
 
         // UPDATE
         public Task<ResponseMessage<bool>> UpdateRefundRequestAsync(Guid id, UpdateRefundRequestDTO updateRefundRequestDTO, ThisUserObj thisUserObj);

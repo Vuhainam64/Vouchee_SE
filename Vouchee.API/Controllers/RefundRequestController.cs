@@ -51,7 +51,17 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _refundRequestService.GetRefundRequestAsync(currentUser, pagingRequest, refundRequestFilter);
+            var result = await _refundRequestService.GetSupplierRefundRequestAsync(currentUser, pagingRequest, refundRequestFilter);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpGet("get_buyer_refund_request")]
+        public async Task<IActionResult> GetBuyerRefundRequest([FromQuery] PagingRequest pagingRequest, [FromQuery] RefundRequestFilter refundRequestFilter)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _refundRequestService.GetBuyerRefundRequestAsync(currentUser, pagingRequest, refundRequestFilter);
             return Ok(result);
         }
 

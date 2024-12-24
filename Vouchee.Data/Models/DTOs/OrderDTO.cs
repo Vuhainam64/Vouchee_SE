@@ -35,6 +35,7 @@ namespace Vouchee.Business.Models.DTOs
         public int? VPointUp { get; set; }
         public DateTime? createDate { get; set; }
         public DateTime? exprireTime => createDate != null ? createDate.Value.AddMinutes(2) : null;
+        public Guid? createBy { get; set; }
 
         public string? status { get; set; }
     }

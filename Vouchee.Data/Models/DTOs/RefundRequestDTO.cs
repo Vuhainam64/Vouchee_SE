@@ -51,6 +51,7 @@ namespace Vouchee.Data.Models.DTOs
         public virtual GetWalletTransactionDTO? walletTransaction { get; set; }
         public virtual GetVoucherCodeDTO? voucherCode { get; set; }
 
+        public string? reason { get; set; }
         public string? supplierName { get; set; }
         public string? status { get; set; }
         public DateTime? createDate { get; set; }

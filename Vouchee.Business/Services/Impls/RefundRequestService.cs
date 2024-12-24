@@ -21,6 +21,8 @@ namespace Vouchee.Business.Services.Impls
 {
     public class RefundRequestService : IRefundRequestService
     {
+        private readonly ISendEmailService _sendEmailService;
+
         private readonly IBaseRepository<Order> _orderRepository;
         private readonly IBaseRepository<User> _userRepository;
         private readonly IBaseRepository<VoucherCode> _voucherCodeRepository;
@@ -28,13 +30,15 @@ namespace Vouchee.Business.Services.Impls
         private readonly IBaseRepository<RefundRequest> _refundRequestRepository;
         private readonly IMapper _mapper;
 
-        public RefundRequestService(IBaseRepository<Order> orderRepository,
+        public RefundRequestService(ISendEmailService sendEmailService,
+                                    IBaseRepository<Order> orderRepository,
                                     IBaseRepository<User> userRepository,
                                     IBaseRepository<VoucherCode> voucherCodeRepository,
                                     IBaseRepository<Media> mediaRepository,
                                     IBaseRepository<RefundRequest> refundRequestRepository,
                                     IMapper mapper)
         {
+            _sendEmailService = sendEmailService;
             _orderRepository = orderRepository;
             _userRepository = userRepository;
             _voucherCodeRepository = voucherCodeRepository;
@@ -45,7 +49,11 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<ResponseMessage<Guid>> CreateRefundRequestAsync(CreateRefundRequestDTO createRefundRequestDTO, ThisUserObj thisUserObj)
         {
-            var existedVoucherCode = await _voucherCodeRepository.GetByIdAsync(createRefundRequestDTO.voucherCodeId, isTracking: true);
+            var existedVoucherCode = await _voucherCodeRepository.GetByIdAsync(createRefundRequestDTO.voucherCodeId, 
+                                                                                includeProperties: x => x.Include(x => x.Modal)
+                                                                                                            .ThenInclude(x => x.Voucher)
+                                                                                                                .ThenInclude(x => x.Supplier), 
+                                                                                isTracking: true);
 
             if (existedVoucherCode == null)
             {
@@ -55,6 +63,13 @@ namespace Vouchee.Business.Services.Impls
             if (existedVoucherCode.OrderId == null)
             {
                 throw new ConflictException("Voucher code này chưa được order");
+            }
+
+            var existedRefundRequest = await _refundRequestRepository.GetFirstOrDefaultAsync(x => x.VoucherCodeId == createRefundRequestDTO.voucherCodeId);
+
+            if (existedRefundRequest != null)
+            {
+                throw new ConflictException("Voucher code này đã có refund request từ trước");
             }
 
             existedVoucherCode.Status = VoucherCodeStatusEnum.SUSPECTED.ToString();
@@ -80,6 +95,14 @@ namespace Vouchee.Business.Services.Impls
             }
 
             var result = await _refundRequestRepository.AddAsync(refundRequest);
+
+            var suppliers = await _userRepository.GetWhereAsync(x => x.SupplierId == existedVoucherCode.Modal.Voucher.Supplier.Id);
+
+            foreach (var supplier in suppliers)
+            {
+                await _sendEmailService.SendEmailAsync(supplier.Email, "Có yêu cầu refund mới", $"Có yêu càu refund {result}");
+            }
+
             return new ResponseMessage<Guid>()
             {
                 message = "Tạo refund request thành công, bạn chờ 15' để supplier xác nhận nhé",
@@ -102,7 +125,7 @@ namespace Vouchee.Business.Services.Impls
                 throw new ConflictException("Refund request này đã được xử lý");
             }
 
-            foreach (var media in existedRefundRequest.Medias)
+            foreach (var media in existedRefundRequest.Medias.ToList())
             {
                 await _mediaRepository.DeleteAsync(media);
             }
@@ -138,7 +161,7 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<DynamicResponseModel<GetRefundRequestDTO>> GetRefundRequestAsync(ThisUserObj thisUserObj, PagingRequest pagingRequest, RefundRequestFilter refundRequestFilter)
+        public async Task<DynamicResponseModel<GetRefundRequestDTO>> GetSupplierRefundRequestAsync(ThisUserObj thisUserObj, PagingRequest pagingRequest, RefundRequestFilter refundRequestFilter)
         {
             var existedUser = await _userRepository.GetByIdAsync(thisUserObj.userId, includeProperties: x => x.Include(x => x.Supplier));
 
@@ -199,7 +222,7 @@ namespace Vouchee.Business.Services.Impls
                 throw new ConflictException("Refund request này đã được xử lý");
             }
 
-            var existedVoucherCode = await _voucherCodeRepository.GetByIdAsync(id);
+            var existedVoucherCode = await _voucherCodeRepository.GetByIdAsync(updateRefundRequestDTO.voucherCodeId);
 
             if (existedVoucherCode == null)
             {
@@ -212,8 +235,9 @@ namespace Vouchee.Business.Services.Impls
             }
 
             existedRefundRequest = _mapper.Map(updateRefundRequestDTO, existedRefundRequest);
+            existedRefundRequest.UpdateBy = thisUserObj.userId;
 
-            foreach (var media in existedRefundRequest.Medias)
+            foreach (var media in existedRefundRequest.Medias.ToList())
             {
                 await _mediaRepository.DeleteAsync(media);
             }
@@ -289,6 +313,8 @@ namespace Vouchee.Business.Services.Impls
                 existedOrder.Buyer.BuyerWallet.UpdateDate = DateTime.Now;
                 existedOrder.Buyer.BuyerWallet.UpdateBy = thisUserObj.userId;
 
+                await _sendEmailService.SendEmailAsync(existedOrder.Buyer.Email, "Cập nhật trạng thái refund", "Refund của bạn đã được chấp thuận");
+
                 await _orderRepository.SaveChanges();
 
                 await _refundRequestRepository.SaveChanges();
@@ -307,6 +333,8 @@ namespace Vouchee.Business.Services.Impls
                 existedRefundRequest.UpdateDate = DateTime.Now;
                 existedRefundRequest.UpdateBy = thisUserObj.userId;
 
+                await _sendEmailService.SendEmailAsync(existedOrder.Buyer.Email, "Cập nhật trạng thái refund", "Refund của bạn đã bị từ chối");
+
                 await _refundRequestRepository.SaveChanges();
                 return new ResponseMessage<bool>()
                 {
@@ -317,6 +345,28 @@ namespace Vouchee.Business.Services.Impls
             }
 
             return null;
+        }
+
+        public async Task<DynamicResponseModel<GetRefundRequestDTO>> GetBuyerRefundRequestAsync(ThisUserObj thisUserObj, PagingRequest pagingRequest, RefundRequestFilter refundRequestFilter)
+        {
+            (int, IQueryable<GetRefundRequestDTO>) result;
+
+            result = _refundRequestRepository.GetTable()
+                        .Where(x => x.VoucherCode.Order.CreateBy == thisUserObj.userId)
+                        .ProjectTo<GetRefundRequestDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetRefundRequestDTO>(refundRequestFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            return new DynamicResponseModel<GetRefundRequestDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+            };
         }
     }
 }
