@@ -269,6 +269,9 @@ namespace Vouchee.Business.Services.Impls
             if (refundRequestStatusEnum == RefundRequestStatusEnum.ACCEPTED)
             {
                 existedRefundRequest.Reason = $"Refund request này đã được chấp thuận và đã hoàn {existedRefundRequest.VoucherCode.Modal.SellPrice} về ví mua";
+                existedRefundRequest.Status = RefundRequestStatusEnum.ACCEPTED.ToString();
+                existedRefundRequest.UpdateBy = thisUserObj.userId;
+                existedRefundRequest.UpdateDate = DateTime.Now;
 
                 existedRefundRequest.WalletTransaction = new()
                 {
@@ -299,7 +302,11 @@ namespace Vouchee.Business.Services.Impls
             }
             else if (refundRequestStatusEnum == RefundRequestStatusEnum.DECLINED)
             {
+                existedRefundRequest.Status = RefundRequestStatusEnum.DECLINED.ToString();
                 existedRefundRequest.Reason = reason;
+                existedRefundRequest.UpdateDate = DateTime.Now;
+                existedRefundRequest.UpdateBy = thisUserObj.userId;
+
                 await _refundRequestRepository.SaveChanges();
                 return new ResponseMessage<bool>()
                 {
