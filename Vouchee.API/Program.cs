@@ -9,14 +9,17 @@ using System.Net;
 using Hangfire;
 using Hangfire.SqlServer;
 using Vouchee.Business.Services;
+using Hangfire.Dashboard;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
-                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+
 builder.Services.AddDependencyInjection(builder.Configuration);
 builder.Services.AddDistributedMemoryCache();
+
 builder.Services.AddHangfire(config =>
     config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
           .UseSimpleAssemblyNameTypeSerializer()
@@ -34,6 +37,7 @@ builder.Services.AddHangfireServer();
 
 IConfiguration configuration = builder.Configuration;
 
+// Add other services
 builder.Services.AddSwaggerServices(configuration);
 builder.Services.AddFirebaseAuthentication(configuration);
 builder.Services.AddSettingObjects(configuration);
@@ -45,7 +49,6 @@ builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(@
                     ValidationAlgorithm = ValidationAlgorithm.HMACSHA256
                 });
 
-// Define CORS policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: "MyAllowSpecificOrigins",
@@ -54,11 +57,12 @@ builder.Services.AddCors(options =>
                           policy.WithOrigins("https://phatnq-test.web.app", "https://www.vouchee.shop", "https://vouchee.shop", "http://localhost:3000")
                                 .AllowAnyMethod()
                                 .AllowAnyHeader()
-                                .AllowCredentials(); // If you need to allow cookies or credentials
+                                .AllowCredentials();
                       });
 });
 
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+
 builder.Services.AddSingleton(new SmtpClient
 {
     Host = "smtp.gmail.com",
@@ -66,41 +70,51 @@ builder.Services.AddSingleton(new SmtpClient
     Credentials = new NetworkCredential("advouchee@gmail.com", "advouchee123"),
     EnableSsl = true
 });
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
 
 app.UseSwagger();
-app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
-});
+app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
 
-app.UseMiddleware<ExceptionHandlingMiddleware>(); // Use generic type for middleware
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-// Use CORS with the defined policy
 app.UseCors("MyAllowSpecificOrigins");
 
 app.UseAuthentication();
 
-app.UseMiddleware<AuthorizeMiddleware>(); // Place before UseAuthorization
+app.UseMiddleware<AuthorizeMiddleware>();
 
 app.UseAuthorization();
 
+// Hangfire Dashboard with no authentication
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { new AllowAllUsersAuthorizationFilter() }
+});
+
+RecurringJob.AddOrUpdate<IWithdrawService>
+    (
+        "Withdraw_AllWallets",
+        service => service.CreateWithdrawRequestInAllWalletAsync(),
+        Cron.Weekly(DayOfWeek.Tuesday, 10, 0), // Every Tuesday at 10:00 AM
+        TimeZoneInfo.Local
+    );
+
 app.MapControllers();
-
-app.UseHangfireDashboard("/hangfire");
-
-RecurringJob.AddOrUpdate<IWithdrawService>(
-    "Withdraw_AllWallets",
-    service => service.CreateWithdrawRequestInAllWalletAsync(),
-    Cron.Weekly(DayOfWeek.Tuesday, 10, 0), // Every Tuesday at 10:00 AM
-    TimeZoneInfo.Local);
 
 app.Run();
 
-// HELLO
+// Custom filter to allow all users
+public class AllowAllUsersAuthorizationFilter : IDashboardAuthorizationFilter
+{
+    public bool Authorize(Hangfire.Dashboard.DashboardContext context)
+    {
+        return true; // Allow everyone
+    }
+}

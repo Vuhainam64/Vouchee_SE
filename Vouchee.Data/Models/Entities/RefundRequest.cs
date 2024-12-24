@@ -36,6 +36,7 @@ namespace Vouchee.Data.Models.Entities
         public decimal Lon { get; set; }
         [Column(TypeName = "decimal(38, 20)")]
         public decimal Lat { get; set; }
+        public string? Reason { get; set; }
 
         public string? Status { get; set; }
         public DateTime? CreateDate { get; set; }

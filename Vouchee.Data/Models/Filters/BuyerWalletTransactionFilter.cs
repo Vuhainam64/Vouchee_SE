@@ -13,5 +13,6 @@ namespace Vouchee.Data.Models.Filters
         public BuyerWalletTransactionStatusEnum? status { get; set; }
         public DateOnly? startDate { get; set; }
         public DateOnly? endDate { get; set; }
+        public WalletTransactionTypeEnum? type { get; set; }
     }
 }
