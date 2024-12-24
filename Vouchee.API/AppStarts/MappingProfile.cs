@@ -119,6 +119,7 @@ namespace Vouchee.API.AppStarts
             CreateMap<Order, GetOrderDTO>().ReverseMap();
             CreateMap<Order, GetDetailOrderDTO>().ReverseMap();
             CreateMap<GetOrderDTO, OrderFilter>().ReverseMap();
+
             // ADDRESS
             CreateMap<Address, CreateAddressDTO>().ReverseMap();
             CreateMap<Address, UpdateAddressDTO>().ReverseMap();
@@ -197,7 +198,6 @@ namespace Vouchee.API.AppStarts
             CreateMap<Media, UpdateMediaDTO>().ReverseMap();
             CreateMap<Media, GetMediaDTO>().ReverseMap();
             
-
             // CART
             CreateMap<Cart,CartDTO>()
                 .ForMember(dest => dest.balance, opt => opt.MapFrom(src => src.Buyer.BuyerWallet.Balance))
@@ -296,6 +296,15 @@ namespace Vouchee.API.AppStarts
             CreateMap<MoneyRequest, CreateWithdrawRequestDTO>().ReverseMap();
             CreateMap<MoneyRequest, GetWithdrawRequestDTO>().ReverseMap();
             CreateMap<WithdrawRequestFilter, GetWithdrawRequestDTO>().ReverseMap();
+
+            // REFUND REQUEST
+            CreateMap<RefundRequest, RefundRequestDTO>().ReverseMap();
+            CreateMap<RefundRequest, CreateRefundRequestDTO>().ReverseMap();
+            CreateMap<RefundRequest, UpdateRefundRequestDTO>().ReverseMap();
+            CreateMap<RefundRequest, GetRefundRequestDTO>()
+                .ForMember(dest => dest.supplierName, opt => opt.MapFrom(src => src.VoucherCode.Modal.Voucher.Supplier.Name))
+                .ReverseMap();
+            CreateMap<GetRefundRequestDTO, RefundRequestFilter>().ReverseMap();
         }
     }
 }

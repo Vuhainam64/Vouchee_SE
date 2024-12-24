@@ -6,15 +6,10 @@ using System.Threading.Tasks;
 
 namespace Vouchee.Data.Models.Constants.Enum.Status
 {
-    public enum VoucherCodeStatusEnum
+    public enum RefundRequestStatusEnum
     {
         PENDING,
-        UNUSED,
-        USED,
-        EXPIRED,
-        VIOLENT,
-        NONE,
-        CONVERTING,
-        SUSPECTED
+        ACCEPTED,
+        DECLINED
     }
 }
