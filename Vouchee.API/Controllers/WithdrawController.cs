@@ -51,6 +51,13 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("get_all_withdraw_request")]
+        public async Task<IActionResult> GetAllWithdrawRequest([FromQuery] PagingRequest pagingRequest, [FromQuery] WithdrawRequestFilter withdrawRequestFilter)
+        {
+            var result = await _withdrawService.GetWithdrawRequestAsync(pagingRequest, withdrawRequestFilter);
+            return Ok(result);
+        }
+
         [HttpGet("export_withdraw")]
         [Authorize]
         public async Task<IActionResult> ExportWithdraw()

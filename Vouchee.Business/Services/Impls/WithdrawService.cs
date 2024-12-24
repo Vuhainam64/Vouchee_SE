@@ -139,6 +139,8 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<ResponseMessage<bool>> CreateWithdrawRequestInAllWalletAsync()
         {
+            var generateId = Guid.NewGuid();
+
             var wallets = await _walletRepository.GetTable().AsTracking().ToListAsync();
 
             foreach (var wallet in wallets.ToList())
@@ -187,6 +189,7 @@ namespace Vouchee.Business.Services.Impls
                             BuyerWalletId = wallet?.Buyer?.BuyerWallet?.Id,
                             SellerWalletId = wallet?.Seller?.SellerWallet?.Id,
                             SupplierWalletId = wallet?.Supplier?.SupplierWallet?.Id,
+                            UpdateId = generateId
                         }
                     };
 
@@ -206,25 +209,122 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<DynamicResponseModel<GetWithdrawRequestDTO>> GetWithdrawRequestAsync(PagingRequest pagingRequest, WithdrawRequestFilter withdrawRequestFilter, ThisUserObj thisUserObj)
+        public async Task<DynamicResponseModel<GetWithdrawRequestDTO>> GetWithdrawRequestAsync(
+                PagingRequest pagingRequest,
+                WithdrawRequestFilter withdrawRequestFilter,
+                ThisUserObj thisUserObj)
         {
-            (int, IQueryable<GetWithdrawRequestDTO>) result;
+            // Generate a unique ID for the update
+            var generateId = Guid.NewGuid();
 
-            result = _moneyRequestRepository.GetTable()
-                        .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()) && x.UserId == thisUserObj.userId)
-                        .ProjectTo<GetWithdrawRequestDTO>(_mapper.ConfigurationProvider)
-                        .DynamicFilter(_mapper.Map<GetWithdrawRequestDTO>(withdrawRequestFilter))
-                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+            // Fetch and update all entities with the new UpdateId
+            var query = _moneyRequestRepository.GetTable().AsTracking()
+                .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()) && x.UserId == thisUserObj.userId);
 
-            return new DynamicResponseModel<GetWithdrawRequestDTO>()
+            foreach (var entity in query)
             {
-                metaData = new MetaData()
+                entity.UpdateId = generateId;
+            }
+
+            await _moneyRequestRepository.SaveChanges();
+
+            // Fetch the filtered and paginated data from the database
+            var filteredQuery = query
+                .ProjectTo<GetWithdrawRequestDTO>(_mapper.ConfigurationProvider)
+                .DynamicFilter(_mapper.Map<GetWithdrawRequestDTO>(withdrawRequestFilter));
+
+            // Execute the query to retrieve data as a list
+            var filteredList = await filteredQuery.ToListAsync();
+
+            // Perform grouping in memory
+            var groupedResult = filteredList
+                .GroupBy(x => x.updateId)
+                .Select(group => new
+                {
+                    UpdateId = group.Key,
+                    Items = group.ToList()
+                })
+                .ToList();
+
+            // Flatten the grouped result if needed for the response
+            var flattenedResult = groupedResult
+                .SelectMany(g => g.Items)
+                .ToList();
+
+            // Calculate pagination metadata
+            var totalItems = flattenedResult.Count;
+            var pagedResults = flattenedResult
+                .Skip((pagingRequest.page - 1) * pagingRequest.pageSize)
+                .Take(pagingRequest.pageSize)
+                .ToList();
+
+            return new DynamicResponseModel<GetWithdrawRequestDTO>
+            {
+                metaData = new MetaData
                 {
                     page = pagingRequest.page,
                     size = pagingRequest.pageSize,
-                    total = result.Item1 // Total vouchers count for metadata
+                    total = totalItems
                 },
-                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+                results = pagedResults
+            };
+        }
+
+        public async Task<DynamicResponseModel<GetWithdrawRequestDTO>> GetWithdrawRequestAsync(PagingRequest pagingRequest, WithdrawRequestFilter withdrawRequestFilter)
+        {
+            // Generate a unique ID for the update
+            var generateId = Guid.NewGuid();
+
+            // Fetch and update all entities with the new UpdateId
+            var query = _moneyRequestRepository.GetTable().AsTracking()
+                .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()));
+
+            foreach (var entity in query)
+            {
+                entity.UpdateId = generateId;
+            }
+
+            await _moneyRequestRepository.SaveChanges();
+
+            // Fetch the filtered and paginated data from the database
+            var filteredQuery = query
+                .ProjectTo<GetWithdrawRequestDTO>(_mapper.ConfigurationProvider)
+                .DynamicFilter(_mapper.Map<GetWithdrawRequestDTO>(withdrawRequestFilter));
+
+            // Execute the query to retrieve data as a list
+            var filteredList = await filteredQuery.ToListAsync();
+
+            // Perform grouping in memory
+            var groupedResult = filteredList
+                .GroupBy(x => x.updateId)
+                .Select(group => new
+                {
+                    UpdateId = group.Key,
+                    Items = group.ToList()
+                })
+                .ToList();
+
+            // Flatten the grouped result if needed for the response
+            var flattenedResult = groupedResult
+                .SelectMany(g => g.Items)
+                .ToList();
+
+            // Calculate pagination metadata
+            var totalItems = flattenedResult.Count;
+            var pagedResults = flattenedResult
+                .Skip((pagingRequest.page - 1) * pagingRequest.pageSize)
+                .Take(pagingRequest.pageSize)
+                .ToList();
+
+            return new DynamicResponseModel<GetWithdrawRequestDTO>
+            {
+                metaData = new MetaData
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = totalItems
+                },
+                results = pagedResults
             };
         }
 
@@ -245,6 +345,28 @@ namespace Vouchee.Business.Services.Impls
 
             result = _walletTransactionRepository.GetTable()
                         .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()) && x.BuyerWallet.BuyerId == thisUserObj.userId)
+                        .ProjectTo<GetWalletTransactionDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetWalletTransactionDTO>(walletTransactionFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            return new DynamicResponseModel<GetWalletTransactionDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+            };
+        }
+
+        public async Task<DynamicResponseModel<GetWalletTransactionDTO>> GetWithdrawWalletTransactionByUpdateId(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter, Guid updateId)
+        {
+            (int, IQueryable<GetWalletTransactionDTO>) result;
+
+            result = _walletTransactionRepository.GetTable()
+                        .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()) && x.UpdateId == updateId)
                         .ProjectTo<GetWalletTransactionDTO>(_mapper.ConfigurationProvider)
                         .DynamicFilter(_mapper.Map<GetWalletTransactionDTO>(walletTransactionFilter))
                         .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);

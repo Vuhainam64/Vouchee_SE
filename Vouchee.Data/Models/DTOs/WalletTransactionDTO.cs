@@ -40,6 +40,7 @@ namespace Vouchee.Data.Models.DTOs
         public int? afterBalance { get; set; }
 
         public string? note { get; set; }
+        public Guid? updateId { get; set; }
 
         public string? status { get; set; }
         public DateTime? createDate { get; set; }
@@ -62,6 +63,7 @@ namespace Vouchee.Data.Models.DTOs
         public Guid? id { get; set; }
         public Guid? supplierWalletId { get; set; }
         public string? supplierName { get; set; }
+        public Guid? updateId { get; set; }
 
         public string? orderId { get; set; }
 
