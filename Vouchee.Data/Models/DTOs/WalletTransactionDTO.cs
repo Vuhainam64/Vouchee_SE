@@ -31,10 +31,11 @@ namespace Vouchee.Data.Models.DTOs
     {
         public Guid? id { get; set; }
 
-        public Guid? partnerTransactionId { get; set; }
+        public string? withdrawRequestId { get; set; }
+        public string? orderId { get; set; }
         public string? topUpRequestId { get; set; }
         public Guid? refundRequestId { get; set; }
-        public string? orderId { get; set; }
+        public Guid? partnerTransactionId { get; set; }
         public Guid? sellerWalletId { get; set; }
         public Guid? buyerWalletId { get; set; }
         public Guid? supplierWalletId { get; set; }
