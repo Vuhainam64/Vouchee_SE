@@ -106,6 +106,70 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
+        public async Task<DynamicResponseModel<GetWalletTransactionDTO>> GetWalletTransactionAsync(
+    PagingRequest pagingRequest,
+    WalletTransactionFilter walletTransactionFilter)
+        {
+            (int totalRecords, IQueryable<GetWalletTransactionDTO> queryableData) result;
+
+            // Start building the query from the repository
+            var query = _walletTransactionRepository.GetTable();
+
+            //// Apply userId filter if provided
+            //if (walletTransactionFilter.userId.HasValue)
+            //{
+            //    query = query.Where(transaction => transaction.USer == walletTransactionFilter.userId.Value);
+            //}
+
+            //// Apply status filter if provided
+            //if (walletTransactionFilter.status.HasValue)
+            //{
+            //    query = query.Where(transaction => transaction.Status == walletTransactionFilter.status.Value);
+            //}
+
+            //// Apply type filter if provided
+            //if (walletTransactionFilter.type.HasValue)
+            //{
+            //    query = query.Where(transaction => transaction.Type == walletTransactionFilter.type.Value);
+            //}
+
+            // Apply date range filter if provided
+            if (walletTransactionFilter.fromDate.HasValue)
+            {
+                query = query.Where(transaction => transaction.CreateDate >= walletTransactionFilter.fromDate.Value);
+            }
+
+            if (walletTransactionFilter.toDate.HasValue)
+            {
+                query = query.Where(transaction => transaction.CreateDate <= walletTransactionFilter.toDate.Value);
+            }
+
+            // Project the query to DTO
+            var projectedQuery = query.ProjectTo<GetWalletTransactionDTO>(_mapper.ConfigurationProvider);
+
+            // Apply dynamic filters if necessary (based on mapping from WalletTransactionFilter)
+            projectedQuery = projectedQuery.DynamicFilter(_mapper.Map<GetWalletTransactionDTO>(walletTransactionFilter));
+
+            // Apply pagination
+            result = projectedQuery.PagingIQueryable(
+                pagingRequest.page,
+                pagingRequest.pageSize,
+                PageConstant.LIMIT_PAGING,
+                PageConstant.DEFAULT_PAPING);
+
+            // Return the result with metadata
+            return new DynamicResponseModel<GetWalletTransactionDTO>
+            {
+                metaData = new MetaData
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.totalRecords
+                },
+                results = await result.queryableData.ToListAsync()
+            };
+        }
+
         public async Task<dynamic> GetWalletTransactionsAsync(ThisUserObj currentUser)
         {
             var existedUser = await _userRepository.FindAsync(currentUser.userId);
