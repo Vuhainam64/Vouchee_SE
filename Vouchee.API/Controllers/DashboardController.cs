@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Vouchee.Business.Models;
 using Vouchee.Business.Services;
 using Vouchee.Data.Models.Constants.Enum.Other;
+using Vouchee.Data.Models.Filters;
 
 namespace Vouchee.API.Controllers
 {
@@ -11,10 +13,13 @@ namespace Vouchee.API.Controllers
     public class DashboardController : ControllerBase
     {
         private readonly IDashboardService _dashboardService;
+        private readonly IWalletTransactionService _walletTransactionService;
 
-        public DashboardController(IDashboardService dashboardService)
+        public DashboardController(IDashboardService dashboardService,
+                                   IWalletTransactionService walletTransactionService)
         {
             _dashboardService = dashboardService;
+            _walletTransactionService = walletTransactionService;
         }
 
         [HttpGet("get_active_user_dashboard")]
@@ -105,6 +110,13 @@ namespace Vouchee.API.Controllers
         public async Task<IActionResult> GetPartnerTransactionDashboard(DateOnly fromDate, DateOnly toDate, bool today, DateFilterTypeEnum filterType)
         {
             var result = await _dashboardService.GetPartnerTransactionDashboard(fromDate, toDate, today, filterType);
+            return Ok(result);
+        }
+
+        [HttpGet("get_wallet_transaction")]
+        public async Task<IActionResult> GetWalletTransaction([FromQuery] PagingRequest pagingRequest, [FromQuery] WalletTransactionFilter walletTransactionFilter)
+        {
+            var result = await _walletTransactionService.GetWalletTransactionAsync(pagingRequest, walletTransactionFilter);
             return Ok(result);
         }
     }
