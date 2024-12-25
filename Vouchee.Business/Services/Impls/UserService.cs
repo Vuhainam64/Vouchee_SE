@@ -431,10 +431,8 @@ namespace Vouchee.Business.Services.Impls
         {
             try
             {
-                var user = await _userRepository
-               .GetTable()
-               .Include(u => u.Supplier)
-               .FirstOrDefaultAsync(u => u.Id == id);
+                var user = await _userRepository.FindAsync(id);
+
                 if (user != null)
                 {
                     GetDetailUserDTO userDTO = _mapper.Map<GetDetailUserDTO>(user);
@@ -577,29 +575,31 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<ResponseMessage<GetUserDTO>> UpdateUserBankAsync(UpdateUserBankDTO updateUserBankDTO, ThisUserObj thisUserObj, WalletTypeEnum walletTypeEnum)
         {
-            var existedUser = await _userRepository
-                .GetTable()
-                .Include(u => u.Supplier)
-                .FirstOrDefaultAsync(u => u.Id == thisUserObj.userId);
+            var existedUser = await _userRepository.FindAsync(thisUserObj.userId, isTracking: true);
 
             if (existedUser != null)
             {
                 // Update wallet based on wallet type
                 if (walletTypeEnum == WalletTypeEnum.BUYER)
                 {
-                    _mapper.Map(updateUserBankDTO, existedUser.BuyerWallet);
+                    existedUser.BuyerWallet = _mapper.Map(updateUserBankDTO, existedUser.BuyerWallet);
                 }
                 else if (walletTypeEnum == WalletTypeEnum.SELLER)
                 {
-                    _mapper.Map(updateUserBankDTO, existedUser.SellerWallet);
+                    existedUser.SellerWallet = _mapper.Map(updateUserBankDTO, existedUser.SellerWallet);
                 }
                 else
                 {
-                    _mapper.Map(updateUserBankDTO, existedUser.Supplier.SupplierWallet);
+                    if (existedUser.Supplier == null)
+                    {
+                        throw new NotFoundException("Tài khoản này không phải là tài khoản supplier");
+                    }
+
+                    existedUser.Supplier.SupplierWallet = _mapper.Map(updateUserBankDTO, existedUser.Supplier.SupplierWallet);
                 }
 
                 // Save changes to the database
-                await _userRepository.UpdateAsync(existedUser);
+                await _userRepository.SaveChanges();
 
                 return new ResponseMessage<GetUserDTO>()
                 {
