@@ -34,9 +34,9 @@ namespace Vouchee.Data.Models.Entities
         public string? Contact { get; set; }
         public bool IsVerified { get; set; }
         public string? Image { get; set; }
-        public string? BankName { get; set; }
-        public string? BankNumber { get; set; }
-        public string? BankAccount { get; set; }
+        //public string? BankName { get; set; }
+        //public string? BankNumber { get; set; }
+        //public string? BankAccount { get; set; }
         public int? TotalQuantitySold => Vouchers.Sum(x => x.Modals.Sum(x => x.OrderDetails.Sum(x => x.Quantity)));
 
         public bool IsActive { get; set; }

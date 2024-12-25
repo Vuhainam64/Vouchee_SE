@@ -43,6 +43,10 @@ namespace Vouchee.Data.Models.Entities
 
         public int Balance { get; set; }
 
+        public string? BankName { get; set; }
+        public string? BankNumber { get; set; }
+        public string? BankAccount { get; set; }
+
         public bool IsActive = true;
         public required string Status { get; set; }
         public DateTime? CreateDate { get; set; } 

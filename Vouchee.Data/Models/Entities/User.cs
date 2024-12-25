@@ -60,9 +60,9 @@ namespace Vouchee.Data.Models.Entities
         public int ResponsibilityScore { get; set; }
         public int VPoint { get; set; }
         public string? Role { get; set; }
-        public string? BankName { get; set; }
-        public string? BankNumber { get; set; }
-        public string? BankAccount { get; set; }
+        //public string? BankName { get; set; }
+        //public string? BankNumber { get; set; }
+        //public string? BankAccount { get; set; }
 
         public bool IsActive { get; set; }
         public required string Status { get; set; }

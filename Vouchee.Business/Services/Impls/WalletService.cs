@@ -96,8 +96,8 @@ namespace Vouchee.Business.Services.Impls
             return new
             {
                 totalBalance = user.BuyerWallet.Balance,
-                bankAccount = user.BankAccount,
-                bankName = user.BankName
+                //bankAccount = user.BankAccount,
+                //bankName = user.BankName
             };
         }
 
