@@ -571,20 +571,33 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<ResponseMessage<GetUserDTO>> UpdateUserBankAsync(UpdateUserBankDTO updateUserBankDTO, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<GetUserDTO>> UpdateUserBankAsync(UpdateUserBankDTO updateUserBankDTO, ThisUserObj thisUserObj, WalletTypeEnum walletTypeEnum)
         {
             var existedUser = await _userRepository.GetByIdAsync(thisUserObj.userId, isTracking: true);
             if (existedUser != null)
             {
-                var entity = _mapper.Map(updateUserBankDTO, existedUser);
-                entity.UpdateBy = thisUserObj.userId;
-                await _userRepository.UpdateAsync(entity);
+                // Update wallet based on wallet type
+                if (walletTypeEnum == WalletTypeEnum.BUYER)
+                {
+                    _mapper.Map(updateUserBankDTO, existedUser.BuyerWallet);
+                }
+                else if (walletTypeEnum == WalletTypeEnum.SELLER)
+                {
+                    _mapper.Map(updateUserBankDTO, existedUser.SellerWallet);
+                }
+                else
+                {
+                    _mapper.Map(updateUserBankDTO, existedUser.Supplier.SupplierWallet);
+                }
+
+                // Save changes to the database
+                await _userRepository.UpdateAsync(existedUser);
 
                 return new ResponseMessage<GetUserDTO>()
                 {
                     message = "Cập nhật thành công",
                     result = true,
-                    value = _mapper.Map<GetUserDTO>(entity)
+                    value = _mapper.Map<GetUserDTO>(existedUser)
                 };
             }
             else
@@ -592,6 +605,7 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Không tìm thấy user");
             }
         }
+
 
         public async Task<ResponseMessage<GetUserDTO>> UpdateUserRoleAsync(UpdateUserRoleDTO updateUserRoleDTO)
         {
