@@ -76,7 +76,7 @@ namespace Vouchee.API.Controllers
         }
 
         [Authorize]
-        [HttpGet("get_withdraw_requests")]
+        [HttpGet("get_user_withdraw_requests")]
         public async Task<IActionResult> GetWithdrawRequests([FromQuery] PagingRequest pagingRequest, [FromQuery] WithdrawRequestFilter withdrawRequestFilter)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
@@ -86,7 +86,7 @@ namespace Vouchee.API.Controllers
         }
 
         [Authorize]
-        [HttpGet("get_withdraw_transactions")]
+        [HttpGet("get_user_withdraw_transactions")]
         public async Task<IActionResult> GetWithdrawTransasction([FromQuery] PagingRequest pagingRequest, [FromQuery] WalletTransactionFilter walletTransactionFilter)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);

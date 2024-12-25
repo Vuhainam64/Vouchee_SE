@@ -42,12 +42,22 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        [Authorize]
-        [HttpGet("get_top_up_requests")]
+        [HttpGet("get_all_top_up_requests")]
         public async Task<IActionResult> GetTopUpRequests([FromQuery] PagingRequest pagingRequest,
                                                             [FromQuery] TopUpRequestFilter topUpRequestFilter) 
         {
             var result = await _topUpRequestService.GetTopUpRequestsAsync(pagingRequest, topUpRequestFilter);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpGet("get_user_top_up_requests")]
+        public async Task<IActionResult> GetUserTopUpRequests([FromQuery] PagingRequest pagingRequest,
+                                                    [FromQuery] TopUpRequestFilter topUpRequestFilter)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _topUpRequestService.GetUserTopUpRequestsAsync(pagingRequest, topUpRequestFilter, currentUser);
             return Ok(result);
         }
 

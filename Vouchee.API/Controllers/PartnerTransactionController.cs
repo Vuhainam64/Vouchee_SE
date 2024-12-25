@@ -6,6 +6,7 @@ using Vouchee.Business.Models;
 using Vouchee.Business.Services;
 using Vouchee.Business.Services.Impls;
 using Vouchee.Data.Models.DTOs;
+using Vouchee.Data.Models.Filters;
 
 namespace Vouchee.API.Controllers
 {
@@ -28,6 +29,13 @@ namespace Vouchee.API.Controllers
         public async Task<IActionResult> CreatePartnerTransaction([FromBody] CreateSePayPartnerInTransactionDTO createPartnerInTransactionDTO)
         {
             var result = await _partnerTransactionService.CreatePartnerTransactionAsync(createPartnerInTransactionDTO);
+            return Ok(result);
+        }
+
+        [HttpGet("get_all_partner_transaction")]
+        public async Task<IActionResult> GetAllPartnerTransaction([FromQuery] PagingRequest pagingRequest, [FromQuery] PartnerTransactionFilter partnerTransactionFilter)
+        {
+            var result = await _partnerTransactionService.GetPartnerTransactionAsync(pagingRequest, partnerTransactionFilter);
             return Ok(result);
         }
     }

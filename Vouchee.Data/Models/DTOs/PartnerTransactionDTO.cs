@@ -17,8 +17,8 @@ namespace Vouchee.Data.Models.DTOs
         public string? code { get; set; }
         public string? content { get; set; }
         public string? transferType { get; set; }
-        public int? transferAmount { get; set; }
-        public int? accumulated { get; set; }
+        public int transferAmount { get; set; }
+        public int accumulated { get; set; }
         public string? subAccount { get; set; }
         public string? referenceCode { get; set; }
         public string? description { get; set; }
@@ -27,5 +27,24 @@ namespace Vouchee.Data.Models.DTOs
     public class CreateSePayPartnerInTransactionDTO : SePayTransactionDTO
     {
         public DateTime createdAt = DateTime.Now;
+    }
+
+    public class GetPartnerTransactionDTO
+    {
+        public Guid id { get; set; }
+
+        public required string gateway { get; set; }
+        public DateTime? transactionDate { get; set; }
+        public string? accountNumber { get; set; }
+        public string? subAccount { get; set; }
+        public int amountIn { get; set; }
+        public int amountOut { get; set; }
+        public int accumulated { get; set; }
+        public string? code { get; set; }
+        public string? content { get; set; }
+        public string? referenceCode { get; set; }
+        public string? description { get; set; }
+        public string? partnerName { get; set; }
+        public int partnerTransactionId { get; set; }
     }
 }

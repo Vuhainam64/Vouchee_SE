@@ -844,50 +844,59 @@ namespace Vouchee.Business.Services.Impls
             DateTime fromDateTime = fromDate.ToDateTime(TimeOnly.MinValue);
             DateTime toDateTime = toDate.ToDateTime(TimeOnly.MaxValue);
 
-            // Fetch all vouchers
-            var parnerTransactions = await _partnerTransactionRepository.GetTable()
-                                                .ToListAsync();
+            // Fetch all partner transactions
+            var partnerTransactions = await _partnerTransactionRepository.GetTable().ToListAsync();
 
-            // Filter vouchers based on the date range
-            var filteredPartnerTransactions = parnerTransactions.Where(partnerTransaction =>
-                partnerTransaction.TransactionDate >= fromDateTime && partnerTransaction.TransactionDate <= toDateTime);
+            // Filter transactions based on the date range
+            var filteredPartnerTransactions = partnerTransactions.Where(partnerTransaction =>
+                partnerTransaction.TransactionDate.HasValue && // Ensure TransactionDate is not null
+                partnerTransaction.TransactionDate.Value >= fromDateTime &&
+                partnerTransaction.TransactionDate.Value <= toDateTime);
 
-            // Group vouchers based on the specified date filter type
-            IEnumerable<IGrouping<object, dynamic>> groupedWalletTransaction;
+            // Group transactions based on the specified date filter type
+            IEnumerable<IGrouping<object, dynamic>> groupedPartnerTransactions;
 
             switch (dateFilterTypeEnum)
             {
                 case DateFilterTypeEnum.DAILY:
-                    groupedWalletTransaction = filteredPartnerTransactions.GroupBy(voucher => (object)voucher.CreateDate.Value.Date);
+                    groupedPartnerTransactions = filteredPartnerTransactions
+                        .GroupBy(transaction => (object)transaction.TransactionDate.Value.Date);
                     break;
                 case DateFilterTypeEnum.WEEKLY:
-                    groupedWalletTransaction = filteredPartnerTransactions.GroupBy(voucher => (object)CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(voucher.CreateDate.Value.Date, CalendarWeekRule.FirstDay, DayOfWeek.Monday));
+                    groupedPartnerTransactions = filteredPartnerTransactions
+                        .GroupBy(transaction => (object)CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
+                            transaction.TransactionDate.Value,
+                            CalendarWeekRule.FirstDay,
+                            DayOfWeek.Monday));
                     break;
                 case DateFilterTypeEnum.MONTHLY:
-                    groupedWalletTransaction = filteredPartnerTransactions.GroupBy(voucher => (object)voucher.CreateDate.Value.Month);
+                    groupedPartnerTransactions = filteredPartnerTransactions
+                        .GroupBy(transaction => (object)transaction.TransactionDate.Value.Month);
                     break;
                 case DateFilterTypeEnum.YEARLY:
-                    groupedWalletTransaction = filteredPartnerTransactions.GroupBy(voucher => (object)voucher.CreateDate.Value.Year);
+                    groupedPartnerTransactions = filteredPartnerTransactions
+                        .GroupBy(transaction => (object)transaction.TransactionDate.Value.Year);
                     break;
                 default:
                     throw new ArgumentException("Invalid date filter type");
             }
 
             // Generate the dashboard data
-            var totalPartnerTransactionDashboard = groupedWalletTransaction.Select(g => new
+            var totalPartnerTransactionDashboard = groupedPartnerTransactions.Select(group => new
             {
-                Period = g.Key,
-                TotalRefundTransaction = g.Count(),
-                TotalAmount = g.Sum(x => x.AmountIn)
+                Period = group.Key,
+                TotalPartnerTransaction = group.Count(),
+                TotalAmount = group.Sum(transaction => transaction.AmountIn)
             }).OrderBy(x => x.Period).ToList();
 
             // Create summary metrics
             var partnerTransactionSummary = new
             {
-                TotalRefundTransaction = filteredPartnerTransactions.Count(),
-                TotalAmount = filteredPartnerTransactions.Sum(transaction => transaction.AmountIn) // Calculate total amount overall
+                TotalPartnerTransaction = filteredPartnerTransactions.Count(),
+                TotalAmount = filteredPartnerTransactions.Sum(transaction => transaction.AmountIn)
             };
 
+            // Return the summary and grouped data
             return new
             {
                 partnerTransactionSummary,
