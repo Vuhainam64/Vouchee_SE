@@ -105,7 +105,7 @@ namespace Vouchee.API.AppStarts
                 .ForMember(dest => dest.brandName, opt => opt.MapFrom(src => src.Modal.Voucher.Brand.Name))
                 .ForMember(dest => dest.brandImage, opt => opt.MapFrom(src => src.Modal.Voucher.Brand.Image))
                 .ForMember(dest => dest.image, opt => opt.MapFrom(src => src.Modal.Image))
-                .ForMember(dto => dto.voucherCodes, opt => opt.MapFrom(od => od.Order.VoucherCodes))
+                //.ForMember(dto => dto.voucherCodes, opt => opt.MapFrom(od => od.Order.VoucherCodes))
                 .ForMember(dest => dest.sellerId, opt => opt.MapFrom(src => src.Modal.Voucher.SellerId))
                 .ForMember(dest => dest.sellerName, opt => opt.MapFrom(src => src.Modal.Voucher.Seller.Name))
                 .ReverseMap()
