@@ -251,6 +251,7 @@ namespace Vouchee.API.AppStarts
             // WALLET
             CreateMap<Wallet, WalletDTO>().ReverseMap();
             CreateMap<Wallet, GetWalletDTO>().ReverseMap();
+            CreateMap<Wallet, GetSupplierWallet>().ReverseMap();
             CreateMap<Wallet, GetBuyerWallet>().ReverseMap();
             CreateMap<Wallet, GetSellerWallet>().ReverseMap();
             CreateMap<Wallet, UpdateUserBankDTO>().ReverseMap();
