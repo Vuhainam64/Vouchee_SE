@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using Vouchee.API.Helpers;
 using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Services;
 using Vouchee.Business.Services.Impls;
+using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Sort;
 using Vouchee.Data.Models.Filters;
 
@@ -77,11 +79,11 @@ namespace Vouchee.API.Controllers
 
         [Authorize]
         [HttpPut("update_user_bank")]
-        public async Task<IActionResult> UpdateUserBank([FromBody] UpdateUserBankDTO updateUserBankDTO)
+        public async Task<IActionResult> UpdateUserBank([FromBody] UpdateUserBankDTO updateUserBankDTO, [Required] WalletTypeEnum walletTypeEnum)
         {
             ThisUserObj thisUserObj = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _userService.UpdateUserBankAsync(updateUserBankDTO, thisUserObj);
+            var result = await _userService.UpdateUserBankAsync(updateUserBankDTO, thisUserObj, walletTypeEnum);
             return Ok(result);
         }
 
