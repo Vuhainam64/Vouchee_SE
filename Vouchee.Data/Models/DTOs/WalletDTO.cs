@@ -23,7 +23,9 @@ namespace Vouchee.Data.Models.DTOs
 
     public class GetWalletDTO : WalletDTO
     {
-
+        public string? BankName { get; set; }
+        public string? BankNumber { get; set; }
+        public string? BankAccount { get; set; }
     }
 
     public class GetSellerWallet : GetWalletDTO
@@ -38,7 +40,7 @@ namespace Vouchee.Data.Models.DTOs
         public virtual ICollection<GetSellerWalletTransaction> sellerWalletTransactions { get; set; }
     }
 
-    public class GetBuyerWallet : WalletDTO
+    public class GetBuyerWallet : GetWalletDTO
     {
         public GetBuyerWallet()
         {
@@ -46,5 +48,14 @@ namespace Vouchee.Data.Models.DTOs
         }
 
         public virtual ICollection<GetBuyerWalletTransactionDTO> buyerWalletTransactions { get; set; }
+    }
+    public class GetSupplierWallet : GetWalletDTO
+    {
+        public GetSupplierWallet()
+        {
+            supplierWalletTransactions = [];
+        }
+
+        public virtual ICollection<GetSupplierWalletTransactionDTO> supplierWalletTransactions { get; set; }
     }
 }

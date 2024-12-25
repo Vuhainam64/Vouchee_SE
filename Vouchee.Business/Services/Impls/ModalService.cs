@@ -221,7 +221,7 @@ namespace Vouchee.Business.Services.Impls
                 var dto = _mapper.Map<GetOrderedModalDTO>(data.Modal);
                 dto.voucherCodeCount = data.VoucherCodeCount;
                 dto.voucherCodes = data.VoucherCodes
-                                        .Select(vc => _mapper.Map<GetVoucherCodeDTO>(vc))
+                                        .Select(vc => _mapper.Map<GetVoucherCodeModalDTO>(vc))
                                         .ToList();
                 return dto;
             }).ToList();
