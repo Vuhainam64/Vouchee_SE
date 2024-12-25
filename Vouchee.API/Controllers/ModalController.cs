@@ -74,7 +74,9 @@ namespace Vouchee.API.Controllers
         [HttpPut("update_modal/{id}")]
         public async Task<IActionResult> UpdateVoucherCode(Guid id, [FromBody] UpdateModalDTO updateModalDTO)
         {
-            var result = await _modalService.UpdateModalAsync(id, updateModalDTO);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _modalService.UpdateModalAsync(id, updateModalDTO, currentUser);
             return Ok(result);
         }
 

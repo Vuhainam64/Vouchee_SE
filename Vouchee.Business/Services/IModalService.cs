@@ -23,7 +23,7 @@ namespace Vouchee.Business.Services
         //public Task<DynamicResponseModel<GetPendingModalDTO>> GetPendingModals(Guid sellerId, PagingRequest pagingRequest, ModalFilter modalFilter);
 
         // UPDATE
-        public Task<bool> UpdateModalAsync(Guid id, UpdateModalDTO updateModalDTO);
+        public Task<ResponseMessage<bool>> UpdateModalAsync(Guid id, UpdateModalDTO updateModalDTO, ThisUserObj thisUserObj);
         public Task<ResponseMessage<GetModalDTO>> UpdateModalStatusAsync(Guid id, VoucherStatusEnum modalStatus);
         public Task<ResponseMessage<GetModalDTO>> UpdateModalisActiveAsync(Guid id, bool isActive);
 
