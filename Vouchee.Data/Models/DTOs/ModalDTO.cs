@@ -102,7 +102,7 @@ namespace Vouchee.Data.Models.DTOs
         public Guid? SellerId { get; set; }
         public string? SellerImage { get; set; }
 
-        public virtual ICollection<GetVoucherCodeDTO> voucherCodes { get; set; }
+        public virtual ICollection<GetVoucherCodeModalDTO> voucherCodes { get; set; }
     }
 
     //public class GetPendingModalDTO : ModalDTO
