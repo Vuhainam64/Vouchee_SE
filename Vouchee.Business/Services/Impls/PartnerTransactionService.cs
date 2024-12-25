@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,13 +8,16 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Vouchee.Business.Exceptions;
+using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Data.Helpers.Base;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Status;
+using Vouchee.Data.Models.Constants.Number;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
+using Vouchee.Data.Models.Filters;
 
 namespace Vouchee.Business.Services.Impls
 {
@@ -414,6 +418,27 @@ namespace Vouchee.Business.Services.Impls
                 }
             }
             return null;
+        }
+
+        public async Task<DynamicResponseModel<GetPartnerTransactionDTO>> GetPartnerTransactionAsync(PagingRequest pagingRequest, PartnerTransactionFilter partnerTransactionFilter)
+        {
+            (int, IQueryable<GetPartnerTransactionDTO>) result;
+
+            result = _partnerTransactionRepository.GetTable()
+                        .ProjectTo<GetPartnerTransactionDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetPartnerTransactionDTO>(partnerTransactionFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            return new DynamicResponseModel<GetPartnerTransactionDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+            };
         }
     }
 }

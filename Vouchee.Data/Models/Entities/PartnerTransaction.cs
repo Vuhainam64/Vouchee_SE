@@ -30,15 +30,14 @@ namespace Vouchee.Data.Models.Entities
         public DateTime? TransactionDate { get; set; }
         public string? AccountNumber { get; set; }
         public string? SubAccount { get; set; }
-        public int? AmountIn { get; set; }
-        public int? AmountOut { get; set; }
-        public int? Accumulated { get; set; }
+        public int AmountIn { get; set; }
+        public int AmountOut { get; set; }
+        public int Accumulated { get; set; }
         public string? Code { get; set; }
         public string? Content { get; set; }
         public string? ReferenceCode { get; set; }
         public string? Description { get; set; }
         public string? PartnerName { get; set; }
-        public int? PartnerTransactionId { get; set; }
-        public DateTime? CreateDate { get; set; }
+        public int PartnerTransactionId { get; set; }
     }
 }

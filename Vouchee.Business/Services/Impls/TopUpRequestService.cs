@@ -132,6 +132,34 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
+        public async Task<DynamicResponseModel<GetTopUpRequestDTO>> GetUserTopUpRequestsAsync(PagingRequest pagingRequest, TopUpRequestFilter topUpRequestFilter, ThisUserObj thisUserObj)
+        {
+            (int, IQueryable<GetTopUpRequestDTO>) result;
+            try
+            {
+                result = _topUpRequestRepository.GetTable()
+                            .Where(x => x.UserId == thisUserObj.userId)
+                            .ProjectTo<GetTopUpRequestDTO>(_mapper.ConfigurationProvider)
+                            .DynamicFilter(_mapper.Map<GetTopUpRequestDTO>(topUpRequestFilter))
+                            .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+            }
+            catch (Exception ex)
+            {
+                LoggerService.Logger(ex.Message);
+                throw new LoadException(ex.Message);
+            }
+            return new DynamicResponseModel<GetTopUpRequestDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+            };
+        }
+
         public async Task<ResponseMessage<bool>> UpdateTopUpRequest(Guid id, int amount, ThisUserObj currentUser = null)
         {
             var existedTopUpRequest = await _topUpRequestRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.TopUpWalletTransaction)
