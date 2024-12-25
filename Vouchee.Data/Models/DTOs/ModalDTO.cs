@@ -122,7 +122,7 @@ namespace Vouchee.Data.Models.DTOs
             voucherCodes = [];
         }
 
-        public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
+        public virtual ICollection<GetVoucherCodeModalDTO>? voucherCodes { get; set; }
     }
 
     public class CartModalDTO : ModalDTO

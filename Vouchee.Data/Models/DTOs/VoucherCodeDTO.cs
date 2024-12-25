@@ -57,6 +57,24 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? UpdateId { get; set; }
         public string? Comment { get; set; }
     }
+
+    public class GetVoucherCodeModalDTO : VoucherCodeDTO
+    {
+        public Guid id { get; set; }
+        public string name { get; set; }
+        public string modalname { get; set; }
+        public string brand { get; set; }
+        public Guid? modalId { get; set; }
+        public string? orderId { get; set; }
+        public Guid? buyerId { get; set; }
+
+        public string? status { get; set; }
+
+        public DateTime? updateDate { get; set; }
+        public Guid? UpdateId { get; set; }
+        public string? Comment { get; set; }
+
+    }
     public class UpdateCodeVoucherCodeDTO 
     {
         [Required]
