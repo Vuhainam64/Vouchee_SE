@@ -73,7 +73,7 @@ namespace Vouchee.Business.Models.DTOs
 
         public GetBuyerWallet? buyerWallet { get; set; }
         public GetSellerWallet? sellerWallet { get; set; }
-
+        public GetSupplierWallet? supplierWallet { get; set; }
         public virtual ICollection<CartDTO> carts { get; set; }
         //public virtual ICollection<GetVoucherDTO> vouchers { get; set; }
         public virtual ICollection<GetOrderDTO>? orders { get; set; }
