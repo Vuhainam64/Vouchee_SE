@@ -63,28 +63,29 @@ namespace Vouchee.Business.Services.Impls
 
             if (isBan)
             {
-                if (!reason.IsNullOrEmpty()) { 
-                existedUser.IsActive = false;
-                existedUser.Status = UserStatusEnum.BANNED.ToString();
-                existedUser.Description = reason;
-                existedUser.UpdateDate = DateTime.Now;
-                existedUser.UpdateBy = thisUserObj.userId;
-
-                foreach (var voucher in existedUser.Vouchers)
+                if (!reason.IsNullOrEmpty())
                 {
-                    voucher.Status = VoucherStatusEnum.INACTIVE_BY_BANNED_USER.ToString();
-                    voucher.IsActive = false;
-                    voucher.UpdateDate = DateTime.Now;
-                    voucher.UpdateBy = thisUserObj.userId;
+                    existedUser.IsActive = false;
+                    existedUser.Status = UserStatusEnum.BANNED.ToString();
+                    existedUser.Description = reason;
+                    existedUser.UpdateDate = DateTime.Now;
+                    existedUser.UpdateBy = thisUserObj.userId;
 
-                    foreach (var modal in voucher.Modals)
+                    foreach (var voucher in existedUser.Vouchers)
                     {
-                        modal.Status = ModalStatusEnum.INACTIVE_BY_BANNED_USER.ToString();
+                        voucher.Status = VoucherStatusEnum.INACTIVE_BY_BANNED_USER.ToString();
                         voucher.IsActive = false;
                         voucher.UpdateDate = DateTime.Now;
                         voucher.UpdateBy = thisUserObj.userId;
+
+                        foreach (var modal in voucher.Modals)
+                        {
+                            modal.Status = ModalStatusEnum.INACTIVE_BY_BANNED_USER.ToString();
+                            voucher.IsActive = false;
+                            voucher.UpdateDate = DateTime.Now;
+                            voucher.UpdateBy = thisUserObj.userId;
+                        }
                     }
-                }
                 }
                 else
                 {
@@ -244,7 +245,7 @@ namespace Vouchee.Business.Services.Impls
                 {
                     message = "User created successfully",
                     result = true,
-                    value = (Guid) result
+                    value = (Guid)result
                 };
             }
             catch (FirebaseAuthException ex)
@@ -411,7 +412,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<GetUserDTO> GetUserByEmailAsync(string email)
         {
-            var user = await _userRepository.GetFirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()), 
+            var user = await _userRepository.GetFirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()),
                                                                             includeProperties: x => x.Include(x => x.Carts)
                                                                                                 .Include(x => x.BuyerWallet)
                                                                                                 .Include(x => x.SellerWallet));
@@ -430,7 +431,10 @@ namespace Vouchee.Business.Services.Impls
         {
             try
             {
-                var user = await _userRepository.FindAsync(id);
+                var user = await _userRepository
+               .GetTable()
+               .Include(u => u.Supplier)
+               .FirstOrDefaultAsync(u => u.Id == id);
                 if (user != null)
                 {
                     GetDetailUserDTO userDTO = _mapper.Map<GetDetailUserDTO>(user);
@@ -507,7 +511,7 @@ namespace Vouchee.Business.Services.Impls
 
             if (existedUser == null)
             {
-                throw new NotFoundException("Không tìm thấy user này"); 
+                throw new NotFoundException("Không tìm thấy user này");
             }
 
             if (existedUser.IsActive == false && existedUser.Status == UserStatusEnum.INACTIVE.ToString())
@@ -573,7 +577,11 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<ResponseMessage<GetUserDTO>> UpdateUserBankAsync(UpdateUserBankDTO updateUserBankDTO, ThisUserObj thisUserObj, WalletTypeEnum walletTypeEnum)
         {
-            var existedUser = await _userRepository.GetByIdAsync(thisUserObj.userId, isTracking: true);
+            var existedUser = await _userRepository
+                .GetTable()
+                .Include(u => u.Supplier)
+                .FirstOrDefaultAsync(u => u.Id == thisUserObj.userId);
+
             if (existedUser != null)
             {
                 // Update wallet based on wallet type
