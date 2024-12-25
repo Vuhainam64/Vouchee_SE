@@ -30,10 +30,10 @@ namespace Vouchee.Business.Models.DTOs
 
     public class GetOrderDetailDTO : OrderDetailDTO
     {
-        public GetOrderDetailDTO()
+        /*public GetOrderDetailDTO()
         {
-            voucherCodes = new HashSet<GetVoucherCodeDTO>();
-        }
+            voucherCodes = new HashSet<GetVoucherCodeModalDTO>();
+        }*/
 
         public string? orderId { get; set; }
         public Guid? modalId { get; set; }
@@ -55,6 +55,6 @@ namespace Vouchee.Business.Models.DTOs
         public string? status { get; set; }
         public DateTime? createDate { get; set; }
 
-        public virtual ICollection<GetVoucherCodeDTO>? voucherCodes { get; set; }
+        /*public virtual ICollection<GetVoucherCodeModalDTO>? voucherCodes { get; set; }*/
     }
 }
