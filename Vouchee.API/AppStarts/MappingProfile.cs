@@ -147,6 +147,7 @@ namespace Vouchee.API.AppStarts
                 .ReverseMap();
             CreateMap<User, GetUserDTO>()
                 .ForMember(dest => dest.SupplierName, opt => opt.MapFrom(src => src.Supplier.Name))
+                .ForMember(dest => dest.supplierWallet, opt => opt.MapFrom(src => src.Supplier.SupplierWallet))
                 .ReverseMap();
             CreateMap<GetUserDTO, UserFilter>().ReverseMap();
 
