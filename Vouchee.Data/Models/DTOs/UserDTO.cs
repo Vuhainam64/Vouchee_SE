@@ -47,9 +47,9 @@ namespace Vouchee.Business.Models.DTOs
         public string? role { get; set; }
         public string? description { get; set; }
 
-        public string? bankAccount { get; set; }
+        /*public string? bankAccount { get; set; }
         public string? bankNumber { get; set; }
-        public string? bankName { get; set; }
+        public string? bankName { get; set; }*/
         public bool? isActive { get; set; }
 
         public string? status { get; set; }
@@ -58,6 +58,10 @@ namespace Vouchee.Business.Models.DTOs
         public DateTime? updateDate { get; set; }
         public Guid? updateBy { get; set; }
         public string SupplierName {  get; set; }
+
+        public GetBuyerWallet? buyerWallet { get; set; }
+        public GetSellerWallet? sellerWallet { get; set; }
+        public GetSupplierWallet? supplierWallet { get; set; }
     }
     
     public class GetDetailUserDTO : GetUserDTO
