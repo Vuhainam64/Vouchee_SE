@@ -9,6 +9,10 @@ namespace Vouchee.Data.Models.Constants.Enum.Other
     public enum WalletTransactionTypeEnum
     {
         WITHDRAW,
-        REFUND
+        REFUND,
+        TOPUP,
+        BUYER_ORDER,
+        SELLER_ORDER,
+        SUPPLIER_ORDER
     }
 }

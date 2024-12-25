@@ -218,7 +218,7 @@ namespace Vouchee.Business.Services.Impls
                         {
                             existedOrder.Buyer.BuyerWallet.BuyerWalletTransactions.Add(new()
                             {
-                                Type = "AMOUNT_OUT",
+                                Type = WalletTransactionTypeEnum.BUYER_ORDER.ToString(),
                                 CreateBy = existedOrder.Buyer.Id,
                                 CreateDate = DateTime.Now,
                                 Status = BuyerWalletTransactionStatusEnum.TRANSACTION_SUCCESS.ToString(),
@@ -249,7 +249,7 @@ namespace Vouchee.Business.Services.Impls
 
                             existedSeller.SellerWallet.SellerWalletTransactions.Add(new()
                             {
-                                Type = "AMOUNT_IN",
+                                Type = WalletTransactionTypeEnum.SELLER_ORDER.ToString(),
                                 CreateBy = existedOrder.Buyer.Id,
                                 CreateDate = DateTime.Now,
                                 Status = SellerWalletTransactionStatusEnum.DONE.ToString(),
@@ -295,7 +295,7 @@ namespace Vouchee.Business.Services.Impls
                             existedSupplier.SupplierWallet.SupplierWalletTransactions.Add(new()
                             {
                                 Status = WalletTransactionStatusEnum.PAID.ToString(),
-                                Type = "AMOUNT_IN",
+                                Type = WalletTransactionTypeEnum.SUPPLIER_ORDER.ToString(),
                                 OrderId = existedOrder.Id,
                                 BeforeBalance = existedSupplier.SupplierWallet.Balance,
                                 Amount = amount * 10 / 100,
@@ -328,10 +328,7 @@ namespace Vouchee.Business.Services.Impls
                     {
                         string topUpRequestId = identifier;
 
-                        var existedTopUpRequest = await _moneyRequestRepository.GetByIdAsync(topUpRequestId, includeProperties: x => x.Include(x => x.TopUpWalletTransaction)
-                                                                                                                                        .ThenInclude(x => x.BuyerWallet)
-                                                                                                                                    .Include(x => x.User),
-                                                                                                                             isTracking: true);
+                        var existedTopUpRequest = await _moneyRequestRepository.GetByIdAsync(topUpRequestId, includeProperties: x => x.Include(x => x.User.BuyerWallet), isTracking: true);
 
                         if (existedTopUpRequest == null)
                         {
@@ -340,12 +337,21 @@ namespace Vouchee.Business.Services.Impls
 
                         existedTopUpRequest.Status = WalletTransactionStatusEnum.PAID.ToString();
                         existedTopUpRequest.UpdateDate = DateTime.Now;
+                        existedTopUpRequest.TopUpWalletTransaction = new()
+                        {
+                            PartnerTransactionId = partnerTransactionId,
+                            CreateDate = DateTime.Now,
+                            Status = WalletTransactionStatusEnum.PAID.ToString(),
+                            Type = WalletTransactionTypeEnum.TOPUP.ToString(),
+                            AfterBalance = existedTopUpRequest.User.BuyerWallet.Balance + existedTopUpRequest.Amount,
+                            Amount = existedTopUpRequest.Amount,
+                            BeforeBalance = existedTopUpRequest.User.BuyerWallet.Balance,
+                            BuyerWalletId = existedTopUpRequest.User.BuyerWallet.Id,
+                            Note = $"Nạp {existedTopUpRequest.Amount} vào ví mua",
+                        };
 
-                        existedTopUpRequest.TopUpWalletTransaction.PartnerTransactionId = partnerTransactionId;
-                        existedTopUpRequest.TopUpWalletTransaction.UpdateDate = DateTime.Now;
-                        existedTopUpRequest.TopUpWalletTransaction.Status = WalletTransactionStatusEnum.PAID.ToString();
-                        existedTopUpRequest.TopUpWalletTransaction.BuyerWallet.Balance += (int)partnerTransaction.AmountIn;
-                        existedTopUpRequest.TopUpWalletTransaction.BuyerWallet.UpdateDate = DateTime.Now;
+                        existedTopUpRequest.User.BuyerWallet.Balance += existedTopUpRequest.Amount;
+                        existedTopUpRequest.User.BuyerWallet.UpdateDate = DateTime.Now;
 
                         await _sendEmailService.SendEmailAsync(existedTopUpRequest.User.Email, "Cập nhật biến động số dư", $"Bạn đã nạp thành công {existedTopUpRequest.Amount} vào tài khoản");
 

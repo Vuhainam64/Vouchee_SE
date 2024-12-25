@@ -274,9 +274,24 @@ namespace Vouchee.Business.Services.Impls
         //    };
         //}
 
-        public Task<bool> UpdateModalAsync(Guid id, UpdateModalDTO updateModalDTO)
+        public async Task<ResponseMessage<bool>> UpdateModalAsync(Guid id, UpdateModalDTO updateModalDTO, ThisUserObj thisUserObj)
         {
-            throw new NotImplementedException();
+            var existedModal = await _modalRepository.GetByIdAsync(id, isTracking: true);
+            if (existedModal == null)
+            {
+                throw new NotFoundException("Không tìm thấy modal này");
+            }
+
+            existedModal = _mapper.Map(updateModalDTO, existedModal);
+
+            await _modalRepository.SaveChanges();
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Cập nhật modal thành công",
+                result = true,
+                value = true
+            };
         }
 
         public async Task<ResponseMessage<GetModalDTO>> UpdateModalisActiveAsync(Guid id, bool isActive)
