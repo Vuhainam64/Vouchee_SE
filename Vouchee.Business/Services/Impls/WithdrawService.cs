@@ -272,30 +272,29 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<DynamicResponseModel<GetWithdrawRequestDTO>> GetWithdrawRequestAsync(PagingRequest pagingRequest, WithdrawRequestFilter withdrawRequestFilter)
         {
-            // Generate a unique ID for the update
-            var generateId = Guid.NewGuid();
-
-            // Fetch and update all entities with the new UpdateId
+            // Fetch the base query
             var query = _moneyRequestRepository.GetTable().AsTracking()
-                .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()));
+                .Where(x => x.Type == MoneyRequestTypeEnum.WITHDRAW.ToString());
 
-            foreach (var entity in query)
-            {
-                entity.UpdateId = generateId;
-            }
-
-            await _moneyRequestRepository.SaveChanges();
-
-            // Fetch the filtered and paginated data from the database
+            // Apply dynamic filtering
             var filteredQuery = query
                 .ProjectTo<GetWithdrawRequestDTO>(_mapper.ConfigurationProvider)
                 .DynamicFilter(_mapper.Map<GetWithdrawRequestDTO>(withdrawRequestFilter));
 
-            // Execute the query to retrieve data as a list
+            // Fetch the filtered data
             var filteredList = await filteredQuery.ToListAsync();
 
-            // Perform grouping in memory
-            var groupedResult = filteredList
+            // Assign WalletType and group results by UpdateId
+            var processedList = filteredList.Select(item =>
+            {
+                item.WalletType = item.withdrawWalletTransaction?.sellerWalletId != null ? "Seller" :
+                                  item.withdrawWalletTransaction?.buyerWalletId != null ? "Buyer" :
+                                  item.withdrawWalletTransaction?.supplierWalletId != null ? "Supplier" : "Unknown";
+                return item;
+            }).ToList();
+
+            // Group by UpdateId
+            var groupedResult = processedList
                 .GroupBy(x => x.updateId)
                 .Select(group => new
                 {
@@ -304,7 +303,7 @@ namespace Vouchee.Business.Services.Impls
                 })
                 .ToList();
 
-            // Flatten the grouped result if needed for the response
+            // Flatten the grouped result if needed for pagination
             var flattenedResult = groupedResult
                 .SelectMany(g => g.Items)
                 .ToList();
@@ -316,6 +315,7 @@ namespace Vouchee.Business.Services.Impls
                 .Take(pagingRequest.pageSize)
                 .ToList();
 
+            // Return the paginated response
             return new DynamicResponseModel<GetWithdrawRequestDTO>
             {
                 metaData = new MetaData
@@ -327,6 +327,7 @@ namespace Vouchee.Business.Services.Impls
                 results = pagedResults
             };
         }
+
 
         public async Task<GetWithdrawRequestDTO> GetWithdrawRequestById(string id)
         {
@@ -383,21 +384,27 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<ResponseMessage<bool>> UpdateWithdrawRequest(string id, WithdrawRequestStatusEnum withdrawRequestStatusEnum, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<bool>> UpdateWithdrawRequest(List<UpdateWithDrawRequestDTO> updateWithDrawRequestDTOs, ThisUserObj thisUserObj)
         {
-            var withdrawRequest = await _moneyRequestRepository.GetByIdAsync(id, isTracking: true);
-
-            if (withdrawRequest == null)
+            var generateId = Guid.NewGuid();
+            foreach (var item in updateWithDrawRequestDTOs)
             {
-                throw new NotFoundException("Không tìm thấy request với id này");
+                var withdrawRequest = await _moneyRequestRepository.GetByIdAsync(item.id, isTracking: true);
+                // Generate a unique ID for the update
+                
+                if (withdrawRequest == null)
+                {
+                    throw new NotFoundException("Không tìm thấy request với id này");
+                }
+
+                withdrawRequest.UpdateId = generateId;
+
+                withdrawRequest.Status = item.statusEnum.ToString();
+                withdrawRequest.UpdateDate = DateTime.Now;
+                withdrawRequest.UpdateBy = thisUserObj.userId;
+
+                await _moneyRequestRepository.SaveChanges();
             }
-
-            withdrawRequest.Status = withdrawRequestStatusEnum.ToString();
-            withdrawRequest.UpdateDate = DateTime.Now;
-            withdrawRequest.UpdateBy = thisUserObj.userId;
-
-            await _moneyRequestRepository.SaveChanges();
-
             return new ResponseMessage<bool>()
             {
                 message = "Cập nhật thành công",

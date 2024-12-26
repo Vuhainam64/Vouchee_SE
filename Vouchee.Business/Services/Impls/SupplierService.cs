@@ -259,7 +259,7 @@ namespace Vouchee.Business.Services.Impls
                 usedorexpireVouchers,
                 waitingforpayment,
                 totalamountthatcanbereceived,
-                monthDashboard = completeMonthDashboard 
+                    monthDashboard = completeMonthDashboard 
                 },
             };
         }

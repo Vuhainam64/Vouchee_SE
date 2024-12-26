@@ -24,6 +24,6 @@ namespace Vouchee.Business.Services
         public Task<DynamicResponseModel<GetWalletTransactionDTO>> GetWithdrawWalletTransactionAsync(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter, ThisUserObj thisUserObj);
 
         // UPDATE
-        public Task<ResponseMessage<bool>> UpdateWithdrawRequest(string id, WithdrawRequestStatusEnum withdrawRequestStatusEnum, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<bool>> UpdateWithdrawRequest(List<UpdateWithDrawRequestDTO> updateWithDrawRequestDTOs, ThisUserObj thisUserObj);
     }
 }

@@ -10,5 +10,7 @@ namespace Vouchee.Data.Models.Filters
     public class WithdrawRequestFilter
     {
         public WithdrawRequestStatusEnum? status { get; set; }
+
+        public DateTime? CreateDate { get; set; }
     }
 }

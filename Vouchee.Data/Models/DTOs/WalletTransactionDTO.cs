@@ -85,4 +85,9 @@ namespace Vouchee.Data.Models.DTOs
         public DateTime? updateDate { get; set; }
         public Guid? updateBy { get; set; }
     }
+    public class UpdateWithDrawRequestDTO
+    {
+        public Guid? id { get; set;}
+        public WithdrawRequestStatusEnum? statusEnum { get; set; }
+    }
 }
