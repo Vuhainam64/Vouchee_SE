@@ -31,4 +31,5 @@ namespace Vouchee.Data.Models.DTOs
         //public DateTime? exprireTime => createDate?.AddMinutes(2);
         public virtual GetWalletTransactionDTO? withdrawWalletTransaction { get; set; }
     }
+    
 }

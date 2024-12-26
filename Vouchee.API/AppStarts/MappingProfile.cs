@@ -308,6 +308,7 @@ namespace Vouchee.API.AppStarts
             CreateMap<MoneyRequest, CreateWithdrawRequestDTO>().ReverseMap();
             CreateMap<MoneyRequest, GetWithdrawRequestDTO>().ReverseMap();
             CreateMap<WithdrawRequestFilter, GetWithdrawRequestDTO>().ReverseMap();
+
         }
     }
 }
