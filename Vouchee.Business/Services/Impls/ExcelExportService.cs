@@ -198,30 +198,30 @@ namespace Vouchee.Business.Services.Impls
                     worksheet.Cells[row, 1].Value = row - 2; // Ord. No.
 
                     // Check for BuyerWallet, SellerWallet, or SupplierWallet
-                    //if (item.WithdrawWalletTransaction?.BuyerWallet != null)
-                    //{
-                    //    worksheet.Cells[row, 2].Value = item.WithdrawWalletTransaction.BuyerWallet.Buyer.BankNumber; // Account No.
-                    //    worksheet.Cells[row, 3].Value = item.WithdrawWalletTransaction.BuyerWallet.Buyer.BankAccount; // Beneficiary
-                    //    worksheet.Cells[row, 4].Value = item.WithdrawWalletTransaction.BuyerWallet.Buyer.BankName; // Beneficiary Bank
-                    //}
-                    //else if (item.WithdrawWalletTransaction?.SellerWallet != null)
-                    //{
-                    //    worksheet.Cells[row, 2].Value = item.WithdrawWalletTransaction.SellerWallet.Seller.BankNumber; // Account No.
-                    //    worksheet.Cells[row, 3].Value = item.WithdrawWalletTransaction.SellerWallet.Seller.BankAccount; // Beneficiary
-                    //    worksheet.Cells[row, 4].Value = item.WithdrawWalletTransaction.SellerWallet.Seller.BankName; // Beneficiary Bank
-                    //}
-                    //else if (item.WithdrawWalletTransaction?.SupplierWallet != null)
-                    //{
-                    //    worksheet.Cells[row, 2].Value = item.WithdrawWalletTransaction.SupplierWallet.Supplier.BankNumber; // Account No.
-                    //    worksheet.Cells[row, 3].Value = item.WithdrawWalletTransaction.SupplierWallet.Supplier.BankAccount; // Beneficiary
-                    //    worksheet.Cells[row, 4].Value = item.WithdrawWalletTransaction.SupplierWallet.Supplier.BankName; // Beneficiary Bank
-                    //}
-                    //else
-                    //{
-                    //    worksheet.Cells[row, 2].Value = "N/A"; // Account No.
-                    //    worksheet.Cells[row, 3].Value = "N/A"; // Beneficiary
-                    //    worksheet.Cells[row, 4].Value = "N/A"; // Beneficiary Bank
-                    //}
+                    if (item.WithdrawWalletTransaction?.BuyerWallet != null)
+                    {
+                        worksheet.Cells[row, 2].Value = item.WithdrawWalletTransaction.BuyerWallet.Buyer.BuyerWallet.BankNumber; // Account No.
+                        worksheet.Cells[row, 3].Value = item.WithdrawWalletTransaction.BuyerWallet.Buyer.BuyerWallet.BankAccount; // Beneficiary
+                        worksheet.Cells[row, 4].Value = item.WithdrawWalletTransaction.BuyerWallet.Buyer.BuyerWallet.BankName; // Beneficiary Bank
+                    }
+                    else if (item.WithdrawWalletTransaction?.SellerWallet != null)
+                    {
+                        worksheet.Cells[row, 2].Value = item.WithdrawWalletTransaction.SellerWallet.Seller.SellerWallet.BankNumber; // Account No.
+                        worksheet.Cells[row, 3].Value = item.WithdrawWalletTransaction.SellerWallet.Seller.SellerWallet.BankAccount; // Beneficiary
+                        worksheet.Cells[row, 4].Value = item.WithdrawWalletTransaction.SellerWallet.Seller.SellerWallet.BankName; // Beneficiary Bank
+                    }
+                    else if (item.WithdrawWalletTransaction?.SupplierWallet != null)
+                    {
+                        worksheet.Cells[row, 2].Value = item.WithdrawWalletTransaction.SupplierWallet.Supplier.SupplierWallet.BankNumber; // Account No.
+                        worksheet.Cells[row, 3].Value = item.WithdrawWalletTransaction.SupplierWallet.Supplier.SupplierWallet.BankAccount; // Beneficiary
+                        worksheet.Cells[row, 4].Value = item.WithdrawWalletTransaction.SupplierWallet.Supplier.SupplierWallet.BankName; // Beneficiary Bank
+                    }
+                    else
+                    {
+                        worksheet.Cells[row, 2].Value = "N/A"; // Account No.
+                        worksheet.Cells[row, 3].Value = "N/A"; // Beneficiary
+                        worksheet.Cells[row, 4].Value = "N/A"; // Beneficiary Bank
+                    }
 
                     worksheet.Cells[row, 5].Value = item.Amount; // Amount
                     worksheet.Cells[row, 6].Value = "Chuyển khoản"; // Payment Detail
