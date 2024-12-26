@@ -96,12 +96,12 @@ namespace Vouchee.API.Controllers
         }
 
         [Authorize]
-        [HttpPut("update_withdraw_request_status/{id}")]
-        public async Task<IActionResult> UpdateWithdrawRequestStatus(string id, WithdrawRequestStatusEnum status)
+        [HttpPut("update_withdraw_request_status")]
+        public async Task<IActionResult> UpdateWithdrawRequestStatus([FromBody] List<UpdateWithDrawRequestDTO> withDrawRequestDTOs)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _withdrawService.UpdateWithdrawRequest(id, status, currentUser);
+            var result = await _withdrawService.UpdateWithdrawRequest(withDrawRequestDTOs, currentUser);
             return Ok(result);
         }
     }
