@@ -327,6 +327,46 @@ namespace Vouchee.Business.Services.Impls
                 results = pagedResults
             };
         }
+        public async Task<dynamic> GetWithdrawRequestbyMonthAsync(WithdrawRequestFilter withdrawRequestFilter)
+        {
+            var year = DateTime.Now.Year;  // Use the current year for grouping
+
+            // Fetch the base query
+            var query = _moneyRequestRepository.GetTable().AsTracking()
+                .Where(x => x.Type == MoneyRequestTypeEnum.WITHDRAW.ToString());
+
+            // Apply dynamic filtering based on the provided filter
+            var filteredQuery = query
+                .ProjectTo<GetWithdrawRequestDTO>(_mapper.ConfigurationProvider)
+                .DynamicFilter(_mapper.Map<GetWithdrawRequestDTO>(withdrawRequestFilter));
+
+            // Fetch the filtered data
+            var filteredList = await filteredQuery.ToListAsync();
+
+            // Group by Month and Year, and return the monthly totals
+            var groupedResult = filteredList
+                .Where(x => x.createDate?.Year == year)  // Filter by the current year
+                .GroupBy(x => new { x.createDate?.Month, x.createDate?.Year })
+                .Select(group => new MonthlyTotalDTO
+                {
+                    Year = group.Key.Year,
+                    Month = group.Key.Month,
+                    TotalAmount = group.Sum(x => x.amount)  // Calculate total amount for the month
+                })
+                .ToList();
+
+            // Ensure all 12 months are included, even if there is no data for a particular month
+            var allMonths = Enumerable.Range(1, 12)  // Generate months 1 through 12
+                .Select(month => new MonthlyTotalDTO
+                {
+                    Year = year,
+                    Month = month,
+                    TotalAmount = groupedResult.FirstOrDefault(g => g.Month == month)?.TotalAmount ?? 0  // Set TotalAmount to 0 if no data
+                })
+                .ToList();
+
+            return allMonths;  // Return the list of MonthlyTotalDTO for all months
+        }
 
 
         public async Task<GetWithdrawRequestDTO> GetWithdrawRequestById(string id)

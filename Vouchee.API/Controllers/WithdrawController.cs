@@ -96,6 +96,16 @@ namespace Vouchee.API.Controllers
         }
 
         [Authorize]
+        [HttpGet("get_withdraw_transactions_chart_admin")]
+        public async Task<IActionResult> GetWithdrawTransasctionChart([FromQuery] WithdrawRequestFilter withdrawRequest)
+        {
+            /*ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);*/
+
+            var result = await _withdrawService.GetWithdrawRequestbyMonthAsync(withdrawRequest);
+            return Ok(result);
+        }
+
+        [Authorize]
         [HttpPut("update_withdraw_request_status")]
         public async Task<IActionResult> UpdateWithdrawRequestStatus([FromBody] List<UpdateWithDrawRequestDTO> withDrawRequestDTOs)
         {
