@@ -158,9 +158,16 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<byte[]> GenerateWithdrawRequestExcel()
         {
-            var result = await _moneyRequestRepository.GetTable()
+            var result = await _moneyRequestRepository.GetTable().AsTracking()
                 .Where(x => x.WithdrawWalletTransaction != null && x.Status == WithdrawRequestStatusEnum.PENDING.ToString())
                 .ToListAsync();
+
+            foreach (var item in result.ToList())
+            {
+                item.Status = WithdrawRequestStatusEnum.TRANSFERING.ToString();
+            }
+
+            await _moneyRequestRepository.SaveChanges();
 
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
@@ -231,7 +238,6 @@ namespace Vouchee.Business.Services.Impls
 
                     row++;
                 }
-
 
                 // Auto-fit columns
                 worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
