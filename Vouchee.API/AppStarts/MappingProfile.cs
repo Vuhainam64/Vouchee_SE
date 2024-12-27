@@ -283,6 +283,8 @@ namespace Vouchee.API.AppStarts
                 .ForMember(dest => dest.id, opt => opt.Ignore())
                 .ReverseMap()
                 .ForMember(src => src.Id, opt => opt.Ignore());
+            CreateMap<PartnerTransaction, GetPartnerTransactionDTO>().ReverseMap();
+            CreateMap<PartnerTransactionFilter, GetPartnerTransactionDTO>().ReverseMap();
 
             // PROMOTION
             CreateMap<Promotion, CreateShopPromotionDTO>().ReverseMap();
