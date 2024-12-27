@@ -73,6 +73,9 @@ namespace Vouchee.Data.Models.DTOs
         public string? supplierName { get; set; }
         public Guid? updateId { get; set; }
 
+        public string? BankName { get; set; }
+        public string? BankNumber { get; set; }
+        public string? BankAccount { get; set; }
         public string? orderId { get; set; }
 
         public int? beforeBalance { get; set; }
