@@ -261,21 +261,23 @@ namespace Vouchee.API.AppStarts
 
             // WALLET TRANSACTION
             CreateMap<WalletTransaction, WalletTransactionDTO>().ReverseMap();
-            CreateMap<WalletTransaction, GetWalletTransactionDTO>().ReverseMap();
-            CreateMap<WalletTransaction, GetSellerWalletTransaction>()
-                .ForMember(dest => dest.BankAccount, opt => opt.MapFrom(src => src.SellerWallet.BankAccount))
-                .ForMember(dest => dest.BankNumber, opt => opt.MapFrom(src => src.SellerWallet.BankNumber))
-                .ForMember(dest => dest.BankName, opt => opt.MapFrom(src => src.SellerWallet.BankName))
+            CreateMap<WalletTransaction, GetWalletTransactionDTO>()
+                .ForMember(dest => dest.BankAccount, opt => opt.MapFrom(src =>
+                    src.BuyerWallet != null ? src.BuyerWallet.BankAccount :
+                    src.SellerWallet != null ? src.SellerWallet.BankAccount :
+                    src.SupplierWallet.BankAccount))
+                .ForMember(dest => dest.BankName, opt => opt.MapFrom(src =>
+                    src.BuyerWallet != null ? src.BuyerWallet.BankName :
+                    src.SellerWallet != null ? src.SellerWallet.BankName :
+                    src.SupplierWallet.BankName))
+                .ForMember(dest => dest.BankNumber, opt => opt.MapFrom(src =>
+                    src.BuyerWallet != null ? src.BuyerWallet.BankNumber :
+                    src.SellerWallet != null ? src.SellerWallet.BankNumber :
+                    src.SupplierWallet.BankNumber))
                 .ReverseMap();
-            CreateMap<WalletTransaction, GetBuyerWalletTransactionDTO>()
-                .ForMember(dest => dest.BankAccount, opt => opt.MapFrom(src => src.BuyerWallet.BankAccount))
-                .ForMember(dest => dest.BankNumber, opt => opt.MapFrom(src => src.BuyerWallet.BankNumber))
-                .ForMember(dest => dest.BankName, opt => opt.MapFrom(src => src.BuyerWallet.BankName))
-                .ReverseMap();
+            CreateMap<WalletTransaction, GetSellerWalletTransaction>().ReverseMap();
+            CreateMap<WalletTransaction, GetBuyerWalletTransactionDTO>().ReverseMap();
             CreateMap<WalletTransaction, GetSupplierWalletTransactionDTO>()
-                .ForMember(dest => dest.BankAccount, opt => opt.MapFrom(src => src.SupplierWallet.BankAccount))
-                .ForMember(dest => dest.BankNumber, opt => opt.MapFrom(src => src.SupplierWallet.BankNumber))
-                .ForMember(dest => dest.BankName, opt => opt.MapFrom(src => src.SupplierWallet.BankName))
                 .ForMember(dest => dest.supplierName, opt => opt.MapFrom(src => src.SupplierWallet.Supplier.Name))
                 .ReverseMap();
             CreateMap<GetWalletTransactionDTO, WalletTransactionFilter>().ReverseMap();
@@ -294,7 +296,7 @@ namespace Vouchee.API.AppStarts
                 .ForMember(dest => dest.id, opt => opt.Ignore())
                 .ReverseMap()
                 .ForMember(src => src.Id, opt => opt.Ignore());
-            CreateMap<PartnerTransaction, GetPartnerTransactionDTO>().ReverseMap();
+                        CreateMap<PartnerTransaction, GetPartnerTransactionDTO>().ReverseMap();
             CreateMap<PartnerTransactionFilter, GetPartnerTransactionDTO>().ReverseMap();
 
             // PROMOTION
