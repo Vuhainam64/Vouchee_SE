@@ -309,6 +309,14 @@ namespace Vouchee.API.AppStarts
             CreateMap<MoneyRequest, GetWithdrawRequestDTO>().ReverseMap();
             CreateMap<WithdrawRequestFilter, GetWithdrawRequestDTO>().ReverseMap();
 
+            // REFUND REQUEST
+            CreateMap<RefundRequest, RefundRequestDTO>().ReverseMap();
+            CreateMap<RefundRequest, CreateRefundRequestDTO>().ReverseMap();
+            CreateMap<RefundRequest, UpdateRefundRequestDTO>().ReverseMap();
+            CreateMap<RefundRequest, GetRefundRequestDTO>()
+                .ForMember(dest => dest.supplierName, opt => opt.MapFrom(src => src.VoucherCode.Modal.Voucher.Supplier.Name))
+                .ReverseMap();
+            CreateMap<GetRefundRequestDTO, RefundRequestFilter>().ReverseMap();
         }
     }
 }
