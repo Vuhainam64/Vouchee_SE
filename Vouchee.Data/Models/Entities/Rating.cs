@@ -38,6 +38,7 @@ namespace Vouchee.Data.Models.Entities
         public int SellerStar { get; set; }
         public string? Comment { get; set; }
         public string? Reply { get; set; }
+        public string? Reason { get; set; }
 
         public string? Status { get; set; }
         public DateTime? CreateDate { get; set; }

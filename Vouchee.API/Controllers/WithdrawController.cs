@@ -124,5 +124,25 @@ namespace Vouchee.API.Controllers
             var result = await _withdrawService.UpdateWithdrawRequest(withDrawRequestDTOs, currentUser);
             return Ok(result);
         }
+
+        [Authorize]
+        [HttpPut("update_withdraw_request/{id}")]
+        public async Task<IActionResult> UpdateWithdrawQuest(string id, int amount)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _withdrawService.UpdateWithdrawRequest(id, amount, currentUser);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpDelete("delete_withdraw_request/{id}")]
+        public async Task<IActionResult> DeleteWithdrawRequest(string id)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _withdrawService.DeleteWithdrawRequest(id, currentUser);
+            return Ok(result);
+        }
     }
 }

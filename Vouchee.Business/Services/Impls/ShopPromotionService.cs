@@ -54,6 +54,11 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
+        public Task<bool> DeletePromotionAsync(Guid id, ThisUserObj thisUserObj)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<GetShopPromotionDTO> GetActiveShopPromotion(ThisUserObj thisUserObj)
         {
             DateTime currentTime = DateTime.Now;
@@ -184,6 +189,26 @@ namespace Vouchee.Business.Services.Impls
         {
             var promotions = await _shopPromotionRepository.GetWhereAsync(x => x.SellerId == shopId);
             return _mapper.Map<IList<GetShopPromotionDTO>>(promotions);
+        }
+
+        public Task<bool> UpdatePromotionAsync(Guid id, UpdateShopPromotionDTO updatePromotionDTO, ThisUserObj thisUserObj)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ResponseMessage<bool>> UpdatePromotionState(Guid id, bool isActive, ThisUserObj thisUserObj)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<ResponseMessage<bool>> IShopPromotionService.DeletePromotionAsync(Guid id, ThisUserObj thisUserObj)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<ResponseMessage<bool>> IShopPromotionService.UpdatePromotionAsync(Guid id, UpdateShopPromotionDTO updatePromotionDTO, ThisUserObj thisUserObj)
+        {
+            throw new NotImplementedException();
         }
 
         //public async Task<bool> UpdatePromotionAsync(Guid id, UpdateShopPromotionDTO updatePromotionDTO, ThisUserObj thisUserObj)

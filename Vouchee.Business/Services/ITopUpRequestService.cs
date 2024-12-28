@@ -21,7 +21,7 @@ namespace Vouchee.Business.Services
         public Task<DynamicResponseModel<GetTopUpRequestDTO>> GetUserTopUpRequestsAsync(PagingRequest pagingRequest, TopUpRequestFilter topUpRequestFilter, ThisUserObj thisUserObj);
 
         // UPDATE
-        public Task<ResponseMessage<bool>> UpdateTopUpRequest(Guid id, int amount, ThisUserObj currentUser = null);
+        public Task<ResponseMessage<bool>> UpdateTopUpRequest(Guid id, int amount, ThisUserObj currentUser);
 
         // DELETE
         public Task<ResponseMessage<bool>> DeleteTopUpRequest(Guid id, ThisUserObj currentUser);

@@ -482,5 +482,15 @@ namespace Vouchee.Business.Services.Impls
                 value = generateId
             };
         }
+
+        public Task<ResponseMessage<bool>> UpdateWithdrawRequest(string id, int amount, ThisUserObj thisUserObj)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ResponseMessage<bool>> DeleteWithdrawRequest(string id, ThisUserObj thisUserObj)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

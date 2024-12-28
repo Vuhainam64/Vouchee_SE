@@ -10,6 +10,7 @@ using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
 using Vouchee.Data.Helpers.Base;
+using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.Constants.Number;
 using Vouchee.Data.Models.DTOs;
 using Vouchee.Data.Models.Entities;
@@ -59,6 +60,8 @@ namespace Vouchee.Business.Services.Impls
             }
 
             var newRating = _mapper.Map<Rating>(createRatingDTO);
+            newRating.CreateBy = thisUserObj.userId;
+            newRating.Status = RatingStatusEnum.NONE.ToString();
 
             int count = 0;
             foreach (var media in newRating.Medias)
@@ -238,6 +241,16 @@ namespace Vouchee.Business.Services.Impls
                 result = true,
                 value = true
             };
+        }
+
+        public Task<ResponseMessage<bool>> ReportRatingAsync(Guid id, string reason, ThisUserObj thisUserObj)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ResponseMessage<bool>> DeleteRatingAsync(Guid id, ThisUserObj thisUserObj)
+        {
+            throw new NotImplementedException();
         }
     }
 }

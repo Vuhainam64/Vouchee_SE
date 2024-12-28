@@ -60,6 +60,7 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpGet("get_rating_dashboard")]
         public async Task<IActionResult> GetRatingDashboard()
         {
@@ -87,6 +88,26 @@ namespace Vouchee.API.Controllers
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _ratingService.ReplyRatingAsync(id, rep, currentUser);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpPut("report_rating/{id}")]
+        public async Task<IActionResult> ReportRating(Guid id, string reason)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _ratingService.ReportRatingAsync(id, reason, currentUser);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpDelete("delete_rating/{id}")]
+        public async Task<IActionResult> DeleteRating(Guid id)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _ratingService.DeleteRatingAsync(id, currentUser);
             return Ok(result);
         }
     }

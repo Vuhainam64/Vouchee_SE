@@ -33,40 +33,47 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<Guid?> CreateVoucherTypeAsync(CreateVoucherTypeDTO createVoucherTypeDTO, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<Guid>> CreateVoucherTypeAsync(CreateVoucherTypeDTO createVoucherTypeDTO, ThisUserObj thisUserObj)
         {
             var voucherType = _mapper.Map<VoucherType>(createVoucherTypeDTO);
             voucherType.CreateBy = thisUserObj.userId;
 
             var voucherTypeId = await _voucherTypeRepository.AddAsync(voucherType);
 
-            if (voucherTypeId != null && createVoucherTypeDTO.image != null)
+            //if (voucherTypeId != null && createVoucherTypeDTO.image != null)
+            //{
+            //    voucherType.Image = await _fileUploadService.UploadImageToFirebase(createVoucherTypeDTO.image, thisUserObj.userId.ToString(), StoragePathEnum.VOUCHER_TYPE);
+
+            //    if (!await _voucherTypeRepository.UpdateAsync(voucherType))
+            //    {
+            //        throw new UpdateObjectException("Không thể update voucher type");
+            //    }
+            //}
+
+            return new ResponseMessage<Guid>()
             {
-                voucherType.Image = await _fileUploadService.UploadImageToFirebase(createVoucherTypeDTO.image, thisUserObj.userId.ToString(), StoragePathEnum.VOUCHER_TYPE);
-
-                if (!await _voucherTypeRepository.UpdateAsync(voucherType))
-                {
-                    throw new UpdateObjectException("Không thể update voucher type");
-                }
-            }
-
-            return voucherTypeId;
+                value = (Guid) voucherTypeId,
+                result = true,
+                message = "Tạo voucher type thành công"
+            };
         }
 
-        public async Task<bool> DeleteVoucherTypeAsync(Guid id)
+        public async Task<ResponseMessage<bool>> DeleteVoucherTypeAsync(Guid id)
         {
+            var voucherType = await _voucherTypeRepository.GetByIdAsync(id, isTracking: true);
+            if (voucherType == null)
+            {
+                throw new NotFoundException("Không thấy voucher type này");
+            }
 
-            bool result = false;
-            var voucherType = await _voucherTypeRepository.GetByIdAsync(id);
-            if (voucherType != null)
+            await _voucherTypeRepository.DeleteAsync(voucherType);
+
+            return new ResponseMessage<bool>()
             {
-                result = await _voucherTypeRepository.DeleteAsync(voucherType);
-            }
-            else
-            {
-                throw new NotFoundException($"Không tìm thấy voucher type với id {id}");
-            }
-            return result;
+                message = "Xóa voucher type thành công",
+                result = true,
+                value = true
+            };
         }
 
         public async Task<GetVoucherTypeDTO> GetVoucherTypeByIdAsync(Guid id)
@@ -119,19 +126,24 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<bool> UpdateVoucherTypeAsync(Guid id, UpdateVoucherTypeDTO updateVoucherTypeDTO)
+        public async Task<ResponseMessage<bool>> UpdateVoucherTypeAsync(Guid id, UpdateVoucherTypeDTO updateVoucherTypeDTO)
         {
-            var existedVoucherType = await _voucherTypeRepository.GetByIdAsync(id);
-            if (existedVoucherType != null)
+            var existedVoucherType = await _voucherTypeRepository.GetByIdAsync(id, isTracking: true);
+            if (existedVoucherType == null)
             {
-                var entity = _mapper.Map<VoucherType>(updateVoucherTypeDTO);
-                return await _voucherTypeRepository.UpdateAsync(entity);
-            }
-            else
-            {
-                throw new NotFoundException("Không tìm thấy voucher type");
+                throw new NotFoundException("Không tìm thấy voucher type này");
             }
 
+            existedVoucherType = _mapper.Map(updateVoucherTypeDTO, existedVoucherType);
+
+            await _voucherTypeRepository.SaveChanges();
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Cập nhật thành công",
+                result = true,
+                value = true
+            };
         }
     }
 }
