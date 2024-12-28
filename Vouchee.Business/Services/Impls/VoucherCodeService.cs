@@ -204,7 +204,19 @@ namespace Vouchee.Business.Services.Impls
             {
                 existedVoucherCode.IsActive = false;
             }
-            if(existedVoucherCode.Status == VoucherCodeStatusEnum.CONVERTING.ToString() && voucherCodeStatus == VoucherCodeStatusEnum.UNUSED)
+            if (existedVoucherCode.EndDate < DateOnly.FromDateTime(DateTime.Now))
+            {
+                existedVoucherCode.IsActive = false;
+                await _voucherCodeRepository.UpdateAsync(existedVoucherCode);
+                return new ResponseMessage<GetVoucherCodeDTO>()
+                {
+                    message = "Voucher code hết hạn",
+                    result = true,
+                    value = _mapper.Map<GetVoucherCodeDTO>(existedVoucherCode)
+                };
+            }
+
+            if (existedVoucherCode.Status == VoucherCodeStatusEnum.CONVERTING.ToString() && voucherCodeStatus == VoucherCodeStatusEnum.UNUSED)
             {
                 existedVoucherCode.IsVerified = true;
                 existedVoucherCode.IsActive = true;
