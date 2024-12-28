@@ -93,6 +93,16 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
+        [HttpPut("update_shop_promotion_state/{id}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateShopPromotionStatus(Guid id, bool isActive)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _shopPromotionService.UpdatePromotionState(id, isActive, currentUser);
+            return Ok(result);
+        }
+
         //// DELETE
         [HttpDelete("delete_promotion/{id}")]
         [Authorize]
