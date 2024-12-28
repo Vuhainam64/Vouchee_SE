@@ -23,7 +23,7 @@ namespace Vouchee.Business.Services
         public Task<DynamicResponseModel<GetWithdrawRequestDTO>> GetWithdrawRequestAsync(PagingRequest pagingRequest, WithdrawRequestFilter withdrawRequestFilter, ThisUserObj thisUserObj);
         public Task<DynamicResponseModel<GetWalletTransactionDTO>> GetWithdrawWalletTransactionAsync(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter, ThisUserObj thisUserObj);
         public Task<dynamic> GetWithdrawRequestbyMonthAsync(WithdrawRequestFilter withdrawRequestFilter);
-        public Task<DynamicResponseModel<GetWalletTransactionDTO>> GetWithdrawWalletTransactionByUpdateId(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter);
+        public Task<DynamicResponseModel<dynamic>> GetWithdrawWalletTransactionByUpdateId(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter);
 
         // UPDATE
         public Task<ResponseMessage<Guid>> UpdateWithdrawRequest(List<UpdateWithDrawRequestDTO> updateWithDrawRequestDTOs, ThisUserObj thisUserObj);

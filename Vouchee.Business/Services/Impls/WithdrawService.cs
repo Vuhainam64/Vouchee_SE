@@ -409,27 +409,50 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<DynamicResponseModel<GetWalletTransactionDTO>> GetWithdrawWalletTransactionByUpdateId(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter)
+        public async Task<DynamicResponseModel<dynamic>> GetWithdrawWalletTransactionByUpdateId(PagingRequest pagingRequest,WalletTransactionFilter walletTransactionFilter)
         {
-            (int, IQueryable<GetWalletTransactionDTO>) result;
+            // Filter and group by updateId
+            var groupedQuery = _walletTransactionRepository.GetTable()
+                .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()))
+                .ProjectTo<GetWalletTransactionDTO>(_mapper.ConfigurationProvider)
+                .DynamicFilter(_mapper.Map<GetWalletTransactionDTO>(walletTransactionFilter))
+                .GroupBy(x => x.updateId)
+                .Select(group => new
+                {
+                    UpdateId = group.Key,
+                    Count = group.Count(),
+                    Transactions = group.ToList()
+                });
 
-            result = _walletTransactionRepository.GetTable()
-                        .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()))
-                        .ProjectTo<GetWalletTransactionDTO>(_mapper.ConfigurationProvider)
-                        .DynamicFilter(_mapper.Map<GetWalletTransactionDTO>(walletTransactionFilter))
-                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+            // Apply paging to the grouped results
+            var pagedGroups = groupedQuery
+                .Skip((pagingRequest.page - 1) * pagingRequest.pageSize)
+                .Take(pagingRequest.pageSize)
+                .ToList();
 
-            return new DynamicResponseModel<GetWalletTransactionDTO>()
+            // Total count of unique groups
+            var totalGroups = groupedQuery.Count();
+
+            // Prepare the response
+            var results = pagedGroups.Select(group => new
+            {
+                UpdateId = group.UpdateId,
+                Count = group.Count,
+                Transactions = group.Transactions
+            }).ToList<dynamic>();
+
+            return new DynamicResponseModel<dynamic>()
             {
                 metaData = new MetaData()
                 {
                     page = pagingRequest.page,
                     size = pagingRequest.pageSize,
-                    total = result.Item1 // Total vouchers count for metadata
+                    total = totalGroups
                 },
-                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+                results = results
             };
         }
+
 
         public async Task<ResponseMessage<Guid>> UpdateWithdrawRequest(List<UpdateWithDrawRequestDTO> updateWithDrawRequestDTOs, ThisUserObj thisUserObj)
         {
