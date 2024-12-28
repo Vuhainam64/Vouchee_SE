@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using DocumentFormat.OpenXml.Office2019.Drawing.Model3D;
 using Google.Api;
+using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -129,24 +130,77 @@ namespace Vouchee.Business.Services.Impls
             return result;
         }
 
-        public async Task<GetVoucherCodeDTO> GetVoucherCodeByIdAsync(Guid id)
+        public async Task<GetVoucherCodeDTO> GetVoucherCodeByIdAsync(Guid id, bool isUsing, ThisUserObj thisUserObj)
         {
             try
             {
                 var existedVoucherCode = await _voucherCodeRepository.GetByIdAsync(id);
-                GetVoucherCodeDTO voucherCodeDTO = _mapper.Map<GetVoucherCodeDTO>(existedVoucherCode);
 
                 if (existedVoucherCode == null)
                 {
+                    Console.WriteLine($"Không tìm thấy voucher code với id {id}");
                     throw new NotFoundException($"Không tìm thấy voucher code với id {id}");
+                }
+
+                GetVoucherCodeDTO voucherCodeDTO = _mapper.Map<GetVoucherCodeDTO>(existedVoucherCode);
+
+                if (isUsing)
+                {
+                    var currentDate = DateOnly.FromDateTime(DateTime.Now);
+
+                    if (existedVoucherCode.Status != VoucherCodeStatusEnum.UNUSED.ToString())
+                    {
+                        Console.WriteLine("Voucher code này không trong trạng thái unused");
+                        throw new ConflictException("Voucher code này không trong trạng thái unused");
+                    }
+
+                    if (currentDate > existedVoucherCode.EndDate)
+                    {
+                        Console.WriteLine("Voucher code này đã hết hạn");
+                        throw new ConflictException("Voucher code này đã hết hạn");
+                    }
+
+                    // Log job scheduling
+                    Console.WriteLine($"Scheduling job to update voucher code {id} status to USED after 5 minutes.");
+                    BackgroundJob.Schedule(() => UpdateVoucherCodeStatusToUsedAsync(id, thisUserObj), TimeSpan.FromMinutes(10));
                 }
 
                 return voucherCodeDTO;
             }
             catch (Exception ex)
             {
-                LoggerService.Logger(ex.Message);
+                Console.WriteLine($"Error in GetVoucherCodeByIdAsync: {ex.Message}");
                 throw new LoadException(ex.Message);
+            }
+        }
+
+        public async Task UpdateVoucherCodeStatusToUsedAsync(Guid id, ThisUserObj thisUserObj)
+        {
+            try
+            {
+                var existedVoucherCode = await _voucherCodeRepository.GetByIdAsync(id, isTracking: true);
+
+                if (existedVoucherCode == null)
+                {
+                    Console.WriteLine($"Không tìm thấy voucher code với id {id} trong UpdateVoucherCodeStatusToUsedAsync.");
+                    return; // Optionally, throw an exception here if this should be handled
+                }
+
+                // Update the status and other properties
+                existedVoucherCode.Status = VoucherCodeStatusEnum.USED.ToString();
+                existedVoucherCode.UpdateDate = DateTime.Now;
+                existedVoucherCode.UpdateBy = thisUserObj.userId;
+
+                // Save changes
+                await _voucherCodeRepository.SaveChanges();
+
+                // Log successful update
+                Console.WriteLine($"Voucher code {id} đã được cập nhật thành trạng thái USED.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating voucher code {id}: {ex.Message}");
+                throw; // Optionally rethrow or handle the exception
             }
         }
 

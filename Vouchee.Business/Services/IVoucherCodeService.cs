@@ -20,7 +20,7 @@ namespace Vouchee.Business.Services
         public Task<ResponseMessage<GetDetailModalDTO>> CreateVoucherCodeAsync(Guid modalId, IList<CreateVoucherCodeDTO> createVoucherCodeDTOs, ThisUserObj thisUserObj);
 
         // READ
-        public Task<GetVoucherCodeDTO> GetVoucherCodeByIdAsync(Guid id);
+        public Task<GetVoucherCodeDTO> GetVoucherCodeByIdAsync(Guid id, bool isUsing, ThisUserObj thisUserObj);
         public Task<DynamicResponseModel<GetVoucherCodeDTO>> GetVoucherCodeByUpdateIdAsync(ThisUserObj thisUserObj ,Guid id, PagingRequest pagingRequest);
         public Task<IList<GetVoucherCodeDTO>> GetVoucherCodesAsync(VoucherCodeFilter voucherCodeFilter);
         public Task<DynamicResponseModel<GetVoucherCodeDTO>> GetOrderedVoucherCode(Guid modalId, ThisUserObj thisUserObj, PagingRequest pagingRequest, VoucherCodeFilter voucherCodeFilter);
