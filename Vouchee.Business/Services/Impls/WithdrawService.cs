@@ -342,7 +342,9 @@ namespace Vouchee.Business.Services.Impls
 
             // Fetch the filtered data
             var filteredList = await filteredQuery.ToListAsync();
-
+            var sumAmount = filteredList.Sum(x => x.amount);
+            var countItem = filteredList.Count();
+            var newestItem = DateTime.Now;
             // Group by Month and Year, and return the monthly totals
             var groupedResult = filteredList
                 .Where(x => x.createDate?.Year == year)  // Filter by the current year
@@ -365,7 +367,12 @@ namespace Vouchee.Business.Services.Impls
                 })
                 .ToList();
 
-            return allMonths;  // Return the list of MonthlyTotalDTO for all months
+            return new {
+                allMonths,
+                sumAmount,
+                countItem,
+                newestItem
+                    };  // Return the list of MonthlyTotalDTO for all months
         }
 
 
