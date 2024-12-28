@@ -106,6 +106,16 @@ namespace Vouchee.API.Controllers
         }
 
         [Authorize]
+        [HttpGet("get_withdraw_transactions_by_update_id")]
+        public async Task<IActionResult> GetWithdrawTransasctionbyUpdateId([FromQuery] PagingRequest pagingRequest,[FromQuery] WalletTransactionFilter walletTransactionFilter, Guid updateId)
+        {
+            /*ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);*/
+
+            var result = await _withdrawService.GetWithdrawWalletTransactionByUpdateId(pagingRequest,walletTransactionFilter,updateId);
+            return Ok(result);
+        }
+
+        [Authorize]
         [HttpPut("update_withdraw_request_status")]
         public async Task<IActionResult> UpdateWithdrawRequestStatus([FromBody] List<UpdateWithDrawRequestDTO> withDrawRequestDTOs)
         {
