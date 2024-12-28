@@ -52,7 +52,9 @@ namespace Vouchee.API.Controllers
         [HttpGet("get_voucher_code/{id}")]
         public async Task<IActionResult> GetVoucherCodeById(Guid id)
         {
-            var voucherCode = await _voucherCodeService.GetVoucherCodeByIdAsync(id);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var voucherCode = await _voucherCodeService.GetVoucherCodeByIdAsync(id, true, currentUser);
             return Ok(voucherCode);
         }
     }
