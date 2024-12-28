@@ -414,7 +414,7 @@ namespace Vouchee.Business.Services.Impls
             (int, IQueryable<GetWalletTransactionDTO>) result;
 
             result = _walletTransactionRepository.GetTable()
-                        .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()) && x.UpdateId == updateId)
+                        .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()))
                         .ProjectTo<GetWalletTransactionDTO>(_mapper.ConfigurationProvider)
                         .DynamicFilter(_mapper.Map<GetWalletTransactionDTO>(walletTransactionFilter))
                         .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
