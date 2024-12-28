@@ -27,5 +27,10 @@ namespace Vouchee.Business.Services
 
         // UPDATE
         public Task<ResponseMessage<Guid>> UpdateWithdrawRequest(List<UpdateWithDrawRequestDTO> updateWithDrawRequestDTOs, ThisUserObj thisUserObj);
+
+        public Task<ResponseMessage<bool>> UpdateWithdrawRequest(string id, int amount, ThisUserObj thisUserObj);
+
+        // DELETE
+        public Task<ResponseMessage<bool>> DeleteWithdrawRequest(string id, ThisUserObj thisUserObj);
     }
 }
