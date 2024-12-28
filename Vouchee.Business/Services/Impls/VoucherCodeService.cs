@@ -4,6 +4,7 @@ using DocumentFormat.OpenXml.Office2019.Drawing.Model3D;
 using Google.Api;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -279,22 +280,40 @@ namespace Vouchee.Business.Services.Impls
                     .FirstOrDefaultAsync();
                 if (updatecode != null)
                 {
+                    if (!code.newcode.IsNullOrEmpty())
+                    {
+                        throw new Exception("Thiếu New Voucher của Voucher code: " + code.id);
+                    }
                     var result = await updatecode;
-                    result.Status = VoucherCodeStatusEnum.UNUSED.ToString();
-                    result.UpdateDate = DateTime.Now;
-                    result.NewCode = code.newcode;
-                    result.Comment = code.Comment;
-                    result.UpdateBy = thisUserObj.userId;
-                    result.UpdateStatus = code.UpdateStatus.ToString();
                     if (code.UpdateStatus == UpdateStatusEnum.SUCCESS)
                     {
-                        result.IsVerified = true;
+                        
+                            result.IsVerified = true;
+                            result.Status = VoucherCodeStatusEnum.UNUSED.ToString();
+                            result.UpdateDate = DateTime.Now;
+                            result.NewCode = code.newcode;
+                            result.Comment = code.Comment;
+                            result.UpdateBy = thisUserObj.userId;
+                            result.UpdateStatus = code.UpdateStatus.ToString();
+
+                            await _voucherCodeRepository.UpdateAsync(result);
+                            list.Add(_mapper.Map<GetVoucherCodeDTO>(result));
                     }
-                    else { 
-                        result.IsVerified = false; 
+                    else
+                    {
+                        result.IsVerified = false;
+                        result.Status = VoucherCodeStatusEnum.SUSPECTED.ToString();
+                        result.UpdateDate = DateTime.Now;
+                        /*result.NewCode = code.newcode;*/
+                        result.Comment = code.Comment;
+                        result.UpdateBy = thisUserObj.userId;
+                        result.UpdateStatus = code.UpdateStatus.ToString();
+
+                        await _voucherCodeRepository.UpdateAsync(result);
+                        list.Add(_mapper.Map<GetVoucherCodeDTO>(result));
                     }
-                    await _voucherCodeRepository.UpdateAsync(result);
-                    list.Add(_mapper.Map<GetVoucherCodeDTO>(result));
+                    
+                   
                 }
                 else
                 {
