@@ -204,6 +204,10 @@ namespace Vouchee.Business.Services.Impls
             {
                 existedVoucherCode.IsActive = true;
             }
+            if(existedVoucherCode.Status == VoucherCodeStatusEnum.CONVERTING.ToString() && voucherCodeStatus == VoucherCodeStatusEnum.UNUSED)
+            {
+                existedVoucherCode.IsVerified = true;
+            }
             existedVoucherCode.Status = voucherCodeStatus.ToString();
             existedVoucherCode.UpdateDate = DateTime.Now;
             existedVoucherCode.UpdateBy = thisUserObj.userId;
