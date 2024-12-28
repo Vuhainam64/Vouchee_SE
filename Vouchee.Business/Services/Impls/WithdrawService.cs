@@ -431,7 +431,7 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<ResponseMessage<bool>> UpdateWithdrawRequest(List<UpdateWithDrawRequestDTO> updateWithDrawRequestDTOs, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<Guid>> UpdateWithdrawRequest(List<UpdateWithDrawRequestDTO> updateWithDrawRequestDTOs, ThisUserObj thisUserObj)
         {
             var generateId = Guid.NewGuid();
             foreach (var item in updateWithDrawRequestDTOs)
@@ -452,11 +452,11 @@ namespace Vouchee.Business.Services.Impls
 
                 await _moneyRequestRepository.SaveChanges();
             }
-            return new ResponseMessage<bool>()
+            return new ResponseMessage<Guid>()
             {
                 message = "Cập nhật thành công",
                 result = true,
-                value = true
+                value = generateId
             };
         }
     }
