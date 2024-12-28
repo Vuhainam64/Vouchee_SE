@@ -192,7 +192,7 @@ namespace Vouchee.Business.Services.Impls
             return result;
         }
 
-        public async Task<ResponseMessage<GetVoucherCodeDTO>> UpdateStatusVoucherCodeAsync(Guid id, VoucherCodeStatusEnum voucherCodeStatus)
+        public async Task<ResponseMessage<GetVoucherCodeDTO>> UpdateStatusVoucherCodeAsync(Guid id, VoucherCodeStatusEnum voucherCodeStatus, ThisUserObj thisUserObj)
         {
             var existedVoucherCode = await _voucherCodeRepository.FindAsync(id, true);
 
@@ -200,8 +200,13 @@ namespace Vouchee.Business.Services.Impls
             {
                 throw new NotFoundException($"Không tìm thấy voucher code với id {id}");
             }
-
+            if (existedVoucherCode.Status == VoucherCodeStatusEnum.PENDING.ToString())
+            {
+                existedVoucherCode.IsActive = true;
+            }
             existedVoucherCode.Status = voucherCodeStatus.ToString();
+            existedVoucherCode.UpdateDate = DateTime.Now;
+            existedVoucherCode.UpdateBy = thisUserObj.userId;
 
             await _voucherCodeRepository.UpdateAsync(existedVoucherCode);
 

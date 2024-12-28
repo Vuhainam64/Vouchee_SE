@@ -118,7 +118,8 @@ namespace Vouchee.API.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateStatusVoucherCode(Guid id, VoucherCodeStatusEnum status)
         {
-            var result = await _voucherCodeService.UpdateStatusVoucherCodeAsync(id, status);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+            var result = await _voucherCodeService.UpdateStatusVoucherCodeAsync(id, status, currentUser);
             return Ok(result);
         }
 
