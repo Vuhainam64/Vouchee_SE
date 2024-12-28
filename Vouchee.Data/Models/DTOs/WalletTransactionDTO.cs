@@ -92,7 +92,7 @@ namespace Vouchee.Data.Models.DTOs
     }
     public class UpdateWithDrawRequestDTO
     {
-        public Guid? id { get; set;}
+        public string? id { get; set;}
         public WithdrawRequestStatusEnum? statusEnum { get; set; }
     }
 }
