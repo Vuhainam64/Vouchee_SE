@@ -409,7 +409,7 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<DynamicResponseModel<GetWalletTransactionDTO>> GetWithdrawWalletTransactionByUpdateId(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter, Guid updateId)
+        public async Task<DynamicResponseModel<GetWalletTransactionDTO>> GetWithdrawWalletTransactionByUpdateId(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter)
         {
             (int, IQueryable<GetWalletTransactionDTO>) result;
 
