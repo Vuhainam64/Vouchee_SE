@@ -23,5 +23,9 @@ namespace Vouchee.Business.Services
         // UPDATE
         public Task<ResponseMessage<bool>> UpdateRatingAsync(Guid id, UpdateRatingDTO updateRatingDTO, ThisUserObj thisUserObj);
         public Task<ResponseMessage<bool>> ReplyRatingAsync(Guid id, string reply, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<bool>> ReportRatingAsync(Guid id, string reason, ThisUserObj thisUserObj);
+
+        // DELETE
+        public Task<ResponseMessage<bool>> DeleteRatingAsync(Guid id, ThisUserObj thisUserObj);
     }
 }

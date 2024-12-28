@@ -23,62 +23,41 @@ namespace Vouchee.Data.Models.DTOs
         public string? description { get; set; }
         [Range(0, 100, ErrorMessage = "Phần trăm giảm giá phải nằm trong khoảng từ 0 đến 100.")]
         public int? percentDiscount { get; set; }
-        [Range(0, int.MaxValue, ErrorMessage = "Số tiền giảm giá phải lớn hơn hoặc bằng 0.")]
-        public int? moneyDiscount { get; set; }
-        [Range(1, int.MaxValue, ErrorMessage = "Số lượng yêu cầu phải lớn hơn 0.")]
-        public int? requiredQuantity { get; set; }
-        [Range(0, int.MaxValue, ErrorMessage = "Số tiền tối đa được giảm phải lớn hơn hoặc bằng 0.")]
-        public int? maxMoneyToDiscount { get; set; }
-        [Range(0, int.MaxValue, ErrorMessage = "Số tiền tối thiểu để áp dụng phải lớn hơn hoặc bằng 0.")]
-        public int? minMoneyToApply { get; set; }
-        [DataType(DataType.Date, ErrorMessage = "Ngày bắt đầu không hợp lệ.")]
-        public DateTime? startDate { get; set; }
-        [DataType(DataType.Date, ErrorMessage = "Ngày kết thúc không hợp lệ.")]
-        [DateGreaterThan("startDate", ErrorMessage = "Ngày kết thúc phải lớn hơn ngày bắt đầu.")]
-        public DateTime? endDate { get; set; }
+        //[Range(0, int.MaxValue, ErrorMessage = "Số tiền giảm giá phải lớn hơn hoặc bằng 0.")]
+        //public int? moneyDiscount { get; set; }
+        //[Range(1, int.MaxValue, ErrorMessage = "Số lượng yêu cầu phải lớn hơn 0.")]
+        //public int? requiredQuantity { get; set; }
+        //[Range(0, int.MaxValue, ErrorMessage = "Số tiền tối đa được giảm phải lớn hơn hoặc bằng 0.")]
+        //public int? maxMoneyToDiscount { get; set; }
+        //[Range(0, int.MaxValue, ErrorMessage = "Số tiền tối thiểu để áp dụng phải lớn hơn hoặc bằng 0.")]
+        //public int? minMoneyToApply { get; set; }
+        //[DataType(DataType.Date, ErrorMessage = "Ngày bắt đầu không hợp lệ.")]
+        //public DateTime? startDate { get; set; }
+        //[DataType(DataType.Date, ErrorMessage = "Ngày kết thúc không hợp lệ.")]
+        //[DateGreaterThan("startDate", ErrorMessage = "Ngày kết thúc phải lớn hơn ngày bắt đầu.")]
+        //public DateTime? endDate { get; set; }
         [Range(0, int.MaxValue, ErrorMessage = "Tồn kho phải lớn hơn hoặc bằng 0.")]
         public int? stock { get; set; }
-        [Url(ErrorMessage = "Hình ảnh phải là URL hợp lệ.")]
-        public string? image { get; set; }
-        public bool isActive { get; set; } = false;
+        //[Url(ErrorMessage = "Hình ảnh phải là URL hợp lệ.")]
+        //public string? image { get; set; }
+        public bool isActive { get; set; } = true;
         public string? status = ObjectStatusEnum.NONE.ToString();
         public DateTime? createDate = DateTime.Now;
     }
 
-    //public class UpdateShopPromotionDTO
-    //{
-    //    [Required(ErrorMessage = "Name is required.")]
-    //    [StringLength(100, ErrorMessage = "Name can't be longer than 100 characters.")]
-    //    public string? Name { get; set; }
-
-    //    [StringLength(500, ErrorMessage = "Description can't be longer than 500 characters.")]
-    //    public string? Description { get; set; }
-
-    //    [Required(ErrorMessage = "Start date is required.")]
-    //    [DataType(DataType.Date)]
-    //    [Display(Name = "Start Date")]
-    //    public DateTime? StartDate { get; set; }
-
-    //    [Required(ErrorMessage = "End date is required.")]
-    //    [DataType(DataType.Date)]
-    //    [Display(Name = "End Date")]
-    //    [DateGreaterThan("StartDate", ErrorMessage = "End date must be greater than start date.")]
-    //    public DateTime? EndDate { get; set; }
-
-    //    [Range(1, int.MaxValue, ErrorMessage = "Quantity must be a positive number.")]
-    //    public int? Quantity { get; set; } = null;
-
-    //    [StringLength(50, ErrorMessage = "Code can't be longer than 50 characters.")]
-    //    public string? Code { get; set; } = null;
-
-    //    [Required(ErrorMessage = "Promotion type is required.")]
-    //    [Display(Name = "Promotion Type")]
-    //    public PromotionTypeEnum? Type { get; set; }
-
-    //    [StringLength(1000, ErrorMessage = "Policy can't be longer than 1000 characters.")]
-    //    public string? Policy { get; set; }
-    //    public DateTime updateDate = DateTime.Now;
-    //}
+    public class UpdateShopPromotionDTO
+    {
+        [Required(ErrorMessage = "Tên không được để trống.")]
+        [StringLength(100, ErrorMessage = "Tên không được vượt quá 100 ký tự.")]
+        public string? name { get; set; }
+        [StringLength(500, ErrorMessage = "Mô tả không được vượt quá 500 ký tự.")]
+        public string? description { get; set; }
+        [Range(0, 100, ErrorMessage = "Phần trăm giảm giá phải nằm trong khoảng từ 0 đến 100.")]
+        public int? percentDiscount { get; set; }
+        [Range(0, int.MaxValue, ErrorMessage = "Tồn kho phải lớn hơn hoặc bằng 0.")]
+        public int? stock { get; set; }
+        public DateTime? updateDate = DateTime.Now;
+    }
 
     public class GetShopPromotionDTO
     {
@@ -86,15 +65,15 @@ namespace Vouchee.Data.Models.DTOs
         public string? name { get; set; }
         public string? description { get; set; }
         public int? percentDiscount { get; set; }
-        public int? moneyDiscount { get; set; }
-        public int? requiredQuantity { get; set; }
-        public int? maxMoneyToDiscount { get; set; }
-        public int? minMoneyToApply { get; set; }
-        public DateTime? startDate { get; set; }
-        public DateTime? endDate { get; set; }
+        //public int? moneyDiscount { get; set; }
+        //public int? requiredQuantity { get; set; }
+        //public int? maxMoneyToDiscount { get; set; }
+        //public int? minMoneyToApply { get; set; }
+        //public DateTime? startDate { get; set; }
+        //public DateTime? endDate { get; set; }
         public int? stock { get; set; }
-        public string? image { get; set; }
-        public string type = "SHOP";
+        //public string? image { get; set; }
+        //public string type = "SHOP";
 
         public bool? isActive { get; set; }
         public string? status { get; set; }

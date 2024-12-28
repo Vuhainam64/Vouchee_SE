@@ -8,16 +8,16 @@ namespace Vouchee.Business.Services
     public interface IVoucherTypeService
     {
         // CREATE
-        public Task<Guid?> CreateVoucherTypeAsync(CreateVoucherTypeDTO createVoucherTypeDTO, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<Guid>> CreateVoucherTypeAsync(CreateVoucherTypeDTO createVoucherTypeDTO, ThisUserObj thisUserObj);
 
         // READ
         public Task<GetVoucherTypeDTO> GetVoucherTypeByIdAsync(Guid id);
         public Task<DynamicResponseModel<GetVoucherTypeDTO>> GetVoucherTypesAsync(PagingRequest pagingRequest, VoucherTypeFilter voucherTypeFilter);
 
         // UPDATE
-        public Task<bool> UpdateVoucherTypeAsync(Guid id, UpdateVoucherTypeDTO updateVoucherTypeDTO);
+        public Task<ResponseMessage<bool>> UpdateVoucherTypeAsync(Guid id, UpdateVoucherTypeDTO updateVoucherTypeDTO);
 
         // DELETE
-        public Task<bool> DeleteVoucherTypeAsync(Guid id);
+        public Task<ResponseMessage<bool>> DeleteVoucherTypeAsync(Guid id);
     }
 }

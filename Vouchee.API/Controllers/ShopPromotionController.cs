@@ -83,25 +83,25 @@ namespace Vouchee.API.Controllers
         //}
 
         // UPDATE
-        //[HttpPut("update_shop_promotion/{id}")]
-        //[Authorize]
-        //public async Task<IActionResult> UpdatePromotion(Guid id, [FromBody] UpdateShopPromotionDTO updatePromotionDTO)
-        //{
-        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+        [HttpPut("update_shop_promotion/{id}")]
+        [Authorize]
+        public async Task<IActionResult> UpdatePromotion(Guid id, [FromBody] UpdateShopPromotionDTO updatePromotionDTO)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-        //    var result = await _shopPromotionService.UpdatePromotionAsync(id, updatePromotionDTO, currentUser);
-        //    return Ok(result);
-        //}
+            var result = await _shopPromotionService.UpdatePromotionAsync(id, updatePromotionDTO, currentUser);
+            return Ok(result);
+        }
 
         //// DELETE
-        //[HttpDelete("delete_promotion/{id}")]
-        //[Authorize]
-        //public async Task<IActionResult> DeletePromotion(Guid id)
-        //{
-        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService, _roleService);
+        [HttpDelete("delete_promotion/{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeletePromotion(Guid id)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-        //    var result = await _shopPromotionService.DeletePromotionAsync(id, currentUser);
-        //    return Ok(result);
-        //}
+            var result = await _shopPromotionService.DeletePromotionAsync(id, currentUser);
+            return Ok(result);
+        }
     }
 }

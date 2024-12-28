@@ -26,9 +26,10 @@ namespace Vouchee.Business.Services
         // public Task<IList<GetPromotionDTO>> GetPromotionByBuyerId(Guid buyerId);
 
         // UPDATE
-        // public Task<bool> UpdatePromotionAsync(Guid id, UpdateShopPromotionDTO updatePromotionDTO, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<bool>> UpdatePromotionAsync(Guid id, UpdateShopPromotionDTO updatePromotionDTO, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<bool>> UpdatePromotionState(Guid id, bool isActive, ThisUserObj thisUserObj);
 
         // DELETE
-        // public Task<bool> DeletePromotionAsync(Guid id, ThisUserObj thisUserObj);
+        public Task<ResponseMessage<bool>> DeletePromotionAsync(Guid id, ThisUserObj thisUserObj);
     }
 }

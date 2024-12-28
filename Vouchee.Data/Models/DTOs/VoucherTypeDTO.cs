@@ -11,7 +11,7 @@ namespace Vouchee.Business.Models.DTOs
     {
         [Required(ErrorMessage = "Cần title")]
         public string? title { get; set; }
-        public IFormFile? image { get; set; }
+        //public IFormFile? image { get; set; }
         public DateTime? createDate = DateTime.Now;
         public string? status = ObjectStatusEnum.ACTIVE.ToString();
     }
