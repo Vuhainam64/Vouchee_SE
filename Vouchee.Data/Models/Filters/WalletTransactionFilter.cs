@@ -15,5 +15,7 @@ namespace Vouchee.Data.Models.Filters
         public DateTime? fromDate { get; set; }
         public DateTime? toDate { get; set; }
         public Guid? userId { get; set; }
+
+        public Guid updateId { get; set; }
     }
 }
