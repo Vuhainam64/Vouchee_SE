@@ -200,13 +200,14 @@ namespace Vouchee.Business.Services.Impls
             {
                 throw new NotFoundException($"Không tìm thấy voucher code với id {id}");
             }
-            if (existedVoucherCode.Status == VoucherCodeStatusEnum.PENDING.ToString())
+            if (voucherCodeStatus == VoucherCodeStatusEnum.SUSPECTED || voucherCodeStatus == VoucherCodeStatusEnum.VIOLENT || voucherCodeStatus == VoucherCodeStatusEnum.EXPIRED)
             {
-                existedVoucherCode.IsActive = true;
+                existedVoucherCode.IsActive = false;
             }
             if(existedVoucherCode.Status == VoucherCodeStatusEnum.CONVERTING.ToString() && voucherCodeStatus == VoucherCodeStatusEnum.UNUSED)
             {
                 existedVoucherCode.IsVerified = true;
+                existedVoucherCode.IsActive = true;
             }
             existedVoucherCode.Status = voucherCodeStatus.ToString();
             existedVoucherCode.UpdateDate = DateTime.Now;
