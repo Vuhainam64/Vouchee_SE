@@ -107,7 +107,7 @@ namespace Vouchee.API.Controllers
 
         [Authorize]
         [HttpGet("get_withdraw_transactions_by_update_id")]
-        public async Task<IActionResult> GetWithdrawTransasctionbyUpdateId([FromQuery] PagingRequest pagingRequest,[FromQuery] WalletTransactionFilter walletTransactionFilter)
+        public async Task<IActionResult> GetWithdrawTransasctionbyUpdateId([FromQuery] PagingRequest pagingRequest,[FromQuery] WithdrawRequestFilter walletTransactionFilter)
         {
             /*ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);*/
 

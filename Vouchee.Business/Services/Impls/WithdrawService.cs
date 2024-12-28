@@ -409,13 +409,13 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<DynamicResponseModel<dynamic>> GetWithdrawWalletTransactionByUpdateId(PagingRequest pagingRequest,WalletTransactionFilter walletTransactionFilter)
+        public async Task<DynamicResponseModel<dynamic>> GetWithdrawWalletTransactionByUpdateId(PagingRequest pagingRequest, WithdrawRequestFilter walletTransactionFilter)
         {
             // Filter and group by updateId
-            var groupedQuery = _walletTransactionRepository.GetTable()
+            var groupedQuery = _moneyRequestRepository.GetTable()
                 .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()))
-                .ProjectTo<GetWalletTransactionDTO>(_mapper.ConfigurationProvider)
-                .DynamicFilter(_mapper.Map<GetWalletTransactionDTO>(walletTransactionFilter))
+                .ProjectTo<GetWithdrawRequestDTO>(_mapper.ConfigurationProvider)
+                .DynamicFilter(_mapper.Map<GetWithdrawRequestDTO>(walletTransactionFilter))
                 .GroupBy(x => x.updateId)
                 .Select(group => new
                 {
