@@ -79,7 +79,9 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<dynamic> GetModalByIdAsync(Guid id, PagingRequest pagingRequest)
         {
-            Modal existedModal = await _modalRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.VoucherCodes));
+            Modal existedModal = await _modalRepository.GetByIdAsync(id, includeProperties: x => x
+                                                                        .Include(x => x.VoucherCodes)
+        .Include(x => x.Ratings));
 
             if (existedModal != null)
             {
