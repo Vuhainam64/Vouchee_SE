@@ -117,12 +117,12 @@ namespace Vouchee.Business.Services.Impls
                             throw new NotFoundException($"Không tìm thấy order {orderId} trong db");
                         }
 
-                        if (DateTime.Now > existedOrder.CreateDate.Value.AddMinutes(2))
+                        if (partnerTransaction.TransactionDate > existedOrder.CreateDate?.AddMinutes(5))
                         {
                             CreateNotificationDTO errorNoti = new()
                             {
                                 title = "Thanh toán đơn hàng lỗi",
-                                body = $"Đơn hàng {orderId} đã hết hạn lúc {existedOrder.CreateDate.Value.AddMinutes(2)}, số tiền bạn đã nạp trước đó sẽ được hoàn về ví mua và số dư vpoint và số dư ví sẽ không bị trừ",
+                                body = $"Đơn hàng {orderId} đã hết hạn lúc {existedOrder.CreateDate.Value.AddMinutes(5)}, số tiền bạn đã nạp trước đó sẽ được hoàn về ví mua và số dư vpoint và số dư ví sẽ không bị trừ",
                                 receiverId = existedOrder.Buyer.Id
                             };
 
