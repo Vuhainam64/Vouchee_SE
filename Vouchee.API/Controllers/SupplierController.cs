@@ -43,12 +43,12 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        //[HttpGet("get_best_suppliers")]
-        //public async Task<IActionResult> GetBestSuppiers()
-        //{
-        //    var result = await _supplierService.GetBestSuppliers();
-        //    return Ok(result);
-        //}
+        [HttpGet("get_best_suppliers")]
+        public async Task<IActionResult> GetBestSuppiers()
+        {
+            var result = await _supplierService.GetSuppliersAsync();
+            return Ok(result);
+        }
 
         [HttpGet("get_supplier/{id}")]
         public async Task<IActionResult> GetSupplierById(Guid id)
