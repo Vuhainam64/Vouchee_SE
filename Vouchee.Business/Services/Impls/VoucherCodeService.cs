@@ -334,7 +334,7 @@ namespace Vouchee.Business.Services.Impls
                     .FirstOrDefaultAsync();
                 if (updatecode != null)
                 {
-                    if (!code.newcode.IsNullOrEmpty())
+                    if (code.newcode.IsNullOrEmpty())
                     {
                         throw new Exception("Thiếu New Voucher của Voucher code: " + code.id);
                     }
