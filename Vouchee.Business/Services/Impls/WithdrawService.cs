@@ -176,13 +176,13 @@ namespace Vouchee.Business.Services.Impls
                         Status = "PENDING",
                         Amount = wallet.Balance,
                         CreateDate = DateTime.Now,
-                        Type = "WITHDRAW",
+                        Type = MoneyRequestTypeEnum.AUTO_WITHDRAW.ToString(),
                         WithdrawWalletTransaction = new()
                         {
                             Status = "PENDING",
                             Amount = wallet.Balance,
                             CreateDate = DateTime.Now,
-                            Type = "WITHDRAW",
+                            Type = WalletTransactionTypeEnum.AUTO_WITHDRAW.ToString(),
                             BeforeBalance = wallet.Balance,
                             AfterBalance = 0,
                             Note = note,
@@ -219,7 +219,8 @@ namespace Vouchee.Business.Services.Impls
 
             // Fetch and update all entities with the new UpdateId
             var query = _moneyRequestRepository.GetTable().AsTracking()
-                .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()) && x.UserId == thisUserObj.userId);
+                .Where(x => (x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()) || x.Type.Equals(MoneyRequestTypeEnum.AUTO_WITHDRAW.ToString()) 
+                            && x.UserId == thisUserObj.userId));
 
             foreach (var entity in query)
             {
@@ -274,7 +275,7 @@ namespace Vouchee.Business.Services.Impls
         {
             // Fetch the base query
             var query = _moneyRequestRepository.GetTable().AsTracking()
-                .Where(x => x.Type == MoneyRequestTypeEnum.WITHDRAW.ToString());
+                .Where(x => x.Type == MoneyRequestTypeEnum.WITHDRAW.ToString() || x.Type == MoneyRequestTypeEnum.AUTO_WITHDRAW.ToString());
 
             // Apply dynamic filtering
             var filteredQuery = query
@@ -333,7 +334,7 @@ namespace Vouchee.Business.Services.Impls
 
             // Fetch the base query
             var query = _moneyRequestRepository.GetTable().AsTracking()
-                .Where(x => x.Type == MoneyRequestTypeEnum.WITHDRAW.ToString());
+                .Where(x => x.Type == MoneyRequestTypeEnum.WITHDRAW.ToString() || x.Type == MoneyRequestTypeEnum.AUTO_WITHDRAW.ToString());
 
             // Apply dynamic filtering based on the provided filter
             var filteredQuery = query
@@ -392,10 +393,14 @@ namespace Vouchee.Business.Services.Impls
             (int, IQueryable<GetWalletTransactionDTO>) result;
 
             result = _walletTransactionRepository.GetTable()
-                        .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()) && x.BuyerWallet.BuyerId == thisUserObj.userId)
-                        .ProjectTo<GetWalletTransactionDTO>(_mapper.ConfigurationProvider)
-                        .DynamicFilter(_mapper.Map<GetWalletTransactionDTO>(walletTransactionFilter))
-                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+                .Where(x => (x.Type.Equals(WalletTransactionTypeEnum.WITHDRAW.ToString())
+                             || x.Type.Equals(WalletTransactionTypeEnum.AUTO_WITHDRAW.ToString()))
+                            && ((x.BuyerWallet != null && x.BuyerWallet.BuyerId == thisUserObj.userId)
+                                || (x.SellerWallet != null && x.SellerWallet.SellerId == thisUserObj.userId)
+                                || (x.SupplierWallet != null && x.SupplierWallet.SupplierId == thisUserObj.userId)))
+                .ProjectTo<GetWalletTransactionDTO>(_mapper.ConfigurationProvider)
+                .DynamicFilter(_mapper.Map<GetWalletTransactionDTO>(walletTransactionFilter))
+                .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
             return new DynamicResponseModel<GetWalletTransactionDTO>()
             {
@@ -413,7 +418,7 @@ namespace Vouchee.Business.Services.Impls
         {
             // Filter and group by updateId
             var groupedQuery = _moneyRequestRepository.GetTable()
-                .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()))
+                .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()) || x.Type.Equals(MoneyRequestTypeEnum.AUTO_WITHDRAW.ToString()))
                 .ProjectTo<GetWithdrawRequestDTO>(_mapper.ConfigurationProvider)
                 .DynamicFilter(_mapper.Map<GetWithdrawRequestDTO>(walletTransactionFilter))
                 .GroupBy(x => x.updateId)

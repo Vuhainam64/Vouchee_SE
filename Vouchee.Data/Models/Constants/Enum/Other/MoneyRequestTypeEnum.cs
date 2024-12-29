@@ -9,6 +9,7 @@ namespace Vouchee.Data.Models.Constants.Enum.Other
     public enum MoneyRequestTypeEnum
     {
         WITHDRAW,
+        AUTO_WITHDRAW,
         TOPUP
     }
 }

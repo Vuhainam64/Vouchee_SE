@@ -25,6 +25,7 @@ namespace Vouchee.Data.Models.DTOs
         public string? id { get; set; }
         public Guid? userId { get; set; }
         public string? status { get; set; }
+        public string? type { get; set; }
         public DateTime? createDate { get; set; }
         public Guid? updateId { get; set; }
         public string? WalletType { get; set; }
