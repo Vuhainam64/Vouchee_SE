@@ -583,7 +583,7 @@ namespace Vouchee.Business.Services.Impls
 
             // Fetch all withdraw transactions
             var withdrawRequests = await _moneyRequestRepository.GetTable()
-                .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()))
+                .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()) || x.Type.Equals(MoneyRequestTypeEnum.AUTO_WITHDRAW.ToString()))
                 .ToListAsync();
 
             // Filter transactions based on the date range

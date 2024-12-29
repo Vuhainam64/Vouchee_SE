@@ -131,14 +131,15 @@ namespace Vouchee.Business.Services.Impls
                             existedOrder.Buyer.BuyerWallet.UpdateDate = DateTime.Now;
                             existedOrder.Buyer.BuyerWallet.BuyerWalletTransactions.Add(new()
                             {
-                                Status = "PAID",
-                                Type = "AMOUNT_IN",
+                                Status = BuyerWalletTransactionStatusEnum.TRANSACTION_SUCCESS.ToString(),
+                                Type = WalletTransactionTypeEnum.EXPIRED_ORDER.ToString(),
                                 BeforeBalance = existedOrder.Buyer.BuyerWallet.Balance,
                                 Amount = (int) createPartnerTransaction.transferAmount,
                                 AfterBalance = existedOrder.Buyer.BuyerWallet.Balance + (int)createPartnerTransaction.transferAmount,
                                 CreateDate = DateTime.Now,
                                 Note = "Hoàn tiền về ví do hết hạn giao dịch",
-                                PartnerTransactionId = partnerTransactionId
+                                PartnerTransactionId = partnerTransactionId,
+                                OrderId = existedOrder.Id,
                             });
                             existedOrder.Buyer.BuyerWallet.Balance += (int)createPartnerTransaction.transferAmount;
 
