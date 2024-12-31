@@ -2,6 +2,8 @@
 using AutoMapper.QueryableExtensions;
 using Castle.Core.Smtp;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -417,17 +419,24 @@ namespace Vouchee.Business.Services.Impls
         public async Task<DynamicResponseModel<dynamic>> GetWithdrawWalletTransactionByUpdateId(PagingRequest pagingRequest, WithdrawRequestFilter walletTransactionFilter)
         {
             // Filter and group by updateId
-            var groupedQuery = _moneyRequestRepository.GetTable()
-                .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()) || x.Type.Equals(MoneyRequestTypeEnum.AUTO_WITHDRAW.ToString()))
-                .ProjectTo<GetWithdrawRequestDTO>(_mapper.ConfigurationProvider)
-                .DynamicFilter(_mapper.Map<GetWithdrawRequestDTO>(walletTransactionFilter))
+            var filteredQuery = _moneyRequestRepository.GetTable()
+            .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()) || x.Type.Equals(MoneyRequestTypeEnum.AUTO_WITHDRAW.ToString()))
+            .ProjectTo<GetWithdrawRequestDTO>(_mapper.ConfigurationProvider)
+            .DynamicFilter(_mapper.Map<GetWithdrawRequestDTO>(walletTransactionFilter));
+            if (!string.IsNullOrEmpty(walletTransactionFilter.updateId.ToString()))
+            {
+                filteredQuery = filteredQuery.Where(x => x.updateId.Equals(walletTransactionFilter.updateId));
+            }
+            var groupedQuery = filteredQuery
                 .GroupBy(x => x.updateId)
                 .Select(group => new
                 {
                     UpdateId = group.Key,
                     Count = group.Count(),
+                    UpdateDate = group.Max(x => x.updateDate),
                     Transactions = group.ToList()
                 });
+
 
             // Apply paging to the grouped results
             var pagedGroups = groupedQuery
@@ -443,6 +452,7 @@ namespace Vouchee.Business.Services.Impls
             {
                 UpdateId = group.UpdateId,
                 Count = group.Count,
+                UpdateDate = group.UpdateDate,
                 Transactions = group.Transactions
             }).ToList<dynamic>();
 

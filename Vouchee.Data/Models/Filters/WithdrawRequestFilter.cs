@@ -14,5 +14,7 @@ namespace Vouchee.Data.Models.Filters
         public MoneyRequestTypeEnum? type { get; set; }
 
         public DateTime? CreateDate { get; set; }
+        public Guid? updateId { get; set; }
+        public DateTime? updateDate { get; set; }
     }
 }
