@@ -82,7 +82,10 @@ namespace Vouchee.Data.Models.DTOs
 
     public class GetModalDTO : ModalDTO
     {
-        
+        public GetModalDTO() {
+            ratings = [];
+        }
+        public virtual ICollection<GetRatingDTO>? ratings { get; set; }
     }
 
     public class GetOrderedModalDTO
