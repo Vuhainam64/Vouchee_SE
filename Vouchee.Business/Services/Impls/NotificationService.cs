@@ -142,6 +142,7 @@ namespace Vouchee.Business.Services.Impls
                                                     .Where(x => x.ReceiverId == userId)
                                                     .ProjectTo<GetNotificationDTO>(_mapper.ConfigurationProvider)
                                                     .DynamicFilter(_mapper.Map<GetNotificationDTO>(notifcationFilter))
+                                                    .OrderBy(x => x.createDate)
                                                     .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING); ;
             }
             catch (Exception ex)
