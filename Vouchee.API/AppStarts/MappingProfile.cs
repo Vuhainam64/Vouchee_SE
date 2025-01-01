@@ -304,6 +304,7 @@ namespace Vouchee.API.AppStarts
             CreateMap<Promotion, CreateModalPromotionDTO>().ReverseMap();
             CreateMap<Promotion, GetShopPromotionDTO>().ReverseMap();
             CreateMap<Promotion, GetModalPromotionDTO>().ReverseMap();
+            CreateMap<Promotion, UpdateShopPromotionDTO>().ReverseMap();
             CreateMap<GetShopPromotionDTO, ShopPromotionFilter>().ReverseMap();
 
             // RATING
