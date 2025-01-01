@@ -32,8 +32,8 @@ namespace Vouchee.Data.Models.Entities
 
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
-        public Guid? CreateBy { get; set; }
-        [Column(TypeName = "datetime")]
+        //public Guid? CreateBy { get; set; }
+        //[Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
     }

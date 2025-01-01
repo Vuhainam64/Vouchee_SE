@@ -280,7 +280,7 @@ namespace Vouchee.Business.Services.Impls
                             Notification sellerNotification = new()
                             {
                                 ReceiverId = existedSeller.Id,
-                                CreateBy = existedOrder.CreateBy,
+                                //CreateBy = existedOrder.CreateBy,
                                 CreateDate = DateTime.Now,
                                 Title = "THÔNG BÁO CÓ ĐƠN HÀNG MỚI",
                                 Body = description,
