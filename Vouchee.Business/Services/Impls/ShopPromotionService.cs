@@ -191,6 +191,28 @@ namespace Vouchee.Business.Services.Impls
             return _mapper.Map<IList<GetShopPromotionDTO>>(promotions);
         }
 
+        public async Task<ResponseMessage<bool>> UpdateExpiredPromotionAsync()
+        {
+            var today = DateOnly.FromDateTime(DateTime.Now);
+
+            // Fetch promotions that have expired
+            var expiredPromotions = _shopPromotionRepository.GetTable().AsTracking()
+                                            .Where(x => x.EndDate < today);
+            foreach (var promotion in await expiredPromotions.ToListAsync())
+            {
+                promotion.Status = PromotionStatusEnum.EXPIRED.ToString(); // Assuming 'Status' is a string or enum property
+            }
+
+            await _shopPromotionRepository.SaveChanges();
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Cập nhật promotion thành công",
+                result = true,
+                value = true
+            };
+        }
+
         public Task<bool> UpdatePromotionAsync(Guid id, UpdateShopPromotionDTO updatePromotionDTO, ThisUserObj thisUserObj)
         {
             throw new NotImplementedException();
