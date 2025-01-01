@@ -67,6 +67,7 @@ namespace Vouchee.Data.Models.DTOs
         [Range(0, int.MaxValue, ErrorMessage = "Tồn kho phải lớn hơn hoặc bằng 0.")]
         public int? stock { get; set; }
         public DateTime? updateDate = DateTime.Now;
+        public bool isActive { get; set; }
     }
 
     public class GetShopPromotionDTO
