@@ -390,8 +390,24 @@ namespace Vouchee.Business.Services.Impls
             {
                 if (item.promotionId != null)
                 {
+                    DateTime now = DateTime.Now;
+                    DateOnly dateOnly = DateOnly.FromDateTime(now);
+
                     var appliedPromotion = await _shopPromotionRepository.GetByIdAsync(item.promotionId,
                                                                                 includeProperties: x => x.Include(x => x.Seller));
+
+                    if (appliedPromotion == null)
+                    {
+                        throw new NotFoundException("Không tìm thấy promotion này");
+                    }
+
+                    if (appliedPromotion.StartDate.HasValue && appliedPromotion.EndDate.HasValue)
+                    {
+                        if (dateOnly < appliedPromotion.StartDate || dateOnly > appliedPromotion.EndDate)
+                        {
+                            throw new InvalidOperationException($"Promotion chỉ có hiệu lực từ {appliedPromotion.StartDate} -> {appliedPromotion.EndDate}");
+                        }
+                    }
 
                     var currentSeller = _cartDTO.sellers.FirstOrDefault(x => x.sellerId == appliedPromotion.SellerId);
                     currentSeller.appliedPromotion = _mapper.Map<GetShopPromotionDTO>(appliedPromotion);

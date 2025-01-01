@@ -31,11 +31,11 @@ namespace Vouchee.Data.Models.DTOs
         //public int? maxMoneyToDiscount { get; set; }
         //[Range(0, int.MaxValue, ErrorMessage = "Số tiền tối thiểu để áp dụng phải lớn hơn hoặc bằng 0.")]
         //public int? minMoneyToApply { get; set; }
-        //[DataType(DataType.Date, ErrorMessage = "Ngày bắt đầu không hợp lệ.")]
-        //public DateTime? startDate { get; set; }
-        //[DataType(DataType.Date, ErrorMessage = "Ngày kết thúc không hợp lệ.")]
-        //[DateGreaterThan("startDate", ErrorMessage = "Ngày kết thúc phải lớn hơn ngày bắt đầu.")]
-        //public DateTime? endDate { get; set; }
+        [DataType(DataType.Date, ErrorMessage = "Ngày bắt đầu không hợp lệ.")]
+        public DateTime? startDate { get; set; }
+        [DataType(DataType.Date, ErrorMessage = "Ngày kết thúc không hợp lệ.")]
+        [DateGreaterThan("startDate", ErrorMessage = "Ngày kết thúc phải lớn hơn ngày bắt đầu.")]
+        public DateTime? endDate { get; set; }
         [Range(0, int.MaxValue, ErrorMessage = "Tồn kho phải lớn hơn hoặc bằng 0.")]
         public int? stock { get; set; }
         //[Url(ErrorMessage = "Hình ảnh phải là URL hợp lệ.")]
@@ -69,8 +69,8 @@ namespace Vouchee.Data.Models.DTOs
         //public int? requiredQuantity { get; set; }
         //public int? maxMoneyToDiscount { get; set; }
         //public int? minMoneyToApply { get; set; }
-        //public DateTime? startDate { get; set; }
-        //public DateTime? endDate { get; set; }
+        public DateOnly? startDate { get; set; }
+        public DateOnly? endDate { get; set; }
         public int? stock { get; set; }
         //public string? image { get; set; }
         //public string type = "SHOP";
