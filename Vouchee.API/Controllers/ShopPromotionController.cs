@@ -64,11 +64,11 @@ namespace Vouchee.API.Controllers
 
         [Authorize]
         [HttpGet("get_current_shop_promotions")]
-        public async Task<IActionResult> GetCurrentShopPromotion()
+        public async Task<IActionResult> GetCurrentShopPromotion([FromQuery] PagingRequest pagingRequest, [FromQuery] ShopPromotionFilter shopPromotionFilter)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var promotion = await _shopPromotionService.GetShopPromotionByShopId(currentUser.userId);
+            var promotion = await _shopPromotionService.GetCurrentShopPromotion(currentUser, pagingRequest, shopPromotionFilter);
             return Ok(promotion);
         }
 

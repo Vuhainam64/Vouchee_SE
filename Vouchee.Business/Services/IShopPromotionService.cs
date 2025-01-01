@@ -20,8 +20,9 @@ namespace Vouchee.Business.Services
         // public Task<IList<GetShopPromotionDTO>> GetShopPromotionBySeller(ThisUserObj thisUserObj);
         public Task<GetShopPromotionDTO> GetPromotionByIdAsync(Guid id);
         public Task<DynamicResponseModel<GetShopPromotionDTO>> GetPromotionsAsync(PagingRequest pagingRequest, ShopPromotionFilter promotionFilter);
-        public Task<GetShopPromotionDTO> GetActiveShopPromotion(ThisUserObj thisUserObj);
+        //public Task<GetShopPromotionDTO> GetActiveShopPromotion(ThisUserObj thisUserObj);
         public Task<IList<GetShopPromotionDTO>> GetShopPromotionByShopId(Guid shopId);
+        public Task<DynamicResponseModel<GetShopPromotionDTO>> GetCurrentShopPromotion(ThisUserObj thisUserObj, PagingRequest pagingRequest, ShopPromotionFilter shopPromotionFilter);
         // public Task<DynamicResponseModel<GetShopPromotionDTO>> GetActivePromotion(PagingRequest pagingRequest, ShopPromotionFilter promotionFilter);
         // public Task<IList<GetPromotionDTO>> GetPromotionByBuyerId(Guid buyerId);
 

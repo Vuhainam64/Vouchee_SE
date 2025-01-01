@@ -109,6 +109,34 @@ namespace Vouchee.Business.Services.Impls
             return _mapper.Map<GetShopPromotionDTO>(activePromotion);
         }
 
+        public async Task<DynamicResponseModel<GetShopPromotionDTO>> GetCurrentShopPromotion(ThisUserObj thisUserObj, PagingRequest pagingRequest, ShopPromotionFilter shopPromotionFilter)
+        {
+            var existedUser = await _userRepository.GetByIdAsync(thisUserObj.userId);
+
+            if (existedUser == null)
+            {
+                throw new NotFoundException("Không tìm thấy user này");
+            }
+
+            (int, IQueryable<GetShopPromotionDTO>) result;
+
+            result = _shopPromotionRepository.GetTable()
+                        .ProjectTo<GetShopPromotionDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetShopPromotionDTO>(shopPromotionFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAGE);
+
+            return new DynamicResponseModel<GetShopPromotionDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+            };
+        }
+
         //public async Task<bool> DeletePromotionAsync(Guid id, ThisUserObj thisUserObj)
         //{
 
