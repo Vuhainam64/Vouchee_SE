@@ -153,19 +153,19 @@ namespace Vouchee.Business.Services.Impls
 
                     if (wallet.BuyerId != null)
                     {
-                        note = $"Tự động rút {wallet.Balance} từ ví mua, {wallet.Buyer}";
+                        note = $"Tự động rút {wallet.Balance} từ ví mua";
 
                         await _sendEmailService.SendEmailAsync(wallet.Buyer.Email, "Tự động rút tiền", note);
                     }
                     else if (wallet.SellerId != null)
                     {
-                        note = $"Tự động rút  {wallet.Balance} từ ví bán, {wallet.Balance}";
+                        note = $"Tự động rút  {wallet.Balance} từ ví bán";
 
                         await _sendEmailService.SendEmailAsync(wallet.Seller.Email, "Tự động rút tiền", note);
                     }
                     else if (wallet.SupplierId != null)
                     {
-                        note = $"Tự động rút  {wallet.Balance} từ ví supplier, {wallet.Balance}";
+                        note = $"Tự động rút  {wallet.Balance} từ ví supplier";
 
                         foreach (var supplierAccount in wallet.Supplier.Users)
                         {
