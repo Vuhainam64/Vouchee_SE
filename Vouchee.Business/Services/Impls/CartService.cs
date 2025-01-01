@@ -367,10 +367,23 @@ namespace Vouchee.Business.Services.Impls
             {
                 throw new NotFoundException("Chưa có món hàng nào được chọn trong cart");
             }
-
             var selectedModalIds = checkOutViewModel.item_brief
-                                                   .SelectMany(item => item.modalId)
-                                                   .ToList();
+                                                     .SelectMany(item => item.modalId) // Adjust according to how modal IDs are stored
+                                                     .ToList();
+
+            var allModals = _cartDTO.sellers
+                                .SelectMany(seller => seller.modals) // Adjust 'Modals' to match your actual property name
+                                .ToList();
+
+            // Validate selected modal IDs against all modals in the cart
+            var invalidModalIds = selectedModalIds
+                .Where(modalId => !allModals.Any(modal => modal.id == modalId)) // Adjust 'Id' according to your modal structure
+                .ToList();
+
+            if (invalidModalIds.Any())
+            {
+                throw new InvalidOperationException($"Những modal này không tồn tại trong cart: {string.Join(", ", invalidModalIds)}");
+            }
 
             // Filter sellers to only those who have modals matching selectedModalIds
             _cartDTO.sellers = _cartDTO.sellers
@@ -415,12 +428,13 @@ namespace Vouchee.Business.Services.Impls
                     {
                         modal.shopPromotionId = appliedPromotion.Id;
 
-                        if (appliedPromotion.MoneyDiscount != 0
-                                && appliedPromotion.MoneyDiscount != null)
-                        {
-                            modal.shopDiscountMoney = appliedPromotion.MoneyDiscount;
-                        }
-                        else if (appliedPromotion.PercentDiscount != 0
+                        //if (appliedPromotion.MoneyDiscount != 0
+                        //        && appliedPromotion.MoneyDiscount != null)
+                        //{
+                        //    modal.shopDiscountMoney = appliedPromotion.MoneyDiscount;
+                        //}
+
+                        if (appliedPromotion.PercentDiscount != 0
                                     && appliedPromotion.PercentDiscount != null)
                         {
                             modal.shopDiscountPercent = appliedPromotion.PercentDiscount;

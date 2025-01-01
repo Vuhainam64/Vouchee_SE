@@ -88,6 +88,8 @@ namespace Vouchee.Data.Models.DTOs
 
         public bool? isActive { get; set; }
         public string? status { get; set; }
+        public DateTime? createDate { get; set; }
+        public DateTime? updateDate { get; set; }
     }
 
     //    public class GetDetailShopPromotionDTO

@@ -30,15 +30,15 @@ namespace Vouchee.Data.Models.Entities
         public required string Name { get; set; }
         public string? Description { get; set; }
         public int? PercentDiscount { get; set; }
-        public int? MoneyDiscount { get; set; }
-        public int? RequiredQuantity { get; set; }
-        public int? MaxMoneyToDiscount { get; set; }
-        public int? MinMoneyToApply { get; set; }
+        //public int? MoneyDiscount { get; set; }
+        //public int? RequiredQuantity { get; set; }
+        //public int? MaxMoneyToDiscount { get; set; }
+        //public int? MinMoneyToApply { get; set; }
         public DateOnly? StartDate { get; set; }
         public DateOnly? EndDate { get; set; }
         public int? Stock { get; set; }
-        public string? Image { get; set; }
-        public string? Type { get; set; }
+        //public string? Image { get; set; }
+        //public string? Type { get; set; }
 
         public bool IsActive { get; set; }
         public required string Status { get; set; }
