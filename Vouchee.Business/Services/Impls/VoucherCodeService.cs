@@ -161,9 +161,9 @@ namespace Vouchee.Business.Services.Impls
                         throw new ConflictException("Voucher code này đã hết hạn");
                     }
 
-                   /* // Log job scheduling
+                    // Log job scheduling
                     Console.WriteLine($"Scheduling job to update voucher code {id} status to USED after 5 minutes.");
-                    BackgroundJob.Schedule(() => UpdateVoucherCodeStatusToUsedAsync(id, thisUserObj), TimeSpan.FromMinutes(10));*/
+                    BackgroundJob.Schedule(() => UpdateVoucherCodeStatusToUsedAsync(id, thisUserObj), TimeSpan.FromMinutes(10));
                 }
 
                 return voucherCodeDTO;
