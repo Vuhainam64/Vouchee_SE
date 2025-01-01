@@ -27,18 +27,23 @@ namespace Vouchee.Business.Services.Impls
 {
     public class ShopPromotionService : IShopPromotionService
     {
+        private readonly IBaseRepository<User> _userRepository;
         private readonly IBaseRepository<Promotion> _shopPromotionRepository;
         private readonly IMapper _mapper;
 
-        public ShopPromotionService(IBaseRepository<Promotion> shopPromotionRepository, 
+        public ShopPromotionService(IBaseRepository<User> userRepository,
+                                    IBaseRepository<Promotion> shopPromotionRepository, 
                                     IMapper mapper)
         {
+            _userRepository = userRepository;
             _shopPromotionRepository = shopPromotionRepository;
             _mapper = mapper;
         }
 
         public async Task<ResponseMessage<Guid>> CreateShopPromotionAsync(CreateShopPromotionDTO createShopPromotionDTO, ThisUserObj thisUserObj)
         {
+            
+
             var promotion = _mapper.Map<Promotion>(createShopPromotionDTO);
 
             promotion.CreateBy = thisUserObj.userId;
@@ -54,9 +59,37 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public Task<bool> DeletePromotionAsync(Guid id, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<bool>> DeletePromotionAsync(Guid id, ThisUserObj thisUserObj)
         {
-            throw new NotImplementedException();
+            var existedPromotion = await _shopPromotionRepository.FindAsync(id, isTracking: true);
+
+            if (existedPromotion == null)
+            {
+                throw new NotFoundException("Promotion này không tòn tại");
+            }
+
+            if (existedPromotion.ShopPromotionOrderDetails.Count() != 0)
+            {
+                existedPromotion.Status = PromotionStatusEnum.INACTIVE.ToString();
+                existedPromotion.UpdateDate = DateTime.Now;
+                existedPromotion.UpdateBy = thisUserObj.userId;
+
+                return new ResponseMessage<bool>()
+                {
+                    message = "Cập nhật promotion thành công",
+                    result = true,
+                    value = true
+                };
+            }
+
+            await _shopPromotionRepository.DeleteAsync(existedPromotion);
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Đã xóa promotion thành công",
+                result = true,
+                value = true
+            };
         }
 
         public async Task<GetShopPromotionDTO> GetActiveShopPromotion(ThisUserObj thisUserObj)
@@ -213,24 +246,49 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public Task<bool> UpdatePromotionAsync(Guid id, UpdateShopPromotionDTO updatePromotionDTO, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<bool>> UpdatePromotionAsync(Guid id, UpdateShopPromotionDTO updatePromotionDTO, ThisUserObj thisUserObj)
         {
-            throw new NotImplementedException();
+            var existedPromotion = await _shopPromotionRepository.GetByIdAsync(id, isTracking: true);
+
+            if (existedPromotion == null)
+            {
+                throw new NotFoundException("Promotion này không tòn tại");
+            }
+
+            existedPromotion = _mapper.Map(updatePromotionDTO, existedPromotion);
+            existedPromotion.UpdateBy = thisUserObj.userId;
+
+            await _shopPromotionRepository.SaveChanges();
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Cập nhật thành công",
+                result = true,
+                value = true
+            };
         }
 
-        public Task<ResponseMessage<bool>> UpdatePromotionState(Guid id, bool isActive, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<bool>> UpdatePromotionState(Guid id, bool isActive, ThisUserObj thisUserObj)
         {
-            throw new NotImplementedException();
-        }
+            var existedPromotion = await _shopPromotionRepository.GetByIdAsync(id, isTracking: true);
 
-        Task<ResponseMessage<bool>> IShopPromotionService.DeletePromotionAsync(Guid id, ThisUserObj thisUserObj)
-        {
-            throw new NotImplementedException();
-        }
+            if (existedPromotion == null)
+            {
+                throw new NotFoundException("Promotion này không tòn tại");
+            }
 
-        Task<ResponseMessage<bool>> IShopPromotionService.UpdatePromotionAsync(Guid id, UpdateShopPromotionDTO updatePromotionDTO, ThisUserObj thisUserObj)
-        {
-            throw new NotImplementedException();
+            existedPromotion.IsActive = isActive;
+            existedPromotion.UpdateDate = DateTime.Now;
+            existedPromotion.UpdateBy = thisUserObj.userId;
+
+            await _shopPromotionRepository.SaveChanges();
+
+            return new ResponseMessage<bool>()
+            {
+                message = "Cập nhật thành công",
+                result = true,
+                value = true
+            };
         }
 
         //public async Task<bool> UpdatePromotionAsync(Guid id, UpdateShopPromotionDTO updatePromotionDTO, ThisUserObj thisUserObj)
