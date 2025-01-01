@@ -61,7 +61,7 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _notificationService.CreateNotificationAsync(currentUser.userId, createNotificationDTO);
+            var result = await _notificationService.CreateNotificationAsync(createNotificationDTO);
             return Ok(result);
         }
 

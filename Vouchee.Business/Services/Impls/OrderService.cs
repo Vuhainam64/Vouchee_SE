@@ -79,6 +79,7 @@ namespace Vouchee.Business.Services.Impls
                 CreateBy = thisUserObj.userId,
                 CreateDate = DateTime.Now,
                 OrderDetails = new List<OrderDetail>(),
+                Note = "Đơn hàng chờ thanh toán"
             };
 
             // duyet tung seller
@@ -151,7 +152,7 @@ namespace Vouchee.Business.Services.Impls
 
             await _sendEmailService.SendEmailAsync(order.Buyer.Email, "Đơn hang mới", orderId);
 
-            await _notificationService.CreateNotificationAsync(Guid.Parse("DEEE9638-DA34-4230-BE77-34137AA5FCFF"), createNotificationDTO);
+            await _notificationService.CreateNotificationAsync(createNotificationDTO);
 
             return new ResponseMessage<string>
             {

@@ -53,6 +53,7 @@ namespace Vouchee.Data.Models.Entities
         public int FinalPrice => TotalPrice - DiscountPrice - UsedVPoint - UsedBalance;
         public string? GiftEmail { get; set; }
         public int VPointUp => (int)Math.Ceiling((decimal)(TotalPrice + DiscountPrice + UsedVPoint) / 1000);
+        public string? Note { get; set; }
 
         public required string Status { get; set; }
         [Column(TypeName = "datetime")]

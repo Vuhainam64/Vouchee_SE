@@ -142,12 +142,13 @@ namespace Vouchee.Business.Services.Impls
                                 OrderId = existedOrder.Id,
                             });
                             existedOrder.Buyer.BuyerWallet.Balance += (int)createPartnerTransaction.transferAmount;
+                            existedOrder.Note = $"Đơn hàng hủy do hết hạn giao dịch, đã hoàn {createPartnerTransaction.transferAmount}";
 
                             await _orderRepository.SaveChanges();
 
                             await _sendEmailService.SendEmailAsync(existedOrder.Buyer.Email, "Trạng thái đơn hàng", $"Đơn hàng {existedOrder.Id} lỗi do hết thời gian");
 
-                            await _notificationService.CreateNotificationAsync(Guid.Parse("DEEE9638-DA34-4230-BE77-34137AA5FCFF"), errorNoti);
+                            await _notificationService.CreateNotificationAsync(errorNoti);
 
                             throw new ConflictException($"Order này đã hết hạn lúc {existedOrder.CreateDate.Value.AddMinutes(2)}");
                         }
@@ -159,7 +160,7 @@ namespace Vouchee.Business.Services.Impls
                             receiverId = existedOrder.Buyer.Id
                         };
 
-                        await _notificationService.CreateNotificationAsync(Guid.Parse("DEEE9638-DA34-4230-BE77-34137AA5FCFF"), successNoti);
+                        await _notificationService.CreateNotificationAsync(successNoti);
 
                         await _sendEmailService.SendEmailAsync("advouchee@gmail.com", "Tiền về ngân hàng của Nam", $"Ngân hàng của Nam được nhận {existedOrder.FinalPrice * 2 / 100} từ đơn hàng {existedOrder.Id}");
                         
@@ -319,6 +320,7 @@ namespace Vouchee.Business.Services.Impls
                             await _supplierRepository.SaveChanges();
                         }
 
+                        existedOrder.Note = "Đơn hàng thanh toán thành công";
                         await _userRepository.SaveChanges();
 
                         await _orderRepository.SaveChanges();
