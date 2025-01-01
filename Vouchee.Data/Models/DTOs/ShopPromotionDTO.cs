@@ -31,11 +31,14 @@ namespace Vouchee.Data.Models.DTOs
         //public int? maxMoneyToDiscount { get; set; }
         //[Range(0, int.MaxValue, ErrorMessage = "Số tiền tối thiểu để áp dụng phải lớn hơn hoặc bằng 0.")]
         //public int? minMoneyToApply { get; set; }
+        [Required(ErrorMessage = "Ngày bắt đầu là bắt buộc.")]
         [DataType(DataType.Date, ErrorMessage = "Ngày bắt đầu không hợp lệ.")]
-        public DateTime? startDate { get; set; }
+        public DateOnly? startDate { get; set; }
+
+        [Required(ErrorMessage = "Ngày kết thúc là bắt buộc.")]
         [DataType(DataType.Date, ErrorMessage = "Ngày kết thúc không hợp lệ.")]
-        [DateGreaterThan("startDate", ErrorMessage = "Ngày kết thúc phải lớn hơn ngày bắt đầu.")]
-        public DateTime? endDate { get; set; }
+        [DateOnlyGreaterThan("startDate", ErrorMessage = "Ngày kết thúc phải lớn hơn ngày bắt đầu.")]
+        public DateOnly? endDate { get; set; }
         [Range(0, int.MaxValue, ErrorMessage = "Tồn kho phải lớn hơn hoặc bằng 0.")]
         public int? stock { get; set; }
         //[Url(ErrorMessage = "Hình ảnh phải là URL hợp lệ.")]
@@ -141,4 +144,37 @@ namespace Vouchee.Data.Models.DTOs
     //    }
     //}
 
+}
+
+public class DateOnlyGreaterThanAttribute : ValidationAttribute
+{
+    private readonly string _comparisonProperty;
+
+    public DateOnlyGreaterThanAttribute(string comparisonProperty)
+    {
+        _comparisonProperty = comparisonProperty;
+    }
+
+    protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+    {
+        var currentValue = value as DateOnly?;
+        var comparisonProperty = validationContext.ObjectType.GetProperty(_comparisonProperty);
+
+        if (comparisonProperty == null)
+        {
+            return new ValidationResult($"Unknown property: {_comparisonProperty}");
+        }
+
+        var comparisonValue = comparisonProperty.GetValue(validationContext.ObjectInstance) as DateOnly?;
+
+        if (currentValue.HasValue && comparisonValue.HasValue)
+        {
+            if (currentValue <= comparisonValue)
+            {
+                return new ValidationResult(ErrorMessage ?? $"The date must be greater than {_comparisonProperty}.");
+            }
+        }
+
+        return ValidationResult.Success;
+    }
 }
