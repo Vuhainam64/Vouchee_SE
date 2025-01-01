@@ -145,27 +145,28 @@ namespace Vouchee.Business.Services.Impls
 
             var wallets = await _walletRepository.GetTable().AsTracking().ToListAsync();
 
-            foreach (var wallet in wallets.ToList())
+            foreach (var wallet in wallets.ToList().Where(x => x.SupplierId != null || x.SellerId != null))
             {
                 if (wallet.Balance > 0)
                 {
                     string note = string.Empty;
 
-                    if (wallet.BuyerId != null)
-                    {
-                        note = $"Tự động rút {wallet.Balance} từ ví mua";
+                    //if (wallet.BuyerId != null)
+                    //{
+                    //    note = $"Tự động rút {wallet.Balance} từ ví mua";
 
-                        await _sendEmailService.SendEmailAsync(wallet.Buyer.Email, "Tự động rút tiền", note);
-                    }
-                    else if (wallet.SellerId != null)
+                    //    await _sendEmailService.SendEmailAsync(wallet.Buyer.Email, "Tự động rút tiền", note);
+                    //}
+
+                    if (wallet.SellerId != null)
                     {
-                        note = $"Tự động rút  {wallet.Balance} từ ví bán";
+                        note = $"Tự động rút {wallet.Balance} từ ví bán";
 
                         await _sendEmailService.SendEmailAsync(wallet.Seller.Email, "Tự động rút tiền", note);
                     }
                     else if (wallet.SupplierId != null)
                     {
-                        note = $"Tự động rút  {wallet.Balance} từ ví supplier";
+                        note = $"Tự động rút {wallet.Balance} từ ví supplier";
 
                         foreach (var supplierAccount in wallet.Supplier.Users)
                         {
