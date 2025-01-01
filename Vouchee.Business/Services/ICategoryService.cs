@@ -25,6 +25,6 @@ namespace Vouchee.Business.Services
         public Task<ResponseMessage<bool>> UpdateCategoryStateAsync(Guid id, bool isActive, ThisUserObj currentUser);
 
         // REMOVE
-        public Task<ResponseMessage<bool>> DeleteCategoryAsync(Guid id);
+        public Task<ResponseMessage<bool>> DeleteCategoryAsync(Guid id, ThisUserObj thisUserObj);
     }
 }

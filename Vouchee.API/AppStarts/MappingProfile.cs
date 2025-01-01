@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Google.Api;
 using Vouchee.Business.Models.DTOs;
 using Vouchee.Business.Utils;
@@ -302,9 +303,15 @@ namespace Vouchee.API.AppStarts
             // PROMOTION
             CreateMap<Promotion, CreateShopPromotionDTO>().ReverseMap();
             CreateMap<Promotion, CreateModalPromotionDTO>().ReverseMap();
-            CreateMap<Promotion, GetShopPromotionDTO>().ReverseMap();
+            CreateMap<Promotion, GetModalPromotionDTO>().ReverseMap();
             CreateMap<Promotion, GetModalPromotionDTO>().ReverseMap();
             CreateMap<Promotion, UpdateShopPromotionDTO>().ReverseMap();
+            CreateMap<Promotion, GetShopPromotionDTO>()
+                .ForMember(dest => dest.status, opt => opt.MapFrom(src =>
+                    src.StartDate >= DateOnly.FromDateTime(DateTime.Now) || src.EndDate < DateOnly.FromDateTime(DateTime.Now)
+                    ? PromotionStatusEnum.EXPIRED.ToString() :
+                    src.Stock == 0 ? PromotionStatusEnum.OUT_OF_STOCK.ToString() : PromotionStatusEnum.NONE.ToString()))
+                .ReverseMap();
             CreateMap<GetShopPromotionDTO, ShopPromotionFilter>().ReverseMap();
 
             // RATING

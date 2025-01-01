@@ -118,7 +118,7 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<ResponseMessage<bool>> DeleteBrandAsync(Guid id)
+        public async Task<ResponseMessage<bool>> DeleteBrandAsync(Guid id, ThisUserObj thisUserObj)
         {
             var existedBrand = await _brandRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Vouchers), isTracking: true);
 
@@ -129,7 +129,16 @@ namespace Vouchee.Business.Services.Impls
 
             if (existedBrand.Vouchers.Count != 0)
             {
-                throw new ConflictException("Có các voucher phụ thuộc vào brand này");
+                existedBrand.IsActive = false;
+                existedBrand.UpdateDate = DateTime.Now;
+                existedBrand.UpdateBy = thisUserObj.userId;
+
+                return new ResponseMessage<bool>()
+                {
+                    message = "Cập nhật địa chỉ thành công",
+                    result = true,
+                    value = true
+                };
             }
 
             await _brandRepository.DeleteAsync(existedBrand);
@@ -198,7 +207,7 @@ namespace Vouchee.Business.Services.Impls
 
             existedBrand.UpdateDate = DateTime.Now;
             existedBrand.UpdateBy = thisUserObj.userId;
-            existedBrand.Status = status.ToString();
+            //existedBrand.Status = status.ToString();
 
             await _brandRepository.UpdateAsync(existedBrand);
 
@@ -210,28 +219,28 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<ResponseMessage<bool>> VerifyBrand(Guid id, ThisUserObj thisUserObj)
-        {
-            var existedBrand = await _brandRepository.GetByIdAsync(id, isTracking: true);
+        //public async Task<ResponseMessage<bool>> VerifyBrand(Guid id, ThisUserObj thisUserObj)
+        //{
+        //    var existedBrand = await _brandRepository.GetByIdAsync(id, isTracking: true);
 
-            if (existedBrand == null)
-            {
-                throw new NotFoundException("Không tìm thấy thương hiệu này");
-            }
+        //    if (existedBrand == null)
+        //    {
+        //        throw new NotFoundException("Không tìm thấy thương hiệu này");
+        //    }
 
-            existedBrand.VerifiedBy = thisUserObj.userId;
-            existedBrand.VerifiedDate = DateTime.Now;
-            existedBrand.IsVerified = true;
+        //    existedBrand.VerifiedBy = thisUserObj.userId;
+        //    existedBrand.VerifiedDate = DateTime.Now;
+        //    existedBrand.IsVerified = true;
 
-            await _brandRepository.UpdateAsync(existedBrand);
+        //    await _brandRepository.UpdateAsync(existedBrand);
 
-            return new ResponseMessage<bool>()
-            {
-                message = "Cập nhật thương hiệu thành công",
-                result = true,
-                value = true
-            };
-        }
+        //    return new ResponseMessage<bool>()
+        //    {
+        //        message = "Cập nhật thương hiệu thành công",
+        //        result = true,
+        //        value = true
+        //    };
+        //}
 
         public async Task<ResponseMessage<bool>> RemoveAddressFromBrandAsync(Guid addressId, Guid brandId)
         {
@@ -269,7 +278,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<List<GetBrandDTO>> GetBrandsByName(string name)
         {
-            var existedBrand = await _brandRepository.GetWhereAsync(x => x.Name.ToLower().Contains(name.ToLower()));
+            var existedBrand = await _brandRepository.GetWhereAsync(x => x.Name.ToLower().Contains(name.ToLower()) && x.IsActive == true);
 
             return _mapper.Map<List<GetBrandDTO>>(existedBrand);
         }

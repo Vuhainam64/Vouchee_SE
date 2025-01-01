@@ -58,12 +58,27 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<ResponseMessage<bool>> DeleteVoucherTypeAsync(Guid id)
+        public async Task<ResponseMessage<bool>> DeleteVoucherTypeAsync(Guid id, ThisUserObj thisUserObj)
         {
             var voucherType = await _voucherTypeRepository.GetByIdAsync(id, isTracking: true);
             if (voucherType == null)
             {
                 throw new NotFoundException("Không thấy voucher type này");
+            }
+            if (voucherType.Categories.Count() != 0)
+            {
+                voucherType.UpdateDate = DateTime.Now;
+                voucherType.UpdateBy = thisUserObj.userId;
+                voucherType.IsActive = false;
+
+                await _voucherTypeRepository.SaveChanges();
+
+                return new ResponseMessage<bool>()
+                {
+                    message = "Cập nhật voucher type thành công",
+                    result = true,
+                    value = true
+                };
             }
 
             await _voucherTypeRepository.DeleteAsync(voucherType);

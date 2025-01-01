@@ -66,7 +66,7 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<ResponseMessage<bool>> DeleteAddressAsync(Guid id)
+        public async Task<ResponseMessage<bool>> DeleteAddressAsync(Guid id, ThisUserObj thisUserObj)
         {
             var existedAddress = await _addressRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Brands), isTracking: true);
 
@@ -77,7 +77,16 @@ namespace Vouchee.Business.Services.Impls
 
             if (existedAddress.Brands.Count != 0)
             {
-                throw new ConflictException("Có các brand phụ thuộc vào địa chỉ này");
+                existedAddress.IsActive = false;
+                existedAddress.UpdateBy = thisUserObj.userId;
+                existedAddress.UpdateDate = DateTime.Now;
+
+                return new ResponseMessage<bool>()
+                {
+                    message = "Cập nhật địa chỉ thầnh công",
+                    result = true,
+                    value = true
+                };
             }
 
             if (await _addressRepository.DeleteAsync(existedAddress))
@@ -158,19 +167,19 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
-        public async Task<bool> UpdateAddressAsync(Guid id, UpdateAddressDTO updateAddressDTO)
-        {
-            var existedAddress = await _addressRepository.GetByIdAsync(id);
-            if (existedAddress != null)
-            {
-                var entity = _mapper.Map<Address>(updateAddressDTO);
-                return await _addressRepository.UpdateAsync(entity);
-            }
-            else
-            {
-                throw new NotFoundException("Không tìm thấy addess");
-            }
-        }
+        //public async Task<bool> UpdateAddressAsync(Guid id, UpdateAddressDTO updateAddressDTO)
+        //{
+        //    var existedAddress = await _addressRepository.GetByIdAsync(id);
+        //    if (existedAddress != null)
+        //    {
+        //        var entity = _mapper.Map<Address>(updateAddressDTO);
+        //        return await _addressRepository.UpdateAsync(entity);
+        //    }
+        //    else
+        //    {
+        //        throw new NotFoundException("Không tìm thấy addess");
+        //    }
+        //}
 
         public async Task<ResponseMessage<bool>> UpdateAddressAsync(Guid id, UpdateAddressDTO updateAddressDTO, ThisUserObj thisUserObj)
         {
@@ -213,50 +222,50 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<ResponseMessage<bool>> UpdateAddressStatusAsync(Guid id, ObjectStatusEnum statusEnum, ThisUserObj thisUserObj)
-        {
-            var existedAddress = await _addressRepository.GetByIdAsync(id, isTracking: true);
-            if (existedAddress == null)
-            {
-                throw new NotFoundException("Không tìm thấy địa chỉ");
-            }
+        //public async Task<ResponseMessage<bool>> UpdateAddressStatusAsync(Guid id, ObjectStatusEnum statusEnum, ThisUserObj thisUserObj)
+        //{
+        //    var existedAddress = await _addressRepository.GetByIdAsync(id, isTracking: true);
+        //    if (existedAddress == null)
+        //    {
+        //        throw new NotFoundException("Không tìm thấy địa chỉ");
+        //    }
 
-            existedAddress.Status = statusEnum.ToString();
-            existedAddress.UpdateDate = DateTime.Now;
-            existedAddress.UpdateBy = thisUserObj.userId;
+        //    existedAddress.Status = statusEnum.ToString();
+        //    existedAddress.UpdateDate = DateTime.Now;
+        //    existedAddress.UpdateBy = thisUserObj.userId;
 
-            await _addressRepository.UpdateAsync(existedAddress);
+        //    await _addressRepository.UpdateAsync(existedAddress);
 
-            return new ResponseMessage<bool>()
-            {
-                message = "Cập nhật địa chỉ thành công",
-                result = true,
-                value = true
-            };
-        }
+        //    return new ResponseMessage<bool>()
+        //    {
+        //        message = "Cập nhật địa chỉ thành công",
+        //        result = true,
+        //        value = true
+        //    };
+        //}
 
-        public async Task<ResponseMessage<bool>> VerifyAddressAsync(Guid id, bool isVerify, ThisUserObj thisUserObj)
-        {
-            var existedAddress = await _addressRepository.GetByIdAsync(id, isTracking: true);
-            if (existedAddress == null)
-            {
-                throw new NotFoundException("Không tìm thấy địa chỉ");
-            }
+        //public async Task<ResponseMessage<bool>> VerifyAddressAsync(Guid id, bool isVerify, ThisUserObj thisUserObj)
+        //{
+        //    var existedAddress = await _addressRepository.GetByIdAsync(id, isTracking: true);
+        //    if (existedAddress == null)
+        //    {
+        //        throw new NotFoundException("Không tìm thấy địa chỉ");
+        //    }
 
-            existedAddress.VerifiedBy = thisUserObj.userId;
-            existedAddress.VerifiedDate = DateTime.Now;
-            existedAddress.IsVerified = isVerify;
-            existedAddress.UpdateDate = DateTime.Now;
-            existedAddress.UpdateBy = thisUserObj.userId;
+        //    existedAddress.VerifiedBy = thisUserObj.userId;
+        //    existedAddress.VerifiedDate = DateTime.Now;
+        //    existedAddress.IsVerified = isVerify;
+        //    existedAddress.UpdateDate = DateTime.Now;
+        //    existedAddress.UpdateBy = thisUserObj.userId;
 
-            await _addressRepository.UpdateAsync(existedAddress);
+        //    await _addressRepository.UpdateAsync(existedAddress);
 
-            return new ResponseMessage<bool>()
-            {
-                message = "Cập nhật địa chỉ thành công",
-                result = true,
-                value = true
-            };
-        }
+        //    return new ResponseMessage<bool>()
+        //    {
+        //        message = "Cập nhật địa chỉ thành công",
+        //        result = true,
+        //        value = true
+        //    };
+        //}
     }
 }

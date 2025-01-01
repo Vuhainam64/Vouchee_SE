@@ -27,6 +27,7 @@ namespace Vouchee.Business.Services.Impls
         private readonly INotificationService _notificationService;
         private readonly ICartService _cartService;
 
+        private readonly IBaseRepository<Promotion> _promotionRepository;
         private readonly IBaseRepository<Modal> _modalRepository;
         private readonly IBaseRepository<User> _userRepository;
         private readonly IBaseRepository<VoucherCode> _voucherCodeRepository;
@@ -35,7 +36,8 @@ namespace Vouchee.Business.Services.Impls
         private readonly IBaseRepository<Order> _orderRepository;
         private readonly IMapper _mapper;
 
-        public OrderService(ISendEmailService sendEmailService,
+        public OrderService(IBaseRepository<Promotion> promotionRepository,
+                            ISendEmailService sendEmailService,
                             INotificationService notificationService,
                             ICartService cartService,
                             IBaseRepository<Modal> modalRepository,
@@ -46,6 +48,7 @@ namespace Vouchee.Business.Services.Impls
                             IBaseRepository<Order> orderRepository,
                             IMapper mapper)
         {
+            _promotionRepository = promotionRepository;
             _sendEmailService = sendEmailService;
             _notificationService = notificationService;
             _cartService = cartService;
@@ -111,14 +114,50 @@ namespace Vouchee.Business.Services.Impls
                                 throw new ConflictException($"Bạn đặt {cartModal.quantity} {cartModal.title} nhưng trong khi chỉ còn {existedModal.Stock}");
                             }
 
-                            existedModal.Carts.Remove(existedModal.Carts.FirstOrDefault(c => c.ModalId == cartModal.id));
+                            Guid? promotionId = null;
+
+                            if (cartModal.shopPromotionId != null)
+                            {
+                                var existedPromotion = await _promotionRepository.GetByIdAsync(cartModal.shopPromotionId, isTracking: true);
+
+                                if (existedPromotion == null)
+                                {
+                                    throw new NotFoundException($"Không tìm thấy promotion {cartModal.shopPromotionId}");
+                                }
+
+                                // Get today's date as DateOnly
+                                var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+                                // Check if the promotion has expired
+                                if (existedPromotion.EndDate.HasValue && today > existedPromotion.EndDate.Value)
+                                {
+                                    throw new InvalidOperationException($"Promotion {cartModal.shopPromotionId} đã hết hạn. Hạn cuối: {existedPromotion.EndDate.Value:yyyy-MM-dd}");
+                                }
+
+                                // Optional: Check if the promotion has started
+                                if (existedPromotion.StartDate.HasValue && today < existedPromotion.StartDate.Value)
+                                {
+                                    throw new InvalidOperationException($"Promotion {cartModal.shopPromotionId} chưa bắt đầu. Ngày bắt đầu: {existedPromotion.StartDate.Value:yyyy-MM-dd}");
+                                }
+
+                                if (existedPromotion.Stock == 0)
+                                {
+                                    throw new ConflictException($"Promotion {cartModal.shopPromotionId} đã hết");
+                                }
+
+                                existedModal.Carts.Remove(existedModal.Carts.FirstOrDefault(c => c.ModalId == cartModal.id));
+
+                                existedPromotion.Stock -= 1;
+
+                                await _promotionRepository.SaveChanges();
+                            }
 
                             order.OrderDetails.Add(new OrderDetail
                             {
                                 ModalId = existedModal.Id,
                                 Quantity = cartModal.quantity,
                                 UnitPrice = existedModal.SellPrice,
-                                Status = OrderStatusEnum.PENDING.ToString(),
+                                //Status = OrderStatusEnum.PENDING.ToString(),
                                 CreateDate = DateTime.Now,
                                 CreateBy = thisUserObj.userId,
                                 ShopDiscountPercent = (int)cartModal.shopDiscountPercent,

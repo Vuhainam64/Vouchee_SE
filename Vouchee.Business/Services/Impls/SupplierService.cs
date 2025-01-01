@@ -53,10 +53,10 @@ namespace Vouchee.Business.Services.Impls
             var supplier = _mapper.Map<Supplier>(createSupplierDTO);
             supplier.SupplierWallet = new()
             {
-                Status = ObjectStatusEnum.ACTIVE.ToString(),
+                //Status = ObjectStatusEnum.ACTIVE.ToString(),
                 Balance = 0,
                 CreateDate = DateTime.Now,
-                IsActive = true,
+                //IsActive = true,
                 CreateBy = thisUserObj.userId,
             };
 
@@ -84,10 +84,10 @@ namespace Vouchee.Business.Services.Impls
 
             existedSupplier.SupplierWallet = new()
             {
-                Status = "ACTIVE",
+                //Status = "ACTIVE",
                 Balance = 0,
                 CreateDate = DateTime.Now,
-                IsActive = true,
+                //IsActive = true,
             };
 
             await _supplierRepository.SaveChanges();
