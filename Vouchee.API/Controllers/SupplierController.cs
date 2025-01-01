@@ -31,7 +31,9 @@ namespace Vouchee.API.Controllers
         [Authorize]
         public async Task<IActionResult> CreateSupplier([FromForm] CreateSupplierDTO createSupplierDTO)
         {
-            var result = await _supplierService.CreateSupplierAsync(createSupplierDTO);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _supplierService.CreateSupplierAsync(createSupplierDTO, currentUser);
             return Ok(result);
         }
 

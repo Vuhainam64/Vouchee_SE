@@ -48,14 +48,26 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<Guid?> CreateSupplierAsync(CreateSupplierDTO createSupplierDTO)
+        public async Task<ResponseMessage<Guid>> CreateSupplierAsync(CreateSupplierDTO createSupplierDTO, ThisUserObj thisUserObj)
         {
             var supplier = _mapper.Map<Supplier>(createSupplierDTO);
-
-            supplier.Status = ObjectStatusEnum.ACTIVE.ToString();
+            supplier.SupplierWallet = new()
+            {
+                Status = ObjectStatusEnum.ACTIVE.ToString(),
+                Balance = 0,
+                CreateDate = DateTime.Now,
+                IsActive = true,
+                CreateBy = thisUserObj.userId,
+            };
 
             var supplierId = await _supplierRepository.AddAsync(supplier);
-            return supplierId;
+
+            return new ResponseMessage<Guid>
+            {
+                message = "Tạo supplier thành công",
+                result = true,
+                value = (Guid) supplierId
+            };
         }
 
         public async Task<ResponseMessage<bool>> CreateSupplierWalletAsync(Guid supplierId)

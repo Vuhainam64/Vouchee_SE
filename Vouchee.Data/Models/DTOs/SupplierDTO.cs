@@ -9,7 +9,7 @@ namespace Vouchee.Business.Models.DTOs
     {
         public string? name { get; set; }
         public DateTime? createDate = DateTime.Now;
-        public Guid? createBy { get; set; }
+        public string status = ObjectStatusEnum.ACTIVE.ToString();
     }
 
     public class UpdateSupplierDTO 

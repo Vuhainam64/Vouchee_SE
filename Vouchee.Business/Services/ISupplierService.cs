@@ -10,7 +10,7 @@ namespace Vouchee.Business.Services
     public interface ISupplierService
     {
         // CREATE
-        public Task<Guid?> CreateSupplierAsync(CreateSupplierDTO createSupplierDTO);
+        public Task<ResponseMessage<Guid>> CreateSupplierAsync(CreateSupplierDTO createSupplierDTO, ThisUserObj thisUserObj);
         public Task<ResponseMessage<bool>> CreateSupplierWalletAsync(Guid supplierId);
 
         // READ

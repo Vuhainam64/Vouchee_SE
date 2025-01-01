@@ -80,7 +80,7 @@ namespace Vouchee.Business.Services.Impls
                 }
 
                 moneyRequest.WithdrawWalletTransaction.BuyerWalletId = existedUser.BuyerWallet.Id;
-                moneyRequest.WithdrawWalletTransaction.Note = "Rút tiền từ ví mua";
+                moneyRequest.WithdrawWalletTransaction.Note = $"Rút {createWithdrawRequestDTO.amount} từ ví mua";
                 moneyRequest.WithdrawWalletTransaction.BeforeBalance = existedUser.BuyerWallet.Balance;
                 moneyRequest.WithdrawWalletTransaction.Amount = createWithdrawRequestDTO.amount;
                 moneyRequest.WithdrawWalletTransaction.AfterBalance = existedUser.BuyerWallet.Balance - createWithdrawRequestDTO.amount;
@@ -98,7 +98,7 @@ namespace Vouchee.Business.Services.Impls
                 }
 
                 moneyRequest.WithdrawWalletTransaction.SellerWalletId = existedUser.SellerWallet.Id;
-                moneyRequest.WithdrawWalletTransaction.Note = "Rút tiền từ ví bán";
+                moneyRequest.WithdrawWalletTransaction.Note = $"Rút {createWithdrawRequestDTO.amount} từ ví bán";
                 moneyRequest.WithdrawWalletTransaction.BeforeBalance = existedUser.SellerWallet.Balance;
                 moneyRequest.WithdrawWalletTransaction.Amount = createWithdrawRequestDTO.amount;
                 moneyRequest.WithdrawWalletTransaction.AfterBalance = existedUser.SellerWallet.Balance - createWithdrawRequestDTO.amount;
@@ -116,7 +116,7 @@ namespace Vouchee.Business.Services.Impls
                 }
 
                 moneyRequest.WithdrawWalletTransaction.SupplierWalletId = existedUser.Supplier.SupplierWallet.Id;
-                moneyRequest.WithdrawWalletTransaction.Note = "Rút tiền từ ví supplier";
+                moneyRequest.WithdrawWalletTransaction.Note = $"Rút {createWithdrawRequestDTO.amount} từ ví supplier";
                 moneyRequest.WithdrawWalletTransaction.BeforeBalance = existedUser.SellerWallet.Balance;
                 moneyRequest.WithdrawWalletTransaction.Amount = createWithdrawRequestDTO.amount;
                 moneyRequest.WithdrawWalletTransaction.AfterBalance = existedUser.SellerWallet.Balance - createWithdrawRequestDTO.amount;

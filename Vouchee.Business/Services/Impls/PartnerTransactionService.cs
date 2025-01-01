@@ -231,7 +231,7 @@ namespace Vouchee.Business.Services.Impls
                                 OrderId = existedOrder.Id,
                                 BeforeBalance = existedOrder.Buyer.BuyerWallet.Balance,
                                 AfterBalance = existedOrder.Buyer.BuyerWallet.Balance - existedOrder.UsedBalance,
-                                Note = $"Thanh toán đơn hàng {existedOrder.Id}"
+                                Note = $"Rút {existedOrder.UsedBalance} để thanh toán đơn hàng {existedOrder.Id} "
                             });
                             existedOrder.Buyer.BuyerWallet.Balance -= existedOrder.UsedBalance;
                         }
@@ -241,7 +241,7 @@ namespace Vouchee.Business.Services.Impls
                         // Process seller wallet updates
                         foreach (var seller in existedOrder.OrderDetails.GroupBy(x => x.Modal.Voucher.SellerId))
                         {
-                            var amount = seller.Sum(x => x.FinalPrice);
+                            var amount = seller.Sum(x => x.FinalPrice) - (seller.Sum(x => x.FinalPrice) * 10 / 100);
 
                             var existedSeller = await _userRepository.GetByIdAsync(seller.Key, includeProperties: x => x.Include(x => x.SellerWallet)
                                                                                                                             .ThenInclude(x => x.SellerWalletTransactions)
@@ -258,21 +258,23 @@ namespace Vouchee.Business.Services.Impls
                                 CreateBy = existedOrder.Buyer.Id,
                                 CreateDate = DateTime.Now,
                                 Status = SellerWalletTransactionStatusEnum.DONE.ToString(),
-                                Amount = amount - (amount * 10 / 100),
+                                Amount = amount,
                                 OrderId = existedOrder.Id,
                                 BeforeBalance = existedSeller.SellerWallet.Balance,
-                                AfterBalance = existedSeller.SellerWallet.Balance + (amount - (amount * 10 / 100)),
-                                Note = $"Nhận tiền từ đơn {existedOrder.Id}"
+                                AfterBalance = existedSeller.SellerWallet.Balance + amount,
+                                Note = $"Nhận {amount} từ đơn {existedOrder.Id}"
                             });
 
-                            existedSeller.SellerWallet.Balance += amount - (amount * 10 / 100);
+                            existedSeller.SellerWallet.Balance += amount;
 
                             string description = $"Đơn hàng số {existedOrder.Id}\n";
 
                             foreach (var modal in seller)
                             {
-                                description += $"Modal: {modal.ModalId} - {modal.Quantity}\n";
+                                description += $"Modal: {modal.ModalId} - số lượng: {modal.Quantity}\n";
                             }
+
+                            description += $"Tổng tiền sau khi trừ 10% tiền dịch vụ: {amount}";
 
                             Notification sellerNotification = new()
                             {
@@ -284,14 +286,14 @@ namespace Vouchee.Business.Services.Impls
                                 Seen = false,
                             };
 
-                            await _sendEmailService.SendEmailAsync(existedSeller.Email, "Thông báo có đơn hàng mới từ người mua", $"{description} và đã được chuyển {amount - (amount * 7 / 100)} về ví");
+                            await _sendEmailService.SendEmailAsync(existedSeller.Email, "Thông báo có đơn hàng mới từ người mua", $"{description} và đã được chuyển {amount} về ví");
 
                             await _notificationRepository.AddAsync(sellerNotification);
                         }
 
                         foreach (var supplier in existedOrder.OrderDetails.GroupBy(x => x.Modal.Voucher.SupplierId))
                         {
-                            var amount = supplier.Sum(x => x.FinalPrice);
+                            var amount = supplier.Sum(x => x.FinalPrice) * 10 / 100;
 
                             var existedSupplier = await _supplierRepository.GetByIdAsync(supplier.Key, includeProperties: x => x.Include(x => x.SupplierWallet)
                                                                                                                                         .ThenInclude(x => x.SupplierWalletTransactions)
@@ -303,15 +305,15 @@ namespace Vouchee.Business.Services.Impls
                                 Type = WalletTransactionTypeEnum.SUPPLIER_ORDER.ToString(),
                                 OrderId = existedOrder.Id,
                                 BeforeBalance = existedSupplier.SupplierWallet.Balance,
-                                Amount = amount * 10 / 100,
-                                AfterBalance = existedSupplier.SupplierWallet.Balance + (amount * 10 / 100),
+                                Amount = amount,
+                                AfterBalance = existedSupplier.SupplierWallet.Balance + amount,
                                 CreateDate = DateTime.Now
                             });
-                            existedSupplier.SupplierWallet.Balance += amount * 10 / 100;
+                            existedSupplier.SupplierWallet.Balance += amount;
 
                             foreach (var supplierToSendEmail in existedSupplier.Users)
                             {
-                                await _sendEmailService.SendEmailAsync(supplierToSendEmail.Email, "Tiền được thanh toán", $"Nhà cung cấp {supplierToSendEmail.Supplier} đã được trả {amount * 5 / 100} cho đơn hàng {existedOrder.Id}");
+                                await _sendEmailService.SendEmailAsync(supplierToSendEmail.Email, $"Số tiền {amount} được thanh toán", $"Nhà cung cấp {supplierToSendEmail.Supplier} đã được trả {amount} cho đơn hàng {existedOrder.Id}");
                             }
 
                             await _supplierRepository.SaveChanges();
