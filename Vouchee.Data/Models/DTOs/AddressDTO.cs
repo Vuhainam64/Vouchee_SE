@@ -23,8 +23,7 @@ namespace Vouchee.Business.Models.DTOs
         [Required(ErrorMessage = "Vĩ độ không được để trống.")]
         [Range(-90, 90, ErrorMessage = "Vĩ độ phải nằm trong khoảng từ -90 đến 90.")]
         public decimal? lat { get; set; }
-        public bool isVerified = false;
-        public bool isActive = false;
+        public bool isActive = true;
         public ObjectStatusEnum status = ObjectStatusEnum.NONE;
         public DateTime CreateDate = DateTime.Now;
     }
@@ -47,7 +46,6 @@ namespace Vouchee.Business.Models.DTOs
         public string? name { get; set; }
         public decimal? lon { get; set; }
         public decimal? lat { get; set; }
-        public bool? isVerified { get; set; }
         public bool? isActive { get; set; }
         public string? status { get; set; }
     }

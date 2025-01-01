@@ -75,7 +75,7 @@ namespace Vouchee.Business.Services.Impls
 
             if (existedPromotion.ShopPromotionOrderDetails.Count() != 0)
             {
-                existedPromotion.Status = PromotionStatusEnum.INACTIVE.ToString();
+                existedPromotion.IsActive = false;
                 existedPromotion.UpdateDate = DateTime.Now;
                 existedPromotion.UpdateBy = thisUserObj.userId;
 
@@ -97,17 +97,17 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<GetShopPromotionDTO> GetActiveShopPromotion(ThisUserObj thisUserObj)
-        {
-            DateTime currentTime = DateTime.Now;
-            var activePromotion = _shopPromotionRepository.GetTable().FirstOrDefault(x => x.SellerId == thisUserObj.userId);
-            if (activePromotion == null)
-            {
-                throw new NotFoundException("Hiện tại bạn không có shop promotion này đang hoạt động");
-            }
+        //public async Task<GetShopPromotionDTO> GetActiveShopPromotion(ThisUserObj thisUserObj)
+        //{
+        //    DateTime currentTime = DateTime.Now;
+        //    var activePromotion = _shopPromotionRepository.GetTable().FirstOrDefault(x => x.SellerId == thisUserObj.userId);
+        //    if (activePromotion == null)
+        //    {
+        //        throw new NotFoundException("Hiện tại bạn không có shop promotion này đang hoạt động");
+        //    }
 
-            return _mapper.Map<GetShopPromotionDTO>(activePromotion);
-        }
+        //    return _mapper.Map<GetShopPromotionDTO>(activePromotion);
+        //}
 
         public async Task<DynamicResponseModel<GetShopPromotionDTO>> GetCurrentShopPromotion(ThisUserObj thisUserObj, PagingRequest pagingRequest, ShopPromotionFilter shopPromotionFilter)
         {
@@ -121,9 +121,10 @@ namespace Vouchee.Business.Services.Impls
             (int, IQueryable<GetShopPromotionDTO>) result;
 
             result = _shopPromotionRepository.GetTable()
-                        .ProjectTo<GetShopPromotionDTO>(_mapper.ConfigurationProvider)
-                        .DynamicFilter(_mapper.Map<GetShopPromotionDTO>(shopPromotionFilter))
-                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAGE);
+                    .Where(x => x.SellerId == thisUserObj.userId)
+                    .ProjectTo<GetShopPromotionDTO>(_mapper.ConfigurationProvider)
+                    .DynamicFilter(_mapper.Map<GetShopPromotionDTO>(shopPromotionFilter))
+                    .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAGE);
 
             return new DynamicResponseModel<GetShopPromotionDTO>()
             {
@@ -253,31 +254,38 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<IList<GetShopPromotionDTO>> GetShopPromotionByShopId(Guid shopId)
         {
-            var promotions = await _shopPromotionRepository.GetWhereAsync(x => x.SellerId == shopId);
+            DateTime now = DateTime.Now;
+            DateOnly dateOnly = DateOnly.FromDateTime(now);
+
+            var promotions = _shopPromotionRepository.GetTable()
+                                                            .Where(x => x.SellerId == shopId)
+                                                            .Where(x => x.StartDate >= dateOnly && x.EndDate <= dateOnly)
+                                                            .Where(x => x.IsActive == true)
+                                                            .Where(x => x.Stock > 0);
             return _mapper.Map<IList<GetShopPromotionDTO>>(promotions);
         }
 
-        public async Task<ResponseMessage<bool>> UpdateExpiredPromotionAsync()
-        {
-            var today = DateOnly.FromDateTime(DateTime.Now);
+        //public async Task<ResponseMessage<bool>> UpdateExpiredPromotionAsync()
+        //{
+        //    var today = DateOnly.FromDateTime(DateTime.Now);
 
-            // Fetch promotions that have expired
-            var expiredPromotions = _shopPromotionRepository.GetTable().AsTracking()
-                                            .Where(x => x.EndDate < today);
-            foreach (var promotion in await expiredPromotions.ToListAsync())
-            {
-                promotion.Status = PromotionStatusEnum.EXPIRED.ToString(); // Assuming 'Status' is a string or enum property
-            }
+        //    // Fetch promotions that have expired
+        //    var expiredPromotions = _shopPromotionRepository.GetTable().AsTracking()
+        //                                    .Where(x => x.EndDate < today);
+        //    foreach (var promotion in await expiredPromotions.ToListAsync())
+        //    {
+        //        promotion.Status = PromotionStatusEnum.EXPIRED.ToString(); // Assuming 'Status' is a string or enum property
+        //    }
 
-            await _shopPromotionRepository.SaveChanges();
+        //    await _shopPromotionRepository.SaveChanges();
 
-            return new ResponseMessage<bool>()
-            {
-                message = "Cập nhật promotion thành công",
-                result = true,
-                value = true
-            };
-        }
+        //    return new ResponseMessage<bool>()
+        //    {
+        //        message = "Cập nhật promotion thành công",
+        //        result = true,
+        //        value = true
+        //    };
+        //}
 
         public async Task<ResponseMessage<bool>> UpdatePromotionAsync(Guid id, UpdateShopPromotionDTO updatePromotionDTO, ThisUserObj thisUserObj)
         {

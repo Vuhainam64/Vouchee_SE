@@ -83,34 +83,34 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        [Authorize]
-        [HttpPut("update_address_status/{id}")]
-        public async Task<IActionResult> UpdateAddressStatus(Guid id, ObjectStatusEnum status)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+        //[Authorize]
+        //[HttpPut("update_address_status/{id}")]
+        //public async Task<IActionResult> UpdateAddressStatus(Guid id, ObjectStatusEnum status)
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _addresService.UpdateAddressStatusAsync(id, status, currentUser);
-            return Ok(result);
-        }
+        //    var result = await _addresService.UpdateAddressStatusAsync(id, status, currentUser);
+        //    return Ok(result);
+        //}
 
-        [Authorize]
-        [HttpPut("verify_address/{id}")]
-        public async Task<IActionResult> VerifyAddress(Guid id, bool isVerify)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+        //[Authorize]
+        //[HttpPut("verify_address/{id}")]
+        //public async Task<IActionResult> VerifyAddress(Guid id, bool isVerify)
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            if (currentUser.role.Equals(RoleEnum.ADMIN.ToString()))
-            {
-                var result = await _addresService.VerifyAddressAsync(id, isVerify, currentUser);
-                return Ok(result);
-            }
+        //    if (currentUser.role.Equals(RoleEnum.ADMIN.ToString()))
+        //    {
+        //        var result = await _addresService.VerifyAddressAsync(id, isVerify, currentUser);
+        //        return Ok(result);
+        //    }
 
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                code = HttpStatusCode.Forbidden,
-                message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
-            });
-        }
+        //    return StatusCode((int)HttpStatusCode.Forbidden, new
+        //    {
+        //        code = HttpStatusCode.Forbidden,
+        //        message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
+        //    });
+        //}
 
         // DELETE
         [Authorize]
@@ -119,7 +119,7 @@ namespace Vouchee.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _addresService.DeleteAddressAsync(id);
+            var result = await _addresService.DeleteAddressAsync(id, currentUser);
             return Ok(result);
         }
     }

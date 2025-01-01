@@ -114,7 +114,7 @@ namespace Vouchee.API.Controllers
 
             if (currentUser.role.Equals(RoleEnum.ADMIN.ToString()))
             {
-                var result = await _categoryService.DeleteCategoryAsync(id);
+                var result = await _categoryService.DeleteCategoryAsync(id, currentUser);
                 return Ok(result);
             }
 

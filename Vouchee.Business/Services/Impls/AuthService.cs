@@ -70,12 +70,12 @@ namespace Vouchee.Business.Services.Impls
                     BuyerWallet = new()
                     {
                         CreateDate = DateTime.Now,
-                        Status = ObjectStatusEnum.ACTIVE.ToString(),
+                        //Status = ObjectStatusEnum.ACTIVE.ToString(),
                     },
                     SellerWallet = new()
                     {
                         CreateDate = DateTime.Now,
-                        Status = ObjectStatusEnum.ACTIVE.ToString(),
+                        //Status = ObjectStatusEnum.ACTIVE.ToString(),
                     },
                 };
 

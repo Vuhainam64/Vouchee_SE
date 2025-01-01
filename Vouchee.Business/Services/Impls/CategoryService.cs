@@ -67,7 +67,7 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<ResponseMessage<bool>> DeleteCategoryAsync(Guid id)
+        public async Task<ResponseMessage<bool>> DeleteCategoryAsync(Guid id, ThisUserObj thisUserObj)
         {
             var existedCategory = await _categoryRepository.GetByIdAsync(id, includeProperties: x => x.Include(x => x.Vouchers), isTracking: true);
 
@@ -78,7 +78,18 @@ namespace Vouchee.Business.Services.Impls
 
             if (existedCategory.Vouchers.Count != 0)
             {
-                throw new ConflictException("Có các voucher phụ thuộc vào category này");
+                existedCategory.UpdateDate = DateTime.Now;
+                existedCategory.IsActive = false;
+                existedCategory.UpdateBy = thisUserObj.userId;
+
+                await _categoryRepository.SaveChanges();
+
+                return new ResponseMessage<bool>()
+                {
+                    message = "Cập nhật category thành công",
+                    result = true,
+                    value = true
+                };
             }
 
             await _categoryRepository.DeleteAsync(existedCategory);
