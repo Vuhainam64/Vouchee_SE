@@ -57,6 +57,9 @@ namespace Vouchee.Data.Models.DTOs
         public string? description { get; set; }
         [Range(0, 100, ErrorMessage = "Phần trăm giảm giá phải nằm trong khoảng từ 0 đến 100.")]
         public int? percentDiscount { get; set; }
+        [Required(ErrorMessage = "Ngày bắt đầu là bắt buộc.")]
+        [DataType(DataType.Date, ErrorMessage = "Ngày bắt đầu không hợp lệ.")]
+        public DateOnly? startDate { get; set; }
         [Required(ErrorMessage = "Ngày kết thúc là bắt buộc.")]
         [DataType(DataType.Date, ErrorMessage = "Ngày kết thúc không hợp lệ.")]
         [DateOnlyGreaterThan("startDate", ErrorMessage = "Ngày kết thúc phải lớn hơn ngày bắt đầu.")]

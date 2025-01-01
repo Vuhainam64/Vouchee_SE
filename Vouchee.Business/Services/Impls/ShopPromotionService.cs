@@ -42,7 +42,12 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<ResponseMessage<Guid>> CreateShopPromotionAsync(CreateShopPromotionDTO createShopPromotionDTO, ThisUserObj thisUserObj)
         {
-            
+            var existedSeller = await _userRepository.GetByIdAsync(thisUserObj.userId);
+
+            if (existedSeller == null)
+            {
+                throw new NotFoundException("Không tìm thấy seller này");
+            }
 
             var promotion = _mapper.Map<Promotion>(createShopPromotionDTO);
 
