@@ -106,6 +106,14 @@ RecurringJob.AddOrUpdate<IWithdrawService>
         TimeZoneInfo.Local
     );
 
+RecurringJob.AddOrUpdate<IShopPromotionService>(
+    "Update_Expired_Promotions",
+    service => service.UpdateExpiredPromotionAsync(),
+    Cron.Daily(0, 0), // Every day at 12:00 AM
+    TimeZoneInfo.Local
+);
+
+
 app.MapControllers();
 
 app.Run();
