@@ -44,7 +44,7 @@ namespace Vouchee.Data.Models.DTOs
         //[Url(ErrorMessage = "Hình ảnh phải là URL hợp lệ.")]
         //public string? image { get; set; }
         public bool isActive { get; set; } = true;
-        public string? status = PromotionStatusEnum.ACTIVE.ToString();
+        //public string? status = PromotionStatusEnum.ACTIVE.ToString();
         public DateTime? createDate = DateTime.Now;
     }
 

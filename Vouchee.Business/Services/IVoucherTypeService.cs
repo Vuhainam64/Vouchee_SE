@@ -18,6 +18,6 @@ namespace Vouchee.Business.Services
         public Task<ResponseMessage<bool>> UpdateVoucherTypeAsync(Guid id, UpdateVoucherTypeDTO updateVoucherTypeDTO);
 
         // DELETE
-        public Task<ResponseMessage<bool>> DeleteVoucherTypeAsync(Guid id);
+        public Task<ResponseMessage<bool>> DeleteVoucherTypeAsync(Guid id, ThisUserObj thisUserObj);
     }
 }

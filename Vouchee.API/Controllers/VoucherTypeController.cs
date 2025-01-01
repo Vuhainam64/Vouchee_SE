@@ -79,7 +79,9 @@ namespace Vouchee.API.Controllers
         [HttpDelete("delete_voucher_type/{id}")]
         public async Task<IActionResult> DeleteVoucherType(Guid id)
         {
-            var result = await _voucherTypeService.DeleteVoucherTypeAsync(id);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _voucherTypeService.DeleteVoucherTypeAsync(id, currentUser);
             return Ok(result);
         }
     }

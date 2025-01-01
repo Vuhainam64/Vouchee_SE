@@ -25,7 +25,7 @@ namespace Vouchee.Data.Models.DTOs
         public bool? isVerified = false;
         public ObjectStatusEnum? status = ObjectStatusEnum.NONE;
         public DateTime? createDate = DateTime.Now;
-        public bool? isActive = false;
+        public bool? isActive = true;
 
         public IList<CreateAddressDTO> addresses { get; set; }
     }
@@ -44,7 +44,6 @@ namespace Vouchee.Data.Models.DTOs
 
         public string? name { get; set; }
         public string? image { get; set; }
-        public bool? isVerified { get; set; }
         public bool? isActive { get; set; }
         public string? status { get; set; }
     }

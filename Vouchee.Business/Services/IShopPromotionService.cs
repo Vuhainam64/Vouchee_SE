@@ -29,7 +29,7 @@ namespace Vouchee.Business.Services
         // UPDATE
         public Task<ResponseMessage<bool>> UpdatePromotionAsync(Guid id, UpdateShopPromotionDTO updatePromotionDTO, ThisUserObj thisUserObj);
         public Task<ResponseMessage<bool>> UpdatePromotionState(Guid id, bool isActive, ThisUserObj thisUserObj);
-        public Task<ResponseMessage<bool>> UpdateExpiredPromotionAsync();
+        // public Task<ResponseMessage<bool>> UpdateExpiredPromotionAsync();
 
         // DELETE
         public Task<ResponseMessage<bool>> DeletePromotionAsync(Guid id, ThisUserObj thisUserObj);

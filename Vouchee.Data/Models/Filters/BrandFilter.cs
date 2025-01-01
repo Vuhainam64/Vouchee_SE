@@ -9,5 +9,6 @@ namespace Vouchee.Data.Models.Filters
     public class BrandFilter
     {
         public string? name { get; set; }
+        public bool? isActive { get; set; }
     }
 }

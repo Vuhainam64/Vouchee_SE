@@ -202,12 +202,12 @@ namespace Vouchee.Business.Services.Impls
             user.BuyerWallet = new()
             {
                 CreateDate = DateTime.Now,
-                Status = ObjectStatusEnum.ACTIVE.ToString(),
+                //Status = ObjectStatusEnum.ACTIVE.ToString(),
             };
             user.SellerWallet = new()
             {
                 CreateDate = DateTime.Now,
-                Status = ObjectStatusEnum.ACTIVE.ToString(),
+                //Status = ObjectStatusEnum.ACTIVE.ToString(),
             };
 
             try

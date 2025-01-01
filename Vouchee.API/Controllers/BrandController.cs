@@ -88,34 +88,34 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
 
-        [HttpPut("update_brand_status/{id}")]
-        [Authorize]
-        public async Task<IActionResult> UpdateBrandStatus(Guid id, [FromQuery] ObjectStatusEnum status)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+        //[HttpPut("update_brand_status/{id}")]
+        //[Authorize]
+        //public async Task<IActionResult> UpdateBrandStatus(Guid id, [FromQuery] ObjectStatusEnum status)
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _brandService.UpdateBrandStatusAsync(id, status, currentUser);
-            return Ok(result);
-        }
+        //    var result = await _brandService.UpdateBrandStatusAsync(id, status, currentUser);
+        //    return Ok(result);
+        //}
 
-        [HttpPut("verify_brand/{id}")]
-        [Authorize]
-        public async Task<IActionResult> VerifyBrand(Guid id)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+        //[HttpPut("verify_brand/{id}")]
+        //[Authorize]
+        //public async Task<IActionResult> VerifyBrand(Guid id)
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            if (currentUser.role.Equals(RoleEnum.ADMIN.ToString()))
-            {
-                var result = await _brandService.VerifyBrand(id, currentUser);
-                return Ok(result);
-            }
+        //    if (currentUser.role.Equals(RoleEnum.ADMIN.ToString()))
+        //    {
+        //        var result = await _brandService.VerifyBrand(id, currentUser);
+        //        return Ok(result);
+        //    }
 
-            return StatusCode((int)HttpStatusCode.Forbidden, new
-            {
-                code = HttpStatusCode.Forbidden,
-                message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
-            });
-        }
+        //    return StatusCode((int)HttpStatusCode.Forbidden, new
+        //    {
+        //        code = HttpStatusCode.Forbidden,
+        //        message = "Chỉ có quản trị viên mới có thể thực hiện chức năng này"
+        //    });
+        //}
 
         [HttpPut("remove_address_from_brand")]
         [Authorize]
@@ -130,13 +130,13 @@ namespace Vouchee.API.Controllers
         // DELETE
         [HttpDelete("delete_brand/{id}")]
         [Authorize]
-        public async Task<IActionResult> DeleteBrand(Guid id)
+        public async Task<IActionResult> DeleteBrand(Guid id, ThisUserObj thisUserObj)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             if (currentUser.role.Equals(RoleEnum.ADMIN.ToString()))
             {
-                var result = await _brandService.DeleteBrandAsync(id);
+                var result = await _brandService.DeleteBrandAsync(id, thisUserObj);
                 return Ok(result);
             }
 

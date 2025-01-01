@@ -18,10 +18,10 @@ namespace Vouchee.Business.Services
         // UPDATE
         public Task<ResponseMessage<bool>> UpdateAddressAsync(Guid id, UpdateAddressDTO updateAddressDTO, ThisUserObj thisUserObj);
         public Task<ResponseMessage<bool>> UpdateAddressStateAsync(Guid id, bool isActive, ThisUserObj thisUserObj);
-        public Task<ResponseMessage<bool>> UpdateAddressStatusAsync(Guid id, ObjectStatusEnum statusEnum, ThisUserObj thisUserObj);
-        public Task<ResponseMessage<bool>> VerifyAddressAsync(Guid id, bool isVerify , ThisUserObj thisUserObj);
+        // public Task<ResponseMessage<bool>> UpdateAddressStatusAsync(Guid id, ObjectStatusEnum statusEnum, ThisUserObj thisUserObj);
+        // public Task<ResponseMessage<bool>> VerifyAddressAsync(Guid id, bool isVerify , ThisUserObj thisUserObj);
 
         // DELETE
-        public Task<ResponseMessage<bool>> DeleteAddressAsync(Guid id);
+        public Task<ResponseMessage<bool>> DeleteAddressAsync(Guid id, ThisUserObj thisUserObj);
     }
 }

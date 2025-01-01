@@ -51,7 +51,7 @@ namespace Vouchee.Business.Services.Impls
                     existedUser.BuyerWallet = new()
                     {
                         CreateDate = DateTime.Now,
-                        Status = ObjectStatusEnum.ACTIVE.ToString()
+                        //Status = ObjectStatusEnum.ACTIVE.ToString()
                     };
                 }
                 if (existedUser.SellerWallet == null)
@@ -59,7 +59,7 @@ namespace Vouchee.Business.Services.Impls
                     existedUser.SellerWallet = new()
                     {
                         CreateDate = DateTime.Now,
-                        Status = ObjectStatusEnum.ACTIVE.ToString()
+                        //Status = ObjectStatusEnum.ACTIVE.ToString()
                     };
                 }
 

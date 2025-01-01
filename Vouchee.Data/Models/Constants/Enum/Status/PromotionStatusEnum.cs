@@ -8,9 +8,8 @@ namespace Vouchee.Data.Models.Constants.Enum.Status
 {
     public enum PromotionStatusEnum
     {
-        INACTIVE,
-        ACTIVE,
         OUT_OF_STOCK,
-        EXPIRED
+        EXPIRED,
+        NONE
     }
 }
