@@ -321,6 +321,8 @@ namespace Vouchee.Business.Services.Impls
                         }
 
                         existedOrder.Note = "Đơn hàng thanh toán thành công";
+                        existedOrder.UpdateDate = DateTime.Now;
+
                         await _userRepository.SaveChanges();
 
                         await _orderRepository.SaveChanges();
