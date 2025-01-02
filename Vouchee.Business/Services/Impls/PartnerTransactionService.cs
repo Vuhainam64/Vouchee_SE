@@ -314,13 +314,15 @@ namespace Vouchee.Business.Services.Impls
 
                             foreach (var supplierToSendEmail in existedSupplier.Users)
                             {
-                                await _sendEmailService.SendEmailAsync(supplierToSendEmail.Email, $"Số tiền {amount} được thanh toán", $"Nhà cung cấp {supplierToSendEmail.Supplier} đã được trả {amount} cho đơn hàng {existedOrder.Id}");
+                                await _sendEmailService.SendEmailAsync(supplierToSendEmail.Email, $"Số tiền {amount} được thanh toán", $"Nhà cung cấp {existedSupplier.Name} đã được trả {amount} cho đơn hàng {existedOrder.Id}");
                             }
 
                             await _supplierRepository.SaveChanges();
                         }
 
                         existedOrder.Note = "Đơn hàng thanh toán thành công";
+                        existedOrder.UpdateDate = DateTime.Now;
+
                         await _userRepository.SaveChanges();
 
                         await _orderRepository.SaveChanges();

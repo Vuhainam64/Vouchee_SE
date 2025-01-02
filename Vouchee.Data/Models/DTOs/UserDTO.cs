@@ -58,6 +58,7 @@ namespace Vouchee.Business.Models.DTOs
         public DateTime? updateDate { get; set; }
         public Guid? updateBy { get; set; }
         public string SupplierName {  get; set; }
+        public int vpoint { get; set; }
 
         public GetBuyerWallet? buyerWallet { get; set; }
         public GetSellerWallet? sellerWallet { get; set; }
