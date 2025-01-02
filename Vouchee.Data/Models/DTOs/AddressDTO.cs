@@ -47,7 +47,7 @@ namespace Vouchee.Business.Models.DTOs
         public decimal? lon { get; set; }
         public decimal? lat { get; set; }
         public bool? isActive { get; set; }
-        public string? status { get; set; }
+        //public string? status { get; set; }
     }
 
     public class GetAddressDTO : AddressDTO

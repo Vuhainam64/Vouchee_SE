@@ -9,5 +9,6 @@ namespace Vouchee.Data.Models.Filters
     public class CategoryFilter
     {
         public string? title { get; set; }
+        public bool? isActive { get; set; }
     }
 }
