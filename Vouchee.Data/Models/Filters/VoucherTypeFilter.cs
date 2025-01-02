@@ -8,6 +8,7 @@ namespace Vouchee.Data.Models.Filters
 {
     public class VoucherTypeFilter
     {
-        public string? title { get; }
+        public string? title { get; set; }
+        public bool? isActive { get; set; }
     }
 }

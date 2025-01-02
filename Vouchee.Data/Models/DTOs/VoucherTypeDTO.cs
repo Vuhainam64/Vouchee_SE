@@ -36,12 +36,12 @@ namespace Vouchee.Business.Models.DTOs
         public Guid? id { get; set; }
         //public string? image { get; set; }
         public string? title { get; set; }
-
+        public bool? isActive { get; set; }
         //public string? status { get; set; }
-        //public DateTime? createDate { get; set; }
-        //public Guid? createBy { get; set; }
-        //public DateTime? updateDate { get; set; }
-        //public Guid? updateBy { get; set; }
+        public DateTime? createDate { get; set; }
+        public Guid? createBy { get; set; }
+        public DateTime? updateDate { get; set; }
+        public Guid? updateBy { get; set; }
 
         //public virtual ICollection<GetAllVoucherDTO>? vouchers { get; set; }
         public virtual ICollection<GetCategoryDTO>? categories { get; set; }
