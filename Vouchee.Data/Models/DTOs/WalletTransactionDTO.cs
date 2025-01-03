@@ -94,5 +94,6 @@ namespace Vouchee.Data.Models.DTOs
     {
         public string? id { get; set;}
         public WithdrawRequestStatusEnum? statusEnum { get; set; }
+        public string? note { get; set; }
     }
 }
