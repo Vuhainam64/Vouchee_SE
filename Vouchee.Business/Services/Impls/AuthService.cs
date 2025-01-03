@@ -52,7 +52,7 @@ namespace Vouchee.Business.Services.Impls
             string email = userRecord.Email;
             var imageUrl = userRecord.PhotoUrl?.ToString() ?? null;
             var phoneNumber = userRecord.PhoneNumber?.ToString() ?? null;
-            string lastName = userRecord.DisplayName;
+            string lastName = userRecord.DisplayName?.ToString() ?? "Vouchee member";
 
             var user = await _userRepository.GetFirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()), includeProperties: x => x.Include(x => x.DeviceTokens), isTracking: true);
 
