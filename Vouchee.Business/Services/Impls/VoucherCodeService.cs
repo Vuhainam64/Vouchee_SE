@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using DocumentFormat.OpenXml.Office2019.Drawing.Model3D;
 using Google.Api;
 using Hangfire;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -152,13 +153,13 @@ namespace Vouchee.Business.Services.Impls
                     if (existedVoucherCode.Status != VoucherCodeStatusEnum.UNUSED.ToString())
                     {
                         Console.WriteLine("Voucher code này không trong trạng thái unused");
-                        throw new ConflictException("Voucher code này không trong trạng thái unused");
+                        throw new TempException("Voucher code này không trong trạng thái unused");
                     }
 
                     if (currentDate > existedVoucherCode.EndDate)
                     {
                         Console.WriteLine("Voucher code này đã hết hạn");
-                        throw new ConflictException("Voucher code này đã hết hạn");
+                        throw new TempException("Voucher code này đã hết hạn");
                     }
 
                     // Log job scheduling
@@ -171,7 +172,7 @@ namespace Vouchee.Business.Services.Impls
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in GetVoucherCodeByIdAsync: {ex.Message}");
-                throw new LoadException(ex.Message);
+                throw new TempException(ex.Message);
             }
         }
 

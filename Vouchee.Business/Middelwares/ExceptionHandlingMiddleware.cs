@@ -90,6 +90,10 @@ namespace Vouchee.Business.Middelwares
                     errorMessageObject.code = "C001";
                     statusCode = (int)HttpStatusCode.Conflict;
                     break;
+                case TempException:
+                    errorMessageObject.code = "T001";
+                    statusCode = (int)HttpStatusCode.OK;
+                    break;
             }
 
             var errorMessage = JsonConvert.SerializeObject(errorMessageObject);
