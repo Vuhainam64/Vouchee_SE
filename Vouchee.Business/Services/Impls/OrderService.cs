@@ -27,6 +27,8 @@ namespace Vouchee.Business.Services.Impls
         private readonly INotificationService _notificationService;
         private readonly ICartService _cartService;
 
+        private readonly IBaseRepository<Supplier> _supplierRepository;
+        private readonly IBaseRepository<Notification> _notificationRepository;
         private readonly IBaseRepository<Promotion> _promotionRepository;
         private readonly IBaseRepository<Modal> _modalRepository;
         private readonly IBaseRepository<User> _userRepository;
@@ -36,10 +38,12 @@ namespace Vouchee.Business.Services.Impls
         private readonly IBaseRepository<Order> _orderRepository;
         private readonly IMapper _mapper;
 
-        public OrderService(IBaseRepository<Promotion> promotionRepository,
-                            ISendEmailService sendEmailService,
+        public OrderService(ISendEmailService sendEmailService,
                             INotificationService notificationService,
                             ICartService cartService,
+                            IBaseRepository<Supplier> supplierRepository,
+                            IBaseRepository<Notification> notificationRepository,
+                            IBaseRepository<Promotion> promotionRepository,
                             IBaseRepository<Modal> modalRepository,
                             IBaseRepository<User> userRepository,
                             IBaseRepository<VoucherCode> voucherCodeRepository,
@@ -48,10 +52,12 @@ namespace Vouchee.Business.Services.Impls
                             IBaseRepository<Order> orderRepository,
                             IMapper mapper)
         {
-            _promotionRepository = promotionRepository;
             _sendEmailService = sendEmailService;
             _notificationService = notificationService;
             _cartService = cartService;
+            _supplierRepository = supplierRepository;
+            _notificationRepository = notificationRepository;
+            _promotionRepository = promotionRepository;
             _modalRepository = modalRepository;
             _userRepository = userRepository;
             _voucherCodeRepository = voucherCodeRepository;
@@ -60,8 +66,11 @@ namespace Vouchee.Business.Services.Impls
             _orderRepository = orderRepository;
             _mapper = mapper;
         }
+
         public async Task<ResponseMessage<string>> CreateOrderAsync(ThisUserObj thisUserObj, CheckOutViewModel checkOutViewModel)
         {
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
             var user = await _userRepository.GetByIdAsync(thisUserObj.userId, includeProperties: x => x.Include(x => x.BuyerWallet), isTracking: true);
 
             if (user == null)
@@ -74,16 +83,29 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Người dùng này chưa có ví buyer");
             }
 
-            CartDTO cartDTO = await _cartService.GetCheckoutCartsAsync(thisUserObj, checkOutViewModel);
+            DetailCartDTO cartDTO = await _cartService.GetCheckoutCartsAsync(thisUserObj, checkOutViewModel);
 
             Order order = new()
             {
-                Status = OrderStatusEnum.PENDING.ToString(),
-                CreateBy = thisUserObj.userId,
-                CreateDate = DateTime.Now,
-                OrderDetails = new List<OrderDetail>(),
-                Note = "Đơn hàng chờ thanh toán"
+                Status = OrderStatusEnum.PENDING.ToString()
             };
+
+            if (cartDTO.finalPrice == 0)
+            {
+                order.Status = OrderStatusEnum.PAID.ToString();
+                order.CreateBy = thisUserObj.userId;
+                order.CreateDate = DateTime.Now;
+                order.OrderDetails = [];
+                order.Note = "Đơn hàng thanh toán thành công";
+            }
+            else
+            {
+                order.Status = OrderStatusEnum.PENDING.ToString();
+                order.CreateBy = thisUserObj.userId;
+                order.CreateDate = DateTime.Now;
+                order.OrderDetails = [];
+                order.Note = "Đơn hàng chờ thanh toán";
+            }
 
             // duyet tung seller
             foreach (var seller in cartDTO.sellers)
@@ -124,9 +146,6 @@ namespace Vouchee.Business.Services.Impls
                                 {
                                     throw new NotFoundException($"Không tìm thấy promotion {cartModal.shopPromotionId}");
                                 }
-
-                                // Get today's date as DateOnly
-                                var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
                                 // Check if the promotion has expired
                                 if (existedPromotion.EndDate.HasValue && today > existedPromotion.EndDate.Value)
@@ -181,15 +200,186 @@ namespace Vouchee.Business.Services.Impls
 
             var orderId = await _orderRepository.AddReturnString(order);
 
+            var existedOrder = await _orderRepository.GetByIdAsync(orderId, includeProperties: x => x.Include(x => x.OrderDetails)
+                                                                                                                                        .ThenInclude(x => x.Modal.Voucher.Seller)
+                                                                                                                                     .Include(x => x.Buyer)
+                                                                                                                                        .ThenInclude(x => x.BuyerWallet)
+                                                                                                                                            .ThenInclude(x => x.BuyerWalletTransactions)
+                                                                                                                                     .Include(x => x.OrderDetails)
+                                                                                                                                        .ThenInclude(x => x.Modal)
+                                                                                                                                            .ThenInclude(x => x.Voucher),
+                                                                                                                                     isTracking: true);
+
+            if (existedOrder.Status.Equals(OrderStatusEnum.PAID.ToString()))
+            {
+                await _sendEmailService.SendEmailAsync("advouchee@gmail.com", "Tiền về ngân hàng của Nam", $"Ngân hàng của Nam được nhận {existedOrder.FinalPrice * 10 / 100} từ đơn hàng {existedOrder.Id}");
+
+                foreach (var existedOrderDetail in existedOrder.OrderDetails.GroupBy(x => x.Modal.VoucherId))
+                {
+                    // gop tung modal co cung voucher id
+                    var existedVoucher = await _voucherRepository.GetByIdAsync(existedOrderDetail.Key,
+                                                                                        isTracking: true,
+                                                                                        includeProperties: x => x.Include(x => x.Modals)
+                                                                                                                    .ThenInclude(x => x.Carts)
+                                                                                                                  .Include(x => x.Modals)
+                                                                                                                    .ThenInclude(x => x.VoucherCodes));
+
+                    // duyet tung modal 
+                    foreach (var cartModal in existedOrderDetail)
+                    {
+                        var existedModal = existedVoucher.Modals.FirstOrDefault(x => x.Id == cartModal.ModalId);
+
+                        //existedModal.Stock -= cartModal.Quantity;
+
+                        var voucherCodes = _voucherCodeRepository.GetTable()
+                                                                    .Where(x => x.OrderId == null && x.ModalId == existedModal.Id && x.EndDate >= today)
+                                                                    .OrderBy(x => x.EndDate)
+                                                                    .Take(cartModal.Quantity)
+                                                                    .AsTracking();
+
+                        foreach (var voucherCode in voucherCodes)
+                        {
+                            voucherCode.OrderId = existedOrder.Id;
+                            voucherCode.Status = VoucherCodeStatusEnum.UNUSED.ToString();
+                        }
+
+                        await _voucherCodeRepository.SaveChanges();
+
+                        //existedVoucher.Stock -= cartModal.Quantity;
+
+                        existedModal.Carts.Remove(existedModal.Carts.FirstOrDefault(c => c.ModalId == cartModal.ModalId));
+                    }
+
+                    await _voucherRepository.UpdateAsync(existedVoucher);
+                }
+
+                // Update existedOrder details
+                existedOrder.Status = OrderStatusEnum.PAID.ToString();
+
+                if (existedOrder.UsedVPoint > 0)
+                {
+                    existedOrder.Buyer.VPoint -= existedOrder.UsedVPoint;
+                }
+
+                existedOrder.Buyer.VPoint += existedOrder.VPointUp;
+
+                if (existedOrder.UsedBalance > 0)
+                {
+                    existedOrder.Buyer.BuyerWallet.BuyerWalletTransactions.Add(new()
+                    {
+                        Type = WalletTransactionTypeEnum.BUYER_ORDER.ToString(),
+                        CreateBy = existedOrder.Buyer.Id,
+                        CreateDate = DateTime.Now,
+                        Status = BuyerWalletTransactionStatusEnum.TRANSACTION_SUCCESS.ToString(),
+                        Amount = existedOrder.UsedBalance,
+                        OrderId = existedOrder.Id,
+                        BeforeBalance = existedOrder.Buyer.BuyerWallet.Balance,
+                        AfterBalance = existedOrder.Buyer.BuyerWallet.Balance - existedOrder.UsedBalance,
+                        Note = $"Rút {existedOrder.UsedBalance} để thanh toán đơn hàng {existedOrder.Id} "
+                    });
+                    existedOrder.Buyer.BuyerWallet.Balance -= existedOrder.UsedBalance;
+                }
+
+                await _sendEmailService.SendEmailAsync(existedOrder.Buyer.Email, "Thông báo trạng thái đơn hàng", $"{existedOrder.Id} đã thanh toán thành công");
+
+                // Process seller wallet updates
+                foreach (var seller in existedOrder.OrderDetails.GroupBy(x => x.Modal.Voucher.SellerId))
+                {
+                    var amount = seller.Sum(x => x.FinalPrice) - (seller.Sum(x => x.FinalPrice) * 10 / 100);
+
+                    var existedSeller = await _userRepository.GetByIdAsync(seller.Key, includeProperties: x => x.Include(x => x.SellerWallet)
+                                                                                                                    .ThenInclude(x => x.SellerWalletTransactions)
+                                                                                                                    , isTracking: true);
+
+                    if (existedSeller.SellerWallet == null)
+                    {
+                        throw new NotFoundException($"{existedSeller.Id} chưa có ví seller");
+                    }
+
+                    existedSeller.SellerWallet.SellerWalletTransactions.Add(new()
+                    {
+                        Type = WalletTransactionTypeEnum.SELLER_ORDER.ToString(),
+                        CreateBy = existedOrder.Buyer.Id,
+                        CreateDate = DateTime.Now,
+                        Status = SellerWalletTransactionStatusEnum.DONE.ToString(),
+                        Amount = amount,
+                        OrderId = existedOrder.Id,
+                        BeforeBalance = existedSeller.SellerWallet.Balance,
+                        AfterBalance = existedSeller.SellerWallet.Balance + amount,
+                        Note = $"Nhận {amount} từ đơn {existedOrder.Id}"
+                    });
+
+                    existedSeller.SellerWallet.Balance += amount;
+
+                    string description = $"Đơn hàng số {existedOrder.Id}\n";
+
+                    foreach (var modal in seller)
+                    {
+                        description += $"Modal: {modal.ModalId} - số lượng: {modal.Quantity}\n";
+                    }
+
+                    description += $"Tổng tiền sau khi trừ 10% tiền dịch vụ: {amount}";
+
+                    Notification sellerNotification = new()
+                    {
+                        ReceiverId = existedSeller.Id,
+                        //CreateBy = existedOrder.CreateBy,
+                        CreateDate = DateTime.Now,
+                        Title = "THÔNG BÁO CÓ ĐƠN HÀNG MỚI",
+                        Body = description,
+                        Seen = false,
+                    };
+
+                    await _sendEmailService.SendEmailAsync(existedSeller.Email, "Thông báo có đơn hàng mới từ người mua", $"{description} và đã được chuyển {amount} về ví");
+
+                    await _notificationRepository.AddAsync(sellerNotification);
+                }
+
+                foreach (var supplier in existedOrder.OrderDetails.GroupBy(x => x.Modal.Voucher.SupplierId))
+                {
+                    var amount = supplier.Sum(x => x.FinalPrice) * 10 / 100;
+
+                    var existedSupplier = await _supplierRepository.GetByIdAsync(supplier.Key, includeProperties: x => x.Include(x => x.SupplierWallet)
+                                                                                                                                .ThenInclude(x => x.SupplierWalletTransactions)
+                                                                                                                            , isTracking: true);
+
+                    existedSupplier.SupplierWallet.SupplierWalletTransactions.Add(new()
+                    {
+                        Status = WalletTransactionStatusEnum.PAID.ToString(),
+                        Type = WalletTransactionTypeEnum.SUPPLIER_ORDER.ToString(),
+                        OrderId = existedOrder.Id,
+                        BeforeBalance = existedSupplier.SupplierWallet.Balance,
+                        Amount = amount,
+                        AfterBalance = existedSupplier.SupplierWallet.Balance + amount,
+                        CreateDate = DateTime.Now
+                    });
+                    existedSupplier.SupplierWallet.Balance += amount;
+
+                    foreach (var supplierToSendEmail in existedSupplier.Users)
+                    {
+                        await _sendEmailService.SendEmailAsync(supplierToSendEmail.Email, $"Số tiền {amount} được thanh toán", $"Nhà cung cấp {existedSupplier.Name} đã được trả {amount} cho đơn hàng {existedOrder.Id}");
+                    }
+
+                    await _supplierRepository.SaveChanges();
+                }
+
+                existedOrder.Note = "Đơn hàng thanh toán thành công";
+                existedOrder.UpdateDate = DateTime.Now;
+
+                await _userRepository.SaveChanges();
+
+                await _orderRepository.SaveChanges();
+            }
+
             CreateNotificationDTO createNotificationDTO = new()
             {
                 body = "Cảm ơn bạn đã dặt hơn hàng\n" +
-                        $"ID tham khảo: {orderId}",
+                        $"ID tham khảo: {existedOrder.Id}",
                 title = "Đơn hàng mới",
                 receiverId = thisUserObj.userId,
             };
 
-            await _sendEmailService.SendEmailAsync(order.Buyer.Email, "Đơn hang mới", orderId);
+            await _sendEmailService.SendEmailAsync(existedOrder.Buyer.Email, "Đơn hang mới", existedOrder.Id);
 
             await _notificationService.CreateNotificationAsync(createNotificationDTO);
 

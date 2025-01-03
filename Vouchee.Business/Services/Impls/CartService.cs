@@ -455,6 +455,16 @@ namespace Vouchee.Business.Services.Impls
                 totalQuantity = _cartDTO.sellers.Sum(x => x.modals.Sum(x => x.quantity)),
             };
 
+            if (detailCartDTO.useBalance > detailCartDTO.balance)
+            {
+                throw new ConflictException("Số dư trong ví không đủ");
+            }
+
+            if (detailCartDTO.useVPoint + detailCartDTO.useBalance > detailCartDTO.totalPrice + detailCartDTO.shopDiscountPrice)
+            {
+                throw new ConflictException("Số tiền và số điểm sử dụng vượt quá số tiền trong order");
+            }
+
             return detailCartDTO;
         }
     }
