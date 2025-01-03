@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -233,6 +233,7 @@ namespace Vouchee.Business.Services.Impls
 
                         var voucherCodes = _voucherCodeRepository.GetTable()
                                                                     .Where(x => x.OrderId == null && x.ModalId == existedModal.Id && x.EndDate >= today)
+                                                                    .Where(x => x.Status == VoucherCodeStatusEnum.NONE.ToString())
                                                                     .OrderBy(x => x.EndDate)
                                                                     .Take(cartModal.Quantity)
                                                                     .AsTracking();
@@ -240,7 +241,7 @@ namespace Vouchee.Business.Services.Impls
                         foreach (var voucherCode in voucherCodes)
                         {
                             voucherCode.OrderId = existedOrder.Id;
-                            voucherCode.Status = VoucherCodeStatusEnum.UNUSED.ToString();
+                            voucherCode.Status = VoucherCodeStatusEnum.CONVERTING.ToString();
                         }
 
                         await _voucherCodeRepository.SaveChanges();
