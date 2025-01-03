@@ -417,17 +417,22 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<DynamicResponseModel<dynamic>> GetWithdrawWalletTransactionByUpdateId(PagingRequest pagingRequest, WithdrawRequestFilter walletTransactionFilter)
+        public async Task<DynamicResponseModel<dynamic>> GetWithdrawWalletTransactionByUpdateId(
+    PagingRequest pagingRequest,
+    WithdrawRequestFilter walletTransactionFilter)
         {
             // Filter and group by updateId
             var filteredQuery = _moneyRequestRepository.GetTable()
-            .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString()) || x.Type.Equals(MoneyRequestTypeEnum.AUTO_WITHDRAW.ToString()))
-            .ProjectTo<GetWithdrawRequestDTO>(_mapper.ConfigurationProvider)
-            .DynamicFilter(_mapper.Map<GetWithdrawRequestDTO>(walletTransactionFilter));
+                .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString())
+                         || x.Type.Equals(MoneyRequestTypeEnum.AUTO_WITHDRAW.ToString()))
+                .ProjectTo<GetWithdrawRequestDTO>(_mapper.ConfigurationProvider)
+                .DynamicFilter(_mapper.Map<GetWithdrawRequestDTO>(walletTransactionFilter));
+
             if (!string.IsNullOrEmpty(walletTransactionFilter.updateId.ToString()))
             {
                 filteredQuery = filteredQuery.Where(x => x.updateId.Equals(walletTransactionFilter.updateId));
             }
+
             var groupedQuery = filteredQuery
                 .GroupBy(x => x.updateId)
                 .Select(group => new
@@ -435,9 +440,13 @@ namespace Vouchee.Business.Services.Impls
                     UpdateId = group.Key,
                     Count = group.Count(),
                     UpdateDate = group.Max(x => x.updateDate),
-                    Transactions = group.ToList()
+                    Transactions = group.ToList(),
+                    Status = group.All(x => x.status == "PAID")
+                             ? "Hoàn thành"
+                             : group.Any(x => x.status == "FAIL")
+                             ? "Chưa hoàn thành"
+                             : "Đang xử lý"
                 });
-
 
             // Apply paging to the grouped results
             var pagedGroups = groupedQuery
@@ -454,6 +463,7 @@ namespace Vouchee.Business.Services.Impls
                 UpdateId = group.UpdateId,
                 Count = group.Count,
                 UpdateDate = group.UpdateDate,
+                Status = group.Status,
                 Transactions = group.Transactions
             }).ToList<dynamic>();
 
@@ -468,6 +478,7 @@ namespace Vouchee.Business.Services.Impls
                 results = results
             };
         }
+
 
 
         public async Task<ResponseMessage<Guid>> UpdateWithdrawRequest(List<UpdateWithDrawRequestDTO> updateWithDrawRequestDTOs, ThisUserObj thisUserObj)
