@@ -485,6 +485,7 @@ namespace Vouchee.Business.Services.Impls
 
                 withdrawRequest.UpdateId = generateId;
 
+                withdrawRequest.Note = item.note;
                 withdrawRequest.Status = item.statusEnum.ToString();
                 withdrawRequest.UpdateDate = DateTime.Now;
                 withdrawRequest.UpdateBy = thisUserObj.userId;

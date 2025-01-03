@@ -30,6 +30,7 @@ namespace Vouchee.Data.Models.DTOs
         public Guid? updateId { get; set; }
         public string? WalletType { get; set; }
         public DateTime? updateDate { get; set; }
+        public string? note { get; set; }
         //public DateTime? exprireTime => createDate?.AddMinutes(2);
         public virtual GetWalletTransactionDTO? withdrawWalletTransaction { get; set; }
     }
