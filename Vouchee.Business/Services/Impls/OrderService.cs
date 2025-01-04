@@ -201,14 +201,14 @@ namespace Vouchee.Business.Services.Impls
             var orderId = await _orderRepository.AddReturnString(order);
 
             var existedOrder = await _orderRepository.GetByIdAsync(orderId, includeProperties: x => x.Include(x => x.OrderDetails)
-                                                                                                                                        .ThenInclude(x => x.Modal.Voucher.Seller)
-                                                                                                                                     .Include(x => x.Buyer)
-                                                                                                                                        .ThenInclude(x => x.BuyerWallet)
-                                                                                                                                            .ThenInclude(x => x.BuyerWalletTransactions)
-                                                                                                                                     .Include(x => x.OrderDetails)
-                                                                                                                                        .ThenInclude(x => x.Modal)
-                                                                                                                                            .ThenInclude(x => x.Voucher),
-                                                                                                                                     isTracking: true);
+                                                                                                                        .ThenInclude(x => x.Modal.Voucher.Seller)
+                                                                                                                        .Include(x => x.Buyer)
+                                                                                                                        .ThenInclude(x => x.BuyerWallet)
+                                                                                                                            .ThenInclude(x => x.BuyerWalletTransactions)
+                                                                                                                        .Include(x => x.OrderDetails)
+                                                                                                                        .ThenInclude(x => x.Modal)
+                                                                                                                            .ThenInclude(x => x.Voucher),
+                                                                                                                        isTracking: true);
 
             if (existedOrder.Status.Equals(OrderStatusEnum.PAID.ToString()))
             {
@@ -232,7 +232,7 @@ namespace Vouchee.Business.Services.Impls
                         //existedModal.Stock -= cartModal.Quantity;
 
                         var voucherCodes = _voucherCodeRepository.GetTable()
-                                                                    .Where(x => x.OrderId == null && x.ModalId == existedModal.Id && x.EndDate >= today)
+                                                                    .Where(x => x.OrderId == null && x.ModalId == existedModal.Id && x.EndDate >= today && x.StartDate <= today)
                                                                     .Where(x => x.Status == VoucherCodeStatusEnum.NONE.ToString())
                                                                     .OrderBy(x => x.EndDate)
                                                                     .Take(cartModal.Quantity)
