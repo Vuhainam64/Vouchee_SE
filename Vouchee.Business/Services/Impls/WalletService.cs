@@ -84,6 +84,11 @@ namespace Vouchee.Business.Services.Impls
             }
         }
 
+        public Task<dynamic> GetAdminWalletAsync()
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<dynamic> GetBuyerWalletAsync(ThisUserObj currentuser)
         {
             var user = await _userRepository.GetByIdAsync(currentuser.userId, includeProperties: x => x.Include(x => x.BuyerWallet.BuyerWalletTransactions));

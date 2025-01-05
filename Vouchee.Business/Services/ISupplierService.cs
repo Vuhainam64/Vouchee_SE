@@ -20,6 +20,7 @@ namespace Vouchee.Business.Services
         public Task<ResponseMessage<dynamic>> GetSupplierWalletTransactionAsync(ThisUserObj currentUser, PagingRequest pagingRequest, SupplierWalletTransactionFilter supplierWalletTransactionFilter);
         public Task<dynamic> GetSupplierOrderAsync(ThisUserObj currentUser, PagingRequest pagingRequest, OrderFilter orderFilter);
         public Task<ResponseMessage<dynamic>> GetSupplierDashboard(ThisUserObj currentUser);
+        public Task<ResponseMessage<dynamic>> GetAdminDashboard();
         public Task<ResponseMessage<dynamic>> GetSupplierDashboardbyday(ThisUserObj currentUser);
 
         // UPDATE

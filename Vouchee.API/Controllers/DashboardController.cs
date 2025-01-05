@@ -12,12 +12,13 @@ namespace Vouchee.API.Controllers
     [EnableCors("MyAllowSpecificOrigins")]
     public class DashboardController : ControllerBase
     {
+        private readonly ISupplierService _supplierService;
         private readonly IDashboardService _dashboardService;
         private readonly IWalletTransactionService _walletTransactionService;
 
-        public DashboardController(IDashboardService dashboardService,
-                                   IWalletTransactionService walletTransactionService)
+        public DashboardController(ISupplierService supplierService, IDashboardService dashboardService, IWalletTransactionService walletTransactionService)
         {
+            _supplierService = supplierService;
             _dashboardService = dashboardService;
             _walletTransactionService = walletTransactionService;
         }
@@ -117,6 +118,13 @@ namespace Vouchee.API.Controllers
         public async Task<IActionResult> GetWalletTransaction([FromQuery] PagingRequest pagingRequest, [FromQuery] WalletTransactionFilter walletTransactionFilter)
         {
             var result = await _walletTransactionService.GetWalletTransactionAsync(pagingRequest, walletTransactionFilter);
+            return Ok(result);
+        }
+
+        [HttpGet("get_admin_dashboard")]
+        public async Task<IActionResult> GetAdminDashboard()
+        {
+            var result = await _supplierService.GetAdminDashboard();
             return Ok(result);
         }
     }
