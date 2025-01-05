@@ -45,7 +45,7 @@ namespace Vouchee.Data.Models.Entities
         public int Index { get; set; }
         public string? Image { get; set; }
         public int Stock => VoucherCodes.Count(x => x.OrderId == null 
-                                                        && x.Status.Equals(VoucherCodeStatusEnum.NONE.ToString())
+                                                        && x.NewCode != null
                                                             && x.EndDate >= DateOnly.FromDateTime(DateTime.UtcNow));
         public decimal AverageRating => Ratings.Any() ? Math.Round(
                                                         Ratings.Average(rating =>
