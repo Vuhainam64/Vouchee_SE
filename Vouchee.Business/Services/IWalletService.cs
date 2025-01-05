@@ -18,5 +18,6 @@ namespace Vouchee.Business.Services
         // GET
         public Task<dynamic> GetSellerWalletAsync(ThisUserObj currentUser);
         public Task<dynamic> GetBuyerWalletAsync( ThisUserObj currentUser);
+        public Task<dynamic> GetAdminWalletAsync();
     }
 }
