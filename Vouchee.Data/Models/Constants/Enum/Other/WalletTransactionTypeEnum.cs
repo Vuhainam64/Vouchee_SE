@@ -15,6 +15,7 @@ namespace Vouchee.Data.Models.Constants.Enum.Other
         BUYER_ORDER,
         SELLER_ORDER,
         SUPPLIER_ORDER,
-        EXPIRED_ORDER
+        EXPIRED_ORDER,
+        ADMIN
     }
 }

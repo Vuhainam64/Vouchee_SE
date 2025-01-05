@@ -212,6 +212,17 @@ namespace Vouchee.Business.Services.Impls
 
             if (existedOrder.Status.Equals(OrderStatusEnum.PAID.ToString()))
             {
+                WalletTransaction walletTransaction = new()
+                {
+                    Status = "PAID",
+                    Type = WalletTransactionTypeEnum.ADMIN.ToString(),
+                    Amount = existedOrder.FinalPrice * 10 / 100,
+                    CreateDate = DateTime.Now,
+                    Note = $"Ngân hàng của Nam được nhận {existedOrder.FinalPrice * 10 / 100} từ đơn hàng {existedOrder.Id}",
+                };
+
+                existedOrder.WalletTransactions.Add(walletTransaction);
+
                 await _sendEmailService.SendEmailAsync("advouchee@gmail.com", "Tiền về ngân hàng của Nam", $"Ngân hàng của Nam được nhận {existedOrder.FinalPrice * 10 / 100} từ đơn hàng {existedOrder.Id}");
 
                 foreach (var existedOrderDetail in existedOrder.OrderDetails.GroupBy(x => x.Modal.VoucherId))
@@ -233,7 +244,7 @@ namespace Vouchee.Business.Services.Impls
 
                         var voucherCodes = _voucherCodeRepository.GetTable()
                                                                     .Where(x => x.OrderId == null && x.ModalId == existedModal.Id && x.EndDate >= today)
-                                                                    .Where(x => x.Status == VoucherCodeStatusEnum.NONE.ToString())
+                                                                    .Where(x => x.NewCode != null)
                                                                     .OrderBy(x => x.EndDate)
                                                                     .Take(cartModal.Quantity)
                                                                     .AsTracking();
