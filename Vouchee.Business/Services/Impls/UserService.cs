@@ -617,9 +617,9 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<ResponseMessage<GetUserDTO>> UpdateUserRoleAsync(UpdateUserRoleDTO updateUserRoleDTO)
         {
-            if (updateUserRoleDTO.supplierId != null && updateUserRoleDTO.role.Equals(RoleEnum.SUPPLIER.ToString()))
+            if (updateUserRoleDTO.role.Equals(RoleEnum.SUPPLIER) && updateUserRoleDTO.supplierId == null)
             {
-                throw new ConflictException("Role supplier cần phải có supplier");
+                throw new ConflictException("Role supplier cần cung cấp supplier id");
             }
 
             var existedUser = await _userRepository.GetByIdAsync(updateUserRoleDTO.userId, isTracking: true);
@@ -628,6 +628,17 @@ namespace Vouchee.Business.Services.Impls
                 existedUser.Role = updateUserRoleDTO.role.ToString();
                 existedUser.UpdateBy = updateUserRoleDTO.userId;
                 existedUser.UpdateDate = updateUserRoleDTO.updateDate;
+
+                if (updateUserRoleDTO.role.Equals(RoleEnum.SUPPLIER) && updateUserRoleDTO.supplierId != null)
+                {
+                    var existedSupplier = await _supplierRepository.GetByIdAsync(updateUserRoleDTO.supplierId);
+                    if (existedSupplier == null)
+                    {
+                        throw new NotFoundException("Không tìm thấy supplier");
+                    }
+                    existedUser.SupplierId = existedSupplier.Id;
+                }
+
                 await _userRepository.UpdateAsync(existedUser);
 
                 return new ResponseMessage<GetUserDTO>()
