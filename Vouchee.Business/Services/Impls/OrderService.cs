@@ -232,7 +232,7 @@ namespace Vouchee.Business.Services.Impls
                         //existedModal.Stock -= cartModal.Quantity;
 
                         var voucherCodes = _voucherCodeRepository.GetTable()
-                                                                    .Where(x => x.OrderId == null && x.ModalId == existedModal.Id && x.EndDate >= today && x.StartDate <= today)
+                                                                    .Where(x => x.OrderId == null && x.ModalId == existedModal.Id && x.EndDate >= today)
                                                                     .Where(x => x.Status == VoucherCodeStatusEnum.NONE.ToString())
                                                                     .OrderBy(x => x.EndDate)
                                                                     .Take(cartModal.Quantity)

@@ -156,6 +156,12 @@ namespace Vouchee.Business.Services.Impls
                         throw new TempException("Voucher code này không trong trạng thái unused");
                     }
 
+                    if (currentDate < existedVoucherCode.StartDate)
+                    {
+                        Console.WriteLine("Voucher code này chưa có hiệu lực");
+                        throw new TempException("Voucher code này chưa có hiệu lực");
+                    }
+
                     if (currentDate > existedVoucherCode.EndDate)
                     {
                         Console.WriteLine("Voucher code này đã hết hạn");
