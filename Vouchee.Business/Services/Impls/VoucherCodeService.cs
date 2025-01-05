@@ -156,6 +156,12 @@ namespace Vouchee.Business.Services.Impls
                         throw new TempException("Voucher code này không trong trạng thái unused");
                     }
 
+                    if (currentDate < existedVoucherCode.StartDate)
+                    {
+                        Console.WriteLine("Voucher code này chưa có hiệu lực");
+                        throw new TempException("Voucher code này chưa có hiệu lực");
+                    }
+
                     if (currentDate > existedVoucherCode.EndDate)
                     {
                         Console.WriteLine("Voucher code này đã hết hạn");
@@ -501,6 +507,7 @@ namespace Vouchee.Business.Services.Impls
             result = _voucherCodeRepository.GetTable()
                                 .Where(x => x.Modal.Voucher.SupplierId == existedUser.SupplierId)
                                 .Where(x => x.UpdateId != null)
+                                .Where(x => x.OrderId != null)
                                 .Where(x => x.Status == VoucherCodeStatusEnum.CONVERTING.ToString() || x.Status == VoucherCodeStatusEnum.UNUSED.ToString())
                                 .GroupBy(x => x.UpdateId)
                                 .Select(g => new GroupedVoucherCodeDTO
@@ -508,7 +515,7 @@ namespace Vouchee.Business.Services.Impls
                                     UpdateId = g.Key,
                                     Count = g.Count(),
                                     UpdateTime = g.Max(x => x.UpdateDate),
-                                    Status = g.Any(x => x.Status == VoucherCodeStatusEnum.UNUSED.ToString()) ? "Đã xử lý":"Chưa sử lý",
+                                    Status = g.Any(x => x.Status == VoucherCodeStatusEnum.UNUSED.ToString()) ? "Đã xử lý":"Chưa xử lý",
                                     FirstItem = _mapper.Map<GetVoucherCodeDTO>(g.FirstOrDefault())
                                 })
                                 .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);

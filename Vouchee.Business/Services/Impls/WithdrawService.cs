@@ -52,6 +52,39 @@ namespace Vouchee.Business.Services.Impls
             var generateId = Guid.NewGuid();
             var existedUser = await _userRepository.FindAsync(thisUserObj.userId, isTracking: true);
 
+            if (existedUser == null)
+            {
+                throw new NotFoundException("Không tìm thấy user này");
+            }
+
+            if (walletTypeEnum.Equals(WalletTypeEnum.BUYER))
+            {
+                if (string.IsNullOrEmpty(existedUser.BuyerWallet.BankAccount) 
+                        || string.IsNullOrEmpty(existedUser.BuyerWallet.BankName) 
+                            || string.IsNullOrEmpty(existedUser.BuyerWallet.BankNumber))
+                {
+                    throw new ConflictException("Bạn càn cập nhật đầy đủ tài khoản ngân hàng mới có thể rút tiền");
+                }
+            }
+            else if (walletTypeEnum.Equals(WalletTypeEnum.SELLER))
+            {
+                if (string.IsNullOrEmpty(existedUser.SellerWallet.BankAccount) 
+                        || string.IsNullOrEmpty(existedUser.SellerWallet.BankName) 
+                            || string.IsNullOrEmpty(existedUser.SellerWallet.BankNumber))
+                {
+                    throw new ConflictException("Bạn càn cập nhật đầy đủ tài khoản ngân hàng mới có thể rút tiền");
+                }
+            }
+            else if (walletTypeEnum.Equals(WalletTypeEnum.SUPPLIER))
+            {
+                if (string.IsNullOrEmpty(existedUser.Supplier.SupplierWallet.BankAccount) 
+                        || string.IsNullOrEmpty(existedUser.Supplier.SupplierWallet.BankName) 
+                            || string.IsNullOrEmpty(existedUser.Supplier.SupplierWallet.BankNumber))
+                {
+                    throw new ConflictException("Bạn càn cập nhật đầy đủ tài khoản ngân hàng mới có thể rút tiền");
+                }
+            }
+
             MoneyRequest moneyRequest = new()
             {
                 Status = MoneyRequestEnum.PENDING.ToString(),
@@ -145,7 +178,14 @@ namespace Vouchee.Business.Services.Impls
 
             var wallets = await _walletRepository.GetTable().AsTracking().ToListAsync();
 
-            foreach (var wallet in wallets.ToList().Where(x => x.SupplierId != null || x.SellerId != null))
+            foreach (var wallet in wallets.ToList().Where(x => (x.SupplierId != null 
+                                                                    && !string.IsNullOrEmpty(x.Supplier.SupplierWallet.BankAccount)
+                                                                        && !string.IsNullOrEmpty(x.Supplier.SupplierWallet.BankName)
+                                                                            && !string.IsNullOrEmpty(x.Supplier.SupplierWallet.BankNumber)) 
+                                                                        || (x.SellerId != null
+                                                                                && !string.IsNullOrEmpty(x.Seller.SellerWallet.BankAccount)
+                                                                                    && !string.IsNullOrEmpty(x.Seller.SellerWallet.BankName)
+                                                                                        && !string.IsNullOrEmpty(x.Seller.SellerWallet.BankNumber))))
             {
                 if (wallet.Balance > 0)
                 {

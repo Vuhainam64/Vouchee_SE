@@ -201,14 +201,14 @@ namespace Vouchee.Business.Services.Impls
             var orderId = await _orderRepository.AddReturnString(order);
 
             var existedOrder = await _orderRepository.GetByIdAsync(orderId, includeProperties: x => x.Include(x => x.OrderDetails)
-                                                                                                                                        .ThenInclude(x => x.Modal.Voucher.Seller)
-                                                                                                                                     .Include(x => x.Buyer)
-                                                                                                                                        .ThenInclude(x => x.BuyerWallet)
-                                                                                                                                            .ThenInclude(x => x.BuyerWalletTransactions)
-                                                                                                                                     .Include(x => x.OrderDetails)
-                                                                                                                                        .ThenInclude(x => x.Modal)
-                                                                                                                                            .ThenInclude(x => x.Voucher),
-                                                                                                                                     isTracking: true);
+                                                                                                                        .ThenInclude(x => x.Modal.Voucher.Seller)
+                                                                                                                        .Include(x => x.Buyer)
+                                                                                                                        .ThenInclude(x => x.BuyerWallet)
+                                                                                                                            .ThenInclude(x => x.BuyerWalletTransactions)
+                                                                                                                        .Include(x => x.OrderDetails)
+                                                                                                                        .ThenInclude(x => x.Modal)
+                                                                                                                            .ThenInclude(x => x.Voucher),
+                                                                                                                        isTracking: true);
 
             if (existedOrder.Status.Equals(OrderStatusEnum.PAID.ToString()))
             {
