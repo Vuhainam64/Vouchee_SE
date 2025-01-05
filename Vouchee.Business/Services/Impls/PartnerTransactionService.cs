@@ -197,7 +197,7 @@ namespace Vouchee.Business.Services.Impls
                                 foreach (var voucherCode in voucherCodes)
                                 {
                                     voucherCode.OrderId = orderId;
-                                    voucherCode.Status = VoucherCodeStatusEnum.CONVERTING.ToString();
+                                    //voucherCode.Status = VoucherCodeStatusEnum.CONVERTING.ToString();
                                 }
 
                                 await _voucherCodeRepository.SaveChanges();
