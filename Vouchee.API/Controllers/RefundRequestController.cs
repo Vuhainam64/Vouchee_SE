@@ -85,11 +85,11 @@ namespace Vouchee.API.Controllers
 
         [HttpPut("update_refund_request_status/{id}")]
         [Authorize]
-        public async Task<IActionResult> UpdateRefundRequestStatus(Guid id, [FromQuery] string? reason, [FromQuery] RefundRequestStatusEnum status)
+        public async Task<IActionResult> UpdateRefundRequestStatus(Guid id, [FromBody] ReasonDTO reasonDTO, [FromQuery] RefundRequestStatusEnum status)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _refundRequestService.UpdateRefundRequestStatusAsync(id, status, reason, currentUser);
+            var result = await _refundRequestService.UpdateRefundRequestStatusAsync(id, status, reasonDTO.reason, currentUser);
             return Ok(result);
         }
 
@@ -102,4 +102,9 @@ namespace Vouchee.API.Controllers
             return Ok(result);
         }
     }
+}
+
+public class ReasonDTO
+{
+    public string? reason { get; set; }
 }
