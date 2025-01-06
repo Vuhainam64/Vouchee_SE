@@ -572,7 +572,27 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Không tìm thấy user");
             }
         }
+        public async Task<ResponseMessage<GetUserDTO>> UpdateUserImageAsync(string image, ThisUserObj thisUserObj)
+        {
+            var existedUser = await _userRepository.GetByIdAsync(thisUserObj.userId, isTracking: true);
+            if (existedUser != null)
+            {
+                existedUser.Image = image;
+                existedUser.UpdateBy = thisUserObj.userId;
+                await _userRepository.UpdateAsync(existedUser);
 
+                return new ResponseMessage<GetUserDTO>()
+                {
+                    message = "Cập nhật thành công",
+                    result = true,
+                    value = _mapper.Map<GetUserDTO>(existedUser)
+                };
+            }
+            else
+            {
+                throw new NotFoundException("Không tìm thấy user");
+            }
+        }
         public async Task<ResponseMessage<GetUserDTO>> UpdateUserBankAsync(UpdateUserBankDTO updateUserBankDTO, ThisUserObj thisUserObj, WalletTypeEnum walletTypeEnum)
         {
             var existedUser = await _userRepository.FindAsync(thisUserObj.userId, isTracking: true);

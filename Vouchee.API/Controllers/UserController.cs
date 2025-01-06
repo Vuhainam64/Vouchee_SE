@@ -68,6 +68,15 @@ namespace Vouchee.API.Controllers
             var result = await _userService.UpdateUserAsync(updateUserDTO, thisUserObj);
             return Ok(result);
         }
+        [Authorize]
+        [HttpPut("update_user_image")]
+        public async Task<IActionResult> UpdateUserImage([FromBody] string image)
+        {
+            ThisUserObj thisUserObj = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _userService.UpdateUserImageAsync(image, thisUserObj);
+            return Ok(result);
+        }
 
         [Authorize]
         [HttpPut("update_user_role")]
