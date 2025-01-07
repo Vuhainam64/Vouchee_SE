@@ -128,11 +128,11 @@ namespace Vouchee.Business.Services.Impls
                 {
                     throw new ConflictException($"Hiện tại modal này mới có {modal.Stock} code");
                 }
-                if (quantity >= modal.Stock)
+                if (cartModal.Quantity + quantity > modal.Stock)
                 {
                     throw new ConflictException($"Hiện tại modal này mới có {modal.Stock} code");
                 }
-                if (cartModal.Quantity > 20)
+                if (quantity + cartModal.Quantity > 20)
                 {
                     throw new ConflictException("Quantity đã vượt quá 20");
                 }
