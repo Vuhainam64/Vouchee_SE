@@ -37,6 +37,15 @@ namespace Vouchee.API.Controllers
         [Authorize]
         public async Task<IActionResult> AddItem(Guid modalId, [FromQuery] int quantity)
         {
+            if (quantity < 0)
+            {
+                return StatusCode((int)HttpStatusCode.BadRequest, new
+                {
+                    code = HttpStatusCode.BadRequest,
+                    message = "Quantity không được là số âm"
+                });
+            }
+
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _cartService.AddItemAsync(modalId, currentUser, quantity);
