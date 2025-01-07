@@ -507,7 +507,7 @@ namespace Vouchee.Business.Services.Impls
             result = _voucherCodeRepository.GetTable()
                                 .Where(x => x.Modal.Voucher.SupplierId == existedUser.SupplierId)
                                 .Where(x => x.UpdateId != null)
-                                .Where(x => x.Status == VoucherCodeStatusEnum.CONVERTING.ToString() || x.Status == VoucherCodeStatusEnum.UNUSED.ToString())
+                                .Where(x => x.Status == VoucherCodeStatusEnum.CONVERTING.ToString() || x.Status == VoucherCodeStatusEnum.UNUSED.ToString() || x.Status == VoucherCodeStatusEnum.SUSPECTED.ToString())
                                 .GroupBy(x => x.UpdateId)
                                 .Select(g => new GroupedVoucherCodeDTO
                                 {
