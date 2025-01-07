@@ -21,11 +21,24 @@ namespace Vouchee.Business.Models.DTOs
         public DateTime? createDate = DateTime.Now;
     }
 
-    public class UpdateVoucherCodeDTO : VoucherCodeDTO
+    //public class UpdateVoucherCodeDTO : VoucherCodeDTO
+    //{
+    //    public ObjectStatusEnum? status { get; set; }
+    //    public DateTime? updateDate = DateTime.Now;
+    //    public Guid? updateBy { get; set; }
+    //}
+
+    public class UpdateVoucherCodeDTO
     {
-        public ObjectStatusEnum? status { get; set; }
+        public string? code { get; set; }
+        public string? image { get; set; }
+
+        public DateOnly? startDate { get; set; }
+        public DateOnly? endDate { get; set; }
+
+        public VoucherCodeStatusEnum? status { get; set; }
+
         public DateTime? updateDate = DateTime.Now;
-        public Guid? updateBy { get; set; }
     }
 
     public class GetVoucherCodeDTO : VoucherCodeDTO

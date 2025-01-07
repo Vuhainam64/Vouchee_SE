@@ -40,17 +40,17 @@ namespace Vouchee.Data.Models.Entities
 
         public Guid? PartnerTransactionId { get; set; }
         [ForeignKey(nameof(PartnerTransactionId))]
-        [InverseProperty(nameof(PartnerTransaction.Orders))]
+        [InverseProperty(nameof(PartnerTransaction.Order))]
         public virtual PartnerTransaction? PartnerTransaction { get; set; }
 
         [Key]
         public string Id { get; set; }
 
-        public int TotalPrice { get; set; }
-        public int DiscountPrice { get; set; }
+        public int TotalPrice => OrderDetails.Sum(x => x.TotalPrice);
+        public int DiscountPrice => OrderDetails.Sum(x => x.DiscountPrice);
         public int UsedVPoint { get; set; }
         public int UsedBalance { get; set; }
-        public int FinalPrice => TotalPrice - DiscountPrice - UsedVPoint - UsedBalance;
+        public int FinalPrice => OrderDetails.Sum(x => x.FinalPrice) - UsedVPoint - UsedBalance;
         public string? GiftEmail { get; set; }
         public int VPointUp => (int)Math.Ceiling((decimal)(TotalPrice + DiscountPrice + UsedVPoint) / 1000);
         public string? Note { get; set; }

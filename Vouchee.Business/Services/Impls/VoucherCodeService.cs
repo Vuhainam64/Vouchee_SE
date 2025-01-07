@@ -240,16 +240,16 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<bool> UpdateVoucherCodeAsync(Guid id, UpdateVoucherCodeDTO updateVoucherCodeDTO)
         {
-            var existedVoucherCode = await _voucherCodeRepository.FindAsync(id, false);
+            var existedVoucherCode = await _voucherCodeRepository.FindAsync(id, isTracking: true);
 
             if (existedVoucherCode == null)
             {
                 throw new NotFoundException($"Không tìm thấy voucher code với id {id}");
             }
 
-            _mapper.Map(updateVoucherCodeDTO, existedVoucherCode);
+            existedVoucherCode = _mapper.Map(updateVoucherCodeDTO, existedVoucherCode);
 
-            var result = await _voucherCodeRepository.UpdateAsync(existedVoucherCode);
+            var result = await _voucherCodeRepository.SaveChanges();
 
             return result;
         }

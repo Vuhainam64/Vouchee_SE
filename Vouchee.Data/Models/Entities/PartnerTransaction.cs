@@ -11,16 +11,10 @@ namespace Vouchee.Data.Models.Entities
     [Table(nameof(PartnerTransaction))]
     public class PartnerTransaction
     {
-        public PartnerTransaction()
-        {
-            WalletTransactions = [];
-            Orders = [];
-        }
-
         [InverseProperty(nameof(Order.PartnerTransaction))]
-        public virtual ICollection<Order> Orders { get; set; }
+        public virtual Order? Order { get; set; }
         [InverseProperty(nameof(WalletTransaction.PartnerTransaction))]
-        public virtual ICollection<WalletTransaction> WalletTransactions { get; set; }
+        public virtual WalletTransaction? WalletTransaction { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]

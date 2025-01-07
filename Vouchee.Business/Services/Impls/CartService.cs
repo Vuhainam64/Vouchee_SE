@@ -119,11 +119,11 @@ namespace Vouchee.Business.Services.Impls
             {
                 // Nào fix xong thì mở
                 var modal = await _modalRepository.GetByIdAsync(modalId, includeProperties: x => x.Include(x => x.VoucherCodes), false);
-                if (cartModal.Quantity >= modal.Stock)
+                if (cartModal.Quantity > modal.Stock)
                 {
                     throw new ConflictException($"Hiện tại modal này mới có {modal.Stock} code");
                 }
-                if (cartModal.Quantity >= 20)
+                if (cartModal.Quantity > 20)
                 {
                     throw new ConflictException("Quantity đã vượt quá 20");
                 }
@@ -423,6 +423,12 @@ namespace Vouchee.Business.Services.Impls
                     }
 
                     var currentSeller = _cartDTO.sellers.FirstOrDefault(x => x.sellerId == appliedPromotion.SellerId);
+
+                    if (currentSeller == null)
+                    {
+                        throw new ConflictException($"Promotion id {appliedPromotion.Id} không thuộc sản phẩm có seller nào trong cart");
+                    }
+
                     currentSeller.appliedPromotion = _mapper.Map<GetShopPromotionDTO>(appliedPromotion);
                     foreach (var modal in currentSeller.modals)
                     {
