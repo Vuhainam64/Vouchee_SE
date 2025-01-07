@@ -67,6 +67,11 @@ namespace Vouchee.Business.Services.Impls
                                                             .Include(x => x.BuyerWallet)
                                                                     , isTracking);
 
+            if (_user == null)
+            {
+                throw new NotFoundException($"Không tìm thấy user {thisUserObj.fullName}");
+            }
+
             CartDTO cartDTO = new();
 
             if (_user.BuyerWallet == null)
@@ -119,11 +124,11 @@ namespace Vouchee.Business.Services.Impls
             {
                 // Nào fix xong thì mở
                 var modal = await _modalRepository.GetByIdAsync(modalId, includeProperties: x => x.Include(x => x.VoucherCodes), false);
-                if (cartModal.Quantity > modal.Stock)
+                if (cartModal.Quantity >= modal.Stock)
                 {
                     throw new ConflictException($"Hiện tại modal này mới có {modal.Stock} code");
                 }
-                if (cartModal.Quantity > 20)
+                if (cartModal.Quantity >= 20)
                 {
                     throw new ConflictException("Quantity đã vượt quá 20");
                 }
@@ -151,6 +156,11 @@ namespace Vouchee.Business.Services.Impls
                 if (existedModal == null)
                 {
                     throw new NotFoundException("Không tìm thấy modal này");
+                }
+
+                if (existedModal.Stock == 0)
+                {
+                    throw new ConflictException($"Modal {existedModal.Id} hết hàng");
                 }
 
                 if (existedModal.Voucher.SellerId == thisUserObj.userId)
