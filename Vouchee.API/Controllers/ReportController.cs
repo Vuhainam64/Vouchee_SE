@@ -7,6 +7,7 @@ using Vouchee.Business.Services;
 using Vouchee.Data.Models.Filters;
 using Microsoft.AspNetCore.Cors;
 using Vouchee.Data.Models.DTOs;
+using Vouchee.Data.Models.Constants.Enum.Other;
 
 namespace Vouchee.API.Controllers
 {
@@ -26,32 +27,63 @@ namespace Vouchee.API.Controllers
 
         // CREATE
         [Authorize]
-        [HttpPost("create_report/{userId}")]
-        public async Task<IActionResult> CreateReport(Guid userId, [FromBody] CreateReportDTO createReportDTO)
+        [HttpPost("create_user_report/{userId}")]
+        public async Task<IActionResult> CreateUserReport(Guid userId, [FromBody] CreateReportDTO createReportDTO)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _reportService.CreateReportAsync(userId, createReportDTO, currentUser);
+            var result = await _reportService.CreateUserReportAsync(userId, createReportDTO, currentUser);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpPost("create_rating_report/{ratingId}")]
+        public async Task<IActionResult> CreateRatingReport(Guid ratingId, [FromBody] CreateReportDTO createReportDTO)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _reportService.CreateRatingReportAsync(ratingId, createReportDTO, currentUser);
             return Ok(result);
         }
 
         // READ
         [HttpGet("get_all_report")]
         public async Task<IActionResult> GetAllReport([FromQuery] PagingRequest pagingRequest,
-                                                        [FromQuery] ReportFilter reportFilter)
+                                                        [FromQuery] ReportFilter reportFilter,
+                                                        [FromQuery] ReportTypeEnum reportTypeEnum)
         {
-            var result = await _reportService.GetReportsAsync(pagingRequest, reportFilter);
+            var result = await _reportService.GetReportsAsync(pagingRequest, reportFilter, reportTypeEnum);
             return Ok(result);
         }
 
         [Authorize]
-        [HttpGet("get_user_report")]
+        [HttpGet("get_current_user_report")]
         public async Task<IActionResult> GetUserReport([FromQuery] PagingRequest pagingRequest,
                                                             [FromQuery] ReportFilter reportFilter)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _reportService.GetUserReportsAsync(pagingRequest, reportFilter, currentUser);
+            var result = await _reportService.GetUserReportsAsync(pagingRequest, reportFilter, currentUser.userId);
+            return Ok(result);
+        }
+
+        [HttpGet("get_user_report/{userId}")]
+        public async Task<IActionResult> GetUserReportByUserId(Guid userId,
+                                                                [FromQuery] PagingRequest pagingRequest,
+                                                                [FromQuery] ReportFilter reportFilter)
+        {
+            var result = await _reportService.GetUserReportsAsync(pagingRequest, reportFilter, userId);
+            return Ok(result);
+        }
+
+        [HttpGet("get_rating_report/{ratingId}")]
+        public async Task<IActionResult> GetUserReport(Guid ratingId,
+                                                            [FromQuery] PagingRequest pagingRequest,
+                                                            [FromQuery] ReportFilter reportFilter)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _reportService.GetRatingReportsAsync(pagingRequest, reportFilter, ratingId);
             return Ok(result);
         }
 

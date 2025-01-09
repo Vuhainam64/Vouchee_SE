@@ -345,7 +345,10 @@ namespace Vouchee.API.AppStarts
             CreateMap<Report, ReportDTO>().ReverseMap();
             CreateMap<Report, CreateReportDTO>().ReverseMap();
             CreateMap<Report, UpdateReportDTO>().ReverseMap();
-            CreateMap<Report, GetReportDTO>().ReverseMap();
+            CreateMap<Report, GetReportDTO>()
+                .ForMember(dest => dest.userName, opt => opt.MapFrom(src => src.User.Name))
+                .ForMember(dest => dest.ratingContent, opt => opt.MapFrom(src => src.Rating.Comment))
+                .ReverseMap();
             CreateMap<GetReportDTO, ReportFilter>().ReverseMap();
         }
     }

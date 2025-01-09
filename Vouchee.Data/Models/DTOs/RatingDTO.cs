@@ -57,10 +57,20 @@ namespace Vouchee.Data.Models.DTOs
         public GetRatingDTO()
         {
             medias = [];
+            reports = [];
         }
 
+        public Guid? id { get; set; }
         public string? orderId { get; set; }
         public Guid? modalId { get; set; }
+        public string? modalName { get; set; }
+        public string? modalImage { get; set; }
+        public Guid? supplierId { get; set; }
+        public string? supplierName { get; set; }
+        public Guid? sellerId { get; set; }
+        public string? sellerName { get; set; }
+        public string? sellerImage { get; set; }
+        public int numberOfReport { get; set; }
 
         public decimal? totalStar =>
             qualityStar.HasValue && serviceStar.HasValue && sellerStar.HasValue
@@ -76,5 +86,6 @@ namespace Vouchee.Data.Models.DTOs
 
         public DateTime? createDate { get; set; }
         public virtual ICollection<GetMediaDTO> medias { get; set; }
+        public virtual ICollection<GetReportDTO> reports { get; set; }
     }
 }

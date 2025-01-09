@@ -39,14 +39,18 @@ namespace Vouchee.Data.Models.DTOs
         }
 
         public Guid? id { get; set; }
-        public Guid userId { get; set; }
+        public Guid? userId { get; set; }
+        public string? userName { get; set; }
+        public Guid? ratingId { get; set; }
+        public string? ratingContent { get; set; }
         public string? status { get; set; }
         public DateTime? createDate { get; set; }
         public Guid? createBy { get; set; }
         public DateTime? updateDate { get; set; }
         public Guid? updateBy { get; set; }
 
-        public virtual GetUserDTO? user { get; set; }
+        // public virtual GetRatingDTO? rating { get; set; }
+        // public virtual GetUserDTO? user { get; set; }
         public virtual ICollection<GetMediaDTO> medias { get; set; }
     }
 }

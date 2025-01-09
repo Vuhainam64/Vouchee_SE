@@ -107,20 +107,20 @@ namespace Vouchee.Data.Helpers
                             .WithOne(c => c.Buyer)
                             .OnDelete(DeleteBehavior.Cascade); // Prevent cascade on the other side
 
-            modelBuilder.Entity<Report>()
-                            .HasMany(u => u.Medias)
-                            .WithOne(c => c.Report)
-                            .OnDelete(DeleteBehavior.Cascade); // Prevent cascade on the other side
+            //modelBuilder.Entity<Report>()
+            //                .HasMany(u => u.Medias)
+            //                .WithOne(c => c.Report)
+            //                .OnDelete(DeleteBehavior.Cascade); // Prevent cascade on the other side
 
-            modelBuilder.Entity<RefundRequest>()
-                            .HasMany(u => u.Medias)
-                            .WithOne(c => c.RefundRequest)
-                            .OnDelete(DeleteBehavior.Cascade); // Prevent cascade on the other side
+            //modelBuilder.Entity<RefundRequest>()
+            //                .HasMany(u => u.Medias)
+            //                .WithOne(c => c.RefundRequest)
+            //                .OnDelete(DeleteBehavior.Cascade); // Prevent cascade on the other side
 
-            modelBuilder.Entity<Rating>()
-                            .HasMany(u => u.Medias)
-                            .WithOne(c => c.Rating)
-                            .OnDelete(DeleteBehavior.Cascade); // Prevent cascade on the other side
+            //modelBuilder.Entity<Rating>()
+            //                .HasMany(u => u.Medias)
+            //                .WithOne(c => c.Rating)
+            //                .OnDelete(DeleteBehavior.Cascade); // Prevent cascade on the other side
 
             base.OnModelCreating(modelBuilder);
         }

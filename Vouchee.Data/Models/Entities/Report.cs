@@ -20,10 +20,15 @@ namespace Vouchee.Data.Models.Entities
         [Key]
         public Guid Id { get; set; }
 
-        public Guid UserId { get; set; }
+        public Guid? UserId { get; set; }
         [ForeignKey(nameof(UserId))]
         [InverseProperty(nameof(User.Reports))]
         public virtual User? User { get; set; }
+
+        public Guid? RatingId { get; set; }
+        [ForeignKey(nameof(RatingId))]
+        [InverseProperty(nameof(Rating.Reports))]
+        public virtual Rating? Rating { get; set; }
 
         [InverseProperty(nameof(Media.Report))]
         public virtual ICollection<Media> Medias { get; set; }
