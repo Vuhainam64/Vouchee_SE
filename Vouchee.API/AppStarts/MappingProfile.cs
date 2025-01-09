@@ -340,6 +340,13 @@ namespace Vouchee.API.AppStarts
                 .ForMember(dest => dest.supplierName, opt => opt.MapFrom(src => src.VoucherCode.Modal.Voucher.Supplier.Name))
                 .ReverseMap();
             CreateMap<GetRefundRequestDTO, RefundRequestFilter>().ReverseMap();
+
+            // REPORT
+            CreateMap<Report, ReportDTO>().ReverseMap();
+            CreateMap<Report, CreateReportDTO>().ReverseMap();
+            CreateMap<Report, UpdateReportDTO>().ReverseMap();
+            CreateMap<Report, GetReportDTO>().ReverseMap();
+            CreateMap<GetReportDTO, ReportFilter>().ReverseMap();
         }
     }
 }
