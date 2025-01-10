@@ -163,7 +163,7 @@ namespace Vouchee.Business.Services.Impls
             // Return the dashboard data
             return new ResponseMessage<dynamic>()
             {
-                message = "Đã lấy dữ liệu cho supplier thành công",
+                message = "Đã lấy dữ liệu cho admin thành công",
                 result = true,
                 value = new
                 {
