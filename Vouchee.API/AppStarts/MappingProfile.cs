@@ -318,6 +318,14 @@ namespace Vouchee.API.AppStarts
             CreateMap<Rating, CreateRatingDTO>().ReverseMap();
             CreateMap<Rating, UpdateRatingDTO>().ReverseMap();
             CreateMap<Rating, GetRatingDTO>()
+                 .ForMember(dest => dest.supplierId, opt => opt.MapFrom(src => src.Modal.Voucher.SupplierId))
+                 .ForMember(dest => dest.supplierName, opt => opt.MapFrom(src => src.Modal.Voucher.Supplier.Name))
+                 .ForMember(dest => dest.supplierImage, opt => opt.MapFrom(src => src.Modal.Voucher.SupplierId))
+                 .ForMember(dest => dest.sellerId, opt => opt.MapFrom(src => src.Modal.Voucher.SellerId))
+                 .ForMember(dest => dest.sellerName, opt => opt.MapFrom(src => src.Modal.Voucher.Seller.Name))
+                 .ForMember(dest => dest.sellerImage, opt => opt.MapFrom(src => src.Modal.Voucher.Seller.Image))
+                 .ForMember(dest => dest.modalName, opt => opt.MapFrom(src => src.Modal.Title))
+                 .ForMember(dest => dest.modalImage, opt => opt.MapFrom(src => src.Modal.Image))
                 .ForMember(dest => dest.rep, opt => opt.MapFrom(src => src.Reply))
                 .ReverseMap();
             CreateMap<RatingFilter, GetRatingDTO>().ReverseMap();

@@ -67,6 +67,7 @@ namespace Vouchee.Data.Models.DTOs
         public string? modalImage { get; set; }
         public Guid? supplierId { get; set; }
         public string? supplierName { get; set; }
+        public string? supplierImage { get; set; }
         public Guid? sellerId { get; set; }
         public string? sellerName { get; set; }
         public string? sellerImage { get; set; }
