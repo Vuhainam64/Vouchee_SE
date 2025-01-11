@@ -14,6 +14,7 @@ namespace Vouchee.Data.Models.Entities
         public Rating()
         {
             Medias = [];
+            Reports = [];
         }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -32,6 +33,8 @@ namespace Vouchee.Data.Models.Entities
 
         [InverseProperty(nameof(Media.Rating))]
         public virtual ICollection<Media> Medias { get; set; }
+        [InverseProperty(nameof(Report.Rating))]
+        public virtual ICollection<Report> Reports { get; set; }
 
         public int QualityStar { get; set; }
         public int ServiceStar { get; set; }
@@ -39,6 +42,7 @@ namespace Vouchee.Data.Models.Entities
         public string? Comment { get; set; }
         public string? Reply { get; set; }
         public string? Reason { get; set; }
+        public int NumberOfReport => Reports.Count;
 
         public string? Status { get; set; }
         public DateTime? CreateDate { get; set; }

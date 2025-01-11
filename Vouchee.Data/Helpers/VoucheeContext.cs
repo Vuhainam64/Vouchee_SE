@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using System.Drawing;
@@ -36,6 +36,7 @@ namespace Vouchee.Data.Helpers
         public virtual DbSet<DeviceToken> DeviceTokens { get; set; }
         public virtual DbSet<Rating> Ratings { get; set; }
         public virtual DbSet<RefundRequest> RefundRequests { get; set; }
+        public virtual DbSet<Report> Reports { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -72,6 +73,7 @@ namespace Vouchee.Data.Helpers
             modelBuilder.Entity<Rating>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<DeviceToken>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
             modelBuilder.Entity<RefundRequest>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            modelBuilder.Entity<Report>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
 
             // modelBuilder.Seed();
             //modelBuilder.Entity<User>()
@@ -104,6 +106,21 @@ namespace Vouchee.Data.Helpers
                             .HasMany(u => u.Carts)
                             .WithOne(c => c.Buyer)
                             .OnDelete(DeleteBehavior.Cascade); // Prevent cascade on the other side
+
+            //modelBuilder.Entity<Report>()
+            //                .HasMany(u => u.Medias)
+            //                .WithOne(c => c.Report)
+            //                .OnDelete(DeleteBehavior.Cascade); // Prevent cascade on the other side
+
+            //modelBuilder.Entity<RefundRequest>()
+            //                .HasMany(u => u.Medias)
+            //                .WithOne(c => c.RefundRequest)
+            //                .OnDelete(DeleteBehavior.Cascade); // Prevent cascade on the other side
+
+            //modelBuilder.Entity<Rating>()
+            //                .HasMany(u => u.Medias)
+            //                .WithOne(c => c.Rating)
+            //                .OnDelete(DeleteBehavior.Cascade); // Prevent cascade on the other side
 
             base.OnModelCreating(modelBuilder);
         }

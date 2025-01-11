@@ -18,6 +18,7 @@ namespace Vouchee.Data.Models.Entities
             MoneyRequests = [];
             ShopPromotions = [];
             DeviceTokens = [];
+            Reports = [];
         }
 
         [InverseProperty(nameof(Wallet.Buyer))]
@@ -46,6 +47,8 @@ namespace Vouchee.Data.Models.Entities
         public virtual ICollection<Promotion> ShopPromotions { get; set; }
         [InverseProperty(nameof(DeviceToken.Users))]
         public virtual ICollection<DeviceToken> DeviceTokens { get; set; }
+        [InverseProperty(nameof(Report.User))]
+        public virtual ICollection<Report> Reports { get; set; }
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -54,6 +57,7 @@ namespace Vouchee.Data.Models.Entities
         public string? Name { get; set; }
         public string? Email { get; set; }
         public string? HashPassword { get; set; }
+        public int NumberOfReport => Reports.Count();
         public string? Description { get; set; }
         public string? Image { get; set; }
         public string? PhoneNumber { get; set; }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vouchee.Data.Helpers;
 
@@ -11,9 +12,11 @@ using Vouchee.Data.Helpers;
 namespace Vouchee.Data.Migrations
 {
     [DbContext(typeof(VoucheeContext))]
-    partial class VoucheeContextModelSnapshot : ModelSnapshot
+    [Migration("20250109124426_AddImageToReport")]
+    partial class AddImageToReport
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -731,9 +734,6 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("RatingId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Reason")
                         .HasColumnType("nvarchar(max)");
 
@@ -746,12 +746,10 @@ namespace Vouchee.Data.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("UserId")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("RatingId");
 
                     b.HasIndex("UserId");
 
@@ -1389,15 +1387,11 @@ namespace Vouchee.Data.Migrations
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Report", b =>
                 {
-                    b.HasOne("Vouchee.Data.Models.Entities.Rating", "Rating")
-                        .WithMany("Reports")
-                        .HasForeignKey("RatingId");
-
                     b.HasOne("Vouchee.Data.Models.Entities.User", "User")
                         .WithMany("Reports")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("Rating");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -1575,8 +1569,6 @@ namespace Vouchee.Data.Migrations
             modelBuilder.Entity("Vouchee.Data.Models.Entities.Rating", b =>
                 {
                     b.Navigation("Medias");
-
-                    b.Navigation("Reports");
                 });
 
             modelBuilder.Entity("Vouchee.Data.Models.Entities.RefundRequest", b =>

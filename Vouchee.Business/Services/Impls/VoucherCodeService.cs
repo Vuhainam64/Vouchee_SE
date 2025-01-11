@@ -240,16 +240,16 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<bool> UpdateVoucherCodeAsync(Guid id, UpdateVoucherCodeDTO updateVoucherCodeDTO)
         {
-            var existedVoucherCode = await _voucherCodeRepository.FindAsync(id, false);
+            var existedVoucherCode = await _voucherCodeRepository.FindAsync(id, isTracking: true);
 
             if (existedVoucherCode == null)
             {
                 throw new NotFoundException($"Không tìm thấy voucher code với id {id}");
             }
 
-            _mapper.Map(updateVoucherCodeDTO, existedVoucherCode);
+            existedVoucherCode = _mapper.Map(updateVoucherCodeDTO, existedVoucherCode);
 
-            var result = await _voucherCodeRepository.UpdateAsync(existedVoucherCode);
+            var result = await _voucherCodeRepository.SaveChanges();
 
             return result;
         }
@@ -341,10 +341,10 @@ namespace Vouchee.Business.Services.Impls
                     .FirstOrDefaultAsync();
                 if (updatecode != null)
                 {
-                    if (code.newcode.IsNullOrEmpty())
+                  /*  if (code.newcode.IsNullOrEmpty())
                     {
                         throw new Exception("Thiếu New Voucher của Voucher code: " + code.id);
-                    }
+                    }*/
                     var result = await updatecode;
                     if (code.UpdateStatus == UpdateStatusEnum.SUCCESS)
                     {
@@ -507,7 +507,7 @@ namespace Vouchee.Business.Services.Impls
             result = _voucherCodeRepository.GetTable()
                                 .Where(x => x.Modal.Voucher.SupplierId == existedUser.SupplierId)
                                 .Where(x => x.UpdateId != null)
-                                .Where(x => x.Status == VoucherCodeStatusEnum.CONVERTING.ToString() || x.Status == VoucherCodeStatusEnum.UNUSED.ToString())
+                                .Where(x => x.Status == VoucherCodeStatusEnum.CONVERTING.ToString() || x.Status == VoucherCodeStatusEnum.UNUSED.ToString() || x.Status == VoucherCodeStatusEnum.SUSPECTED.ToString())
                                 .GroupBy(x => x.UpdateId)
                                 .Select(g => new GroupedVoucherCodeDTO
                                 {

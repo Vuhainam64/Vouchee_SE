@@ -109,6 +109,7 @@ namespace Vouchee.API.AppStarts
                 //.ForMember(dto => dto.voucherCodes, opt => opt.MapFrom(od => od.Order.VoucherCodes))
                 .ForMember(dest => dest.sellerId, opt => opt.MapFrom(src => src.Modal.Voucher.SellerId))
                 .ForMember(dest => dest.sellerName, opt => opt.MapFrom(src => src.Modal.Voucher.Seller.Name))
+                .ForMember(dest => dest.status, opt => opt.MapFrom(src => src.Order.Status))
                 .ReverseMap()
                 .ForPath(od => od.Order.VoucherCodes, opt => opt.Ignore());
 
@@ -318,6 +319,14 @@ namespace Vouchee.API.AppStarts
             CreateMap<Rating, CreateRatingDTO>().ReverseMap();
             CreateMap<Rating, UpdateRatingDTO>().ReverseMap();
             CreateMap<Rating, GetRatingDTO>()
+                 .ForMember(dest => dest.supplierId, opt => opt.MapFrom(src => src.Modal.Voucher.SupplierId))
+                 .ForMember(dest => dest.supplierName, opt => opt.MapFrom(src => src.Modal.Voucher.Supplier.Name))
+                 .ForMember(dest => dest.supplierImage, opt => opt.MapFrom(src => src.Modal.Voucher.SupplierId))
+                 .ForMember(dest => dest.sellerId, opt => opt.MapFrom(src => src.Modal.Voucher.SellerId))
+                 .ForMember(dest => dest.sellerName, opt => opt.MapFrom(src => src.Modal.Voucher.Seller.Name))
+                 .ForMember(dest => dest.sellerImage, opt => opt.MapFrom(src => src.Modal.Voucher.Seller.Image))
+                 .ForMember(dest => dest.modalName, opt => opt.MapFrom(src => src.Modal.Title))
+                 .ForMember(dest => dest.modalImage, opt => opt.MapFrom(src => src.Modal.Image))
                 .ForMember(dest => dest.rep, opt => opt.MapFrom(src => src.Reply))
                 .ReverseMap();
             CreateMap<RatingFilter, GetRatingDTO>().ReverseMap();
@@ -340,6 +349,16 @@ namespace Vouchee.API.AppStarts
                 .ForMember(dest => dest.supplierName, opt => opt.MapFrom(src => src.VoucherCode.Modal.Voucher.Supplier.Name))
                 .ReverseMap();
             CreateMap<GetRefundRequestDTO, RefundRequestFilter>().ReverseMap();
+
+            // REPORT
+            CreateMap<Report, ReportDTO>().ReverseMap();
+            CreateMap<Report, CreateReportDTO>().ReverseMap();
+            CreateMap<Report, UpdateReportDTO>().ReverseMap();
+            CreateMap<Report, GetReportDTO>()
+                .ForMember(dest => dest.userName, opt => opt.MapFrom(src => src.User.Name))
+                .ForMember(dest => dest.ratingContent, opt => opt.MapFrom(src => src.Rating.Comment))
+                .ReverseMap();
+            CreateMap<GetReportDTO, ReportFilter>().ReverseMap();
         }
     }
 }

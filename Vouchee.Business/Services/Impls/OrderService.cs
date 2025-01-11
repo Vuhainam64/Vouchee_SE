@@ -190,8 +190,8 @@ namespace Vouchee.Business.Services.Impls
                 }
             }
 
-            order.DiscountPrice = order.OrderDetails.Sum(x => x.DiscountPrice);
-            order.TotalPrice = order.OrderDetails.Sum(x => x.TotalPrice);
+            //order.DiscountPrice = order.OrderDetails.Sum(x => x.DiscountPrice);
+            //order.TotalPrice = order.OrderDetails.Sum(x => x.TotalPrice);
             order.UsedBalance = checkOutViewModel.use_balance;
             order.UsedVPoint = checkOutViewModel.use_VPoint;
             order.GiftEmail = checkOutViewModel.gift_email;

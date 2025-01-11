@@ -50,6 +50,7 @@ namespace Vouchee.API.AppStarts
             services.AddScoped<IDashboardService, DashboardService>();
             services.AddScoped<ISendEmailService,SendEmailService>();
             services.AddScoped<IRefundRequestService, RefundRequestService>();
+            services.AddScoped<IReportService, ReportService>();
         }
 
         public static void AddSwaggerServices(this IServiceCollection services, IConfiguration configuration)

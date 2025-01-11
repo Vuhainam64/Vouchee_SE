@@ -48,7 +48,7 @@ namespace Vouchee.Data.Models.Entities
 
         public Guid? PartnerTransactionId { get; set; }
         [ForeignKey(nameof(PartnerTransactionId))]
-        [InverseProperty(nameof(PartnerTransaction.WalletTransactions))]
+        [InverseProperty(nameof(PartnerTransaction.WalletTransaction))]
         public virtual PartnerTransaction? PartnerTransaction { get; set; }
 
         public Guid? RefundRequestId { get; set; }

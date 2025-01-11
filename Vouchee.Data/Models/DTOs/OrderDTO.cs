@@ -39,6 +39,7 @@ namespace Vouchee.Business.Models.DTOs
         public string? note { get; set; }
         public DateTime? updateDate { get; set; }
         public string? status { get; set; }
+        public Guid? partnerTransactionId { get; set; }
     }
 
     public class GetDetailOrderDTO : GetOrderDTO

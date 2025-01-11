@@ -44,6 +44,7 @@ namespace Vouchee.Business.Models.DTOs
     {
         public Guid? id { get; set; }
         public string? email { get; set; }
+        public int numberOfReport { get; set; }
         public string? role { get; set; }
         public string? description { get; set; }
 
