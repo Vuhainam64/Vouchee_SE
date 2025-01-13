@@ -37,6 +37,64 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
+        public async Task<dynamic> GetBuyerInChart(ThisUserObj currentUser)
+        {
+            // Query for wallet transactions linked to the supplier's wallet
+            var walletTransactions = _walletTransactionRepository.GetTable()
+                                        .Where(x => x.BuyerWallet != null
+                                                        && x.BuyerWallet.Id == currentUser.userId
+                                                        && x.WithdrawRequestId == null);
+
+            // Generate all months of the current year
+            var currentYear = DateTime.Now.Year;
+            var allMonths = Enumerable.Range(1, 12)
+                .Select(m => new { Year = currentYear, Month = m })
+                .ToList();
+
+            // Group transactions by month
+            var monthDashboard = await walletTransactions
+                .GroupBy(x => new { x.CreateDate.Value.Year, x.CreateDate.Value.Month })
+                .Select(g => new
+                {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    TotalTransactions = g.Count(),
+                    TotalAmount = g.Sum(t => t.Amount) // Assuming there's an Amount property
+                })
+                .ToListAsync();
+
+            // Merge with all months to ensure each month is included
+            var completeMonthDashboard = allMonths
+                .GroupJoin(
+                    monthDashboard,
+                    all => new { all.Year, all.Month },
+                    db => new { db.Year, db.Month },
+                    (all, dbGroup) => new
+                    {
+                        Year = all.Year,
+                        Month = all.Month,
+                        TotalTransactions = dbGroup.FirstOrDefault()?.TotalTransactions ?? 0,
+                        TotalAmount = dbGroup.FirstOrDefault()?.TotalAmount ?? 0
+                    }
+                )
+                .OrderBy(x => x.Year)
+                .ThenBy(x => x.Month)
+                .ToList();
+            var revenue = walletTransactions.Sum(x => x.Amount);
+
+            // Return the dashboard data
+            return new ResponseMessage<dynamic>()
+            {
+                message = "Đã lấy dữ liệu cho buyer thành công",
+                result = true,
+                value = new
+                {
+                    revenue = revenue,
+                    monthDashboard = completeMonthDashboard
+                },
+            };
+        }
+
         public async Task<DynamicResponseModel<GetBuyerWalletTransactionDTO>> GetBuyerInTransactionAsync(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter, ThisUserObj thisUserObj)
         {
             (int, IQueryable<GetBuyerWalletTransactionDTO>) result;
@@ -124,6 +182,64 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
+        public async Task<dynamic> GetSellerInChart(ThisUserObj thisUserObj)
+        {
+            // Query for wallet transactions linked to the supplier's wallet
+            var walletTransactions = _walletTransactionRepository.GetTable()
+                                        .Where(x => x.SellerWallet != null
+                                                        && x.BuyerWallet.Id == thisUserObj.userId
+                                                        && x.WithdrawRequestId == null);
+
+            // Generate all months of the current year
+            var currentYear = DateTime.Now.Year;
+            var allMonths = Enumerable.Range(1, 12)
+                .Select(m => new { Year = currentYear, Month = m })
+                .ToList();
+
+            // Group transactions by month
+            var monthDashboard = await walletTransactions
+                .GroupBy(x => new { x.CreateDate.Value.Year, x.CreateDate.Value.Month })
+                .Select(g => new
+                {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    TotalTransactions = g.Count(),
+                    TotalAmount = g.Sum(t => t.Amount) // Assuming there's an Amount property
+                })
+                .ToListAsync();
+
+            // Merge with all months to ensure each month is included
+            var completeMonthDashboard = allMonths
+                .GroupJoin(
+                    monthDashboard,
+                    all => new { all.Year, all.Month },
+                    db => new { db.Year, db.Month },
+                    (all, dbGroup) => new
+                    {
+                        Year = all.Year,
+                        Month = all.Month,
+                        TotalTransactions = dbGroup.FirstOrDefault()?.TotalTransactions ?? 0,
+                        TotalAmount = dbGroup.FirstOrDefault()?.TotalAmount ?? 0
+                    }
+                )
+                .OrderBy(x => x.Year)
+                .ThenBy(x => x.Month)
+                .ToList();
+            var revenue = walletTransactions.Sum(x => x.Amount);
+
+            // Return the dashboard data
+            return new ResponseMessage<dynamic>()
+            {
+                message = "Đã lấy dữ liệu cho seller thành công",
+                result = true,
+                value = new
+                {
+                    revenue = revenue,
+                    monthDashboard = completeMonthDashboard
+                },
+            };
+        }
+
         public async Task<DynamicResponseModel<GetSellerWalletTransaction>> GetSellerInTransactionAsync(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter, ThisUserObj thisUserObj)
         {
             (int, IQueryable<GetSellerWalletTransaction>) result;
@@ -208,6 +324,75 @@ namespace Vouchee.Business.Services.Impls
                     total = result.Item1 // Total vouchers count for metadata
                 },
                 results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+            };
+        }
+
+        public async Task<dynamic> GetSupplerInChart(ThisUserObj currentUser)
+        {
+            var existedUser = await _userRepository.GetByIdAsync(currentUser.userId, includeProperties: x => x.Include(x => x.Supplier));
+
+            if (existedUser == null)
+            {
+                throw new NotFoundException("User này không tồn tại");
+            }
+            if (existedUser.Supplier == null)
+            {
+                throw new NotFoundException("User này không thuộc về supplier nào");
+            }
+
+            // Query for wallet transactions linked to the supplier's wallet
+            var walletTransactions = _walletTransactionRepository.GetTable()
+                                        .Where(x => x.SupplierWallet != null
+                                                        && x.SupplierWallet.SupplierId == existedUser.SupplierId
+                                                        && x.WithdrawRequestId == null);
+
+            // Generate all months of the current year
+            var currentYear = DateTime.Now.Year;
+            var allMonths = Enumerable.Range(1, 12)
+                .Select(m => new { Year = currentYear, Month = m })
+                .ToList();
+
+            // Group transactions by month
+            var monthDashboard = await walletTransactions
+                .GroupBy(x => new { x.CreateDate.Value.Year, x.CreateDate.Value.Month })
+                .Select(g => new
+                {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    TotalTransactions = g.Count(),
+                    TotalAmount = g.Sum(t => t.Amount) // Assuming there's an Amount property
+                })
+                .ToListAsync();
+
+            // Merge with all months to ensure each month is included
+            var completeMonthDashboard = allMonths
+                .GroupJoin(
+                    monthDashboard,
+                    all => new { all.Year, all.Month },
+                    db => new { db.Year, db.Month },
+                    (all, dbGroup) => new
+                    {
+                        Year = all.Year,
+                        Month = all.Month,
+                        TotalTransactions = dbGroup.FirstOrDefault()?.TotalTransactions ?? 0,
+                        TotalAmount = dbGroup.FirstOrDefault()?.TotalAmount ?? 0
+                    }
+                )
+                .OrderBy(x => x.Year)
+                .ThenBy(x => x.Month)
+                .ToList();
+            var revenue = walletTransactions.Sum(x => x.Amount);
+
+            // Return the dashboard data
+            return new ResponseMessage<dynamic>()
+            {
+                message = "Đã lấy dữ liệu cho supplier thành công",
+                result = true,
+                value = new
+                {
+                    revenue = revenue,
+                    monthDashboard = completeMonthDashboard
+                },
             };
         }
 
