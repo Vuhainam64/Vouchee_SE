@@ -42,7 +42,7 @@ namespace Vouchee.Business.Services.Impls
             // Query for wallet transactions linked to the supplier's wallet
             var walletTransactions = _walletTransactionRepository.GetTable()
                                         .Where(x => x.BuyerWallet != null
-                                                        && x.BuyerWallet.Id == currentUser.userId
+                                                        && x.BuyerWallet.BuyerId == currentUser.userId
                                                         && x.WithdrawRequestId == null);
 
             // Generate all months of the current year
@@ -100,7 +100,7 @@ namespace Vouchee.Business.Services.Impls
             (int, IQueryable<GetBuyerWalletTransactionDTO>) result;
 
             result = _walletTransactionRepository.GetTable().Where(x => x.BuyerWallet != null 
-                                                                            && x.BuyerWallet.Id == thisUserObj.userId
+                                                                            && x.BuyerWallet.BuyerId == thisUserObj.userId
                                                                             && x.WithdrawRequestId == null
                                                                             && (walletTransactionFilter.fromDate == null || x.CreateDate >= walletTransactionFilter.fromDate) 
                                                                             && (walletTransactionFilter.toDate == null || x.CreateDate <= walletTransactionFilter.toDate))
@@ -130,7 +130,7 @@ namespace Vouchee.Business.Services.Impls
             (int, IQueryable<GetBuyerWalletTransactionDTO>) result;
 
             result = _walletTransactionRepository.GetTable()
-                             .Where(x => x.BuyerWalletId == existedUser.BuyerWallet.Id
+                             .Where(x => x.BuyerWallet.BuyerId == existedUser.Id
                                             && x.WithdrawRequestId != null
                                             && (startDateTime == null || x.CreateDate >= startDateTime) 
                                             && (endDateTime == null || x.CreateDate <= endDateTime))
@@ -162,7 +162,7 @@ namespace Vouchee.Business.Services.Impls
             (int, IQueryable<GetBuyerWalletTransactionDTO>) result;
 
             result = _walletTransactionRepository.GetTable()
-                             .Where(x => x.BuyerWalletId == existedUser.BuyerWallet.Id &&
+                             .Where(x => x.BuyerWallet.BuyerId == existedUser.Id &&
                                          (startDateTime == null || x.CreateDate >= startDateTime) &&
                                          (endDateTime == null || x.CreateDate <= endDateTime) &&
                                          (buyerWalletTransactionFilter.id == null || x.Id == buyerWalletTransactionFilter.id))
@@ -187,7 +187,7 @@ namespace Vouchee.Business.Services.Impls
             // Query for wallet transactions linked to the supplier's wallet
             var walletTransactions = _walletTransactionRepository.GetTable()
                                         .Where(x => x.SellerWallet != null
-                                                        && x.BuyerWallet.Id == thisUserObj.userId
+                                                        && x.SellerWallet.SellerId == thisUserObj.userId
                                                         && x.WithdrawRequestId == null);
 
             // Generate all months of the current year
@@ -307,7 +307,7 @@ namespace Vouchee.Business.Services.Impls
             (int, IQueryable<GetSellerWalletTransaction>) result;
 
             result = _walletTransactionRepository.GetTable()
-                .Where(x => x.SellerWalletId == existedUser.SellerWallet.Id &&
+                .Where(x => x.SellerWallet.SellerId == existedUser.Id &&
                             (startDateTime == null || x.CreateDate >= startDateTime) &&
                             (endDateTime == null || x.CreateDate <= endDateTime) &&
                             (sellerWalletTransactionFilter.orderId == null || x.OrderId == sellerWalletTransactionFilter.orderId))
