@@ -156,7 +156,7 @@ namespace Vouchee.Business.Services.Impls
                         CreateNotificationDTO successNoti = new()
                         {
                             title = "Thanh toán đơn hàng thành công",
-                            body = $"Đơn hàng {orderId}, chi tiết đơn hàng là ",
+                            body = $"Đơn hàng {orderId}",
                             receiverId = existedOrder.Buyer.Id
                         };
 

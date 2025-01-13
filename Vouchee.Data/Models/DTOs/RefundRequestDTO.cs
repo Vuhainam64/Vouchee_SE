@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -13,12 +14,12 @@ namespace Vouchee.Data.Models.DTOs
 {
     public class RefundRequestDTO
     {
-        public RefundRequestDTO()
-        {
-            images = [];
-        }
+        //public RefundRequestDTO()
+        //{
+        //    images = [];
+        //}
 
-        public IList<string> images { get; set; }
+        //public IList<string> images { get; set; }
         public Guid? voucherCodeId { get; set; }
         public string? content { get; set; }
         [Range(-180, 180, ErrorMessage = "Kinh dộ phải nằm giữa -180 và 180.")]
@@ -29,6 +30,12 @@ namespace Vouchee.Data.Models.DTOs
 
     public class CreateRefundRequestDTO : RefundRequestDTO
     {
+        public CreateRefundRequestDTO() 
+        {
+            images = [];
+        }
+
+        public IList<IFormFile> images { get; set; }
         public RefundRequestStatusEnum? status = RefundRequestStatusEnum.PENDING;
         public DateTime? createDate = DateTime.Now;
     }
