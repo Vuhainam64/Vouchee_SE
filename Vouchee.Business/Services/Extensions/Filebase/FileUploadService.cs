@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Firebase.Auth;
 using Firebase.Storage;
 using Microsoft.Extensions.Options;

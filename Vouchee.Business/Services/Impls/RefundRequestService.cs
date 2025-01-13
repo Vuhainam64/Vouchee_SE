@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using DocumentFormat.OpenXml.Wordprocessing;
+using FirebaseAdmin.Messaging;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,6 +11,7 @@ using System.Threading.Tasks;
 using Vouchee.Business.Exceptions;
 using Vouchee.Business.Helpers;
 using Vouchee.Business.Models;
+using Vouchee.Business.Services.Extensions.Filebase;
 using Vouchee.Data.Helpers.Base;
 using Vouchee.Data.Models.Constants.Enum.Other;
 using Vouchee.Data.Models.Constants.Enum.Status;
@@ -21,8 +24,10 @@ namespace Vouchee.Business.Services.Impls
 {
     public class RefundRequestService : IRefundRequestService
     {
+        private readonly IFileUploadService _fileUploadService;
         private readonly ISendEmailService _sendEmailService;
 
+        private readonly IBaseRepository<Data.Models.Entities.Notification> _notificationRepository;
         private readonly IBaseRepository<Order> _orderRepository;
         private readonly IBaseRepository<User> _userRepository;
         private readonly IBaseRepository<VoucherCode> _voucherCodeRepository;
@@ -30,7 +35,9 @@ namespace Vouchee.Business.Services.Impls
         private readonly IBaseRepository<RefundRequest> _refundRequestRepository;
         private readonly IMapper _mapper;
 
-        public RefundRequestService(ISendEmailService sendEmailService,
+        public RefundRequestService(IFileUploadService fileUploadService,
+                                    IBaseRepository<Data.Models.Entities.Notification> notiifcationRepository,
+                                    ISendEmailService sendEmailService,
                                     IBaseRepository<Order> orderRepository,
                                     IBaseRepository<User> userRepository,
                                     IBaseRepository<VoucherCode> voucherCodeRepository,
@@ -38,6 +45,8 @@ namespace Vouchee.Business.Services.Impls
                                     IBaseRepository<RefundRequest> refundRequestRepository,
                                     IMapper mapper)
         {
+            _fileUploadService = fileUploadService;
+            _notificationRepository = notiifcationRepository;
             _sendEmailService = sendEmailService;
             _orderRepository = orderRepository;
             _userRepository = userRepository;
@@ -83,9 +92,11 @@ namespace Vouchee.Business.Services.Impls
 
             foreach (var image in createRefundRequestDTO.images)
             {
+                var imageUrl = await _fileUploadService.UploadImageToFirebase(image, thisUserObj.userId.ToString(), StoragePathEnum.OTHER);
+
                 Media media = new()
                 {
-                    Url = image,
+                    Url = imageUrl,
                     CreateBy = thisUserObj.userId,
                     CreateDate = DateTime.Now,
                     Index = index++,
@@ -242,19 +253,19 @@ namespace Vouchee.Business.Services.Impls
                 await _mediaRepository.DeleteAsync(media);
             }
 
-            int index = 0;
-            foreach (var image in updateRefundRequestDTO.images)
-            {
-                Media media = new()
-                {
-                    Url = image,
-                    CreateBy = thisUserObj.userId,
-                    CreateDate = DateTime.Now,
-                    Index = index++,
-                };
+            //int index = 0;
+            //foreach (var image in updateRefundRequestDTO.images)
+            //{
+            //    Media media = new()
+            //    {
+            //        Url = image,
+            //        CreateBy = thisUserObj.userId,
+            //        CreateDate = DateTime.Now,
+            //        Index = index++,
+            //    };
 
-                existedRefundRequest.Medias.Add(media);
-            }
+            //    existedRefundRequest.Medias.Add(media);
+            //}
 
             await _refundRequestRepository.SaveChanges();
 
@@ -312,6 +323,17 @@ namespace Vouchee.Business.Services.Impls
                 existedOrder.Buyer.BuyerWallet.Balance += existedRefundRequest.VoucherCode.Modal.SellPrice;
                 existedOrder.Buyer.BuyerWallet.UpdateDate = DateTime.Now;
                 existedOrder.Buyer.BuyerWallet.UpdateBy = thisUserObj.userId;
+
+                Data.Models.Entities.Notification notification = new()
+                {
+                    Body = $"Voucher code {id} đã được hoàn tiền về ví mua",
+                    CreateDate = DateTime.Now,
+                    ReceiverId = existedOrder.Buyer.Id,
+                    Seen = false,
+                    Title = "Hoàn tiền thành công",
+                };
+
+                await _notificationRepository.AddAsync(notification);
 
                 await _sendEmailService.SendEmailAsync(existedOrder.Buyer.Email, "Cập nhật trạng thái refund", "Refund của bạn đã được chấp thuận");
 

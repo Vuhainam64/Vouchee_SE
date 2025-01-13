@@ -29,7 +29,7 @@ namespace Vouchee.API.Controllers
         // CREATE
         [Authorize]
         [HttpPost("create_refund_request")]
-        public async Task<IActionResult> CreateRefundRequest([FromBody] CreateRefundRequestDTO refundRequestDTO)
+        public async Task<IActionResult> CreateRefundRequest([FromForm] CreateRefundRequestDTO refundRequestDTO)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
