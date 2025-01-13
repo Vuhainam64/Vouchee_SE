@@ -35,5 +35,71 @@ namespace Vouchee.API.Controllers
         //    var result = await _walletTransactionService.GetWalletTransactionsAsync(currentUser);
         //    return Ok(result);
         //}
+
+        [Authorize]
+        [HttpGet("get_seller_in_transaction")]
+        public async Task<IActionResult> GetSellerInTransaction([FromQuery] PagingRequest pagingRequest,
+                                                                    [FromQuery] WalletTransactionFilter walletTransactionFilter)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _walletTransactionService.GetSellerInTransactionAsync(pagingRequest, walletTransactionFilter, currentUser);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpGet("get_seller_out_transaction")]
+        public async Task<IActionResult> GetSellerOutTransaction([FromQuery] PagingRequest pagingRequest,
+                                                                    [FromQuery] WalletTransactionFilter walletTransactionFilter)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _walletTransactionService.GetSellerOutTransactionAsync(pagingRequest, walletTransactionFilter, currentUser);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpGet("get_buyer_in_transaction")]
+        public async Task<IActionResult> GetBuyerInTransaction([FromQuery] PagingRequest pagingRequest,
+                                                                    [FromQuery] WalletTransactionFilter walletTransactionFilter)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _walletTransactionService.GetBuyerInTransactionAsync(pagingRequest, walletTransactionFilter, currentUser);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpGet("get_buyer_out_transaction")]
+        public async Task<IActionResult> GetBuyerOutTranscation([FromQuery] PagingRequest pagingRequest,
+                                                                    [FromQuery] WalletTransactionFilter walletTransactionFilter)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _walletTransactionService.GetBuyerOutTransactionAsync(pagingRequest, walletTransactionFilter, currentUser);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpGet("get_supplier_out_transaction")]
+        public async Task<IActionResult> GetSupplierOutTransaction([FromQuery] PagingRequest pagingRequest,
+                                                                        [FromQuery] WalletTransactionFilter walletTransactionFilter)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _walletTransactionService.GetSupplierOutTransactionAsync(pagingRequest, walletTransactionFilter, currentUser);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpGet("get_supplier_in_transaction")]
+        public async Task<IActionResult> GetSupplierInTransaction([FromQuery] PagingRequest pagingRequest,
+                                                                        [FromQuery] WalletTransactionFilter walletTransactionFilter)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _walletTransactionService.GetSupplierInTransactionAsync(pagingRequest, walletTransactionFilter, currentUser);
+            return Ok(result);
+        }
     }
 }
