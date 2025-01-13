@@ -318,6 +318,7 @@ namespace Vouchee.Business.Services.Impls
         {
             // Fetch the base query
             var query = _moneyRequestRepository.GetTable().AsTracking()
+                .Where(x => x.UpdateId != null)
                 .Where(x => x.Type == MoneyRequestTypeEnum.WITHDRAW.ToString() || x.Type == MoneyRequestTypeEnum.AUTO_WITHDRAW.ToString());
 
             // Apply dynamic filtering
@@ -463,6 +464,7 @@ namespace Vouchee.Business.Services.Impls
         {
             // Filter and group by updateId
             var filteredQuery = _moneyRequestRepository.GetTable()
+                .Where(x => x.UpdateId != null)
                 .Where(x => x.Type.Equals(MoneyRequestTypeEnum.WITHDRAW.ToString())
                          || x.Type.Equals(MoneyRequestTypeEnum.AUTO_WITHDRAW.ToString()))
                 .ProjectTo<GetWithdrawRequestDTO>(_mapper.ConfigurationProvider)
