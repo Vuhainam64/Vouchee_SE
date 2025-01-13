@@ -25,5 +25,15 @@ namespace Vouchee.Business.Services
         public Task<DynamicResponseModel<GetWalletTransactionDTO>> GetWalletTransactionAsync(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter);
 
         public Task<dynamic> GetWalletTransactionsAsync(ThisUserObj currentUser);
+
+
+        // -- //
+
+        public Task<DynamicResponseModel<GetSellerWalletTransaction>> GetSellerInTransactionAsync(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter, ThisUserObj thisUserObj);
+        public Task<DynamicResponseModel<GetSellerWalletTransaction>> GetSellerOutTransactionAsync(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter, ThisUserObj thisUserObj);
+        public Task<DynamicResponseModel<GetBuyerWalletTransactionDTO>> GetBuyerInTransactionAsync(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter, ThisUserObj thisUserObj);
+        public Task<DynamicResponseModel<GetBuyerWalletTransactionDTO>> GetBuyerOutTransactionAsync(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter, ThisUserObj thisUserObj);
+        public Task<DynamicResponseModel<GetSupplierWalletTransactionDTO>> GetSupplierInTransactionAsync(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter, ThisUserObj thisUserObj);
+        public Task<DynamicResponseModel<GetSupplierWalletTransactionDTO>> GetSupplierOutTransactionAsync(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter, ThisUserObj thisUserObj);
     }
 }

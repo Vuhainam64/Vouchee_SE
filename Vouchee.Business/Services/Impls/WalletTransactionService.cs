@@ -37,6 +37,52 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
+        public async Task<DynamicResponseModel<GetBuyerWalletTransactionDTO>> GetBuyerInTransactionAsync(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter, ThisUserObj thisUserObj)
+        {
+            (int, IQueryable<GetBuyerWalletTransactionDTO>) result;
+
+            result = _walletTransactionRepository.GetTable().Where(x => x.BuyerWallet != null 
+                                                                            && x.BuyerWallet.Id == thisUserObj.userId
+                                                                            && x.WithdrawRequestId == null)
+                        .ProjectTo<GetBuyerWalletTransactionDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetBuyerWalletTransactionDTO>(walletTransactionFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            return new DynamicResponseModel<GetBuyerWalletTransactionDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+            };
+        }
+
+        public async Task<DynamicResponseModel<GetBuyerWalletTransactionDTO>> GetBuyerOutTransactionAsync(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter, ThisUserObj thisUserObj)
+        {
+            (int, IQueryable<GetBuyerWalletTransactionDTO>) result;
+
+            result = _walletTransactionRepository.GetTable().Where(x => x.BuyerWallet != null
+                                                                            && x.BuyerWallet.BuyerId == thisUserObj.userId
+                                                                            && x.WithdrawRequestId != null)
+                        .ProjectTo<GetBuyerWalletTransactionDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetBuyerWalletTransactionDTO>(walletTransactionFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            return new DynamicResponseModel<GetBuyerWalletTransactionDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+            };
+        }
+
         public async Task<DynamicResponseModel<GetBuyerWalletTransactionDTO>> GetBuyerWalletTransactionsAsync(PagingRequest pagingRequest, 
                                                                                                                 BuyerWalletTransactionFilter buyerWalletTransactionFilter, 
                                                                                                                 ThisUserObj currentUser)
@@ -58,6 +104,52 @@ namespace Vouchee.Business.Services.Impls
                              .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
             return new DynamicResponseModel<GetBuyerWalletTransactionDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+            };
+        }
+
+        public async Task<DynamicResponseModel<GetSellerWalletTransaction>> GetSellerInTransactionAsync(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter, ThisUserObj thisUserObj)
+        {
+            (int, IQueryable<GetSellerWalletTransaction>) result;
+
+            result = _walletTransactionRepository.GetTable().Where(x => x.SellerWallet != null 
+                                                                            && x.SellerWallet.SellerId == thisUserObj.userId
+                                                                            && x.WithdrawRequestId == null)
+                        .ProjectTo<GetSellerWalletTransaction>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetSellerWalletTransaction>(walletTransactionFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            return new DynamicResponseModel<GetSellerWalletTransaction>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+            };
+        }
+
+        public async Task<DynamicResponseModel<GetSellerWalletTransaction>> GetSellerOutTransactionAsync(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter, ThisUserObj thisUserObj)
+        {
+            (int, IQueryable<GetSellerWalletTransaction>) result;
+
+            result = _walletTransactionRepository.GetTable().Where(x => x.SellerWallet != null
+                                                                            && x.SellerWallet.SellerId == thisUserObj.userId
+                                                                            && x.WithdrawRequestId != null)
+                        .ProjectTo<GetSellerWalletTransaction>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetSellerWalletTransaction>(walletTransactionFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            return new DynamicResponseModel<GetSellerWalletTransaction>()
             {
                 metaData = new MetaData()
                 {
@@ -95,6 +187,74 @@ namespace Vouchee.Business.Services.Impls
                 .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
             return new DynamicResponseModel<GetSellerWalletTransaction>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+            };
+        }
+
+        public async Task<DynamicResponseModel<GetSupplierWalletTransactionDTO>> GetSupplierInTransactionAsync(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter, ThisUserObj thisUserObj)
+        {
+            var existedUser = await _userRepository.GetByIdAsync(thisUserObj.userId, includeProperties: x => x.Include(x => x.Supplier));
+
+            if (existedUser == null)
+            {
+                throw new NotFoundException("User này không tồn tại");
+            }
+            if (existedUser.Supplier == null)
+            {
+                throw new NotFoundException("User này không thuộc về supplier nào");
+            }
+
+            (int, IQueryable<GetSupplierWalletTransactionDTO>) result;
+
+            result = _walletTransactionRepository.GetTable().Where(x => x.SupplierWallet != null
+                                                                            && x.SupplierWallet.Supplier.Id == existedUser.SupplierId
+                                                                            && x.WithdrawRequestId == null)
+                        .ProjectTo<GetSupplierWalletTransactionDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetSupplierWalletTransactionDTO>(walletTransactionFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            return new DynamicResponseModel<GetSupplierWalletTransactionDTO>()
+            {
+                metaData = new MetaData()
+                {
+                    page = pagingRequest.page,
+                    size = pagingRequest.pageSize,
+                    total = result.Item1 // Total vouchers count for metadata
+                },
+                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+            };
+        }
+
+        public async Task<DynamicResponseModel<GetSupplierWalletTransactionDTO>> GetSupplierOutTransactionAsync(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter, ThisUserObj thisUserObj)
+        {
+            var existedUser = await _userRepository.GetByIdAsync(thisUserObj.userId, includeProperties: x => x.Include(x => x.Supplier));
+
+            if (existedUser == null)
+            {
+                throw new NotFoundException("User này không tồn tại");
+            }
+            if (existedUser.Supplier == null)
+            {
+                throw new NotFoundException("User này không thuộc về supplier nào");
+            }
+
+            (int, IQueryable<GetSupplierWalletTransactionDTO>) result;
+
+            result = _walletTransactionRepository.GetTable().Where(x => x.SupplierWallet != null
+                                                                            && x.SupplierWallet.Supplier.Id == existedUser.SupplierId
+                                                                            && x.WithdrawRequestId != null)
+                        .ProjectTo<GetSupplierWalletTransactionDTO>(_mapper.ConfigurationProvider)
+                        .DynamicFilter(_mapper.Map<GetSupplierWalletTransactionDTO>(walletTransactionFilter))
+                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+
+            return new DynamicResponseModel<GetSupplierWalletTransactionDTO>()
             {
                 metaData = new MetaData()
                 {
