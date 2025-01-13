@@ -283,6 +283,9 @@ namespace Vouchee.API.AppStarts
                 .ForMember(dest => dest.supplierName, opt => opt.MapFrom(src => src.SupplierWallet.Supplier.Name))
                 .ReverseMap();
             CreateMap<GetWalletTransactionDTO, WalletTransactionFilter>().ReverseMap();
+            CreateMap<GetSupplierWalletTransactionDTO, WalletTransactionFilter>().ReverseMap();
+            CreateMap<GetSellerWalletTransaction, WalletTransactionFilter>().ReverseMap();
+            CreateMap<GetBuyerWalletTransactionDTO, WalletTransactionFilter>().ReverseMap();
             CreateMap<GetSellerWalletTransaction, SellerWalletTransactionFilter>().ReverseMap();
             CreateMap<GetBuyerWalletTransactionDTO, BuyerWalletTransactionFilter>().ReverseMap();
             CreateMap<GetSupplierWalletTransactionDTO, SupplierWalletTransactionFilter>().ReverseMap();

@@ -43,7 +43,9 @@ namespace Vouchee.Business.Services.Impls
 
             result = _walletTransactionRepository.GetTable().Where(x => x.BuyerWallet != null 
                                                                             && x.BuyerWallet.Id == thisUserObj.userId
-                                                                            && x.WithdrawRequestId == null)
+                                                                            && x.WithdrawRequestId == null
+                                                                            && (walletTransactionFilter.fromDate == null || x.CreateDate >= walletTransactionFilter.fromDate) 
+                                                                            && (walletTransactionFilter.toDate == null || x.CreateDate <= walletTransactionFilter.toDate))
                         .ProjectTo<GetBuyerWalletTransactionDTO>(_mapper.ConfigurationProvider)
                         .DynamicFilter(_mapper.Map<GetBuyerWalletTransactionDTO>(walletTransactionFilter))
                         .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
@@ -62,14 +64,21 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<DynamicResponseModel<GetBuyerWalletTransactionDTO>> GetBuyerOutTransactionAsync(PagingRequest pagingRequest, WalletTransactionFilter walletTransactionFilter, ThisUserObj thisUserObj)
         {
+            var startDateTime = walletTransactionFilter.fromDate;
+            var endDateTime = walletTransactionFilter.toDate;
+
+            var existedUser = await _userRepository.FindAsync(thisUserObj.userId);
+
             (int, IQueryable<GetBuyerWalletTransactionDTO>) result;
 
-            result = _walletTransactionRepository.GetTable().Where(x => x.BuyerWallet != null
-                                                                            && x.BuyerWallet.BuyerId == thisUserObj.userId
-                                                                            && x.WithdrawRequestId != null)
-                        .ProjectTo<GetBuyerWalletTransactionDTO>(_mapper.ConfigurationProvider)
-                        .DynamicFilter(_mapper.Map<GetBuyerWalletTransactionDTO>(walletTransactionFilter))
-                        .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+            result = _walletTransactionRepository.GetTable()
+                             .Where(x => x.BuyerWalletId == existedUser.BuyerWallet.Id
+                                            && x.WithdrawRequestId != null
+                                            && (startDateTime == null || x.CreateDate >= startDateTime) 
+                                            && (endDateTime == null || x.CreateDate <= endDateTime))
+                             .ProjectTo<GetBuyerWalletTransactionDTO>(_mapper.ConfigurationProvider)
+                             .DynamicFilter(_mapper.Map<GetBuyerWalletTransactionDTO>(walletTransactionFilter))
+                             .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
             return new DynamicResponseModel<GetBuyerWalletTransactionDTO>()
             {
@@ -121,7 +130,9 @@ namespace Vouchee.Business.Services.Impls
 
             result = _walletTransactionRepository.GetTable().Where(x => x.SellerWallet != null 
                                                                             && x.SellerWallet.SellerId == thisUserObj.userId
-                                                                            && x.WithdrawRequestId == null)
+                                                                            && x.WithdrawRequestId == null
+                                                                            && (walletTransactionFilter.fromDate == null || x.CreateDate >= walletTransactionFilter.fromDate)
+                                                                            && (walletTransactionFilter.toDate == null || x.CreateDate <= walletTransactionFilter.toDate))
                         .ProjectTo<GetSellerWalletTransaction>(_mapper.ConfigurationProvider)
                         .DynamicFilter(_mapper.Map<GetSellerWalletTransaction>(walletTransactionFilter))
                         .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
@@ -144,7 +155,9 @@ namespace Vouchee.Business.Services.Impls
 
             result = _walletTransactionRepository.GetTable().Where(x => x.SellerWallet != null
                                                                             && x.SellerWallet.SellerId == thisUserObj.userId
-                                                                            && x.WithdrawRequestId != null)
+                                                                            && x.WithdrawRequestId != null
+                                                                            && (walletTransactionFilter.fromDate == null || x.CreateDate >= walletTransactionFilter.fromDate)
+                                                                            && (walletTransactionFilter.toDate == null || x.CreateDate <= walletTransactionFilter.toDate))
                         .ProjectTo<GetSellerWalletTransaction>(_mapper.ConfigurationProvider)
                         .DynamicFilter(_mapper.Map<GetSellerWalletTransaction>(walletTransactionFilter))
                         .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
@@ -215,7 +228,9 @@ namespace Vouchee.Business.Services.Impls
 
             result = _walletTransactionRepository.GetTable().Where(x => x.SupplierWallet != null
                                                                             && x.SupplierWallet.Supplier.Id == existedUser.SupplierId
-                                                                            && x.WithdrawRequestId == null)
+                                                                            && x.WithdrawRequestId == null
+                                                                            && (walletTransactionFilter.fromDate == null || x.CreateDate >= walletTransactionFilter.fromDate)
+                                                                            && (walletTransactionFilter.toDate == null || x.CreateDate <= walletTransactionFilter.toDate))
                         .ProjectTo<GetSupplierWalletTransactionDTO>(_mapper.ConfigurationProvider)
                         .DynamicFilter(_mapper.Map<GetSupplierWalletTransactionDTO>(walletTransactionFilter))
                         .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
@@ -249,7 +264,9 @@ namespace Vouchee.Business.Services.Impls
 
             result = _walletTransactionRepository.GetTable().Where(x => x.SupplierWallet != null
                                                                             && x.SupplierWallet.Supplier.Id == existedUser.SupplierId
-                                                                            && x.WithdrawRequestId != null)
+                                                                            && x.WithdrawRequestId != null
+                                                                            && (walletTransactionFilter.fromDate == null || x.CreateDate >= walletTransactionFilter.fromDate)
+                                                                            && (walletTransactionFilter.toDate == null || x.CreateDate <= walletTransactionFilter.toDate))
                         .ProjectTo<GetSupplierWalletTransactionDTO>(_mapper.ConfigurationProvider)
                         .DynamicFilter(_mapper.Map<GetSupplierWalletTransactionDTO>(walletTransactionFilter))
                         .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
