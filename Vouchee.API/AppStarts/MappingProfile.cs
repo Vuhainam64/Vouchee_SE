@@ -328,11 +328,17 @@ namespace Vouchee.API.AppStarts
                  .ForMember(dest => dest.sellerId, opt => opt.MapFrom(src => src.Modal.Voucher.SellerId))
                  .ForMember(dest => dest.sellerName, opt => opt.MapFrom(src => src.Modal.Voucher.Seller.Name))
                  .ForMember(dest => dest.sellerImage, opt => opt.MapFrom(src => src.Modal.Voucher.Seller.Image))
+                 .ForMember(dest => dest.buyerId, opt => opt.MapFrom(src => src.Order.Buyer.Id))
+                 .ForMember(dest => dest.buyerName, opt => opt.MapFrom(src => src.Order.Buyer.Name))
+                 .ForMember(dest => dest.buyerImage, opt => opt.MapFrom(src => src.Order.Buyer.Image))
                  .ForMember(dest => dest.modalName, opt => opt.MapFrom(src => src.Modal.Title))
                  .ForMember(dest => dest.modalImage, opt => opt.MapFrom(src => src.Modal.Image))
                 .ForMember(dest => dest.rep, opt => opt.MapFrom(src => src.Reply))
                 .ReverseMap();
-            CreateMap<RatingFilter, GetRatingDTO>().ReverseMap();
+            CreateMap<GetRatingDTO,RatingFilter>()
+                .ForMember(dest => dest.sellerStar, opt => opt.MapFrom(src => src.sellerStar))
+                .ForMember(dest => dest.Status.ToString(), opt => opt.MapFrom(src => src.Status))
+                .ReverseMap();
 
             //DEVICE TOKEN
             CreateMap<DeviceToken, CreateDeviceTokenDTO>().ReverseMap();

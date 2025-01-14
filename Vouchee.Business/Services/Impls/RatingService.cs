@@ -209,6 +209,7 @@ namespace Vouchee.Business.Services.Impls
             existedRating.Reply = reply;
             existedRating.ReplyDate = DateTime.Now;
             existedRating.ReplyBy = thisUserObj.userId;
+            existedRating.Status = RatingStatusEnum.REPLIED.ToString();
 
             await _ratingRepository.UpdateAsync(existedRating);
 
