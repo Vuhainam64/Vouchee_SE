@@ -10,5 +10,6 @@ namespace Vouchee.Data.Models.Constants.Enum.Status
     {
         NONE,
         REPORTED,
+        REPLIED
     }
 }
