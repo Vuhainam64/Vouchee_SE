@@ -334,6 +334,7 @@ namespace Vouchee.API.AppStarts
                 .ReverseMap();
             CreateMap<GetRatingDTO,RatingFilter>()
                 .ForMember(dest => dest.sellerStar, opt => opt.MapFrom(src => src.sellerStar))
+                .ForMember(dest => dest.Status.ToString(), opt => opt.MapFrom(src => src.Status))
                 .ReverseMap();
 
             //DEVICE TOKEN

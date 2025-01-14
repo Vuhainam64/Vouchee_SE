@@ -87,7 +87,7 @@ namespace Vouchee.Data.Models.DTOs
 
         public string? comment { get; set; }
         public string? rep { get; set; }
-
+        public string? Status { get; set; }
         public DateTime? createDate { get; set; }
         public virtual ICollection<GetMediaDTO> medias { get; set; }
         public virtual ICollection<GetReportDTO> reports { get; set; }
