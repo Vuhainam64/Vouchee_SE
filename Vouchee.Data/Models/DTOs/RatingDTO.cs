@@ -71,6 +71,9 @@ namespace Vouchee.Data.Models.DTOs
         public Guid? sellerId { get; set; }
         public string? sellerName { get; set; }
         public string? sellerImage { get; set; }
+        public Guid? buyerId { get; set; }
+        public string? buyerName { get; set; }
+        public string? buyerImage { get; set; }
         public int numberOfReport { get; set; }
 
         public decimal? totalStar =>
