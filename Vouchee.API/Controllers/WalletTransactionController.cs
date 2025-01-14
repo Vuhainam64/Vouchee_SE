@@ -37,6 +37,17 @@ namespace Vouchee.API.Controllers
         //}
 
         [Authorize]
+        [HttpGet("get_seller_in_chart")]
+        public async Task<IActionResult> GetSellerInChart()
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _walletTransactionService.GetSellerInChart(currentUser);
+            return Ok(result);
+        }
+
+
+        [Authorize]
         [HttpGet("get_seller_in_transaction")]
         public async Task<IActionResult> GetSellerInTransaction([FromQuery] PagingRequest pagingRequest,
                                                                     [FromQuery] WalletTransactionFilter walletTransactionFilter)
@@ -59,6 +70,16 @@ namespace Vouchee.API.Controllers
         }
 
         [Authorize]
+        [HttpGet("get_buyer_in_chart")]
+        public async Task<IActionResult> GetBuyerInChart()
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _walletTransactionService.GetBuyerInChart(currentUser);
+            return Ok(result);
+        }
+
+        [Authorize]
         [HttpGet("get_buyer_in_transaction")]
         public async Task<IActionResult> GetBuyerInTransaction([FromQuery] PagingRequest pagingRequest,
                                                                     [FromQuery] WalletTransactionFilter walletTransactionFilter)
@@ -77,6 +98,16 @@ namespace Vouchee.API.Controllers
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
             var result = await _walletTransactionService.GetBuyerOutTransactionAsync(pagingRequest, walletTransactionFilter, currentUser);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpGet("get_supplier_in_chart")]
+        public async Task<IActionResult> GetSupplierInChart()
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
+
+            var result = await _walletTransactionService.GetSupplerInChart(currentUser);
             return Ok(result);
         }
 
