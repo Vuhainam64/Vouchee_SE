@@ -492,7 +492,7 @@ namespace Vouchee.Business.Services.Impls
             };
         }
 
-        public async Task<DynamicResponseModel<GroupedVoucherCodeDTO>> GetSupplierVoucherCodeConvertingAsync(ThisUserObj thisUserObj, PagingRequest pagingRequest)
+        public async Task<DynamicResponseModel<GroupedVoucherCodeDTO>> GetSupplierVoucherCodeConvertingAsync(ThisUserObj thisUserObj, PagingRequest pagingRequest, VoucherCodeConvertFilter voucherCodeConvertFilter)
         {
             var existedUser = await _userRepository.GetByIdAsync(thisUserObj.userId);
 
@@ -506,23 +506,42 @@ namespace Vouchee.Business.Services.Impls
                 throw new NotFoundException("Tài khoản này không phải tài khoản supplier");
             }
 
-            (int, IQueryable<GroupedVoucherCodeDTO>) result;
+            // Base query
+            var query = _voucherCodeRepository.GetTable()
+                .Where(x => x.Modal.Voucher.SupplierId == existedUser.SupplierId)
+                .Where(x => x.UpdateId != null)
+                .Where(x => x.Status == VoucherCodeStatusEnum.CONVERTING.ToString() ||
+                            x.Status == VoucherCodeStatusEnum.UNUSED.ToString() ||
+                            x.Status == VoucherCodeStatusEnum.SUSPECTED.ToString());
 
-            result = _voucherCodeRepository.GetTable()
-                                .Where(x => x.Modal.Voucher.SupplierId == existedUser.SupplierId)
-                                .Where(x => x.UpdateId != null)
-                                .Where(x => x.Status == VoucherCodeStatusEnum.CONVERTING.ToString() || x.Status == VoucherCodeStatusEnum.UNUSED.ToString() || x.Status == VoucherCodeStatusEnum.SUSPECTED.ToString())
-                                .GroupBy(x => x.UpdateId)
-                                .Select(g => new GroupedVoucherCodeDTO
-                                {
-                                    UpdateId = g.Key,
-                                    Count = g.Count(),
-                                    UpdateTime = g.Max(x => x.UpdateDate),
-                                    Status = g.Any(x => x.Status == VoucherCodeStatusEnum.UNUSED.ToString()) ? "Đã xử lý":"Chưa xử lý",
-                                    FirstItem = _mapper.Map<GetVoucherCodeDTO>(g.FirstOrDefault())
-                                })
-                                .PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
+            // Apply filter
+            if (voucherCodeConvertFilter != null)
+            {
+                if (voucherCodeConvertFilter.status.HasValue)
+                {
+                    query = query.Where(x => x.Status == voucherCodeConvertFilter.status.ToString());
+                }
 
+                if (voucherCodeConvertFilter.UpdateId.HasValue)
+                {
+                    query = query.Where(x => x.UpdateId == voucherCodeConvertFilter.UpdateId);
+                }
+            }
+
+            // Group and project
+            var groupedQuery = query
+                .GroupBy(x => x.UpdateId)
+                .Select(g => new GroupedVoucherCodeDTO
+                {
+                    UpdateId = g.Key,
+                    Count = g.Count(),
+                    UpdateTime = g.Max(x => x.UpdateDate),
+                    Status = g.Any(x => x.Status == VoucherCodeStatusEnum.UNUSED.ToString()) ? "Đã xử lý" : "Chưa xử lý",
+                    FirstItem = _mapper.Map<GetVoucherCodeDTO>(g.FirstOrDefault())
+                });
+
+            // Apply paging
+            var result = groupedQuery.PagingIQueryable(pagingRequest.page, pagingRequest.pageSize, PageConstant.LIMIT_PAGING, PageConstant.DEFAULT_PAPING);
 
             return new DynamicResponseModel<GroupedVoucherCodeDTO>()
             {
@@ -532,9 +551,10 @@ namespace Vouchee.Business.Services.Impls
                     size = pagingRequest.pageSize,
                     total = result.Item1 // Total vouchers count for metadata
                 },
-                results = await result.Item2.ToListAsync() // Return the paged voucher list with nearest address and distance
+                results = await result.Item2.ToListAsync() // Return the paged voucher list
             };
         }
+
         public async Task<DynamicResponseModel<GetVoucherCodeDTO>> GetVoucherCodeByUpdateIdAsync(ThisUserObj thisUserObj, Guid updateid, PagingRequest pagingRequest)
         {
             var existedUser = await _userRepository.GetByIdAsync(thisUserObj.userId);

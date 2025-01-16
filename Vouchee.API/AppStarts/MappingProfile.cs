@@ -176,6 +176,8 @@ namespace Vouchee.API.AppStarts
                 .ReverseMap();
             CreateMap<GetVoucherCodeDTO, VoucherCodeFilter>().ReverseMap();
             CreateMap<GetVoucherCodeModalDTO, VoucherCodeFilter>().ReverseMap();
+            CreateMap<GroupedVoucherCodeDTO, GroupedVoucherCodeDTO>();
+            CreateMap<GroupedVoucherCodeDTO, VoucherCodeConvertFilter>().ReverseMap();
 
             // VOUCHER TYPE
             CreateMap<VoucherType, CreateVoucherTypeDTO>().ReverseMap();
