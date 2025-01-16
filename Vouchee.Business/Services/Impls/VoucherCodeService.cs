@@ -416,7 +416,7 @@ namespace Vouchee.Business.Services.Impls
             throw new Exception("loi khong xac dinh");
         }
 
-        public async Task<ResponseMessage<IList<GetVoucherCodechangeStatusDTO>>> UpdateVoucherCodeStatusConvertingAsync(IList<Guid> id, ThisUserObj thisUserObj)
+        public async Task<ResponseMessage<dynamic>> UpdateVoucherCodeStatusConvertingAsync(IList<Guid> id, ThisUserObj thisUserObj)
         {
             var gennerateid = Guid.NewGuid();
             var voucherCodes = _voucherCodeRepository.GetTable();
@@ -445,11 +445,15 @@ namespace Vouchee.Business.Services.Impls
                 }
             }
 
-            return new ResponseMessage<IList<GetVoucherCodechangeStatusDTO>>()
+            return new ResponseMessage<dynamic>()
             {
                 message = "Cập nhật thành công",
                 result = true,
-                value = list
+                value = new
+                {
+                    updateid = gennerateid,
+                    VoucherCodes = list
+                }
             };
         }
 
