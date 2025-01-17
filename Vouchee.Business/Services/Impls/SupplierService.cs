@@ -362,8 +362,9 @@ namespace Vouchee.Business.Services.Impls
 
             var usedorexpireVouchers = await voucherCodes
                 .CountAsync(x => x.Status == VoucherCodeStatusEnum.EXPIRED.ToString()
-                            && x.Status == VoucherCodeStatusEnum.USED.ToString()
-                            && x.Status == VoucherCodeStatusEnum.VIOLENT.ToString());
+                            || x.Status == VoucherCodeStatusEnum.USED.ToString()
+                            || x.Status == VoucherCodeStatusEnum.VIOLENT.ToString()
+                            || x.Status == VoucherCodeStatusEnum.SUSPECTED.ToString());
 
             var convertedVouchers = await voucherCodes
                 .CountAsync(x => x.Status == VoucherCodeStatusEnum.UNUSED.ToString());
@@ -537,6 +538,7 @@ namespace Vouchee.Business.Services.Impls
                 value = new
                 {
                     balance = existedUser.Supplier.SupplierWallet.Balance,
+                    unPaid = result.Item2.Sum(x => x.amount),
                     supplierWalletId = existedUser.Supplier.SupplierWallet.Id,
                     transasctions = new DynamicResponseModel<GetSupplierWalletTransactionDTO>()
                     {

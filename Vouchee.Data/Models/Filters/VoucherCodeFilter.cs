@@ -16,4 +16,10 @@ namespace Vouchee.Data.Models.Filters
 
         public string? Title { get; set; }
     }
+    public class VoucherCodeConvertFilter
+    {
+        public VoucherCodeStatusEnum? status { get; set; }
+
+        public Guid? UpdateId { get; set; }
+    }
 }

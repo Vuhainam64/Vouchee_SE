@@ -66,11 +66,12 @@ namespace Vouchee.API.Controllers
         }
         [Authorize]
         [HttpGet("get_supplier_voucher_code_converting")]
-        public async Task<IActionResult> GetConvertedVoucherCodesConverting([FromQuery] PagingRequest pagingRequest)
+        public async Task<IActionResult> GetConvertedVoucherCodesConverting([FromQuery] PagingRequest pagingRequest,
+                                                                            [FromQuery] VoucherCodeConvertFilter voucherCodeConvertFilter)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _userService);
 
-            var result = await _voucherCodeService.GetSupplierVoucherCodeConvertingAsync(currentUser, pagingRequest);
+            var result = await _voucherCodeService.GetSupplierVoucherCodeConvertingAsync(currentUser, pagingRequest, voucherCodeConvertFilter);
             return Ok(result);
         }
         // GET BY ID
