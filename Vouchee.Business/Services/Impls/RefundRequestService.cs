@@ -326,7 +326,7 @@ namespace Vouchee.Business.Services.Impls
 
                 Data.Models.Entities.Notification notification = new()
                 {
-                    Body = $"Voucher code {id} đã được hoàn tiền về ví mua",
+                    Body = $"Voucher code {existedRefundRequest.VoucherCode.Modal.Title} đã được hoàn tiền về ví mua",
                     CreateDate = DateTime.Now,
                     ReceiverId = existedOrder.Buyer.Id,
                     Seen = false,
