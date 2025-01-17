@@ -16,5 +16,10 @@ namespace Vouchee.Data.Models.Filters
         public DateTime? CreateDate { get; set; }
         public Guid? updateId { get; set; }
         public DateTime? updateDate { get; set; }
+        public string? BankName { get; set; }
+        public string? BankNumber { get; set; }
+        public string? note { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
     }
 }
