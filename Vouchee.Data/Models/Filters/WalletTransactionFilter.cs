@@ -17,5 +17,8 @@ namespace Vouchee.Data.Models.Filters
         public Guid? userId { get; set; }
 
         public Guid updateId { get; set; }
+        public string? BankName { get; set; }
+        public string? BankNumber { get; set; }
+        public string? note { get; set; }
     }
 }
