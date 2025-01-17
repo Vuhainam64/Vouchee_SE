@@ -109,7 +109,9 @@ namespace Vouchee.Business.Services.Impls
                                                                                                                                 .ThenInclude(x => x.BuyerWalletTransactions)
                                                                                                                          .Include(x => x.OrderDetails)
                                                                                                                             .ThenInclude(x => x.Modal)
-                                                                                                                                .ThenInclude(x => x.Voucher),
+                                                                                                                                .ThenInclude(x => x.Voucher)
+                                                                                                                         .Include(x => x.Buyer)
+                                                                                                                            .ThenInclude(x => x.DeviceTokens),
                                                                                                                          isTracking: true);
 
                         if (existedOrder == null)
@@ -144,11 +146,18 @@ namespace Vouchee.Business.Services.Impls
                             existedOrder.Buyer.BuyerWallet.Balance += (int)createPartnerTransaction.transferAmount;
                             existedOrder.Note = $"Đơn hàng hủy do hết hạn giao dịch, đã hoàn {createPartnerTransaction.transferAmount}";
 
-                            await _orderRepository.SaveChanges();
+                            foreach (var orderDetail in existedOrder.OrderDetails)
+                            {
+                                if (orderDetail.ShopPromotion != null)
+                                {
+                                    orderDetail.ShopPromotion.Stock += 1;
+                                    orderDetail.ShopPromotion.UpdateDate = DateTime.Now;
+                                }
+                            }
 
                             await _sendEmailService.SendEmailAsync(existedOrder.Buyer.Email, "Trạng thái đơn hàng", $"Đơn hàng {existedOrder.Id} lỗi do hết thời gian");
 
-                            await _notificationService.CreateNotificationAsync(errorNoti);
+                            await _notificationService.CreateNotificationAsync(errorNoti, existedOrder.Buyer);
 
                             throw new ConflictException($"Order này đã hết hạn lúc {existedOrder.CreateDate.Value.AddMinutes(2)}");
                         }
@@ -171,7 +180,7 @@ namespace Vouchee.Business.Services.Impls
 
                         existedOrder.WalletTransactions.Add( walletTransaction );
 
-                        await _notificationService.CreateNotificationAsync(successNoti);
+                        await _notificationService.CreateNotificationAsync(successNoti, existedOrder.Buyer);
 
                         await _sendEmailService.SendEmailAsync("advouchee@gmail.com", "Tiền về ngân hàng của Nam", $"Ngân hàng của Nam được nhận {existedOrder.FinalPrice * 10 / 100} từ đơn hàng {existedOrder.Id}");
                         

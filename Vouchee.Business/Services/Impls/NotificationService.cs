@@ -36,20 +36,15 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<ResponseMessage<Guid>> CreateNotificationAsync(CreateNotificationDTO createNotificationDTO)
+        public async Task<ResponseMessage<Guid>> CreateNotificationAsync(CreateNotificationDTO createNotificationDTO, User existedUser)
         {
             Data.Models.Entities.Notification notification = _mapper.Map<Data.Models.Entities.Notification>(createNotificationDTO);
             notification.ReceiverId = createNotificationDTO.receiverId;
-            //notification.SenderId = senderId;
-            //notification.CreateBy = senderId;
-
-            var existedUser = await _userRepository.GetByIdAsync(notification.ReceiverId, includeProperties: x => x.Include(x => x.DeviceTokens));
 
             if (existedUser == null)
             {
                 throw new NotFoundException("Không tìm thấy người nhận");
             }
-
 
             if (existedUser.DeviceTokens.Count != 0)
             {
@@ -65,9 +60,29 @@ namespace Vouchee.Business.Services.Impls
                         }
                     };
 
-                    await FirebaseMessaging.DefaultInstance.SendAsync(message);
+                    try
+                    {
+                        // Attempt to send the notification
+                        await FirebaseMessaging.DefaultInstance.SendAsync(message);
+                    }
+                    catch (FirebaseMessagingException ex)
+                    {
+                        if (ex.Message.Contains("NotRegistered") || ex.Message.Contains("InvalidRegistration"))
+                        {
+                            // The token is no longer valid or expired
+                            Console.WriteLine($"Token {deviceToken.Token} is invalid or expired.");
+
+                            // Remove the expired token from the database
+                            await RemoveTokenFromDatabaseAsync(existedUser, deviceToken.Token);
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Error sending message: {ex.Message}");
+                        }
+                    }
                 }
 
+                // After processing all tokens, save the notification
                 var id = await _notificationRepository.AddAsync(notification);
 
                 return new ResponseMessage<Guid>()
@@ -79,6 +94,25 @@ namespace Vouchee.Business.Services.Impls
             }
 
             return null;
+        }
+
+        private async Task RemoveTokenFromDatabaseAsync(Data.Models.Entities.User user, string deviceToken)
+        {
+            // Find the expired or invalid token in the user's DeviceTokens collection
+            var tokenToRemove = user.DeviceTokens.FirstOrDefault(t => t.Token == deviceToken);
+
+            if (tokenToRemove != null)
+            {
+                // Remove the token from the collection
+                user.DeviceTokens.Remove(tokenToRemove);
+                await _userRepository.SaveChanges();
+
+                Console.WriteLine($"Removed expired token: {deviceToken}");
+            }
+            else
+            {
+                Console.WriteLine("Token not found in the database.");
+            }
         }
 
         public Task<bool> DeleteNotificationAsync(Guid id, ThisUserObj thisUserObj)
