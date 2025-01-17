@@ -558,7 +558,8 @@ namespace Vouchee.Business.Services.Impls
                 {
                     throw new NotFoundException("Không tìm thấy request với id này");
                 }
-                updateId.Add((Guid)withdrawRequest.UpdateId);
+                if (withdrawRequest.UpdateId.HasValue) { updateId.Add((Guid)withdrawRequest.UpdateId); }
+                
                 /*withdrawRequest.UpdateId = generateId;*/
 
                 withdrawRequest.Note = item.note;
