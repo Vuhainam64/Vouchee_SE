@@ -480,6 +480,11 @@ namespace Vouchee.Business.Services.Impls
                 throw new ConflictException("Số dư trong ví không đủ");
             }
 
+            if (detailCartDTO.useVPoint > detailCartDTO.vPoint)
+            {
+                throw new ConflictException("VPoint không đủ");
+            }
+
             if (detailCartDTO.useVPoint + detailCartDTO.useBalance > detailCartDTO.totalPrice + detailCartDTO.shopDiscountPrice)
             {
                 throw new ConflictException("Số tiền và số điểm sử dụng vượt quá số tiền trong order");
