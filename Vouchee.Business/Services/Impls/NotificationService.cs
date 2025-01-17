@@ -36,12 +36,10 @@ namespace Vouchee.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<ResponseMessage<Guid>> CreateNotificationAsync(CreateNotificationDTO createNotificationDTO)
+        public async Task<ResponseMessage<Guid>> CreateNotificationAsync(CreateNotificationDTO createNotificationDTO, User existedUser)
         {
             Data.Models.Entities.Notification notification = _mapper.Map<Data.Models.Entities.Notification>(createNotificationDTO);
             notification.ReceiverId = createNotificationDTO.receiverId;
-
-            var existedUser = await _userRepository.GetByIdAsync(notification.ReceiverId, includeProperties: x => x.Include(x => x.DeviceTokens), isTracking: true);
 
             if (existedUser == null)
             {

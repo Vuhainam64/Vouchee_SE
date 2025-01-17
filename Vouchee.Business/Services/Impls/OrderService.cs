@@ -208,7 +208,9 @@ namespace Vouchee.Business.Services.Impls
                                                                                                                             .ThenInclude(x => x.BuyerWalletTransactions)
                                                                                                                         .Include(x => x.OrderDetails)
                                                                                                                         .ThenInclude(x => x.Modal)
-                                                                                                                            .ThenInclude(x => x.Voucher),
+                                                                                                                            .ThenInclude(x => x.Voucher)
+                                                                                                                        .Include(x => x.Buyer)
+                                                                                                                            .ThenInclude(x => x.DeviceTokens),
                                                                                                                         isTracking: true);
 
             if (existedOrder.Status.Equals(OrderStatusEnum.PAID.ToString()))
@@ -394,7 +396,7 @@ namespace Vouchee.Business.Services.Impls
 
             await _sendEmailService.SendEmailAsync(existedOrder.Buyer.Email, "Đơn hang mới", existedOrder.Id);
 
-            await _notificationService.CreateNotificationAsync(createNotificationDTO);
+            await _notificationService.CreateNotificationAsync(createNotificationDTO, existedOrder.Buyer);
 
             return new ResponseMessage<string>
             {
