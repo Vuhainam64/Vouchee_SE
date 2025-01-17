@@ -547,7 +547,7 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<ResponseMessage<Guid>> UpdateWithdrawRequest(List<UpdateWithDrawRequestDTO> updateWithDrawRequestDTOs, ThisUserObj thisUserObj)
         {
-            /*var generateId = Guid.NewGuid();*/
+            var generateId = Guid.NewGuid();
             List<Guid> updateId = new List<Guid>() ;
             foreach (var item in updateWithDrawRequestDTOs)
             {
@@ -558,8 +558,13 @@ namespace Vouchee.Business.Services.Impls
                 {
                     throw new NotFoundException("Không tìm thấy request với id này");
                 }
-                if (withdrawRequest.UpdateId.HasValue) { updateId.Add((Guid)withdrawRequest.UpdateId); }
-                
+                if (withdrawRequest.UpdateId.HasValue) { 
+                    updateId.Add((Guid)withdrawRequest.UpdateId); 
+                }
+                else {
+                    updateId.Add(generateId);
+                    withdrawRequest.UpdateId = generateId;
+                }
                 /*withdrawRequest.UpdateId = generateId;*/
 
                 withdrawRequest.Note = item.note;
