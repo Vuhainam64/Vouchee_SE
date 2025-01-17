@@ -31,7 +31,10 @@ namespace Vouchee.Data.Models.DTOs
         public int? useVPoint { get; set;} = 0;
         public int? useBalance { get; set; } = 0;
         public int? finalPrice => totalPrice - shopDiscountPrice - useVPoint - useBalance;
-        public int? vPointUp => (int?)Math.Ceiling((decimal)(totalPrice - shopDiscountPrice - useVPoint) / 1000);
+        public int? vPointUp =>
+            ((totalPrice - shopDiscountPrice - useVPoint) % 1000 < 500)
+                ? (totalPrice - shopDiscountPrice - useVPoint) / 1000
+                : (totalPrice - shopDiscountPrice - useVPoint) / 1000 + 1;
         public string? giftEmail { get; set; }
     }
 
