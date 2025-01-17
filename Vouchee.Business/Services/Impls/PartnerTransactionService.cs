@@ -144,7 +144,14 @@ namespace Vouchee.Business.Services.Impls
                             existedOrder.Buyer.BuyerWallet.Balance += (int)createPartnerTransaction.transferAmount;
                             existedOrder.Note = $"Đơn hàng hủy do hết hạn giao dịch, đã hoàn {createPartnerTransaction.transferAmount}";
 
-                            await _orderRepository.SaveChanges();
+                            foreach (var orderDetail in existedOrder.OrderDetails)
+                            {
+                                if (orderDetail.ShopPromotion != null)
+                                {
+                                    orderDetail.ShopPromotion.Stock += 1;
+                                    orderDetail.ShopPromotion.UpdateDate = DateTime.Now;
+                                }
+                            }
 
                             await _sendEmailService.SendEmailAsync(existedOrder.Buyer.Email, "Trạng thái đơn hàng", $"Đơn hàng {existedOrder.Id} lỗi do hết thời gian");
 

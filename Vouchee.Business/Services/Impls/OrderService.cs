@@ -167,6 +167,7 @@ namespace Vouchee.Business.Services.Impls
                                 existedModal.Carts.Remove(existedModal.Carts.FirstOrDefault(c => c.ModalId == cartModal.id));
 
                                 existedPromotion.Stock -= 1;
+                                existedPromotion.UpdateDate = DateTime.Now;
 
                                 await _promotionRepository.SaveChanges();
                             }
