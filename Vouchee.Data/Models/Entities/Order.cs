@@ -52,10 +52,8 @@ namespace Vouchee.Data.Models.Entities
         public int UsedBalance { get; set; }
         public int FinalPrice => OrderDetails.Sum(x => x.FinalPrice) - UsedVPoint - UsedBalance;
         public string? GiftEmail { get; set; }
-        public int VPointUp =>
-            ((TotalPrice - DiscountPrice - UsedVPoint) % 1000 < 500)
-                ? (TotalPrice - DiscountPrice - UsedVPoint) / 1000
-                : (TotalPrice - DiscountPrice - UsedVPoint) / 1000 + 1;
+        /*public int VPointUp => (int)Math.Ceiling((decimal)(TotalPrice - DiscountPrice - UsedVPoint ) / 1000);*/
+        public int VPointUp => (int)Math.Round((decimal)(TotalPrice - DiscountPrice - UsedVPoint) / 1000, MidpointRounding.ToZero);
         public string? Note { get; set; }
 
         public required string Status { get; set; }
