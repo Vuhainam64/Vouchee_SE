@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Vouchee.Business.Models;
 using Vouchee.Data.Models.Constants.Enum.Status;
 using Vouchee.Data.Models.DTOs;
+using Vouchee.Data.Models.Entities;
 using Vouchee.Data.Models.Filters;
 
 namespace Vouchee.Business.Services
@@ -13,7 +14,7 @@ namespace Vouchee.Business.Services
     public interface INotificationService
     {
         // CREATE
-        public Task<ResponseMessage<Guid>> CreateNotificationAsync(CreateNotificationDTO createNotificationDTO);
+        public Task<ResponseMessage<Guid>> CreateNotificationAsync(CreateNotificationDTO createNotificationDTO, User trackingUser);
 
         // READ
         public Task<DynamicResponseModel<GetNotificationDTO>> GetNotificationsAsync(PagingRequest pagingRequest,
