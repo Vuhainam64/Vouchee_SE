@@ -321,6 +321,12 @@ namespace Vouchee.Business.Services.Impls
                 //.Where(x => x.UpdateId != null)
                 .Where(x => x.Type == MoneyRequestTypeEnum.WITHDRAW.ToString() || x.Type == MoneyRequestTypeEnum.AUTO_WITHDRAW.ToString());
 
+            if (withdrawRequestFilter.StartDate.HasValue && withdrawRequestFilter.EndDate.HasValue)
+            {
+                query = query.Where(x => x.CreateDate >= withdrawRequestFilter.StartDate.Value &&
+                                         x.CreateDate <= withdrawRequestFilter.EndDate.Value);
+            }
+
             // Apply dynamic filtering
             var filteredQuery = query
                 .ProjectTo<GetWithdrawRequestDTO>(_mapper.ConfigurationProvider)
@@ -525,7 +531,8 @@ namespace Vouchee.Business.Services.Impls
 
         public async Task<ResponseMessage<Guid>> UpdateWithdrawRequest(List<UpdateWithDrawRequestDTO> updateWithDrawRequestDTOs, ThisUserObj thisUserObj)
         {
-            var generateId = Guid.NewGuid();
+            /*var generateId = Guid.NewGuid();*/
+            List<Guid> updateId = new List<Guid>() ;
             foreach (var item in updateWithDrawRequestDTOs)
             {
                 var withdrawRequest = await _moneyRequestRepository.GetByIdAsync(item.id, isTracking: true);
@@ -535,8 +542,8 @@ namespace Vouchee.Business.Services.Impls
                 {
                     throw new NotFoundException("Không tìm thấy request với id này");
                 }
-
-                withdrawRequest.UpdateId = generateId;
+                updateId.Add((Guid)withdrawRequest.UpdateId);
+                /*withdrawRequest.UpdateId = generateId;*/
 
                 withdrawRequest.Note = item.note;
                 withdrawRequest.Status = item.statusEnum.ToString();
@@ -549,7 +556,7 @@ namespace Vouchee.Business.Services.Impls
             {
                 message = "Cập nhật thành công",
                 result = true,
-                value = generateId
+                value = updateId.FirstOrDefault(),
             };
         }
 
