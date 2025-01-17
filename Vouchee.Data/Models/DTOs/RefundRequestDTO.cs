@@ -57,7 +57,8 @@ namespace Vouchee.Data.Models.DTOs
         public virtual ICollection<GetMediaDTO> medias { get; set; }
         public virtual GetWalletTransactionDTO? walletTransaction { get; set; }
         public virtual GetVoucherCodeDTO? voucherCode { get; set; }
-
+        public decimal Lon { get; set; }
+        public decimal Lat { get; set; }
         public string? reason { get; set; }
         public string? supplierName { get; set; }
         public string? status { get; set; }
