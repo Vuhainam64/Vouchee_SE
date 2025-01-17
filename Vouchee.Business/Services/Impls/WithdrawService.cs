@@ -318,7 +318,7 @@ namespace Vouchee.Business.Services.Impls
         {
             // Fetch the base query
             var query = _moneyRequestRepository.GetTable().AsTracking()
-                .Where(x => x.UpdateId != null)
+                //.Where(x => x.UpdateId != null)
                 .Where(x => x.Type == MoneyRequestTypeEnum.WITHDRAW.ToString() || x.Type == MoneyRequestTypeEnum.AUTO_WITHDRAW.ToString());
 
             // Apply dynamic filtering
