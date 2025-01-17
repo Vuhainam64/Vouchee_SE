@@ -93,6 +93,7 @@ namespace Vouchee.Data.Models.DTOs
         public GetOrderedModalDTO()
         {
             voucherCodes = [];
+            ratings = [];
         }
 
         public Guid? id { get; set; }
@@ -104,8 +105,9 @@ namespace Vouchee.Data.Models.DTOs
 
         public Guid? SellerId { get; set; }
         public string? SellerImage { get; set; }
-
+        public string? isRating { get; set; }
         public virtual ICollection<GetVoucherCodeModalDTO> voucherCodes { get; set; }
+        public virtual ICollection<GetRatingDTO>? ratings { get; set; }
     }
 
     //public class GetPendingModalDTO : ModalDTO
