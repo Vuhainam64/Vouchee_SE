@@ -259,7 +259,7 @@ namespace Vouchee.Business.Services.Impls
 
             var promotions = _shopPromotionRepository.GetTable()
                                                             .Where(x => x.SellerId == shopId)
-                                                            .Where(x => x.StartDate >= dateOnly && x.EndDate <= dateOnly)
+                                                            .Where(x => x.StartDate >= dateOnly || x.EndDate <= dateOnly)
                                                             .Where(x => x.IsActive == true)
                                                             .Where(x => x.Stock > 0);
             return _mapper.Map<IList<GetShopPromotionDTO>>(promotions);

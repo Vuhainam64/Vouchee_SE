@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using Firebase.Auth;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -221,6 +222,15 @@ namespace Vouchee.Business.Services.Impls
             var list = groupedData.Select(data =>
             {
                 var dto = _mapper.Map<GetOrderedModalDTO>(data.Modal);
+                if(!dto.ratings.IsNullOrEmpty())
+                {
+                    dto.isRating = "Đã Rating";
+                }
+                else
+                {
+                    dto.isRating = "Chưa Rating";
+                }
+                
                 dto.voucherCodeCount = data.VoucherCodeCount;
                 dto.voucherCodes = data.VoucherCodes
                                         .Select(vc => _mapper.Map<GetVoucherCodeModalDTO>(vc))
