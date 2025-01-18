@@ -125,7 +125,7 @@ namespace Vouchee.Business.Services.Impls
             }
             else if (walletTypeEnum == WalletTypeEnum.SELLER)
             {
-                if (createWithdrawRequestDTO.amount > existedUser.BuyerWallet.Balance)
+                if (createWithdrawRequestDTO.amount > existedUser.SellerWallet.Balance)
                 {
                     throw new ConflictException($"Số tiền trong ví hiện tại không đủ, số dư hiện tại {existedUser.SellerWallet.Balance}");
                 }
@@ -143,7 +143,7 @@ namespace Vouchee.Business.Services.Impls
             }
             else if (walletTypeEnum == WalletTypeEnum.SUPPLIER)
             {
-                if (createWithdrawRequestDTO.amount > existedUser.BuyerWallet.Balance)
+                if (createWithdrawRequestDTO.amount > existedUser.Supplier.SupplierWallet.Balance)
                 {
                     throw new ConflictException($"Số tiền trong ví hiện tại không đủ, số dư hiện tại {existedUser.Supplier.SupplierWallet.Balance}");
                 }
