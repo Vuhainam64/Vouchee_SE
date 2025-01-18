@@ -553,7 +553,7 @@ namespace Vouchee.Business.Services.Impls
                     UpdateId = g.Key,
                     Count = g.Count(),
                     UpdateTime = g.Max(x => x.UpdateDate),
-                    Status = g.Any(x => x.Status == VoucherCodeStatusEnum.UNUSED.ToString()) ? "Đã xử lý" : "Chưa xử lý",
+                    Status = g.Any(x => x.Status == VoucherCodeStatusEnum.UNUSED.ToString() || x.Status == VoucherCodeStatusEnum.USED.ToString()) ? "Đã xử lý" : "Chưa xử lý",
                     FirstItem = _mapper.Map<GetVoucherCodeDTO>(g.FirstOrDefault())
                 });
 
