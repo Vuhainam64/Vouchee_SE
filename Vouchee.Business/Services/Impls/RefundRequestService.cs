@@ -303,6 +303,7 @@ namespace Vouchee.Business.Services.Impls
 
             if (refundRequestStatusEnum == RefundRequestStatusEnum.ACCEPTED)
             {
+                existedRefundRequest.VoucherCode.Modal.Voucher.Supplier.SupplierWallet.Balance -= existedRefundRequest.VoucherCode.Modal.SellPrice;
                 existedRefundRequest.Reason = $"Refund request này đã được chấp thuận và đã hoàn {existedRefundRequest.VoucherCode.Modal.SellPrice} về ví mua";
                 existedRefundRequest.Status = RefundRequestStatusEnum.ACCEPTED.ToString();
                 existedRefundRequest.UpdateBy = thisUserObj.userId;
