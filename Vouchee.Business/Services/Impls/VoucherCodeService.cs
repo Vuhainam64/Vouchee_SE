@@ -335,6 +335,22 @@ namespace Vouchee.Business.Services.Impls
         {
             var voucherCodes = _voucherCodeRepository.GetTable();
             IList<GetVoucherCodeDTO> list = new List<GetVoucherCodeDTO>();
+            if (updateCodeVoucherCodeDTO.Any(dto => dto.newcode == null))
+            {
+                throw new Exception("Thiếu trường NewCode ");
+            }
+            if (updateCodeVoucherCodeDTO.Any(dto => dto.Comment == null))
+            {
+                throw new Exception("Thiếu trường Comment ");
+            }
+            if(updateCodeVoucherCodeDTO.Any(dto => dto.UpdateStatus == null))
+            {
+                throw new Exception("Thiếu trường UpdateStatus ");
+            }
+            if (updateCodeVoucherCodeDTO.Any(dto => dto.newcode == null || dto.Comment == null || dto.UpdateStatus == null))
+            {
+                throw new Exception("Thiếu trường NewCode, UpdateStatus, UpdateStatus  ");
+            }
             foreach (var code in updateCodeVoucherCodeDTO)
             {
                 var updatecode = voucherCodes.Where(c => c.Id == code.id)
@@ -512,7 +528,8 @@ namespace Vouchee.Business.Services.Impls
                 .Where(x => x.UpdateId != null)
                 .Where(x => x.Status == VoucherCodeStatusEnum.CONVERTING.ToString() ||
                             x.Status == VoucherCodeStatusEnum.UNUSED.ToString() ||
-                            x.Status == VoucherCodeStatusEnum.SUSPECTED.ToString());
+                            x.Status == VoucherCodeStatusEnum.SUSPECTED.ToString()||
+                            x.Status == VoucherCodeStatusEnum.USED.ToString());
 
             // Apply filter
             if (voucherCodeConvertFilter != null)
