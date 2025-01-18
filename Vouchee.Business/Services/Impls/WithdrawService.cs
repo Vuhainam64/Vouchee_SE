@@ -571,7 +571,7 @@ namespace Vouchee.Business.Services.Impls
                 withdrawRequest.Status = item.statusEnum.ToString();
                 withdrawRequest.UpdateDate = DateTime.Now;
                 withdrawRequest.UpdateBy = thisUserObj.userId;
-
+                withdrawRequest.WithdrawWalletTransaction.Status = WalletTransactionStatusEnum.PAID.ToString();
                 await _moneyRequestRepository.SaveChanges();
             }
             return new ResponseMessage<Guid>()
