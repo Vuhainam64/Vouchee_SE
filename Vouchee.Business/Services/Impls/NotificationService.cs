@@ -81,17 +81,17 @@ namespace Vouchee.Business.Services.Impls
                         }
                     }
                 }
-
-                // After processing all tokens, save the notification
-                var id = await _notificationRepository.AddAsync(notification);
-
-                return new ResponseMessage<Guid>()
-                {
-                    message = "Tạo noti thành công",
-                    result = true,
-                    value = (Guid)id
-                };
             }
+
+            // After processing all tokens, save the notification
+            var id = await _notificationRepository.AddAsync(notification);
+
+            return new ResponseMessage<Guid>()
+            {
+                message = "Tạo noti thành công",
+                result = true,
+                value = (Guid)id
+            };
 
             return null;
         }
